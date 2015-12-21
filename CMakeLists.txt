@@ -11,11 +11,14 @@ include(ZeSetup)
 # LIBRARIES #
 #############
 set(HEADERS
+  include/ze/common/macros.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
   include/ze/common/string_utils.h
+  include/ze/common/time.h
   include/ze/common/timer.h
   include/ze/common/transformation.h
+  include/ze/common/types.h
   include/ze/common/test/entrypoint.h
   )
 

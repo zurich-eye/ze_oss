@@ -7,7 +7,6 @@
 namespace ze {
 namespace common {
 
-
 inline bool fileExists(const std::string& filename)
 {
   struct stat buf;
@@ -22,7 +21,6 @@ inline bool isDir(const std::string& filename)
   }
   return false;
 }
-
 
 } // namespace common
 } // namespace ze
