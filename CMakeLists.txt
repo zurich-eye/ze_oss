@@ -20,6 +20,7 @@ set(HEADERS
   include/ze/common/transformation.h
   include/ze/common/types.h
   include/ze/common/test/entrypoint.h
+  include/ze/common/test/utils.h
   )
 
 set(SOURCES
