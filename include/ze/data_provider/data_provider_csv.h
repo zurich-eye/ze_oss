@@ -7,6 +7,12 @@
 
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
+#include <ze/data_provider/data_provider_base.h>
+
+// fwd
+namespace cv {
+class Mat;
+}
 
 namespace ze {
 namespace dataset {
@@ -63,12 +69,7 @@ struct CameraMeasurement : public MeasurementBase
   {}
   virtual ~CameraMeasurement() = default;
 
-  cv::Mat getImage() const
-  {
-    cv::Mat image = cv::imread(image_path_filename, CV_LOAD_IMAGE_GRAYSCALE);
-    CHECK_NOTNULL(image.data);
-    return image;
-  }
+  void getImage(cv::Mat* image) const;
 
   const size_t camera_index;
   const std::string image_path_filename;
@@ -99,30 +100,24 @@ struct FeatureTrackMeasurement : public MeasurementBase
 
 } // namespace dataset
 
-class CsvDatasetReader
+class DataProviderCsv : public DataProviderBase
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ZE_POINTER_TYPEDEFS(CsvDatasetReader);
 
   using StampMeasurementPair = std::pair<int64_t, std::shared_ptr<dataset::MeasurementBase>> ;
   using DataBuffer = std::multimap<int64_t, std::shared_ptr<dataset::MeasurementBase>> ;
 
-
-
-  CsvDatasetReader(
+  DataProviderCsv(
       const std::string& csv_directory,
       const std::vector<size_t> imu_indices,
       const std::vector<size_t> camera_indices,
       const std::vector<size_t> track_indices);
 
-  virtual ~CsvDatasetReader() = default;
+  virtual ~DataProviderCsv() = default;
 
-  // Make class iterable:
-  typedef DataBuffer::value_type value_type;
-  typedef DataBuffer::const_iterator const_iterator;
-  DataBuffer::const_iterator begin() const { return buffer_.begin(); }
-  DataBuffer::const_iterator end() const { return buffer_.end(); }
+  // Read next data field and process callback. Waits until callback is processed.
+  virtual void spinOnceBlocking();
 
 private:
 

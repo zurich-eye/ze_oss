@@ -3,10 +3,23 @@
 #include <fstream>
 #include <iostream>
 #include <glog/logging.h>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <ze/common/time.h>
+#include <ze/common/string_utils.h>
 
 namespace ze {
+
+namespace dataset {
+
+void CameraMeasurement::getImage(cv::Mat* img) const
+{
+  CHECK_NOTNULL(img);
+  *img = cv::imread(image_path_filename, CV_LOAD_IMAGE_GRAYSCALE);
+  CHECK_NOTNULL(img->data);
+}
+
+} // namespace dataset
 
 namespace utils {
 
@@ -27,28 +40,14 @@ void checkHeaderAndOpenStream(
   CHECK_EQ(line, header) << "Invalid header.";
 }
 
-void readLine(
-    const std::string& line,
-    const size_t num_elements,
-    std::vector<std::string>* elements)
-{
-  elements->resize(num_elements);
-  std::stringstream line_stream(line);
-  for (size_t i = 0u; i < num_elements; ++i)
-  {
-    CHECK(!line_stream.eof());
-    std::getline(line_stream, elements->at(i), ',');
-    CHECK(!elements->at(i).empty());
-  }
-}
-
 } // namespace utils
 
-CsvDatasetReader::CsvDatasetReader(
+DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
     const std::vector<size_t> imu_indices,
     const std::vector<size_t> camera_indices,
     const std::vector<size_t> track_indices)
+  : DataProviderBase()
 {
   VLOG(1) << "Loading csv dataset from directory \"" << csv_directory << "\".";
 
@@ -73,7 +72,64 @@ CsvDatasetReader::CsvDatasetReader(
   VLOG(1) << "done.";
 }
 
-void CsvDatasetReader::loadImuData(const std::string data_dir, const int64_t playback_delay)
+void DataProviderCsv::spinOnceBlocking()
+{
+  for(const DataProviderCsv::StampMeasurementPair& item : buffer_)
+  {
+    const dataset::MeasurementBase::Ptr& data = item.second;
+    switch (data->type)
+    {
+      case dataset::MeasurementType::kCamera:
+      {
+        if(camera_callback_)
+        {
+          dataset::CameraMeasurement::ConstPtr cam_data =
+              std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
+
+          cv::Mat img;
+          cam_data->getImage(&img);
+
+          camera_callback_(cam_data->stamp_ns, img, cam_data->camera_index);
+        }
+        else
+        {
+          static bool warn_once = false;
+          if(!warn_once)
+          {
+            LOG(WARNING) << "No camera callback registered but measurements available.";
+            warn_once = true;
+          }
+        }
+        break;
+      }
+      case dataset::MeasurementType::kImu:
+      {
+        if(imu_callback_)
+        {
+          dataset::ImuMeasurement::ConstPtr imu_data =
+                std::dynamic_pointer_cast<const dataset::ImuMeasurement>(data);
+          imu_callback_(imu_data->stamp_ns, imu_data->acc, imu_data->gyr);
+        }
+        else
+        {
+          static bool warn_once = false;
+          if(!warn_once)
+          {
+            LOG(WARNING) << "No IMU callback registered but measurements available";
+            warn_once = true;
+          }
+        }
+        break;
+      }
+      default:
+        LOG(FATAL) << "Unhandled message type: " << static_cast<int>(data->type);
+        break;
+    }
+  }
+}
+
+
+void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)
 {
   const std::string kHeader = "#timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]";
   std::ifstream fs;
@@ -82,8 +138,8 @@ void CsvDatasetReader::loadImuData(const std::string data_dir, const int64_t pla
   size_t i = 0;
   while(std::getline(fs, line))
   {
-    std::vector<std::string> items(7u);
-    utils::readLine(line, 7u, &items);
+    std::vector<std::string> items = ze::common::splitString(line, ',');
+    CHECK_EQ(items.size(), 7u);
     Eigen::Vector3d acc, gyr;
     acc << std::stod(items[4]), std::stod(items[5]), std::stod(items[6]);
     gyr << std::stod(items[1]), std::stod(items[2]), std::stod(items[3]);
@@ -97,10 +153,9 @@ void CsvDatasetReader::loadImuData(const std::string data_dir, const int64_t pla
   }
   VLOG(2) << "Loaded " << i << " IMU measurements.";
   fs.close();
-  CHECK(!fs.is_open());
 }
 
-void CsvDatasetReader::loadCameraData(
+void DataProviderCsv::loadCameraData(
     const std::string& data_dir,
     const size_t camera_index,
     int64_t playback_delay)
@@ -112,11 +167,11 @@ void CsvDatasetReader::loadCameraData(
   size_t i = 0;
   while(std::getline(fs, line))
   {
-    std::vector<std::string> elements(2u);
-    utils::readLine(line, 2u, &elements);
+      std::vector<std::string> items = ze::common::splitString(line, ',');
+      CHECK_EQ(items.size(), 2u);
     dataset::CameraMeasurement::Ptr camera_measurement(
         new dataset::CameraMeasurement(
-            std::stoll(elements[0]), camera_index, data_dir + "/data/" + elements[1]));
+            std::stoll(items[0]), camera_index, data_dir + "/data/" + items[1]));
 
     buffer_.insert(std::make_pair(
                      camera_measurement->stamp_ns + playback_delay,
@@ -125,10 +180,9 @@ void CsvDatasetReader::loadCameraData(
   }
   VLOG(2) << "Loaded " << i << " camera measurements.";
   fs.close();
-  CHECK(!fs.is_open());
 }
 
-void CsvDatasetReader::loadFeatureTracksData(
+void DataProviderCsv::loadFeatureTracksData(
     const std::string& /*data_dir*/,
     const size_t /*camera_index*/,
     int64_t /*playback_delay*/)

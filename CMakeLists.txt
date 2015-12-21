@@ -16,6 +16,7 @@ set(HEADERS
   )
 
 set(SOURCES
+  src/data_provider_base.cpp
   src/data_provider_csv.cpp
   )
 
