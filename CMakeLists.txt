@@ -11,7 +11,7 @@ include(ZeSetup)
 # LIBRARIES #
 #############
 set(HEADERS
-	include/ze/common/path_utils.h
+  include/ze/common/path_utils.h
   include/ze/common/sample.h
   include/ze/common/string_utils.h
   include/ze/common/timer.h
