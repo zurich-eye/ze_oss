@@ -1,26 +1,21 @@
 #pragma once
 
-#include <sys/stat.h>
+#include <functional>
+#include <ze/common/types.h>
 
-#include <string>
+// fwd
+namespace cv {
+class Mat;
+}
 
 namespace ze {
-namespace common {
+namespace data_provider {
 
-inline bool fileExists(const std::string& filename)
-{
-  struct stat buf;
-  return stat(filename.c_str(), &buf) != -1;
-}
+using IMUCallback =
+  std::function<void (int64_t& /*stamp*/, const Eigen::Vector3d& /*acc*/, const Eigen::Vector3d& /*gyr*/)>;
 
-inline bool isDir(const std::string& filename)
-{
-  struct stat buf;
-  if(0 == stat(filename.c_str(), &buf)) {
-    return S_ISDIR(buf.st_mode);
-  }
-  return false;
-}
+using CameraCallback =
+  std::function<void (int64_t& /*stamp*/, const cv::Mat& /*img*/, size_t& /*camera-idx*/)>;
 
-} // namespace common
+} // namespace data_provider
 } // namespace ze
