@@ -25,7 +25,7 @@ inline std::string& trimString(std::string& s)
   return leftTrimString(rightTrimString(s));
 }
 
-inline std::vector<std::string> splitString(const std::string &s, char delim)
+inline std::vector<std::string> splitString(const std::string& s, char delim)
 {
   std::stringstream ss(s);
   std::string item;

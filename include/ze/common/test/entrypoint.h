@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <eigen-checks/gtest.h>
 
 // Let the Eclipse parser see the macro.
 #ifndef TEST
@@ -25,13 +26,14 @@
 #define TYPED_TEST(a, b) int Test_##a##_##b()
 #endif
 
-#define ZE_UNITTEST_ENTRYPOINT \
-  int main(int argc, char** argv) { \
+#define ZE_UNITTEST_ENTRYPOINT\
+  int main(int argc, char** argv) {\
   ::testing::InitGoogleTest(&argc, argv);\
   google::InitGoogleLogging(argv[0]);\
+  google::ParseCommandLineFlags(&argc, &argv, false);\
   google::InstallFailureSignalHandler();\
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";\
-  FLAGS_alsologtostderr = true;\
-  FLAGS_colorlogtostderr = true;\
+  FLAGS_alsologtostderr = true; \
+  FLAGS_colorlogtostderr = true; \
   return RUN_ALL_TESTS();\
 }
