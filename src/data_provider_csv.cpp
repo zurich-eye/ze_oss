@@ -128,7 +128,6 @@ void DataProviderCsv::spinOnceBlocking()
   }
 }
 
-
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)
 {
   const std::string kHeader = "#timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]";
