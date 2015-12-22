@@ -8,12 +8,14 @@
 namespace ze {
 namespace common {
 
-std::string getTestDataDir()
+std::string getTestDataDir(const std::string& dataset_name)
 {
   const char* datapath_dir = std::getenv("ZE_TEST_DATA_PATH");
-  CHECK_NOTNULL(datapath_dir) << "Environment variable ZE_TEST_DATA_PATH not set.";
+  CHECK_NOTNULL(datapath_dir);
   std::string path(datapath_dir);
-  CHECK(common::isDir(path)) << "ZE_TEST_DATA_PATH is not a directory.";
+  CHECK(common::isDir(path));
+  path = path + "/data/" + dataset_name;
+  CHECK(common::isDir(path));
   return path;
 }
 
