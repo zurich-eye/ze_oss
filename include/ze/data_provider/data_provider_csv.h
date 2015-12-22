@@ -117,7 +117,15 @@ public:
   virtual ~DataProviderCsv() = default;
 
   // Read next data field and process callback. Waits until callback is processed.
-  virtual void spinOnceBlocking();
+  // Returns false when datatset finished.
+  virtual bool spinOnceBlocking() override;
+
+  virtual bool finished() const override;
+
+  inline size_t size() const
+  {
+    return buffer_.size();
+  }
 
 private:
 
@@ -137,6 +145,10 @@ private:
 
   // Buffer to chronologically sort the data.
   DataBuffer buffer_;
+
+  // Points to the next published buffer value. Make sure buffer does not change
+  // once initialized!
+  DataBuffer::const_iterator buffer_it_;
 };
 
 } // namespace ze

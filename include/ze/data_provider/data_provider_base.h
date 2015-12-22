@@ -31,7 +31,11 @@ public:
   virtual ~DataProviderBase() = default;
 
   // Read next data field and process callback. Waits until callback is processed.
-  virtual void spinOnceBlocking() = 0;
+  // Returns false when datatset finished.
+  virtual bool spinOnceBlocking() = 0;
+
+  // True if there is no more data to process.
+  virtual bool finished() const = 0;
 
   inline void registerImuCallback(const data_provider::ImuCallback& imu_callback)
   {

@@ -49,7 +49,7 @@ DataProviderCsv::DataProviderCsv(
     const std::vector<size_t> track_indices)
   : DataProviderBase()
 {
-  VLOG(1) << "Loading csv dataset from directory \"" << csv_directory << "\".";
+  VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
   CHECK_LE(imu_indices.size(), 1u) << "Using multiple IMUs not implemented";
   for(size_t i : imu_indices)
@@ -69,14 +69,15 @@ DataProviderCsv::DataProviderCsv(
     loadFeatureTracksData(dir, i, ze::time::millisecToNanosec(80));
   }
 
+  buffer_it_ = buffer_.cbegin();
   VLOG(1) << "done.";
 }
 
-void DataProviderCsv::spinOnceBlocking()
+bool DataProviderCsv::spinOnceBlocking()
 {
-  for(const DataProviderCsv::StampMeasurementPair& item : buffer_)
+  if(buffer_it_ != buffer_.cend())
   {
-    const dataset::MeasurementBase::Ptr& data = item.second;
+    const dataset::MeasurementBase::Ptr& data = buffer_it_->second;
     switch (data->type)
     {
       case dataset::MeasurementType::kCamera:
@@ -125,7 +126,15 @@ void DataProviderCsv::spinOnceBlocking()
         LOG(FATAL) << "Unhandled message type: " << static_cast<int>(data->type);
         break;
     }
+    ++buffer_it_;
+    return true;
   }
+  return false;
+}
+
+bool DataProviderCsv::finished() const
+{
+  return buffer_it_ == buffer_.cend();
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)

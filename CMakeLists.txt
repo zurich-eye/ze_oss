@@ -23,6 +23,12 @@ set(SOURCES
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 ##########
+# GTESTS #
+##########
+catkin_add_gtest(test_data_provider_csv test/test_data_provider_csv.cpp)
+target_link_libraries(test_data_provider_csv ${PROJECT_NAME})
+
+##########
 # EXPORT #
 ##########
 cs_install()
