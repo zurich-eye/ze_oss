@@ -110,9 +110,8 @@ public:
 
   DataProviderCsv(
       const std::string& csv_directory,
-      const std::vector<size_t> imu_indices,
-      const std::vector<size_t> camera_indices,
-      const std::vector<size_t> track_indices);
+      const std::string& imu_topic,
+      const std::map<std::string, size_t>& camera_topics);
 
   virtual ~DataProviderCsv() = default;
 
@@ -134,11 +133,6 @@ private:
       const int64_t playback_delay);
 
   void loadCameraData(
-      const std::string& data_dir,
-      const size_t camera_index,
-      int64_t playback_delay);
-
-  void loadFeatureTracksData(
       const std::string& data_dir,
       const size_t camera_index,
       int64_t playback_delay);

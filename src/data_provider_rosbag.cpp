@@ -17,7 +17,7 @@ DataProviderRosbag::DataProviderRosbag(
     const std::string& bag_filename,
     const std::string& imu_topic,
     const std::map<std::string, size_t>& img_topic_camidx_map)
-  : DataProviderBase()
+  : DataProviderBase(data_provider::Type::Rosbag)
   , img_topic_camidx_map_(img_topic_camidx_map)
   , imu_topic_(imu_topic)
 {

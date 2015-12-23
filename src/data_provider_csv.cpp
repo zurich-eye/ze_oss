@@ -44,29 +44,18 @@ void checkHeaderAndOpenStream(
 
 DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
-    const std::vector<size_t> imu_indices,
-    const std::vector<size_t> camera_indices,
-    const std::vector<size_t> track_indices)
-  : DataProviderBase()
+    const std::string& imu_topic,
+    const std::map<std::string, size_t>& camera_topics)
+  : DataProviderBase(data_provider::Type::Csv)
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
-  CHECK_LE(imu_indices.size(), 1u) << "Using multiple IMUs not implemented";
-  for(size_t i : imu_indices)
-  {
-    loadImuData(csv_directory + "/imu" + std::to_string(i), 0u);
-  }
+  loadImuData(csv_directory + ze::common::ensureLeftSlash(imu_topic), 0u);
 
-  for(size_t i : camera_indices)
+  for(auto it : camera_topics)
   {
-    std::string dir = csv_directory + "/cam" + std::to_string(i);
-    loadCameraData(dir, i, ze::time::millisecToNanosec(100));
-  }
-
-  for(size_t i : track_indices)
-  {
-    std::string dir = csv_directory + "/tracks" + std::to_string(i);
-    loadFeatureTracksData(dir, i, ze::time::millisecToNanosec(80));
+    std::string dir = csv_directory + ze::common::ensureLeftSlash(it.first);
+    loadCameraData(dir, it.second, ze::time::millisecToNanosec(100));
   }
 
   buffer_it_ = buffer_.cbegin();
@@ -184,14 +173,6 @@ void DataProviderCsv::loadCameraData(
   }
   VLOG(2) << "Loaded " << i << " camera measurements.";
   fs.close();
-}
-
-void DataProviderCsv::loadFeatureTracksData(
-    const std::string& /*data_dir*/,
-    const size_t /*camera_index*/,
-    int64_t /*playback_delay*/)
-{
-  LOG(FATAL) << "Not implemented";
 }
 
 } // namespace ze

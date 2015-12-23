@@ -2,8 +2,9 @@
 
 namespace ze {
 
-DataProviderBase::DataProviderBase()
-  : shutdown_(false)
+DataProviderBase::DataProviderBase(data_provider::Type type)
+  : type_(type)
+  , shutdown_(false)
 {}
 
 void DataProviderBase::shutdown()

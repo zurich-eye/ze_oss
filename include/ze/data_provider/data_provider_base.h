@@ -21,6 +21,11 @@ using ImuCallback =
 using CameraCallback =
   std::function<void (int64_t /*stamp*/, const cv::Mat& /*img*/, size_t /*camera-idx*/)>;
 
+enum class Type {
+  Csv,
+  Rosbag
+};
+
 } // namespace data_provider
 
 class DataProviderBase
@@ -28,15 +33,15 @@ class DataProviderBase
 public:
   ZE_POINTER_TYPEDEFS(DataProviderBase);
 
-  DataProviderBase();
+  DataProviderBase(data_provider::Type type);
   virtual ~DataProviderBase() = default;
 
   // Process all callbacks. Waits until callback is processed.
-  virtual void spinBlocking() = 0;
+  virtual void spin() = 0;
 
   // Read next data field and process callback. Waits until callback is processed.
   // Returns false when datatset finished.
-  virtual bool spinOnceBlocking() = 0;
+  virtual bool spinOnce() = 0;
 
   // False if there is no more data to process or there was a shutdown signal.
   virtual bool ok() const = 0;
@@ -49,6 +54,7 @@ public:
   void registerCameraCallback(const data_provider::CameraCallback& camera_callback);
 
 protected:
+  data_provider::Type type_;
   data_provider::ImuCallback imu_callback_;
   data_provider::CameraCallback camera_callback_;
   std::atomic_bool shutdown_;
