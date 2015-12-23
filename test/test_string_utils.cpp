@@ -22,4 +22,15 @@ TEST(StringUtilsTest, testSplit)
   EXPECT_EQ(vec[2], "three");
 }
 
+TEST(StringUtilsTest, testEnsureSlash)
+{
+  std::string a = "a";
+  a = ze::common::ensureLeftSlash(a);
+  EXPECT_EQ(a, "/a");
+
+  std::string b = "/b";
+  b = ze::common::ensureLeftSlash(b);
+  EXPECT_EQ(b, "/b");
+}
+
 ZE_UNITTEST_ENTRYPOINT
