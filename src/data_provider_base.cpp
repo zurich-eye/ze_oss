@@ -8,6 +8,7 @@ DataProviderBase::DataProviderBase()
 
 void DataProviderBase::shutdown()
 {
+  // TODO(cfo): Catch SIGINT signal.
   shutdown_ = true;
 }
 

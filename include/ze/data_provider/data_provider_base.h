@@ -31,12 +31,12 @@ public:
   DataProviderBase();
   virtual ~DataProviderBase() = default;
 
-  // Process all callbacks.
-  virtual void spin() = 0;
+  // Process all callbacks. Waits until callback is processed.
+  virtual void spinBlocking() = 0;
 
   // Read next data field and process callback. Waits until callback is processed.
   // Returns false when datatset finished.
-  virtual bool spinOnce() = 0;
+  virtual bool spinOnceBlocking() = 0;
 
   // False if there is no more data to process or there was a shutdown signal.
   virtual bool ok() const = 0;

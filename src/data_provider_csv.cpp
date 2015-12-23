@@ -100,12 +100,7 @@ bool DataProviderCsv::spinOnce()
         }
         else
         {
-          static bool warn_once = false;
-          if(!warn_once)
-          {
-            LOG(WARNING) << "No camera callback registered but measurements available.";
-            warn_once = true;
-          }
+          LOG_FIRST_N(WARNING, 1) << "No camera callback registered but measurements available.";
         }
         break;
       }
@@ -119,12 +114,7 @@ bool DataProviderCsv::spinOnce()
         }
         else
         {
-          static bool warn_once = false;
-          if(!warn_once)
-          {
-            LOG(WARNING) << "No IMU callback registered but measurements available";
-            warn_once = true;
-          }
+          LOG_FIRST_N(WARNING, 1) << "No IMU callback registered but measurements available";
         }
         break;
       }
