@@ -73,7 +73,13 @@ DataProviderCsv::DataProviderCsv(
   VLOG(1) << "done.";
 }
 
-bool DataProviderCsv::spinOnceBlocking()
+void DataProviderCsv::spin()
+{
+  while(ok())
+    spinOnce();
+}
+
+bool DataProviderCsv::spinOnce()
 {
   if(buffer_it_ != buffer_.cend())
   {
@@ -132,9 +138,9 @@ bool DataProviderCsv::spinOnceBlocking()
   return false;
 }
 
-bool DataProviderCsv::finished() const
+bool DataProviderCsv::ok() const
 {
-  return buffer_it_ == buffer_.cend();
+  return buffer_it_ != buffer_.cend() && !shutdown_;
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)

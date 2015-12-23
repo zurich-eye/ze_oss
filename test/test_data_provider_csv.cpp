@@ -32,8 +32,8 @@ TEST(DataProviderTests, testCsv)
       expect_cam_stamp = 0;
   });
 
-  while(!dp.finished())
-    dp.spinOnceBlocking();
+  while(dp.ok())
+    dp.spinOnce();
 
   EXPECT_EQ(expect_imu_stamp, 0);
   EXPECT_EQ(expect_cam_stamp, 0);

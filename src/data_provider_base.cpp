@@ -2,6 +2,23 @@
 
 namespace ze {
 
+DataProviderBase::DataProviderBase()
+  : shutdown_(false)
+{}
 
+void DataProviderBase::shutdown()
+{
+  shutdown_ = true;
+}
+
+void DataProviderBase::registerImuCallback(const data_provider::ImuCallback& imu_callback)
+{
+  imu_callback_ = imu_callback;
+}
+
+void DataProviderBase::registerCameraCallback(const data_provider::CameraCallback& camera_callback)
+{
+  camera_callback_ = camera_callback;
+}
 
 } // namespace ze

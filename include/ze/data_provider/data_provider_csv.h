@@ -116,11 +116,11 @@ public:
 
   virtual ~DataProviderCsv() = default;
 
-  // Read next data field and process callback. Waits until callback is processed.
-  // Returns false when datatset finished.
-  virtual bool spinOnceBlocking() override;
+  virtual void spin() override;
 
-  virtual bool finished() const override;
+  virtual bool spinOnce() override;
+
+  virtual bool ok() const override;
 
   inline size_t size() const
   {

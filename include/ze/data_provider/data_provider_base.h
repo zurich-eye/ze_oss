@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <functional>
 
@@ -27,29 +28,30 @@ class DataProviderBase
 public:
   ZE_POINTER_TYPEDEFS(DataProviderBase);
 
-  DataProviderBase() = default;
+  DataProviderBase();
   virtual ~DataProviderBase() = default;
+
+  // Process all callbacks.
+  virtual void spin() = 0;
 
   // Read next data field and process callback. Waits until callback is processed.
   // Returns false when datatset finished.
-  virtual bool spinOnceBlocking() = 0;
+  virtual bool spinOnce() = 0;
 
-  // True if there is no more data to process.
-  virtual bool finished() const = 0;
+  // False if there is no more data to process or there was a shutdown signal.
+  virtual bool ok() const = 0;
 
-  inline void registerImuCallback(const data_provider::ImuCallback& imu_callback)
-  {
-    imu_callback_ = imu_callback;
-  }
+  // Stop data provider.
+  virtual void shutdown();
 
-  inline void registerCameraCallback(const data_provider::CameraCallback& camera_callback)
-  {
-    camera_callback_ = camera_callback;
-  }
+  void registerImuCallback(const data_provider::ImuCallback& imu_callback);
+
+  void registerCameraCallback(const data_provider::CameraCallback& camera_callback);
 
 protected:
   data_provider::ImuCallback imu_callback_;
   data_provider::CameraCallback camera_callback_;
+  std::atomic_bool shutdown_;
 };
 
 } // namespace ze
