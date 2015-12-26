@@ -99,4 +99,29 @@ TEST(BufferTest, testOldestNewestValue)
   EXPECT_EQ(value[0], 1);
 }
 
+TEST(BufferTest, testInterpolation)
+{
+  Eigen::Vector2d value;
+  ze::Buffer<double, 2> buffer;
+
+  for(int i = 0; i < 10; ++i)
+    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+
+  Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
+  Eigen::Matrix<double, 2, Eigen::Dynamic> values;
+  buffer.getBetweenValuesInterpolated(
+        ze::time::secToNanosec(1.2), ze::time::secToNanosec(5.4), &stamps, &values);
+  EXPECT_EQ(stamps(0), ze::time::secToNanosec(1.2));
+  EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(5.4));
+  EXPECT_DOUBLE_EQ(values(0, 0), 1.2);
+  EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 5.4);
+
+  buffer.getBetweenValuesInterpolated(
+        ze::time::secToNanosec(0), ze::time::secToNanosec(9), &stamps, &values);
+  EXPECT_EQ(stamps(0), ze::time::secToNanosec(0));
+  EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(9));
+  EXPECT_DOUBLE_EQ(values(0, 0), 0);
+  EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 9);
+}
+
 ZE_UNITTEST_ENTRYPOINT

@@ -48,6 +48,91 @@ bool Buffer<Scalar,Dim>::getNearestValue(int64_t stamp, Vector* value)
 }
 
 template <typename Scalar, int Dim>
+bool Buffer<Scalar,Dim>::getBetweenValuesInterpolated(
+    int64_t stamp_from, int64_t stamp_to,
+    Eigen::Matrix<int64_t, 1, Eigen::Dynamic>* stamps,
+    Eigen::Matrix<Scalar, kDim, Eigen::Dynamic>* values)
+{
+  CHECK_NOTNULL(stamps);
+  CHECK_NOTNULL(values);
+  CHECK_GE(stamp_from, 0);
+  CHECK_LT(stamp_from, stamp_to);
+  std::lock_guard<std::mutex> lock(mutex_);
+  if(buffer_.size() < 2)
+  {
+    LOG(WARNING) << "Buffer has less than 2 entries.";
+    return false;
+  }
+
+  const int64_t oldest_stamp = buffer_.begin()->first;
+  const int64_t newest_stamp = buffer_.rbegin()->first;
+  if(stamp_from < oldest_stamp)
+  {
+    LOG(WARNING) << "Requests older timestamp than in buffer.";
+    return false;
+  }
+  if(stamp_to > newest_stamp)
+  {
+    LOG(WARNING) << "Requests newer timestamp than in buffer.";
+    return false;
+  }
+
+  auto it_from_before = iterator_equal_or_before(stamp_from);
+  auto it_to_after = iterator_equal_or_after(stamp_to);
+  CHECK(it_from_before != buffer_.end());
+  CHECK(it_to_after != buffer_.end());
+  auto it_from_after = it_from_before;
+  ++it_from_after;
+  auto it_to_before = it_to_after;
+  --it_to_before;
+  if(it_from_after == it_to_before)
+  {
+    LOG(WARNING) << "Not enough data for interpolation";
+    return false;
+  }
+
+  // Count number measurements.
+  size_t n = 0;
+  auto it = it_from_after;
+  while(it != it_to_after)
+  {
+    ++n;
+    ++it;
+  }
+  n += 2;
+
+  // Interpolate values at start and end and copy in output vector.
+  stamps->resize(1, n);
+  values->resize(kDim, n);
+  for(size_t i = 0; i < n; ++i)
+  {
+    if(i == 0)
+    {
+      (*stamps)(i) = stamp_from;
+      const double w =
+          static_cast<double>(stamp_from - it_from_before->first) /
+          static_cast<double>(it_from_after->first - it_from_before->first);
+      values->col(i) = (1.0 - w) * it_from_before->second + w * it_from_after->second;
+    }
+    else if(i == n-1)
+    {
+      (*stamps)(i) = stamp_to;
+      const double w =
+          static_cast<double>(stamp_to - it_to_before->first) /
+          static_cast<double>(it_to_after->first - it_to_before->first);
+      values->col(i) = (1.0 - w) * it_to_before->second + w * it_to_after->second;
+    }
+    else
+    {
+      (*stamps)(i) = it_from_after->first;
+      values->col(i) = it_from_after->second;
+      ++it_from_after;
+    }
+  }
+  return true;
+}
+
+template <typename Scalar, int Dim>
 bool Buffer<Scalar,Dim>::getOldestValue(Vector* value) const
 {
   CHECK_NOTNULL(value);

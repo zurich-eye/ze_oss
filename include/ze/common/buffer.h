@@ -34,6 +34,11 @@ public:
 
   bool getNewestValue(Vector* value) const;
 
+  bool getBetweenValuesInterpolated(
+      int64_t stamp_from, int64_t stamp_to,
+      Eigen::Matrix<int64_t, 1, Eigen::Dynamic>* stamps,
+      Eigen::Matrix<Scalar, kDim, Eigen::Dynamic>* values);
+
   inline void clear()
   {
     std::lock_guard<std::mutex> lock(mutex_);
