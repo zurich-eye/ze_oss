@@ -11,6 +11,8 @@ include(ZeSetup)
 # LIBRARIES #
 #############
 set(HEADERS
+  include/ze/common/buffer.h
+  include/ze/common/buffer-inl.h
   include/ze/common/macros.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
@@ -38,6 +40,9 @@ target_link_libraries(test_transformation ${PROJECT_NAME})
 
 catkin_add_gtest(test_string_utils test/test_string_utils.cpp)
 target_link_libraries(test_string_utils ${PROJECT_NAME})
+
+catkin_add_gtest(test_buffer test/test_buffer.cpp)
+target_link_libraries(test_buffer ${PROJECT_NAME})
 
 ##########
 # EXPORT #
