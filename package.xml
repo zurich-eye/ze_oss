@@ -17,6 +17,7 @@
   <depend>eigen_checks</depend>
   <depend>minkindr</depend>
   <depend>ze_cmake</depend>
+  <depend>yaml_cpp_catkin</depend>
 
   <test_depend>gtest</test_depend>
 </package>

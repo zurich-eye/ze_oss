@@ -21,6 +21,8 @@ set(HEADERS
   include/ze/common/timer.h
   include/ze/common/transformation.h
   include/ze/common/types.h
+  include/ze/common/yaml_serialization.h
+  include/ze/common/yaml_serialization_eigen.h
   include/ze/common/test/entrypoint.h
   include/ze/common/test/utils.h
   )
