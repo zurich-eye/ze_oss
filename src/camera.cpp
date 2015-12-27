@@ -9,28 +9,28 @@
 namespace ze {
 
 template<typename Scalar>
-CameraInterface<Scalar>::CameraInterface(const int width, const int height)
+Camera<Scalar>::Camera(const int width, const int height)
   : width_(width)
   , height_(height)
 {}
 
 template<typename Scalar>
-typename CameraInterface<Scalar>::Ptr CameraInterface<Scalar>::loadFromYaml(
+typename Camera<Scalar>::Ptr Camera<Scalar>::loadFromYaml(
     const std::string& yaml_file)
 {
   try {
     YAML::Node doc = YAML::LoadFile(yaml_file.c_str());
-    return doc.as<CameraInterface::Ptr>();
+    return doc.as<Camera::Ptr>();
   } catch (const std::exception& ex) {
     LOG(ERROR) << "Failed to load Camera from file " << yaml_file << " with the error: \n"
                << ex.what();
   }
   // Return nullptr in the failure case.
-  return CameraInterface<Scalar>::Ptr();
+  return Camera<Scalar>::Ptr();
 }
 
 template<typename Scalar>
-void CameraInterface<Scalar>::setMask(const cv::Mat& mask) {
+void Camera<Scalar>::setMask(const cv::Mat& mask) {
   CHECK_EQ(height_, mask.rows);
   CHECK_EQ(width_, mask.cols);
   CHECK_EQ(mask.type(), CV_8UC1);
@@ -38,7 +38,7 @@ void CameraInterface<Scalar>::setMask(const cv::Mat& mask) {
 }
 
 template<typename Scalar>
-void CameraInterface<Scalar>::loadMask(const std::string& mask_file)
+void Camera<Scalar>::loadMask(const std::string& mask_file)
 {
   cv::Mat mask(cv::imread(mask_file, 0));
   if(mask.data)
@@ -48,7 +48,7 @@ void CameraInterface<Scalar>::loadMask(const std::string& mask_file)
 }
 
 template<typename Scalar>
-bool CameraInterface<Scalar>::isMasked(
+bool Camera<Scalar>::isMasked(
     const Eigen::Ref<const Vector2>& keypoint) const
 {
   return keypoint[0] < 0.0 ||
