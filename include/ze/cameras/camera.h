@@ -2,15 +2,25 @@
 
 #include <string>
 #include <memory>
+#include <glog/logging.h>
 #include <Eigen/Core>
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
-#include <ze/common/transformation.h>
 #include <ze/common/macros.h> 
+#include <ze/cameras/camera_yaml_serialization.h>
 
 namespace ze {
 
-template<typename T = double>
+enum class CameraType {
+  kPinhole = 0,
+  kPinholeFov = 1,
+  kPinholeEquidistant = 2,
+  kPinholeRadialTangential = 3
+};
+std::string cameraTypeString(CameraType type);
+
+template<typename T>
 class Camera
 {
 public:
@@ -18,41 +28,51 @@ public:
   using Scalar = T;
   using Vector3 = Eigen::Matrix<Scalar, 3, 1>;
   using Vector2 = Eigen::Matrix<Scalar, 2, 1>;
-  using Transformation = kindr::minimal::QuatTransformationTemplate<Scalar>;
-  using Parameters = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-
-  enum class Type {
-    kPinhole = 0,
-    kUnifiedProjection = 1,
-    kOmni = 2
-  };
 
   // Default constructor
-  Camera(const int width, const int height);
+  Camera(const int width, const int height, const CameraType type)
+  : width_(width)
+  , height_(height)
+  , type_(type)
+  {}
 
   virtual ~Camera() = default;
 
   // Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
-  static Ptr loadFromYaml(const std::string& yaml_file);
+  static Ptr loadFromYaml(const std::string& path)
+  {
+    try
+    {
+      YAML::Node doc = YAML::LoadFile(path.c_str());
+      return doc.as<Camera::Ptr>();
+    }
+    catch (const std::exception& ex)
+    {
+      LOG(ERROR) << "Failed to load Camera from file " << path << " with the error: \n"
+                 << ex.what();
+    }
+    return Camera<T>::Ptr();
+  }
 
-  // Computes bearing vector f from pixel coordinates u. Z-component of the returned
-  // bearing vector is 1.0. IMPORTANT: returned vector is NOT of unit length!
-  virtual bool backProject3(const Eigen::Ref<const Vector2>& px, Vector3* bearing) const = 0;
+  // Computes bearing vector bearing from pixel coordinates px. Z-component of
+  // the returned bearing vector is 1.0.
+  virtual void backProject(const Eigen::Ref<const Vector2>& px, Vector3* bearing) const = 0;
 
   // Computes pixel coordinates u from bearing vector f.
-  virtual bool project3(const Eigen::Ref<const Vector3>& bearing, Vector2* px) const = 0;
+  virtual void project(const Eigen::Ref<const Vector3>& bearing, Vector2* px) const = 0;
 
   // Print camera info
-  virtual void print(std::ostream& out, const std::string& s = "Camera: ") const = 0;
-
-  // Equivalent to focal length for projective cameras and factor for
-  // omni-directional cameras that transforms small angular error to pixel-error.
-  virtual double errorMultiplier() const = 0;
-
-  virtual double getAngleError(double img_err) const = 0;
+  void print(std::ostream& out, const std::string& s = "Camera: ") const
+  {
+    out << s << std::endl
+        << "  Label = " << label_ << std::endl
+        << "  Model = " << cameraTypeString(type_) << std::endl
+        << "  Dimensions = " << width_ << "x" << height_ << std::endl
+        << "  Parameters = " << params_.transpose() << std::endl;
+  }
 
   // CameraType value representing the camera model used by the derived class.
-  inline Type type() const { return camera_type_; }
+  inline CameraType type() const { return type_; }
 
   // Name of the camera.
   inline const std::string& label() const { return label_; }
@@ -96,7 +116,13 @@ public:
 
   // Set the mask. Masks must be the same size as the image and they follow the same
   // convention as OpenCV: 0 == masked, nonzero == valid.
-  void setMask(const cv::Mat& mask);
+  void setMask(const cv::Mat& mask)
+  {
+    CHECK_EQ(height_, mask.rows);
+    CHECK_EQ(width_, mask.cols);
+    CHECK_EQ(mask.type(), CV_8UC1);
+    mask_ = mask;
+  }
 
   // Get the mask.
   inline const cv::Mat& getMask() const { return mask_; }
@@ -108,18 +134,32 @@ public:
   inline bool hasMask() const { return !mask_.empty(); }
 
   // load from file
-  void loadMask(const std::string& mask_file);
+  void loadMask(const std::string& mask_file)
+  {
+    cv::Mat mask(cv::imread(mask_file, 0));
+    if(mask.data)
+      setMask(mask);
+    else
+      LOG(FATAL) << "Unable to load mask file.";
+  }
 
   // Check if the keypoint is masked.
-  bool isMasked(const Eigen::Ref<const Vector2>& keypoint) const;
+  bool isMasked(const Eigen::Ref<const Vector2>& px) const
+  {
+    return px[0] < 0.0 ||
+           px[0] >= static_cast<T>(width_) ||
+           px[1] < 0.0 ||
+           px[1] >= static_cast<T>(height_) ||
+           (!mask_.empty() &&
+             mask_.at<uint8_t>(static_cast<int>(px[1]), static_cast<int>(px[0])) == 0);
+  }
 
 protected:
   int width_;
   int height_;
-  Parameters params_; // Camera parameters (fx, fy, cx, cy, distortion params...)
-  Transformation T_cam_body_;
+  CameraType type_;
+  Eigen::Matrix<Scalar, Eigen::Dynamic, 1> params_; // Camera parameters (fx, fy, cx, cy, distortion params...)
   std::string label_;
-  Type camera_type_;
   cv::Mat mask_;
 };
 

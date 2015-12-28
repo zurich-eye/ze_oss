@@ -5,8 +5,11 @@
 namespace ze {
 namespace internal {
 
+// Pure static camera projection and distortion models, intended to be used in
+// both GPU and CPU code. Parameter checking should be performed in interface
+// classes.
+
 // Pinhole projection model.
-// Pure static, intended to be used in both GPU and CPU programming.
 struct PinholeProjection
 {
   template <typename T>
