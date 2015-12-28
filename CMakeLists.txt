@@ -14,6 +14,8 @@ set(HEADERS
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
   include/ze/common/macros.h
+  include/ze/common/manifold.h
+  include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
   include/ze/common/string_utils.h
@@ -45,6 +47,12 @@ target_link_libraries(test_string_utils ${PROJECT_NAME})
 
 catkin_add_gtest(test_buffer test/test_buffer.cpp)
 target_link_libraries(test_buffer ${PROJECT_NAME})
+
+catkin_add_gtest(test_manifold test/test_manifold.cpp)
+target_link_libraries(test_manifold ${PROJECT_NAME})
+
+catkin_add_gtest(test_numerical_derivative test/test_numerical_derivative.cpp)
+target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
 
 ##########
 # EXPORT #
