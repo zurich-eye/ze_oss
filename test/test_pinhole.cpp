@@ -13,4 +13,10 @@ TEST(CameraPinholeTest, testConstructor)
   cam.print(std::cout);
 }
 
+TEST(CameraPinholeTest, testProjectionJacobian)
+{
+
+}
+
+
 ZE_UNITTEST_ENTRYPOINT
