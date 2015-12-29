@@ -2,6 +2,19 @@
 
 #include <ze/common/test/entrypoint.h>
 #include <ze/common/transformation.h>
+#include <ze/common/test/manifold.h>
+
+TEST(TransformationTests, testManifoldSO3)
+{
+  EXPECT_EQ(ze::traits<ze::Quaternion>::dimension, 3);
+  ze::testManifoldInvariants<ze::Quaternion>(
+        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
+        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+
+  ze::testRetractJacobians<ze::Quaternion>(
+        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
+        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+}
 
 TEST(TransformationTests, testSetRandom)
 {
