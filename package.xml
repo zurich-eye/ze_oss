@@ -5,6 +5,7 @@
     CMake configuration, scripts and macros common for common ZE usage.
   </description>
   <maintainer email="christian.forster@WyssZurich.ch">Christian Forster</maintainer>
+  <maintainer email="manuel.werlberger@WyssZurich.ch">Manuel Werlberger</maintainer>
   <version>0.1.0</version>
   <license>ZE</license>
 
