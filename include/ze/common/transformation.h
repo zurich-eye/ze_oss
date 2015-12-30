@@ -45,8 +45,10 @@ Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
 }
 
 
+// -----------------------------------------------------------------------------
 template<typename T> struct traits;
 
+// -----------------------------------------------------------------------------
 // Manifold traits for SO(3):
 template<> struct traits<Quaternion>
 {

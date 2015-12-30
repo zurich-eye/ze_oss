@@ -1,8 +1,8 @@
 #include <cmath>
 
 #include <ze/common/test/entrypoint.h>
-#include <ze/common/transformation.h>
 #include <ze/common/test/manifold.h>
+#include <ze/common/transformation.h>
 
 TEST(TransformationTests, testManifoldSO3)
 {

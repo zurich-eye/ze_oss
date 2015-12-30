@@ -7,9 +7,13 @@
 
 namespace ze {
 
+// For now, the manifold traits are primarily used for simplified computation of
+// numerical derivatives (see numerical_derivative.h). We use the numerical
+// derivatives mainly to test the correctness of the analytical derivatives.
 template<typename T> struct traits;
 
 // -----------------------------------------------------------------------------
+// Manifold traits for scalars.
 namespace internal {
 template<typename Scalar>
 struct ScalarTraits
@@ -49,7 +53,7 @@ template<> struct traits<float> : public internal::ScalarTraits<float> {};
 
 
 // -----------------------------------------------------------------------------
-// traits for any fixed double Eigen matrix
+// Manifold traits for fixed-size Eigen matrices and vectors with double precision.
 template<int M, int N, int Options, int MaxRows, int MaxCols>
 struct traits<Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> >
 {
