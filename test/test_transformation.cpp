@@ -10,8 +10,10 @@ TEST(TransformationTests, testManifoldSO3)
   ze::testManifoldInvariants<ze::Quaternion>(
         ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
         ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
-
   ze::testRetractJacobians<ze::Quaternion>(
+        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
+        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+  ze::testLocalJacobians<ze::Quaternion>(
         ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
         ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
 }

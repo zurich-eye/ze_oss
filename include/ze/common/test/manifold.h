@@ -16,11 +16,10 @@ void testManifoldInvariants(const T& a, const T& b, double tol = 1e-9)
   CHECK(traits<T>::Equals(b, c, tol));
 }
 
-
 template<typename T>
 void testRetractJacobians(const T& a, const T& b, double tol = 1e-9)
 {
-  using namespace std::placeholders; // for _1, _2
+  using namespace std::placeholders; // for _1
   typename traits<T>::Jacobian H1, H2;
   typename traits<T>::TangentVector v = traits<T>::Local(a, b);
   T c = traits<T>::Retract(a, v, &H1, &H2);
@@ -29,7 +28,26 @@ void testRetractJacobians(const T& a, const T& b, double tol = 1e-9)
         std::bind(traits<T>::Retract, _1, v, nullptr, nullptr), a);
   CHECK(traits<typename traits<T>::Jacobian>::Equals(H1, H1_numerical, tol));
 
-  // TODO(cfo): Check second argument
+  typename traits<T>::Jacobian H2_numerical =
+      numericalDerivative<T, typename traits<T>::TangentVector>(
+        std::bind(traits<T>::Retract, a, _1, nullptr, nullptr), v);
+  CHECK(traits<typename traits<T>::Jacobian>::Equals(H2, H2_numerical, tol));
 }
 
+template<typename T>
+void testLocalJacobians(const T& a, const T& b, double tol = 1e-9)
+{
+  using namespace std::placeholders; // for _1
+  typename traits<T>::Jacobian H1, H2;
+  typename traits<T>::TangentVector v = traits<T>::Local(a, b, &H1, &H2);
+  typename traits<T>::Jacobian H1_numerical =
+      numericalDerivative<typename traits<T>::TangentVector, T>(
+        std::bind(traits<T>::Local, _1, b, nullptr, nullptr), a);
+  CHECK(traits<typename traits<T>::Jacobian>::Equals(H1, H1_numerical, tol));
+
+  typename traits<T>::Jacobian H2_numerical =
+      numericalDerivative<typename traits<T>::TangentVector, T>(
+        std::bind(traits<T>::Local, a, _1, nullptr, nullptr), b);
+  CHECK(traits<typename traits<T>::Jacobian>::Equals(H2, H2_numerical, tol));
+}
 } // namespace ze

@@ -8,19 +8,16 @@ namespace ze {
 using Transformation = kindr::minimal::QuatTransformation;
 using Quaternion = kindr::minimal::RotationQuaternion;
 
-Eigen::Matrix3d skewSymmetric(Eigen::Vector3d xyz)
+// Skew symmetric matrix.
+Eigen::Matrix3d skewSymmetric(Eigen::Vector3d w)
 {
   return (Eigen::Matrix3d() <<
-          0.0, -xyz.z(), +xyz.y(),
-          +xyz.z(), 0.0, -xyz.x(),
-          -xyz.y(), +xyz.x(), 0.0).finished();
+          0.0, -w.z(), +w.y(),
+          +w.z(), 0.0, -w.x(),
+          -w.y(), +w.x(), 0.0).finished();
 }
 
-// Right Jacobian for Exponential map in SO(3) - equation (10.86) and following
-// equations in G.S. Chirikjian, "Stochastic Models, Information Theory, and Lie
-// Groups", Volume 2, 2008.
-// expmap(thetahat + omega) \approx expmap(thetahat) * expmap(Jr * omega)
-// where Jr = ExpmapDerivative(thetahat);
+// Right Jacobian for Exponential map in SO(3)
 Eigen::Matrix3d expmapDerivativeSO3(const Eigen::Vector3d& omega)
 {
   double theta2 = omega.dot(omega);
@@ -34,11 +31,7 @@ Eigen::Matrix3d expmapDerivativeSO3(const Eigen::Vector3d& omega)
       + (1 - sin(theta) / theta) * Y * Y;
 }
 
-// Right Jacobian for Log map in SO(3) - equation (10.86) and following equations
-// in G.S. Chirikjian, "Stochastic Models, Information Theory, and Lie Groups",
-// Volume 2, 2008.
-// logmap( Rhat * expmap(omega) ) \approx logmap( Rhat ) + Jrinv * omega
-// where Jrinv = LogmapDerivative(omega);
+// Right Jacobian for Log map in SO(3)
 Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
 {
   double theta2 = omega.dot(omega);
@@ -54,6 +47,7 @@ Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
 
 template<typename T> struct traits;
 
+// Manifold traits for SO(3):
 template<> struct traits<Quaternion>
 {
   static constexpr int dimension = 3; // The dimension of the manifold.
