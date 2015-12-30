@@ -8,6 +8,9 @@ namespace ze {
 using Transformation = kindr::minimal::QuatTransformation;
 using Quaternion = kindr::minimal::RotationQuaternion;
 
+// -----------------------------------------------------------------------------
+// Transformation utils
+
 // Skew symmetric matrix.
 Eigen::Matrix3d skewSymmetric(Eigen::Vector3d w)
 {
@@ -46,10 +49,11 @@ Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
 
 
 // -----------------------------------------------------------------------------
+// Type traits used for optimization
 template<typename T> struct traits;
 
 // -----------------------------------------------------------------------------
-// Manifold traits for SO(3):
+// Manifold traits for SO(3)
 template<> struct traits<Quaternion>
 {
   static constexpr int dimension = 3; // The dimension of the manifold.
@@ -86,5 +90,12 @@ template<> struct traits<Quaternion>
     return h;
   }
 };
+
+// -----------------------------------------------------------------------------
+// Manifold traits for SE(3)
+
+//
+// TODO(cfo): SE(3) traits.
+//
 
 } // namespace ze
