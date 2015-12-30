@@ -26,8 +26,9 @@ class Camera
 public:
   ZE_POINTER_TYPEDEFS(Camera);
   using Scalar = T;
-  using Vector3 = Eigen::Matrix<Scalar, 3, 1>;
-  using Vector2 = Eigen::Matrix<Scalar, 2, 1>;
+  using Vector3  = Eigen::Matrix<Scalar, 3, 1>;
+  using Vector2  = Eigen::Matrix<Scalar, 2, 1>;
+  using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
 
   // Default constructor
   Camera(const int width, const int height, const CameraType type)
@@ -54,12 +55,15 @@ public:
     return Camera<T>::Ptr();
   }
 
-  // Computes bearing vector bearing from pixel coordinates px. Z-component of
-  // the returned bearing vector is 1.0.
-  virtual void backProject(const Eigen::Ref<const Vector2>& px, Vector3* bearing) const = 0;
+  // Computes bearing vector from pixel coordinates. Z-component of returned
+  // bearing vector is 1.0.
+  virtual Vector3 backProject(const Eigen::Ref<const Vector2>& px) const = 0;
 
-  // Computes pixel coordinates u from bearing vector f.
-  virtual void project(const Eigen::Ref<const Vector3>& bearing, Vector2* px) const = 0;
+  // Computes pixel coordinates from bearing vector.
+  virtual Vector2 project(const Eigen::Ref<const Vector3>& bearing) const = 0;
+
+  // Computes Jacobian of projection w.r.t. bearing vector:
+  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Vector3>& bearing) const = 0;
 
   // Print camera info
   void print(std::ostream& out, const std::string& s = "Camera: ") const
