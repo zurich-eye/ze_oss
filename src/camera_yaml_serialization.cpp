@@ -4,8 +4,7 @@
 
 namespace YAML {
 
-bool convert<std::shared_ptr<ze::Camera>>::decode(
-    const Node& node, ze::Camera::Ptr& camera)
+bool convert<std::shared_ptr<ze::Camera>>::decode(const Node& node, ze::Camera::Ptr& camera)
 {
   camera.reset();
   try {
@@ -35,7 +34,7 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(
     {
       if(camera_type == "pinhole" && distortion_type == "none")
       {
-        std::cout << "load pinhole camera without distortion" << std::endl;
+        VLOG(1) << "load pinhole camera without distortion";
         camera = std::make_shared<ze::PinholeCamera>(
               width, height, ze::CameraType::kPinhole, intrinsics);
       }

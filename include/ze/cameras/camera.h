@@ -61,6 +61,9 @@ public:
   // Name of the camera.
   inline const std::string& label() const { return label_; }
 
+  // Camera parameters
+  inline const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params() const { return params_; }
+
   // Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
 
@@ -93,6 +96,7 @@ public:
   }
 
 protected:
+
   int width_;
   int height_;
   Eigen::Matrix<Scalar, Eigen::Dynamic, 1> params_; // Camera parameters (fx, fy, cx, cy, distortion params...)
