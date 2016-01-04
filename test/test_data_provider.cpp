@@ -8,7 +8,7 @@
 
 TEST(DataProviderTests, testCsv)
 {
-  std::string data_dir = ze::common::getTestDataDir("csv_dataset");
+  std::string data_dir = ze::getTestDataDir("csv_dataset");
   EXPECT_FALSE(data_dir.empty());
 
   ze::DataProviderCsv dp(data_dir+"/data", "imu0", { {"cam0", 0} });
@@ -43,9 +43,9 @@ TEST(DataProviderTests, testCsv)
 
 TEST(DataProviderTests, testRosbag)
 {
-  std::string data_dir = ze::common::getTestDataDir("rosbag_euroc_snippet");
+  std::string data_dir = ze::getTestDataDir("rosbag_euroc_snippet");
   std::string bag_filename = data_dir + "/dataset.bag";
-  EXPECT_TRUE(ze::common::fileExists(bag_filename));
+  ASSERT_TRUE(ze::common::fileExists(bag_filename));
 
   ze::DataProviderRosbag dp(bag_filename, "/imu0", { {"/cam0/image_raw", 0},
                                                      {"/cam1/image_raw", 1} });
