@@ -22,12 +22,12 @@ TEST(BufferTest, testRemoveOlderThan)
 {
   ze::Buffer<double, 2> buffer;
   for(int i = 1; i < 10; ++i)
-    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
 
   buffer.removeDataOlderThan(3.0);
   buffer.lock();
-  EXPECT_EQ(buffer.data().begin()->first, ze::time::secToNanosec(6));
-  EXPECT_EQ(buffer.data().rbegin()->first, ze::time::secToNanosec(9));
+  EXPECT_EQ(buffer.data().begin()->first, ze::secToNanosec(6));
+  EXPECT_EQ(buffer.data().rbegin()->first, ze::secToNanosec(9));
   buffer.unlock();
 }
 
@@ -35,30 +35,30 @@ TEST(BufferTest, testIterator)
 {
   ze::Buffer<double, 2> buffer;
   for(int i = 1; i < 10; ++i)
-    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
 
   buffer.lock();
 
   // Check before/after
-  EXPECT_EQ(buffer.iterator_equal_or_before(ze::time::secToNanosec(3.5))->first,
-            ze::time::secToNanosec(3));
-  EXPECT_EQ(buffer.iterator_equal_or_after(ze::time::secToNanosec(3.5))->first,
-            ze::time::secToNanosec(4));
+  EXPECT_EQ(buffer.iterator_equal_or_before(ze::secToNanosec(3.5))->first,
+            ze::secToNanosec(3));
+  EXPECT_EQ(buffer.iterator_equal_or_after(ze::secToNanosec(3.5))->first,
+            ze::secToNanosec(4));
 
   // Check equal
-  EXPECT_EQ(buffer.iterator_equal_or_before(ze::time::secToNanosec(3))->first,
-            ze::time::secToNanosec(3));
-  EXPECT_EQ(buffer.iterator_equal_or_after(ze::time::secToNanosec(4))->first,
-            ze::time::secToNanosec(4));
+  EXPECT_EQ(buffer.iterator_equal_or_before(ze::secToNanosec(3))->first,
+            ze::secToNanosec(3));
+  EXPECT_EQ(buffer.iterator_equal_or_after(ze::secToNanosec(4))->first,
+            ze::secToNanosec(4));
 
   // Expect out of range:
-  EXPECT_EQ(buffer.iterator_equal_or_before(ze::time::secToNanosec(0.8)),
+  EXPECT_EQ(buffer.iterator_equal_or_before(ze::secToNanosec(0.8)),
             buffer.data().end());
-  EXPECT_EQ(buffer.iterator_equal_or_before(ze::time::secToNanosec(9.1)),
+  EXPECT_EQ(buffer.iterator_equal_or_before(ze::secToNanosec(9.1)),
             (--buffer.data().end()));
-  EXPECT_EQ(buffer.iterator_equal_or_after(ze::time::secToNanosec(9.1)),
+  EXPECT_EQ(buffer.iterator_equal_or_after(ze::secToNanosec(9.1)),
             buffer.data().end());
-  EXPECT_EQ(buffer.iterator_equal_or_after(ze::time::secToNanosec(0.8)),
+  EXPECT_EQ(buffer.iterator_equal_or_after(ze::secToNanosec(0.8)),
             buffer.data().begin());
 
   buffer.unlock();
@@ -67,15 +67,15 @@ TEST(BufferTest, testIterator)
 TEST(BufferTest, testNearestValue)
 {
   ze::Buffer<double, 2> buffer;
-  EXPECT_FALSE(buffer.getNearestValue(ze::time::secToNanosec(1)).second);
+  EXPECT_FALSE(buffer.getNearestValue(ze::secToNanosec(1)).second);
 
   for(int i = 1; i < 10; ++i)
-    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
 
-  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(1)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(0.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(1.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(11.0)).first[0], 9);
+  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(0.4)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1.4)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(11.0)).first[0], 9);
 }
 
 TEST(BufferTest, testOldestNewestValue)
@@ -85,7 +85,7 @@ TEST(BufferTest, testOldestNewestValue)
   EXPECT_FALSE(buffer.getNewestValue().second);
 
   for(int i = 1; i < 10; ++i)
-    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
 
   EXPECT_EQ(buffer.getNewestValue().first[0], 9);
   EXPECT_EQ(buffer.getOldestValue().first[0], 1);
@@ -97,21 +97,21 @@ TEST(BufferTest, testInterpolation)
   ze::Buffer<double, 2> buffer;
 
   for(int i = 0; i < 10; ++i)
-    buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
 
   Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
   Eigen::Matrix<double, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
-        ze::time::secToNanosec(1.2), ze::time::secToNanosec(5.4));
-  EXPECT_EQ(stamps(0), ze::time::secToNanosec(1.2));
-  EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(5.4));
+        ze::secToNanosec(1.2), ze::secToNanosec(5.4));
+  EXPECT_EQ(stamps(0), ze::secToNanosec(1.2));
+  EXPECT_EQ(stamps(stamps.cols()-1), ze::secToNanosec(5.4));
   EXPECT_DOUBLE_EQ(values(0, 0), 1.2);
   EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 5.4);
 
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
-        ze::time::secToNanosec(0), ze::time::secToNanosec(9));
-  EXPECT_EQ(stamps(0), ze::time::secToNanosec(0));
-  EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(9));
+        ze::secToNanosec(0), ze::secToNanosec(9));
+  EXPECT_EQ(stamps(0), ze::secToNanosec(0));
+  EXPECT_EQ(stamps(stamps.cols()-1), ze::secToNanosec(9));
   EXPECT_DOUBLE_EQ(values(0, 0), 0);
   EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 9);
 }

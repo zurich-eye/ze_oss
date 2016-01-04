@@ -10,7 +10,6 @@ namespace ze {
 //            to avoid errors when taking differences and we use nanoseconds
 //            when saving to file to have a unique type for lookups in
 //            dictionaries/maps.
-namespace time {
 
 // Seconds to nanoseconds.
 inline constexpr int64_t secToNanosec(double seconds)
@@ -36,5 +35,4 @@ inline constexpr double nanosecToMillisec(int64_t nanoseconds)
   return static_cast<double>(nanoseconds) / static_cast<double>(1e6);
 }
 
-} // namespace time
 } // namespace ze

@@ -5,7 +5,6 @@
 #include <string>
 
 namespace ze {
-namespace common {
 
 inline bool fileExists(const std::string& filename)
 {
@@ -22,5 +21,4 @@ inline bool isDir(const std::string& filename)
   return false;
 }
 
-} // namespace common
 } // namespace ze

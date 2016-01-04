@@ -8,7 +8,6 @@
 #include <glog/logging.h>
 
 namespace ze {
-namespace common {
 
 inline std::string& leftTrimString(std::string& s)
 {
@@ -55,5 +54,4 @@ inline std::vector<std::string> splitString(const std::string& s, char delim)
   return items;
 }
 
-} // namespace common
 } // namespace ze

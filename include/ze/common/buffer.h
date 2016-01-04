@@ -75,7 +75,7 @@ public:
       return;
 
     removeDataBeforeTimestamp_impl(
-          buffer_.rbegin()->first - time::secToNanosec(seconds));
+          buffer_.rbegin()->first - secToNanosec(seconds));
   }
 
   inline void lock() const
