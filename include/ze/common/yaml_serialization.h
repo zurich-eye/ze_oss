@@ -1,4 +1,4 @@
-// THIS FILE IS FROM ETHZ-ASL ASLAM_CV_COMMON
+// THESE FUNCTIONS ARE FROM ETHZ-ASL ASLAM_CV_COMMON
 
 #pragma once
 
@@ -14,15 +14,9 @@
 #include <glog/logging.h>
 #include <yaml-cpp/yaml.h>
 
-#include <ze/common/yaml_serialization_eigen.h>
-
 namespace YAML {
 
-/// \brief A function to get a value from a YAML node with non-exception error handling.
-/// \param[in] node The YAML node.
-/// \param[in] key The key used to dereference the node (node[key]).
-/// \param[out] value The return value.
-/// \returns True if the value was filled in successfully. False otherwise.
+// A function to get a value from a YAML node with non-exception error handling.
 template<typename ValueType>
 bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value) {
   CHECK_NOTNULL(value);
@@ -46,103 +40,220 @@ bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value) {
   return success;
 }
 
-
-template <class ValueType>
-struct convert<std::queue<ValueType> > {
-  static Node encode(const std::queue<ValueType>& queue) {
+// yaml serialization helper function for the Eigen3 Matrix object.
+// The matrix is a base class for dense matrices.
+// http://eigen.tuxfamily.org/dox-devel/TutorialMatrixClass.html
+template <class Scalar_, int A_, int B_, int C_, int D_, int E_>
+struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
+{
+  template <class Scalar, int A, int B, int C, int D, int E>
+  static Node encode(const Eigen::Matrix<Scalar, A, B, C, D, E>& M)
+  {
     Node node;
-    typename aslam::Aligned<std::vector, ValueType>::type tmp_v;
-    typename aslam::Aligned<std::queue, ValueType>::type q_cpy = queue;
-    while (!q_cpy.empty()) {
-      tmp_v.push_back(q_cpy.front());
-      q_cpy.pop();
-    }
-    node = tmp_v;
-    return node;
-  }
-
-  static bool decode(const Node& node, std::queue<ValueType>& queue) {
-    CHECK(node.IsSequence());
-    for (size_t i = 0; i < node.size(); ++i) {
-      ValueType tmp = node[i].as<ValueType>();
-      queue.push(tmp);
-    }
-    return true;
-  }
-};
-
-template <class KeyType>
-struct convert<std::unordered_set<KeyType> > {
-  static Node encode(const std::unordered_set<KeyType>& set) {
-    Node node;
-    for (const KeyType& value : set) {
-      node.push_back(value);
+    typedef typename Eigen::Matrix<Scalar, A, B, C, D, E>::Index IndexType;
+    IndexType rows = M.rows();
+    IndexType cols = M.cols();
+    node["rows"] = rows;
+    node["cols"] = cols;
+    CHECK_GT(rows, 0);
+    CHECK_GT(cols, 0);
+    for (IndexType i = 0; i < rows; ++i) {
+      for (IndexType j = 0; j < cols; ++j) {
+        node["data"].push_back(M(i, j));
+      }
     }
     return node;
   }
 
-  static bool decode(const Node& node, std::unordered_set<KeyType>& set) {
-    set.clear();
-    CHECK(node.IsSequence());
-    for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
-      set.insert(it->as<KeyType>());
-    }
-    return true;
-  }
-};
-
-template <class KeyType, class ValueType>
-struct convert<std::unordered_map<KeyType, ValueType> > {
-  static Node encode(const std::unordered_map<KeyType, ValueType>& map) {
-    Node node;
-    for (const std::pair<KeyType, ValueType>& value : map) {
-      node[value.first] = value.second;
-    }
-    return node;
-  }
-
+  template <class Scalar, int A, int B, int C, int D, int E>
   static bool decode(const Node& node,
-                     std::unordered_map<KeyType, ValueType>& map) {
-    map.clear();
-    for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
-      map[it->first.as<KeyType>()] = it->second.as<ValueType>();
+                     Eigen::Matrix<Scalar, A, B, C, D, E>& M)
+  {
+    if(!node.IsMap()) {
+      LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
+      return false;
+    }
+
+    typedef typename Eigen::Matrix<Scalar, A, B, C, D, E>::Index IndexType;
+    IndexType rows = node["rows"].as<IndexType>();
+    IndexType cols = node["cols"].as<IndexType>();
+
+    if(rows != A || cols != B) {
+      LOG(ERROR) << "The matrix is the wrong size (rows, cols). Wanted: (" << A << ","
+          << B << "), got (" << rows << ", " << cols << ")";
+      return false;
+    }
+
+    size_t expected_size = M.rows() * M.cols();
+    if (!node["data"].IsSequence()) {
+      LOG(ERROR) << "The matrix data is not a sequence.";
+      return false;
+    }
+    if(node["data"].size() != expected_size) {
+      LOG(ERROR) << "The data sequence is the wrong size. Wanted: " << expected_size <<
+          ", got: " << node["data"].size();
+      return false;
+    }
+
+    YAML::const_iterator it = node["data"].begin();
+    YAML::const_iterator it_end = node["data"].end();
+    if (rows > 0 && cols > 0) {
+      for (IndexType i = 0; i < rows; ++i) {
+        for (IndexType j = 0; j < cols; ++j) {
+          CHECK(it != it_end);
+          M(i, j) = it->as<Scalar>();
+          ++it;
+        }
+      }
+    }
+    return true;
+  }
+
+  template <class Scalar, int B, int C, int D, int E>
+  static bool decode(const Node& node,
+                     Eigen::Matrix<Scalar, Eigen::Dynamic, B, C, D, E>& M)
+  {
+    if(!node.IsMap()) {
+      LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
+      return false;
+    }
+
+    typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, B, C, D, E>::Index
+        IndexType;
+    IndexType rows = node["rows"].as<IndexType>();
+    IndexType cols = node["cols"].as<IndexType>();
+
+    if(cols != B)
+    {
+      LOG(ERROR) << "The matrix is the wrong size (rows, cols). Wanted: (" << rows << ","
+          << B << "), got (" << rows << ", " << cols << ")";
+      return false;
+    }
+
+    M.resize(rows, Eigen::NoChange);
+
+    size_t expected_size = M.rows() * M.cols();
+    if (!node["data"].IsSequence())
+    {
+      LOG(ERROR) << "The matrix data is not a sequence.";
+      return false;
+    }
+    if(node["data"].size() != expected_size)
+    {
+      LOG(ERROR) << "The data sequence is the wrong size. Wanted: " << expected_size <<
+          ", got: " << node["data"].size();
+      return false;
+    }
+
+    YAML::const_iterator it = node["data"].begin();
+    YAML::const_iterator it_end = node["data"].end();
+    if (rows > 0 && cols > 0)
+    {
+      for (IndexType i = 0; i < rows; ++i) {
+        for (IndexType j = 0; j < cols; ++j) {
+          CHECK(it != it_end);
+          M(i, j) = it->as<Scalar>();
+          ++it;
+        }
+      }
+    }
+    return true;
+  }
+
+  template <class Scalar, int A, int C, int D, int E>
+  static bool decode(const Node& node,
+                     Eigen::Matrix<Scalar, A, Eigen::Dynamic, C, D, E>& M)
+  {
+    if(!node.IsMap())
+    {
+      LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
+      return false;
+    }
+
+    typedef typename Eigen::Matrix<Scalar, A, Eigen::Dynamic, C, D, E>::Index IndexType;
+    IndexType rows = node["rows"].as<IndexType>();
+    IndexType cols = node["cols"].as<IndexType>();
+
+    if(rows != A)
+    {
+      LOG(ERROR) << "The matrix is the wrong size (rows, cols). Wanted: (" << A << ","
+          << cols << "), got (" << rows << ", " << cols << ")";
+      return false;
+    }
+
+    M.resize(Eigen::NoChange, cols);
+
+    size_t expected_size = M.rows() * M.cols();
+    if (!node["data"].IsSequence())
+    {
+      LOG(ERROR) << "The matrix data is not a sequence.";
+      return false;
+    }
+    if(node["data"].size() != expected_size)
+    {
+      LOG(ERROR) << "The data sequence is the wrong size. Wanted: " << expected_size <<
+          ", got: " << node["data"].size();
+      return false;
+    }
+
+    YAML::const_iterator it = node["data"].begin();
+    YAML::const_iterator it_end = node["data"].end();
+    if (rows > 0 && cols > 0)
+    {
+      for (IndexType i = 0; i < rows; ++i) {
+        for (IndexType j = 0; j < cols; ++j) {
+          CHECK(it != it_end);
+          M(i, j) = it->as<Scalar>();
+          ++it;
+        }
+      }
+    }
+    return true;
+  }
+
+  template <class Scalar, int C, int D, int E>
+  static bool decode(
+      const Node& node,
+      Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, C, D, E>& M)
+  {
+    if(!node.IsMap())
+    {
+      LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
+      return false;
+    }
+
+    typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, C, D,
+                                   E>::Index IndexType;
+    IndexType rows = node["rows"].as<IndexType>();
+    IndexType cols = node["cols"].as<IndexType>();
+
+    M.resize(rows, cols);
+
+    size_t expected_size = M.rows() * M.cols();
+    if (!node["data"].IsSequence())
+    {
+      LOG(ERROR) << "The matrix data is not a sequence.";
+      return false;
+    }
+    if(node["data"].size() != expected_size)
+    {
+      LOG(ERROR) << "The data sequence is the wrong size. Wanted: " << expected_size <<
+          ", got: " << node["data"].size();
+      return false;
+    }
+    YAML::const_iterator it = node["data"].begin();
+    YAML::const_iterator it_end = node["data"].end();
+    if (rows > 0 && cols > 0) {
+      for (IndexType i = 0; i < rows; ++i) {
+        for (IndexType j = 0; j < cols; ++j) {
+          CHECK(it != it_end);
+          M(i, j) = it->as<Scalar>();
+          ++it;
+        }
+      }
     }
     return true;
   }
 };
-
-template <typename ObjectType>
-void Save(const ObjectType& object, std::ostream* ofs) {
-  CHECK_NOTNULL(ofs);
-  assert(ofs->good());
-  YAML::Node out;
-  out = object;
-  *ofs << out;
-}
-
-template <typename T>
-void Save(const T& object, const std::string& filename) {
-  std::ofstream ofs(filename.c_str());
-  Save(object, &ofs);
-}
-
-template <typename ObjectType>
-bool Load(const std::string& filename, ObjectType* object) {
-  CHECK_NOTNULL(object);
-  std::ifstream ifs(filename.c_str());
-  if (!ifs.good()) {
-    return false;
-  }
-
-  try {
-    YAML::Node doc = YAML::LoadFile(filename.c_str());
-    (*object) = doc.as<ObjectType>();
-    return true;
-  }
-  catch (const std::exception& e) {  // NOLINT
-    LOG(ERROR) << "Encountered exception while reading yaml " << e.what();
-    return false;
-  }
-}
 
 }  // namespace YAML
