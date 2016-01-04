@@ -6,7 +6,6 @@
 #include <ze/common/path_utils.h>
 
 namespace ze {
-namespace common {
 
 std::string getTestDataDir(const std::string& dataset_name)
 {
@@ -19,5 +18,4 @@ std::string getTestDataDir(const std::string& dataset_name)
   return path;
 }
 
-} // namespace common
 } // namespace ze

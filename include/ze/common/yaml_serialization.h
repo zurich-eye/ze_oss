@@ -18,14 +18,19 @@ namespace YAML {
 
 // A function to get a value from a YAML node with non-exception error handling.
 template<typename ValueType>
-bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value) {
+bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value)
+{
   CHECK_NOTNULL(value);
   bool success = false;
-  if(!node.IsMap()) {
+  if(!node.IsMap())
+  {
     LOG(ERROR) << "Unable to get Node[\"" << key << "\"] because the node is not a map";
-  } else {
+  }
+  else
+  {
     const YAML::Node sub_node = node[key];
-    if(sub_node) {
+    if(sub_node)
+    {
       try {
         *value = sub_node.as<ValueType>();
         success = true;
@@ -33,7 +38,9 @@ bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value) {
         LOG(ERROR) << "Error getting key \"" << key << "\" as type "
             << typeid(ValueType).name() << ": " << e.what();
       }
-    } else {
+    }
+    else
+    {
       LOG(ERROR) << "Key \"" << key << "\" does not exist";
     }
   }
