@@ -1,25 +1,25 @@
 #pragma once
 
+#include <ze/common/buffer.h>
+
 namespace ze {
 
 template <typename Scalar, int Dim>
-bool Buffer<Scalar,Dim>::getNearestValue(int64_t stamp, Vector* value)
+std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestValue(int64_t stamp)
 {
-  CHECK_NOTNULL(value);
   CHECK_GE(stamp, 0);
 
   std::lock_guard<std::mutex> lock(mutex_);
   if(buffer_.empty())
   {
     LOG(WARNING) << "Buffer is empty.";
-    return false;
+    return std::make_pair(Vector(), false);
   }
 
   auto it_before = iterator_equal_or_before(stamp);
   if(it_before->first == stamp)
   {
-    *value = it_before->second;
-    return true;
+    return std::make_pair(it_before->second, true);
   }
 
   // Compute time difference between stamp and closest entries.
@@ -31,37 +31,55 @@ bool Buffer<Scalar,Dim>::getNearestValue(int64_t stamp, Vector* value)
     dt_before = stamp - it_before->first;
 
   // Select which entry is closest based on time difference.
+  Vector result;
   if(dt_after < 0 && dt_before < 0)
   {
     CHECK(false) << "Should not occur.";
-    return false;
+    return std::make_pair(Vector(), false);
   }
   else if(dt_after < 0)
-    *value = it_before->second;
+    result = it_before->second;
   else if(dt_before < 0)
-    *value = it_after->second;
+    result = it_after->second;
   else if(dt_after > 0 && dt_before > 0 && dt_after < dt_before)
-    *value = it_after->second;
+    result = it_after->second;
   else
-    *value = it_before->second;
-  return true;
+    result = it_before->second;
+  return std::make_pair(result, true);
 }
 
 template <typename Scalar, int Dim>
-bool Buffer<Scalar,Dim>::getBetweenValuesInterpolated(
-    int64_t stamp_from, int64_t stamp_to,
-    Eigen::Matrix<int64_t, 1, Eigen::Dynamic>* stamps,
-    Eigen::Matrix<Scalar, kDim, Eigen::Dynamic>* values)
+std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getOldestValue() const
 {
-  CHECK_NOTNULL(stamps);
-  CHECK_NOTNULL(values);
+  std::lock_guard<std::mutex> lock(mutex_);
+  if(buffer_.empty())
+    return std::make_pair(Vector(), false);
+  return std::make_pair(buffer_.begin()->second, true);
+}
+
+template <typename Scalar, int Dim>
+std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNewestValue() const
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  if(buffer_.empty())
+    return std::make_pair(Vector(), false);
+  return std::make_pair(buffer_.rbegin()->second, true);
+}
+
+template <typename Scalar, int Dim>
+std::pair<Eigen::Matrix<int64_t, 1, Eigen::Dynamic>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+Buffer<Scalar,Dim>::getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to)
+{
   CHECK_GE(stamp_from, 0);
   CHECK_LT(stamp_from, stamp_to);
+  Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
+  Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> values;
+
   std::lock_guard<std::mutex> lock(mutex_);
   if(buffer_.size() < 2)
   {
     LOG(WARNING) << "Buffer has less than 2 entries.";
-    return false;
+    return std::make_pair(stamps, values); // return empty means unsuccessful.
   }
 
   const int64_t oldest_stamp = buffer_.begin()->first;
@@ -69,12 +87,12 @@ bool Buffer<Scalar,Dim>::getBetweenValuesInterpolated(
   if(stamp_from < oldest_stamp)
   {
     LOG(WARNING) << "Requests older timestamp than in buffer.";
-    return false;
+    return std::make_pair(stamps, values); // return empty means unsuccessful.
   }
   if(stamp_to > newest_stamp)
   {
     LOG(WARNING) << "Requests newer timestamp than in buffer.";
-    return false;
+    return std::make_pair(stamps, values); // return empty means unsuccessful.
   }
 
   auto it_from_before = iterator_equal_or_before(stamp_from);
@@ -88,10 +106,10 @@ bool Buffer<Scalar,Dim>::getBetweenValuesInterpolated(
   if(it_from_after == it_to_before)
   {
     LOG(WARNING) << "Not enough data for interpolation";
-    return false;
+    return std::make_pair(stamps, values); // return empty means unsuccessful.
   }
 
-  // Count number measurements.
+  // Count number of measurements.
   size_t n = 0;
   auto it = it_from_after;
   while(it != it_to_after)
@@ -102,56 +120,35 @@ bool Buffer<Scalar,Dim>::getBetweenValuesInterpolated(
   n += 2;
 
   // Interpolate values at start and end and copy in output vector.
-  stamps->resize(1, n);
-  values->resize(kDim, n);
+  stamps.resize(1, n);
+  values.resize(kDim, n);
   for(size_t i = 0; i < n; ++i)
   {
     if(i == 0)
     {
-      (*stamps)(i) = stamp_from;
+      stamps(i) = stamp_from;
       const double w =
           static_cast<double>(stamp_from - it_from_before->first) /
           static_cast<double>(it_from_after->first - it_from_before->first);
-      values->col(i) = (1.0 - w) * it_from_before->second + w * it_from_after->second;
+      values.col(i) = (1.0 - w) * it_from_before->second + w * it_from_after->second;
     }
     else if(i == n-1)
     {
-      (*stamps)(i) = stamp_to;
+      stamps(i) = stamp_to;
       const double w =
           static_cast<double>(stamp_to - it_to_before->first) /
           static_cast<double>(it_to_after->first - it_to_before->first);
-      values->col(i) = (1.0 - w) * it_to_before->second + w * it_to_after->second;
+      values.col(i) = (1.0 - w) * it_to_before->second + w * it_to_after->second;
     }
     else
     {
-      (*stamps)(i) = it_from_after->first;
-      values->col(i) = it_from_after->second;
+      stamps(i) = it_from_after->first;
+      values.col(i) = it_from_after->second;
       ++it_from_after;
     }
   }
-  return true;
-}
 
-template <typename Scalar, int Dim>
-bool Buffer<Scalar,Dim>::getOldestValue(Vector* value) const
-{
-  CHECK_NOTNULL(value);
-  std::lock_guard<std::mutex> lock(mutex_);
-  if(buffer_.empty())
-    return false;
-  *value = buffer_.begin()->second;
-  return true;
-}
-
-template <typename Scalar, int Dim>
-bool Buffer<Scalar,Dim>::getNewestValue(Vector* value) const
-{
-  CHECK_NOTNULL(value);
-  std::lock_guard<std::mutex> lock(mutex_);
-  if(buffer_.empty())
-    return false;
-  *value = buffer_.rbegin()->second;
-  return true;
+  return std::make_pair(stamps, values);
 }
 
 template <typename Scalar, int Dim>

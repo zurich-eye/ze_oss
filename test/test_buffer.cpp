@@ -66,37 +66,29 @@ TEST(BufferTest, testIterator)
 
 TEST(BufferTest, testNearestValue)
 {
-  Eigen::Vector2d value;
   ze::Buffer<double, 2> buffer;
-  EXPECT_FALSE(buffer.getNearestValue(ze::time::secToNanosec(1), &value));
+  EXPECT_FALSE(buffer.getNearestValue(ze::time::secToNanosec(1)).second);
 
   for(int i = 1; i < 10; ++i)
     buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
 
-  buffer.getNearestValue(ze::time::secToNanosec(1), &value);
-  EXPECT_EQ(value[0], 1);
-  buffer.getNearestValue(ze::time::secToNanosec(0.4), &value);
-  EXPECT_EQ(value[0], 1);
-  buffer.getNearestValue(ze::time::secToNanosec(1.4), &value);
-  EXPECT_EQ(value[0], 1);
-  buffer.getNearestValue(ze::time::secToNanosec(11.0), &value);
-  EXPECT_EQ(value[0], 9);
+  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(1)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(0.4)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(1.4)).first[0], 1);
+  EXPECT_EQ(buffer.getNearestValue(ze::time::secToNanosec(11.0)).first[0], 9);
 }
 
 TEST(BufferTest, testOldestNewestValue)
 {
-  Eigen::Vector2d value;
   ze::Buffer<double, 2> buffer;
-  EXPECT_FALSE(buffer.getOldestValue(&value));
-  EXPECT_FALSE(buffer.getNewestValue(&value));
+  EXPECT_FALSE(buffer.getOldestValue().second);
+  EXPECT_FALSE(buffer.getNewestValue().second);
 
   for(int i = 1; i < 10; ++i)
     buffer.insert(ze::time::secToNanosec(i), Eigen::Vector2d(i, i));
 
-  buffer.getNewestValue(&value);
-  EXPECT_EQ(value[0], 9);
-  buffer.getOldestValue(&value);
-  EXPECT_EQ(value[0], 1);
+  EXPECT_EQ(buffer.getNewestValue().first[0], 9);
+  EXPECT_EQ(buffer.getOldestValue().first[0], 1);
 }
 
 TEST(BufferTest, testInterpolation)
@@ -109,15 +101,15 @@ TEST(BufferTest, testInterpolation)
 
   Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
   Eigen::Matrix<double, 2, Eigen::Dynamic> values;
-  buffer.getBetweenValuesInterpolated(
-        ze::time::secToNanosec(1.2), ze::time::secToNanosec(5.4), &stamps, &values);
+  std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
+        ze::time::secToNanosec(1.2), ze::time::secToNanosec(5.4));
   EXPECT_EQ(stamps(0), ze::time::secToNanosec(1.2));
   EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(5.4));
   EXPECT_DOUBLE_EQ(values(0, 0), 1.2);
   EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 5.4);
 
-  buffer.getBetweenValuesInterpolated(
-        ze::time::secToNanosec(0), ze::time::secToNanosec(9), &stamps, &values);
+  std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
+        ze::time::secToNanosec(0), ze::time::secToNanosec(9));
   EXPECT_EQ(stamps(0), ze::time::secToNanosec(0));
   EXPECT_EQ(stamps(stamps.cols()-1), ze::time::secToNanosec(9));
   EXPECT_DOUBLE_EQ(values(0, 0), 0);
