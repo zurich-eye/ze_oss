@@ -1,7 +1,9 @@
 #pragma once
 
 #include <map>
+#include <tuple>
 #include <thread>
+#include <utility>
 #include <mutex>
 #include <Eigen/Dense>
 #include <glog/logging.h>
@@ -11,7 +13,7 @@
 
 namespace ze {
 
-// Oldest timestamp: buffer.begin(), Newest Timestamp: buffer.end() / buffer.rbegin()
+// Oldest entry: buffer.begin(), newest entry: buffer.rbegin()
 template <typename Scalar, int Dim>
 class Buffer
 {
@@ -27,17 +29,20 @@ public:
     buffer_[stamp] = data;
   }
 
-  // Get value with timestamp closest to stamp. Returns false if buffer empty.
-  bool getNearestValue(int64_t stamp, Vector* value);
+  // Get value with timestamp closest to stamp. Boolean in returns if successful.
+  std::pair<Vector, bool> getNearestValue(int64_t stamp);
 
-  bool getOldestValue(Vector* value) const;
+  // Get oldest value in buffer.
+  std::pair<Vector, bool> getOldestValue() const;
 
-  bool getNewestValue(Vector* value) const;
+  // Get newest value in buffer.
+  std::pair<Vector, bool> getNewestValue() const;
 
-  bool getBetweenValuesInterpolated(
-      int64_t stamp_from, int64_t stamp_to,
-      Eigen::Matrix<int64_t, 1, Eigen::Dynamic>* stamps,
-      Eigen::Matrix<Scalar, kDim, Eigen::Dynamic>* values);
+  // Get Values between timestamps. If timestamps are not matched, the values
+  // are interpolated. Returns a vector of timestamps and a block matrix with
+  // values as columns. Returns empty matrices if not successful.
+  std::pair<Eigen::Matrix<int64_t, 1, Eigen::Dynamic>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+  getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to);
 
   inline void clear()
   {
