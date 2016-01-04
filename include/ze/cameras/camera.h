@@ -85,10 +85,10 @@ public:
   inline void setLabel(const std::string& label) { label_ = label; }
 
   // Image width in pixels.
-  int width() const { return width_; }
+  inline int width() const { return width_; }
 
   // Image height in pixels.
-  int height() const { return height_; }
+  inline int height() const { return height_; }
 
   // Return if pixel u is within image boundaries.
   template<typename DerivedKeyPoint>
