@@ -13,6 +13,33 @@ Camera::Camera(const int width, const int height, const CameraType type,
   , type_(type)
 {}
 
+Camera::Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
+{
+  Bearings bearings(3, px_vec.cols());
+  for(int i = 0; i < px_vec.cols(); ++i)
+    bearings.col(i) = this->backProject(px_vec.col(i));
+  return bearings;
+}
+
+Camera::Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
+{
+  Keypoints px_vec(2, bearing_vec.cols());
+  for(int i = 0; i < bearing_vec.cols(); ++i)
+    px_vec.col(i) = this->project(bearing_vec.col(i));
+  return px_vec;
+}
+
+Eigen::Matrix<Camera::Scalar, 6, Eigen::Dynamic>
+Camera::dProject_dBearingVectorized(const Bearings& bearing_vec) const
+{
+  Eigen::Matrix<Scalar, 6, Eigen::Dynamic> H_vec(6, bearing_vec.cols());
+  for(int i = 0; i < bearing_vec.cols(); ++i)
+  {
+    H_vec.col(i) = Eigen::Map<Eigen::Matrix<Scalar, 6, 1>>(this->dProject_dBearing(bearing_vec.col(i)).data());
+  }
+  return H_vec;
+}
+
 Camera::Ptr Camera::loadFromYaml(const std::string& path)
 {
   try

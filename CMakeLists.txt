@@ -14,11 +14,13 @@ set(HEADERS
   include/ze/cameras/camera.h
   include/ze/cameras/camera_impl.h
   include/ze/cameras/camera_models.h
+  include/ze/cameras/camera_utils.h
   include/ze/cameras/camera_yaml_serialization.h
   )
 
 set(SOURCES
   src/camera.cpp
+  src/camera_utils.cpp
   src/camera_yaml_serialization.cpp
   )
 
@@ -30,6 +32,9 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 catkin_add_gtest(test_pinhole test/test_pinhole.cpp)
 target_link_libraries(test_pinhole ${PROJECT_NAME})
+
+catkin_add_gtest(test_camera_utils test/test_camera_utils.cpp)
+target_link_libraries(test_camera_utils ${PROJECT_NAME})
 
 ##########
 # EXPORT #

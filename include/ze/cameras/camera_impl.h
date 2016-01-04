@@ -9,8 +9,8 @@ class PinholeCamera : public Camera
 {
 public:
   using Scalar = typename Camera::Scalar;
-  using Vector2 = typename Camera::Vector2;
-  using Vector3 = typename Camera::Vector3;
+  using Keypoint = typename Camera::Keypoint;
+  using Bearing = typename Camera::Bearing;
   using Matrix23 = typename Camera::Matrix23;
 
   static constexpr size_t dimension = 4;
@@ -24,25 +24,22 @@ public:
 
   virtual ~PinholeCamera() = default;
 
-  virtual Vector3 backProject(const Eigen::Ref<const Vector2>& px) const override
+  virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const override
   {
-    CHECK_EQ(this->params_.size(), static_cast<int>(dimension));
-    Vector3 bearing;
+    Bearing bearing;
     internal::PinholeProjection::backProject(px.data(), this->params_.data(), bearing.data());
     return bearing;
   }
 
-  virtual Vector2 project(const Eigen::Ref<const Vector3>& bearing) const override
+  virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const override
   {
-    CHECK_EQ(this->params_.size(), static_cast<int>(dimension));
-    Vector2 px;
+    Keypoint px;
     internal::PinholeProjection::project(bearing.data(), this->params_.data(), px.data());
     return px;
   }
 
-  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Vector3>& bearing) const override
+  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Bearing>& bearing) const override
   {
-    CHECK_EQ(this->params_.size(), static_cast<int>(dimension));
     Matrix23 H;
     internal::PinholeProjection::dProject_dBearing(bearing.data(), this->params_.data(), H.data());
     return H;

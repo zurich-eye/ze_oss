@@ -22,9 +22,12 @@ class Camera
 public:
   ZE_POINTER_TYPEDEFS(Camera);
   using Scalar = double;
-  using Vector3  = Eigen::Matrix<Scalar, 3, 1>;
-  using Vector2  = Eigen::Matrix<Scalar, 2, 1>;
+  using Bearing  = Eigen::Matrix<Scalar, 3, 1>;
+  using Keypoint  = Eigen::Matrix<Scalar, 2, 1>;
+  using Bearings  = Eigen::Matrix<Scalar, 3, Eigen::Dynamic>;
+  using Keypoints  = Eigen::Matrix<Scalar, 2, Eigen::Dynamic>;
   using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
+
 
 public:
 
@@ -38,13 +41,29 @@ public:
 
   // Computes bearing vector from pixel coordinates. Z-component of returned
   // bearing vector is 1.0.
-  virtual Vector3 backProject(const Eigen::Ref<const Vector2>& px) const = 0;
+  virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
   // Computes pixel coordinates from bearing vector.
-  virtual Vector2 project(const Eigen::Ref<const Vector3>& bearing) const = 0;
+  virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const = 0;
 
   // Computes Jacobian of projection w.r.t. bearing vector.
-  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Vector3>& bearing) const = 0;
+  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Bearing>& bearing) const = 0;
+
+  // Block operations: Always prefer these functions to avoid cache misses.
+  // {
+
+  // Back projects a block of keypoints.
+  virtual Bearings backProjectVectorized(const Keypoints& px_vec) const;
+
+  // Projects a block of bearing vectors.
+  virtual Keypoints projectVectorized(const Bearings& bearing_vec) const;
+
+  // Vectorized computation of projection Jacobian. Each column in the returned
+  // matrix corresponds to one Jacobian after column-major reshaping.
+  virtual Eigen::Matrix<Scalar, 6, Eigen::Dynamic>
+  dProject_dBearingVectorized(const Bearings& bearing) const;
+
+  // }
 
   // Print camera info.
   void print(std::ostream& out, const std::string& s = "Camera: ") const;
