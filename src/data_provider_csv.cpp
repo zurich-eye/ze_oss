@@ -50,12 +50,12 @@ DataProviderCsv::DataProviderCsv(
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
-  loadImuData(csv_directory + ze::common::ensureLeftSlash(imu_topic), 0u);
+  loadImuData(csv_directory + ensureLeftSlash(imu_topic), 0u);
 
   for(auto it : camera_topics)
   {
-    std::string dir = csv_directory + ze::common::ensureLeftSlash(it.first);
-    loadCameraData(dir, it.second, ze::time::millisecToNanosec(100));
+    std::string dir = csv_directory + ensureLeftSlash(it.first);
+    loadCameraData(dir, it.second, millisecToNanosec(100));
   }
 
   buffer_it_ = buffer_.cbegin();
@@ -131,7 +131,7 @@ void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t play
   size_t i = 0;
   while(std::getline(fs, line))
   {
-    std::vector<std::string> items = ze::common::splitString(line, ',');
+    std::vector<std::string> items = splitString(line, ',');
     CHECK_EQ(items.size(), 7u);
     Eigen::Vector3d acc, gyr;
     acc << std::stod(items[4]), std::stod(items[5]), std::stod(items[6]);
@@ -160,7 +160,7 @@ void DataProviderCsv::loadCameraData(
   size_t i = 0;
   while(std::getline(fs, line))
   {
-      std::vector<std::string> items = ze::common::splitString(line, ',');
+      std::vector<std::string> items = splitString(line, ',');
       CHECK_EQ(items.size(), 2u);
     dataset::CameraMeasurement::Ptr camera_measurement(
         new dataset::CameraMeasurement(

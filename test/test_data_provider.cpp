@@ -45,7 +45,7 @@ TEST(DataProviderTests, testRosbag)
 {
   std::string data_dir = ze::getTestDataDir("rosbag_euroc_snippet");
   std::string bag_filename = data_dir + "/dataset.bag";
-  ASSERT_TRUE(ze::common::fileExists(bag_filename));
+  ASSERT_TRUE(ze::fileExists(bag_filename));
 
   ze::DataProviderRosbag dp(bag_filename, "/imu0", { {"/cam0/image_raw", 0},
                                                      {"/cam1/image_raw", 1} });

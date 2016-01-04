@@ -25,7 +25,7 @@ DataProviderRosbag::DataProviderRosbag(
   // TODO(cfo): Check if topics exists.
   // TODO(cfo): Display number of messages per topic in the beginning.
 
-  CHECK(common::fileExists(bag_filename));
+  CHECK(fileExists(bag_filename));
   bag_.reset(new rosbag::Bag);
   try
   {
