@@ -43,7 +43,7 @@ public:
   // Computes pixel coordinates from bearing vector.
   virtual Vector2 project(const Eigen::Ref<const Vector3>& bearing) const = 0;
 
-  // Computes Jacobian of projection w.r.t. bearing vector:
+  // Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Vector3>& bearing) const = 0;
 
   // Print camera info.

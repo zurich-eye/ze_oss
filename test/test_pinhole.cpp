@@ -30,7 +30,7 @@ TEST(CameraPinholeTest, testYamlParsing)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
-  ASSERT_TRUE(ze::common::fileExists(yaml_file));
+  ASSERT_TRUE(ze::fileExists(yaml_file));
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
   cam->print(std::cout);
   CHECK_DOUBLE_EQ(cam->params()(0), 320.0);
