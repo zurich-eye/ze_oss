@@ -10,7 +10,7 @@
 
 TEST(CameraPinholeTest, testProjectionJacobian)
 {
-  ze::PinholeCamera<double> cam(752, 480, 310, 320, 376.0, 240.0);
+  ze::PinholeCamera cam(752, 480, 310, 320, 376.0, 240.0);
   cam.setLabel("test");
   cam.print(std::cout);
 
@@ -20,7 +20,7 @@ TEST(CameraPinholeTest, testProjectionJacobian)
   Eigen::Matrix<double, 2, 3> H = cam.dProject_dBearing(bearing);
   Eigen::Matrix<double, 2, 3> H_numerical =
       ze::numericalDerivative<Eigen::Vector2d, Eigen::Vector3d>(
-        std::bind(&ze::PinholeCamera<double>::project, &cam, std::placeholders::_1),
+        std::bind(&ze::PinholeCamera::project, &cam, std::placeholders::_1),
         bearing);
   CHECK(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }

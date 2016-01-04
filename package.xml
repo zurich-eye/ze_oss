@@ -14,8 +14,8 @@
   <depend>glog_catkin</depend>
   <depend>gflags_catkin</depend>
   <depend>eigen_catkin</depend>
+  <depend>yaml_cpp_catkin</depend>
   <depend>minkindr</depend>
-  <depend>cv_bridge</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
 

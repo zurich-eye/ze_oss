@@ -5,23 +5,22 @@
 
 namespace ze {
 
-template<typename T>
-class PinholeCamera : public Camera<T>
+class PinholeCamera : public Camera
 {
 public:
-  using Scalar = T;
-  using Vector2 = typename Camera<Scalar>::Vector2;
-  using Vector3 = typename Camera<Scalar>::Vector3;
-  using Matrix23 = typename Camera<Scalar>::Matrix23;
+  using Scalar = typename Camera::Scalar;
+  using Vector2 = typename Camera::Vector2;
+  using Vector3 = typename Camera::Vector3;
+  using Matrix23 = typename Camera::Matrix23;
 
   static constexpr size_t dimension = 4;
 
-  PinholeCamera(int width, int height, T fx, T fy, T cx, T cy)
-    : Camera<Scalar>(width, height, CameraType::kPinhole)
-  {
-    this->params_.resize(dimension, 1);
-    this->params_ << fx, fy, cx, cy;
-  }
+  using Camera::Camera;
+
+  PinholeCamera(int width, int height, Scalar fx, Scalar fy, Scalar cx, Scalar cy)
+    : Camera(width, height, CameraType::kPinhole,
+             (Eigen::Matrix<Scalar, 4, 1>() << fx, fy, cx, cy).finished())
+  {}
 
   virtual ~PinholeCamera() = default;
 

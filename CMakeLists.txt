@@ -19,6 +19,7 @@ set(HEADERS
 
 set(SOURCES
   src/camera.cpp
+  src/camera_yaml_serialization.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
