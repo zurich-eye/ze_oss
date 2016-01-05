@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_benchmark_aligned_allocator</name>
+  <description>
+    Benchmark to check the duration of aligned allocation
+  </description>
+  <version>0.1.0</version>
+  <license>tbd</license>
+
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>glog_catkin</depend>
+  <depend>ze_cmake</depend>
+  <depend>imp_core</depend>
+
+</package>
