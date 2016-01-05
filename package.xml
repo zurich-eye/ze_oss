@@ -19,4 +19,5 @@
   <depend>ze_cmake</depend>
 
   <test_depend>gtest</test_depend>
+  <test_depend></test_depend>
 </package>
