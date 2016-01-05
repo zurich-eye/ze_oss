@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_core</name>
+  <description>
+    IMP core module
+  </description>
+  <version>0.0.1</version>
+  <license>tbd</license>
+
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>ze_cmake</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
