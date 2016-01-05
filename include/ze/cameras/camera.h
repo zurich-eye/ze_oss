@@ -61,7 +61,7 @@ public:
   // Vectorized computation of projection Jacobian. Each column in the returned
   // matrix corresponds to one Jacobian after column-major reshaping.
   virtual Eigen::Matrix<Scalar, 6, Eigen::Dynamic>
-  dProject_dBearingVectorized(const Bearings& bearing) const;
+  dProject_dBearingVectorized(const Bearings& bearing_vec) const;
 
   // }
 

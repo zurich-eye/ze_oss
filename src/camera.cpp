@@ -34,9 +34,7 @@ Camera::dProject_dBearingVectorized(const Bearings& bearing_vec) const
 {
   Eigen::Matrix<Scalar, 6, Eigen::Dynamic> H_vec(6, bearing_vec.cols());
   for(int i = 0; i < bearing_vec.cols(); ++i)
-  {
     H_vec.col(i) = Eigen::Map<Eigen::Matrix<Scalar, 6, 1>>(this->dProject_dBearing(bearing_vec.col(i)).data());
-  }
   return H_vec;
 }
 
