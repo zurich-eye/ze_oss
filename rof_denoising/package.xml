@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_ros_rof_denoising</name>
+  <description>
+    ROS nodes for denoising functionalities
+  </description>
+  <version>0.0.1</version>
+  <license>tbd</license>
+
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>rospy</depend>
+  <depend>dynamic_reconfigure</depend>
+
+  <depend>cv_bridge</depend>
+  <depend>ze_cmake</depend>
+  <depend>imp_core</depend>
+  <depend>imp_cu_core</depend>
+  <depend>imp_cu_imgproc</depend>
+  <depend>imp_bridge_opencv</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
