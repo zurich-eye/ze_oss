@@ -181,13 +181,11 @@ class TrajectoryAnalysis:
     
     
     
-   
+        traj_plot.plot_travelled_distance(self.distances, self.result_dir)
     
     def get_trajectory_length(self):
         assert(self.data_loaded)
         return self.distances[-1]
-        
-    #def plot_distances(self):
         
 
 

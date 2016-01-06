@@ -133,4 +133,9 @@ def plot_scale_error(translation, scale_error_perc, results_dir):
         file_out.write('%.8f, %.8f\n' % (translation[i], scale_error_perc[i])) 
     file_out.close()
     
-    
+def plot_travelled_distance(distances, results_dir):
+    fig = plt.figure(figsize=(8,5))
+    ax = fig.add_subplot(111, xlabel='Measurement', ylabel='Distance [m]')
+    ax.plot(range(len(distances)), distances)
+    fig.tight_layout()
+    fig.savefig(results_dir+'/distance'+FORMAT)
