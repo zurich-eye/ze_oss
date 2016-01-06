@@ -4,7 +4,7 @@
 """
 
 import numpy as np
-import ze.transformations as tf
+import ze_py.transformations as tf
 
 def get_rigid_body_trafo(quat,trans):
     T = tf.quaternion_matrix(quat)

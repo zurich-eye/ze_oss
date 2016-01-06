@@ -8,11 +8,11 @@ import yaml
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import ze.trajectory.align as align_trajectory
-import ze.trajectory.utils as traj_utils
-import ze.trajectory.load as traj_loading
-import ze.trajectory.plot as traj_plot
-import ze.transformations as tf
+import ze_trajectory_analysis.align as align_trajectory
+import ze_trajectory_analysis.utils as traj_utils
+import ze_trajectory_analysis.load as traj_loading
+import ze_trajectory_analysis.plot as traj_plot
+import ze_py.transformations as tf
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Cardo']})
 rc('text', usetex=True)

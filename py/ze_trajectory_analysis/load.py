@@ -5,7 +5,7 @@
 
 import os
 import numpy as np
-import ze.trajectory.utils as trajectory_utils
+import ze_trajectory_analysis.utils as trajectory_utils
 
 # -----------------------------------------------------------------------------
 # Dataset loading
