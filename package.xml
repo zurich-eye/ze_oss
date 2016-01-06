@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_trajectory_analysis</name>
+  <version>0.1.0</version>
+  <description>
+    Analyse trajectories: compute drift, RMS error, etc. and plot results.
+  </description>
+  <maintainer email="christian.forster@WyssZurich.ch">Christian Forster</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+
+  <export></export>
+</package>
