@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-@author: Christian Forster
+Zurich Eye
 """
 
 import os

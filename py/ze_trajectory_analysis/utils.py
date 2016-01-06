@@ -1,12 +1,28 @@
 #!/usr/bin/python
 """
-@author: Christian Forster
+Zurich Eye
 """
 
+import os
 import numpy as np
 import ze_py.transformations as tf
 
+def check_file_exists(filename):
+    """Utility to check if file exists"""
+    if not os.path.exists(filename):
+        raise ValueError('File does not exist: ' + filename)
+    return filename
+    
+def read_nanosecond_timestamps_from_csv_file(filename, col=0, delimiter=','):
+    """
+    Read nanosecond timestamps from textfile.
+    """
+    return np.genfromtxt(filename, usecols=(col), delimiter=delimiter, dtype=np.longlong, skip_header=1)
+
 def get_rigid_body_trafo(quat,trans):
+    """
+    Get 4x4 matrix from quaternion and translation.
+    """
     T = tf.quaternion_matrix(quat)
     T[0:3,3] = trans
     return T

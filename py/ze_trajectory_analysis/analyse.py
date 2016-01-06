@@ -1,81 +1,55 @@
 #!/usr/bin/python
 """
-@author: Christian Forster
+Zurich Eye
 """
 
 import os
 import yaml
+import logging
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import ze_trajectory_analysis.align as align_trajectory
-import ze_trajectory_analysis.utils as traj_utils
+import ze_trajectory_analysis.utils as utils
 import ze_trajectory_analysis.load as traj_loading
 import ze_trajectory_analysis.plot as traj_plot
 import ze_py.transformations as tf
-from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Cardo']})
-rc('text', usetex=True)
-
-FORMAT = '.pdf'
-
+           
 class TrajectoryAnalysis:
-    def __init__(self, results_dir, data_format='txt', align_type='sim3',
-                 align_num_frames=-1, use_hand_eye_calib=False, 
-                 evaluation_type='rms', boxplot_distances=''):
-        assert os.path.exists(results_dir)
-        assert data_format in ['txt', 'csv', 'blender']
-        assert align_type in ['first_frame', 'sim3', 'se3']
-        assert evaluation_type in ['rms', 'relative_errors', 'synthetic']
-        self.data_dir = results_dir
-        self.statistics_filename = os.path.join(self.data_dir, 'analysis_statistics.yaml')
+    
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.reset()
+       
+    def reset(self):
         self.data_loaded = False
         self.data_aligned = False
-        self.data_format = data_format
-        self.align_type = align_type
-        self.align_num_frames = int(align_num_frames)
-        self.use_hand_eye_calib = use_hand_eye_calib
-        self.evaluation_type = evaluation_type
-        self.boxplot_distances = boxplot_distances
-        
-    def load_data(self):
+          
+    def load_data(self, data_dir, data_format='csv',
+                  filename_gt = 'traj_gt.csv', filename_es = 'traj_es.csv', 
+                  filename_matches = 'traj_matches.csv', rematch_timestamps = False, 
+                  rematch_timestamps_max_difference_sec = 0.02):
+        """ Loads the trajectory data.
+        The resuls {p_es, q_es, p_gt, q_gt} is synchronized and has the same length.
+        filename_matches is optional, if it does not exist, we create it.
         """
-        Loads the trajectory data. The resuls {p_es, q_es, p_gt, q_gt} is
-        synchronized and has the same length.
-        """
-        print('Loading trajectory data..')
-        
-        
-        cam_delay = 0.0
-        self.T_cm = np.eye(4)
-        
-        # Load dataset parameters
-        dataset_params_file = os.path.join(self.data_dir, 'dataset.yaml')
-        if os.path.exists(dataset_params_file):
-            dataset_params = yaml.load(open(dataset_params_file,'r'))
-            self.T_cm = traj_loading.load_hand_eye_calib(dataset_params) # (marker) in (camera) frame
-            if cam_delay in dataset_params:
-                cam_delay = dataset_params['cam_delay']
-                
-        self.T_mc = tf.inverse_matrix(self.T_cm)
-        
-        # Load trajectory groundtruth and estimate
-        if self.data_format == 'txt':
+        utils.check_file_exists(os.path.join(data_dir, filename_gt))
+        utils.check_file_exists(os.path.join(data_dir, filename_es))
+ 
+        # Load trajectory data
+        self.logger.info('Loading trajectory data..')
+        if data_format == 'csv':
             self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt =\
-                traj_loading.load_dataset(self.data_dir, cam_delay)
-            
-        elif self.data_format == 'csv':
-            self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt =\
-                traj_loading.load_dataset_csv(self.data_dir)
-        elif self.data_format == 'blender':
-            self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt =\
-                traj_loading.load_synthetic_dataset(self.data_dir)
+                traj_loading.load_dataset_csv(data_dir, filename_gt, filename_es,
+                                              filename_matches, rematch_timestamps,
+                                              rematch_timestamps_max_difference_sec)
         else:
             raise ValueError('data_format' + self.data_format + ' not known.')
-        self.distances = traj_utils.get_distance_from_start(self.p_gt)
-               
+        self.logger.info('...done.')
+        
+        # Compute distance along trajectory from start to each measurement.
+        self.distances = utils.get_distance_from_start(self.p_gt)
         self.data_loaded = True
-        print('...done.')
         
     def analyse_trajectory(self):
         if not self.data_loaded:
@@ -168,12 +142,22 @@ class TrajectoryAnalysis:
         assert(self.data_loaded)
         return self.distances[-1]
 
+
+
+
+
+
+# -----------------------------------------------------------------------------
+# DEPRECATED
+
+
+
 def analyse_synthetic_trajectory(results_dir):
     
     data = np.loadtxt(os.path.join(results_dir, 'translation_error.txt'))
     t_gt, p_es, q_es, t_gt, p_gt, q_gt = load_synthetic_dataset(results_dir)
 
-    distances = traj_utils.get_distance_from_start(p_gt)
+    distances = utils.get_distance_from_start(p_gt)
     translation_error = data[:,1:4]
     plot_translation_error(distances, translation_error, results_dir)
       
@@ -225,7 +209,7 @@ def compute_relative_errors(results_dir, t_es, p_es, q_es, t_gt, p_gt, q_gt, n_a
     # compute relative rotation errors    (TODO: activate again for TUM datasets)
     dist = 1.0
     unit='s'
-    errors, e_trans, e_yaw, e_gravity, e_angle = traj_utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, 0.2*dist, unit, t_gt, scale)
+    errors, e_trans, e_yaw, e_gravity, e_angle = utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, 0.2*dist, unit, t_gt, scale)
     e_trans_median = np.median(e_trans)
     e_angle_median = np.median(e_angle)
     print('Relative Error ' + str(dist)+'/'+unit+' over ' + str(len(e_trans)) + ' measurements:')
@@ -296,7 +280,7 @@ def plot_boxplots_distances(results_dir, p_es, q_es, p_gt, q_gt, distances_str):
         [0.0, 1.0, 0.0, 0.0],
         [0.0, 0.0, 1.0, 0.0],
         [0.0, 0.0, 0.0, 1.0]])
-        errors, e_trans, e_yaw, e_gravity, e_angle = traj_utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, max_error)
+        errors, e_trans, e_yaw, e_gravity, e_angle = utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, max_error)
         e_trans_median = np.median(e_trans)
         print('dist = '+str(dist)+', median error = ' + str(e_trans_median) + ' ('+str(e_trans_median/np.double(dist)*100.0)+'%) ' + str(len(e_trans)) + 'measurements')
         trans_errors.append(e_trans)
@@ -358,27 +342,27 @@ def compute_and_save_statistics(data_vec, label, yaml_filename):
     with open(yaml_filename,'w') as outfile:
         outfile.write(yaml.dump(stats, default_flow_style=False))
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
   
-    # parse command line
-    parser = argparse.ArgumentParser(description='''
-    Analyse trajectory
-    ''')
-    parser.add_argument('--trace_dir', help='folder with the results', default='')
-    parser.add_argument('--evaluation_type', help='', default='rms')
-    parser.add_argument('--use_hand_eye_calib', help='', default='True')
-    parser.add_argument('--align_num_frames', help='', default=-1)
-    parser.add_argument('--align_type', help='', default='sim3') # option: 'sim3', 'se3'
-    parser.add_argument('--boxplot_distances', help='', default='')
-    parser.add_argument('--data_format', default='txt') # option: 'csv', 'txt', 'blender'
-    args = parser.parse_args()
-    
-    ta = TrajectoryAnalysis( args.trace_dir,
-                             data_format = args.data_format,
-                             align_type = args.align_type,
-                             align_num_frames = args.align_num_frames,
-                             use_hand_eye_calib = args.use_hand_eye_calib, 
-                             evaluation_type = args.evaluation_type,
-                             boxplot_distances = args.boxplot_distances)
-    ta.load_data()
-    ta.analyse_trajectory()
+# parse command line
+#    parser = argparse.ArgumentParser(description='''
+#    Analyse trajectory
+#    ''')
+#    parser.add_argument('--trace_dir', help='folder with the results', default='')
+#    parser.add_argument('--evaluation_type', help='', default='rms')
+#    parser.add_argument('--use_hand_eye_calib', help='', default='True')
+#    parser.add_argument('--align_num_frames', help='', default=-1)
+#    parser.add_argument('--align_type', help='', default='sim3') # option: 'sim3', 'se3'
+#    parser.add_argument('--boxplot_distances', help='', default='')
+#    parser.add_argument('--data_format', default='txt') # option: 'csv', 'txt', 'blender'
+#    args = parser.parse_args()
+#    
+#    ta = TrajectoryAnalysis( args.trace_dir,
+#                             data_format = args.data_format,
+#                             align_type = args.align_type,
+#                             align_num_frames = args.align_num_frames,
+#                             use_hand_eye_calib = args.use_hand_eye_calib, 
+#                             evaluation_type = args.evaluation_type,
+#                             boxplot_distances = args.boxplot_distances)
+#    ta.load_data()
+#    ta.analyse_trajectory()

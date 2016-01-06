@@ -1,5 +1,7 @@
 #!/usr/bin/python
-# Christian Forster, 2013
+"""
+Zurich Eye
+"""
 
 import numpy as np
 
