@@ -26,6 +26,7 @@ class TrajectoryAnalysis:
         self.logger = logging.getLogger(__name__)
         self.reset()
         self.result_dir = utils.check_folder_exists(result_dir)
+        self.statistics_filename = os.path.join(self.result_dir, 'statistics.yaml')
        
     def reset(self):
         self.data_loaded = False
@@ -60,11 +61,11 @@ class TrajectoryAnalysis:
         self.logger.info('...done.')
         
         # Compute distance along trajectory from start to each measurement.
-        self.distances = utils.get_distance_from_start(self.p_gt)
+        self.distances = utils.get_distance_from_start(self.p_gt) 
         self.data_dir = data_dir
         self.data_loaded = True
                
-    def align_trajectory(self, align_type = 'se3', last_idx = -1, first_idx = 0):
+    def align_trajectory(self, align_type = 'se3', first_idx = 0, last_idx = -1):
         """Align trajectory segment with ground-truth trajectory.
         
         first_idx: First index of data to align.
@@ -98,7 +99,8 @@ class TrajectoryAnalysis:
         elif align_type == 'se3':
             self.logger.info('Align SE3 - rotation, translation and scale.')
             self.rot, self.trans = \
-                align_trajectory.align_se3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
+                align_trajectory.align_se3(self.p_es[first_idx:last_idx,:], self.p_gt[first_idx:last_idx,:])
+            self.rot = np.transpose(self.rot)
             self.scale = 1.0 
         elif align_type == 'first_frame':
             self.trans = np.zeros((3,))
@@ -168,9 +170,9 @@ class TrajectoryAnalysis:
         traj_plot.plot_scale_error(self.distances, e_scale_rel*100.0, self.result_dir)
         
         # compute error statistics:
-        #stats_logger.compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
-        #stats_logger.compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
-        #stats_logger.compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
+        compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
+        compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
+        compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
         
         #if os.path.exists(os.path.join(self.data_dir, 'pointcloud.txt')):
         #    traj_plot.plot_pointcloud_3d(self.data_dir, 
@@ -179,20 +181,14 @@ class TrajectoryAnalysis:
     
     
     
-    def analyse_trajectory(self):
-        if not self.data_loaded:
-            self.load_data()
-            
-        if self.evaluation_type == 'synthetic':
-            self.analyse_synthetic_trajectory(self.data_dir, self.boxplot_distances)
-        elif self.evaluation_type == 'rms':
-            self.compute_rms_errors()
-        elif self.evaluation_type == 'relative_errors':
-            self.compute_relative_errors()    
+   
     
     def get_trajectory_length(self):
         assert(self.data_loaded)
         return self.distances[-1]
+        
+    #def plot_distances(self):
+        
 
 
 

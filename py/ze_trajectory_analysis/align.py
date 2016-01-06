@@ -51,7 +51,7 @@ def align_sim3(model, data):
 
     return s, R, t #, t_error
 
-def align_se3(model,data):
+def align_se3(model, data):
     """Align two trajectories using the method of Horn (closed-form). 
         
     Input:
