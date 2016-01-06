@@ -33,7 +33,7 @@ def associate(stamps_es, stamps_gt, offset_sec = 0.0, max_difference_sec = 0.02)
                          for a in es_keys 
                          for b in gt_keys 
                          if abs(a - (b + offset)) < max_difference]
-    logger.info('...done')
+    logger.info('...done.')
     potential_matches.sort()
     matches = []
     logger.info('Find best matches...')

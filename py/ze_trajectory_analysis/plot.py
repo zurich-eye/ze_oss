@@ -35,7 +35,7 @@ def plot_pointcloud_3d(results_dir, p_gt, p_es, scale, rot, trans):
     #fig.tight_layout()
     fig.savefig(results_dir+'/trajectory_3d'+FORMAT)
     
-def plot_trajectory(results_dir, p_gt, p_es, n_align_frames):
+def plot_trajectory(results_dir, p_gt, p_es, align_first_idx = 0, align_last_idx = -1):
     
     # plot trajectory
     fig = plt.figure(figsize=(6, 5.5))
@@ -45,9 +45,9 @@ def plot_trajectory(results_dir, p_gt, p_es, n_align_frames):
     p_gt_0 = p_gt - p_gt[0,:]
     ax.plot(p_es_0[:,0], p_es_0[:,1], 'b-', label='Estimate')
     ax.plot(p_gt_0[:,0], p_gt_0[:,1], 'r-', label='Groundtruth')
-    if n_align_frames > 0:
-        ax.plot(p_es_0[0:n_align_frames,0], p_es_0[0:n_align_frames,1], 'g-', linewidth=2, label='aligned')
-        for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[:n_align_frames:10,:],p_gt_0[:n_align_frames:10,:]):
+    if align_last_idx > 0:
+        ax.plot(p_es_0[align_first_idx:align_last_idx,0], p_es_0[align_first_idx:align_last_idx,1], 'g-', linewidth=2, label='aligned')
+        for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[align_first_idx:align_last_idx:10,:],p_gt_0[align_first_idx:align_last_idx:10,:]):
             ax.plot([x1,x2],[y1,y2],'-',color="gray")
     
     ax.legend(loc='upper right')

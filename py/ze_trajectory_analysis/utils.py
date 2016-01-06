@@ -12,6 +12,12 @@ def check_file_exists(filename):
     if not os.path.exists(filename):
         raise ValueError('File does not exist: ' + filename)
     return filename
+
+def check_folder_exists(directory):
+    """Utility to check if folder exists"""
+    if not os.path.isdir(directory):
+        raise ValueError('Folder does not exist: ' + directory)
+    return directory
     
 def read_nanosecond_timestamps_from_csv_file(filename, col=0, delimiter=','):
     """

@@ -29,12 +29,12 @@ def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_
     
     # generate or load matches:
     if not os.path.exists(filename_matches) or rematch_timestamps:
-        logger.info("Load data: Find timestamp matches")
+        logger.info("Find timestamp matches.")
         matches = match_stamps.associate(keys_es, keys_gt, match_timestamps_offset,
                                          match_timestamps_max_difference_sec)
         match_stamps.write_matches_to_file(filename_matches, matches)
     else:
-        logger.info("Load data: Find timestamp matches")
+        logger.info("Load timestamp matches from file.")
         matches = np.genfromtxt(filename_matches, dtype=np.longlong, delimiter=',', skip_header=1)
         
     # Create look-up table { es -> gt }

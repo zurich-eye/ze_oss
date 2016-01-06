@@ -8,6 +8,7 @@ import yaml
 import logging
 import argparse
 import numpy as np
+import numpy.testing as npt
 import matplotlib.pyplot as plt
 import ze_trajectory_analysis.align as align_trajectory
 import ze_trajectory_analysis.utils as utils
@@ -17,9 +18,14 @@ import ze_py.transformations as tf
            
 class TrajectoryAnalysis:
     
-    def __init__(self):
+    def __init__(self, result_dir):
+        """Analyse trajectory. 
+        
+        result_dir: The results of the analysis are saved at this location.
+        """
         self.logger = logging.getLogger(__name__)
         self.reset()
+        self.result_dir = utils.check_folder_exists(result_dir)
        
     def reset(self):
         self.data_loaded = False
@@ -28,10 +34,15 @@ class TrajectoryAnalysis:
     def load_data(self, data_dir, data_format='csv',
                   filename_gt = 'traj_gt.csv', filename_es = 'traj_es.csv', 
                   filename_matches = 'traj_matches.csv', rematch_timestamps = False, 
-                  rematch_timestamps_max_difference_sec = 0.02):
-        """ Loads the trajectory data.
+                  match_timestamps_offset = 0.0, rematch_timestamps_max_difference_sec = 0.02):
+        """Loads the trajectory data.
+        
         The resuls {p_es, q_es, p_gt, q_gt} is synchronized and has the same length.
-        filename_matches is optional, if it does not exist, we create it.
+        
+        filename_matches:   Optional, if it does not exist, it is created.
+        rematch_timestamps: If True, finds matching timestamps between estimated
+                            and groundtruth trajectory. Saves the results to
+                            filename_matches.
         """
         utils.check_file_exists(os.path.join(data_dir, filename_gt))
         utils.check_file_exists(os.path.join(data_dir, filename_es))
@@ -42,6 +53,7 @@ class TrajectoryAnalysis:
             self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt =\
                 traj_loading.load_dataset_csv(data_dir, filename_gt, filename_es,
                                               filename_matches, rematch_timestamps,
+                                              match_timestamps_offset,
                                               rematch_timestamps_max_difference_sec)
         else:
             raise ValueError('data_format' + self.data_format + ' not known.')
@@ -49,58 +61,91 @@ class TrajectoryAnalysis:
         
         # Compute distance along trajectory from start to each measurement.
         self.distances = utils.get_distance_from_start(self.p_gt)
+        self.data_dir = data_dir
         self.data_loaded = True
+               
+    def align_trajectory(self, align_type = 'se3', last_idx = -1, first_idx = 0):
+        """Align trajectory segment with ground-truth trajectory.
         
-    def analyse_trajectory(self):
+        first_idx: First index of data to align.
+        last_idx:  Last index of data to align.
+        align_type: 'se3' - translation and orientation
+                    'sim3' - translation, orientation, and scale
+                    'first_frame' - align just the first frame, alignment = Identity.
+        """
         if not self.data_loaded:
-            self.load_data()
-            
-        if self.evaluation_type == 'synthetic':
-            self.analyse_synthetic_trajectory(self.data_dir, self.boxplot_distances)
-        elif self.evaluation_type == 'rms':
-            self.compute_rms_errors()
-        elif self.evaluation_type == 'relative_errors':
-            self.compute_relative_errors()
-        
-    def align_trajectory(self):
-        n = int(self.align_num_frames)
-        if n < 0.0:
-            print('Align all frames')
-            n = len(self.p_es)
+            raise ValueError("You need to first load the data")           
+
+        if last_idx < 0:
+            if first_idx == 0:
+                self.logger.info('Align trajectory using all frames.')
+            else:
+                self.logger.info('Align trajectory from index '+str(first_idx)+' to the end.')
+            last_idx = len(self.p_es)
         else:
-            print('Align trajectory using ' + str(n) + ' frames.')
+            self.logger.info('Align trajectory from index ' + str(first_idx) + \
+                             ' to ' + str(first_idx) + '.')
          
         #
         # TODO: Apply hand-eye calibration to estimted trajectory
         #             
         
-        if self.align_type == 'sim3':
-            self.scale, self.rot, self.trans = align_trajectory.align_sim3(self.p_gt[:n,:], self.p_es[:n,:])
-        elif self.align_type == 'se3':
-            self.rot, self.trans = align_trajectory.align_se3(self.p_gt[:n,:], self.p_es[:n,:])
+        # Compute alignment parameters
+        if align_type == 'sim3':
+            self.logger.info('Align Sim3 - rotation, translation and scale.')
+            self.scale, self.rot, self.trans = \
+                align_trajectory.align_sim3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
+        elif align_type == 'se3':
+            self.logger.info('Align SE3 - rotation, translation and scale.')
+            self.rot, self.trans = \
+                align_trajectory.align_se3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
             self.scale = 1.0 
-        elif self.align_type == 'first_frame':
+        elif align_type == 'first_frame':
             self.trans = np.zeros((3,))
             self.rot = np.eye(3)            
             self.scale = 1.0
             
+        self.logger.info('Alignment translation: \n' + str(self.trans))
+        self.logger.info('Alignment rotation: \n' + str(self.rot))
+        self.logger.info('Alignment scale: \n' + str(self.scale))
+        npt.assert_almost_equal(np.linalg.det(self.rot), 1.0)
+            
+        self.logger.info('Apply alignment to estimated trajectory to fit groundtruth')
+        q = tf.quaternion_from_matrix(tf.convert_3x3_to_4x4(self.rot))
         self.p_es_aligned = np.zeros(np.shape(self.p_es))
         self.q_es_aligned = np.zeros(np.shape(self.q_es))
         for i in range(np.shape(self.p_es)[0]):
             self.p_es_aligned[i,:] = self.scale*self.rot.dot(self.p_es[i,:]) + self.trans
-            self.q_es_aligned[i,:] = ru.dcm2quat(self.rot.dot(ru.quat2dcm(self.q_es[i,:]))) # TODO: use tf
-        self.data_aligned
+            self.q_es_aligned[i,:] = tf.quaternion_multiply(q, self.q_es[i,:])
+        
+        self.align_first_idx = first_idx
+        self.align_last_idx = last_idx
+        self.data_aligned = True         
             
+            
+    def plot_aligned_trajectory(self, plot_format = 'png'):
+        """Saves a plot of the aligned trajectory to 'result_dir'"""
+        
+        if not self.data_aligned:
+            raise ValueError("You need to first load and align the data")   
+            
+        self.logger.info('Save a plot of the aligned trajectory to: ' + self.result_dir)
+        traj_plot.plot_trajectory(self.result_dir, self.p_gt, self.p_es_aligned,
+                                  self.align_first_idx, self.align_last_idx)
+                                  
     def compute_rms_errors(self):
-       
-        # align trajectory
-        self.align_trajectory()
+        """Compute Root Mean Square Error (RMSE) of aligned trajectory w.r.t
+        groundtruth trajectory.
+        """
+        
+        if not self.data_aligned:
+            raise ValueError("You need to first load and align the data")   
         
         # position error 
         e_trans = (self.p_gt-self.p_es_aligned)  
         e_trans_euclidean = np.sqrt(np.sum(e_trans**2, 1))
         
-        # orientation error 
+        self.logger.info('Compute orientation error')
         e_rot = np.zeros((len(e_trans_euclidean,)))
         e_rpy = np.zeros(np.shape(self.p_es_aligned))
         for i in range(np.shape(self.p_es_aligned)[0]):
@@ -110,33 +155,40 @@ class TrajectoryAnalysis:
             e_rpy[i,:] = tf.euler_from_matrix(R_ge, 'rzyx')
             e_rot[i] = np.linalg.norm(tf.logmap_so3(R_ge[:3,:3]))
         
-        # scale drift
+        self.logger.info('Compute scale drift')
         motion_gt = np.diff(self.p_gt, 0)
         motion_es = np.diff(self.p_es_aligned, 0)
         dist_gt = np.sqrt(np.sum(np.multiply(motion_gt,motion_gt),1))
         dist_es = np.sqrt(np.sum(np.multiply(motion_es,motion_es),1))
         e_scale_rel = np.divide(dist_es,dist_gt)-1.0
 
-        # position drift
-        
-        # plot
-        traj_plot.plot_translation_error(self.distances, e_trans, self.data_dir)
-        traj_plot.plot_rotation_error(self.distances, e_rpy, self.data_dir)
-        traj_plot.plot_scale_error(self.distances, e_scale_rel*100.0, self.data_dir)
+        self.logger.info('Save error plots')
+        traj_plot.plot_translation_error(self.distances, e_trans, self.result_dir)
+        traj_plot.plot_rotation_error(self.distances, e_rpy, self.result_dir)
+        traj_plot.plot_scale_error(self.distances, e_scale_rel*100.0, self.result_dir)
         
         # compute error statistics:
-        stats_logger.compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
-        stats_logger.compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
-        stats_logger.compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
+        #stats_logger.compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
+        #stats_logger.compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
+        #stats_logger.compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
         
-        # plot trajectory
-        traj_plot.plot_trajectory(self.data_dir, self.p_gt, self.p_es_aligned,
-                                  self.align_num_frames)
-                            
-        if os.path.exists(os.path.join(self.data_dir, 'pointcloud.txt')):
-            traj_plot.plot_pointcloud_3d(self.data_dir, 
-                                         self.p_gt, self.p_es_aligned,
-                                         self.scale, self.rot, self.trans)
+        #if os.path.exists(os.path.join(self.data_dir, 'pointcloud.txt')):
+        #    traj_plot.plot_pointcloud_3d(self.data_dir, 
+        #                                 self.p_gt, self.p_es_aligned,
+        #                                 self.scale, self.rot, self.trans)
+    
+    
+    
+    def analyse_trajectory(self):
+        if not self.data_loaded:
+            self.load_data()
+            
+        if self.evaluation_type == 'synthetic':
+            self.analyse_synthetic_trajectory(self.data_dir, self.boxplot_distances)
+        elif self.evaluation_type == 'rms':
+            self.compute_rms_errors()
+        elif self.evaluation_type == 'relative_errors':
+            self.compute_relative_errors()    
     
     def get_trajectory_length(self):
         assert(self.data_loaded)
