@@ -185,4 +185,4 @@ protected:
 
 } // namespace ze
 
-#include <ze/nlls_solver/least_squares_solver-inl.h>
+#include <ze/geometry/least_squares_solver-inl.h>

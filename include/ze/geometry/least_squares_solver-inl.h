@@ -1,4 +1,4 @@
-#include <ze/nlls_solver/least_squares_solver.h>
+#include <ze/geometry/least_squares_solver.h>
 
 #include <stdexcept>
 #include <glog/logging.h>

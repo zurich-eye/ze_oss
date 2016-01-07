@@ -1,4 +1,4 @@
-#include <ze/nlls_solver/robust_cost.h>
+#include <ze/geometry/robust_cost.h>
 
 #include <cmath>
 #include <numeric>
