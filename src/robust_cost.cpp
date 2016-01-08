@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <glog/logging.h>
 
+#include <ze/common/stl_utils.h>
+
 namespace ze {
 
 // -----------------------------------------------------------------------------
@@ -16,19 +18,12 @@ float UnitScaleEstimator::compute(std::vector<float>& /*errors*/) const
 
 float MADScaleEstimator::compute(std::vector<float>& errors) const
 {
-  CHECK(!errors.empty()) << "Error vector is empty.";
-  auto it = errors.begin()+std::floor(errors.size()/2);
-  std::nth_element(errors.begin(), it, errors.end()); // compute median
-  return 1.48f * (*it); // 1.48f / 0.6745
+
 }
 
 float NormalDistributionScaleEstimator::compute(std::vector<float>& errors) const
 {
-  const float mean = std::accumulate(errors.begin(), errors.end(), 0)/errors.size();
-  float var = 0.0;
-  for(const float d : errors)
-    var += (d - mean) * (d - mean);
-  return std::sqrt(var); // return standard deviation
+
 }
 
 //------------------------------------------------------------------------------
