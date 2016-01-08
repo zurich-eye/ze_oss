@@ -62,8 +62,23 @@ class TrajectoryAnalysis:
         
         # Compute distance along trajectory from start to each measurement.
         self.distances = utils.get_distance_from_start(self.p_gt) 
+        traj_plot.plot_travelled_distance(self.distances, self.result_dir)
+        
         self.data_dir = data_dir
         self.data_loaded = True
+        
+    def load_estimator_results(self, data_dir, data_format='swe', filename = 'traj_es.csv'):
+        self.logger.info('Loading estimator data')
+        filename = utils.check_file_exists(os.path.join(data_dir, filename))
+        if data_format == 'swe':
+            self.estimator_ts, self.vel_es, self.bias_gyr_es, self.bias_acc_es = \
+                traj_loading.load_estimator_results(filename)
+        else:
+            raise ValueError("estimator results format \""+data_format+"\" not known.")
+            
+        # Plot estimated biases
+        traj_plot.plot_imu_biases(self.estimator_ts, self.bias_gyr_es,
+                                  self.bias_acc_es, self.result_dir)
                
     def align_trajectory(self, align_type = 'se3', first_idx = 0, last_idx = -1):
         """Align trajectory segment with ground-truth trajectory.
@@ -173,22 +188,11 @@ class TrajectoryAnalysis:
         compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
         compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
         compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
-        
-        #if os.path.exists(os.path.join(self.data_dir, 'pointcloud.txt')):
-        #    traj_plot.plot_pointcloud_3d(self.data_dir, 
-        #                                 self.p_gt, self.p_es_aligned,
-        #                                 self.scale, self.rot, self.trans)
-    
-    
-    
-        traj_plot.plot_travelled_distance(self.distances, self.result_dir)
     
     def get_trajectory_length(self):
         assert(self.data_loaded)
         return self.distances[-1]
         
-
-
 
 
 

@@ -8,6 +8,8 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.gridspec as gridspec
+from matplotlib.ticker import FuncFormatter
 #from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Cardo']})
@@ -50,7 +52,7 @@ def plot_trajectory(results_dir, p_gt, p_es, align_first_idx = 0, align_last_idx
         for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[align_first_idx:align_last_idx:10,:],p_gt_0[align_first_idx:align_last_idx:10,:]):
             ax.plot([x1,x2],[y1,y2],'-',color="gray")
     
-    ax.legend(loc='upper right')
+    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     #ax.set_ylim([-0.5, 5])
     fig.tight_layout()
     fig.savefig(results_dir+'/trajectory_top'+FORMAT)
@@ -123,6 +125,7 @@ def plot_scale_error(translation, scale_error_perc, results_dir):
     fig = plt.figure(figsize=(8,2.5))
     ax = fig.add_subplot(111, xlabel='Distance [m]', ylabel='Scale Drift [\%]', xlim=[0,translation[-1]])
     ax.plot(translation, scale_error_perc, 'b-')
+    ax.set_ylim([-100, 100])
     fig.tight_layout()
     fig.savefig(results_dir+'/scale_drift'+FORMAT)
     
@@ -139,3 +142,69 @@ def plot_travelled_distance(distances, results_dir):
     ax.plot(range(len(distances)), distances)
     fig.tight_layout()
     fig.savefig(results_dir+'/distance'+FORMAT)
+    
+def plot_imu_biases(stamps, bias_gyr, bias_acc, results_dir):
+    
+    stamps = np.array(stamps) - stamps[0]
+    
+    # Find min-max range of accelerometer bias
+    acc_min = 1.1*np.min(bias_acc)
+    acc_max = 1.1*np.max(bias_acc)
+
+    # Plot Accelerometer Bias.
+    fig = plt.figure(figsize=(6,8))
+    gs1 = gridspec.GridSpec(3, 1)
+    gs1.update(wspace=0.015) # set the spacing between axes. 
+    ax0 = fig.add_subplot(611, ylabel='Acc. Bias x')
+    ax0.set_xticks([])
+    ax0.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    #ax0.locator_params(axis = 'y', nbins = 5)
+    ax0.plot(stamps/1e9, bias_acc[:,0], color='blue')
+    ax1 = fig.add_subplot(612, ylabel='Acc. Bias y')
+    ax1.set_xticks([])
+    ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    #ax1.locator_params(axis = 'y', nbins = 5)
+    ax1.plot(stamps/1e9, bias_acc[:,1], color='blue')
+    ax2 = fig.add_subplot(613, ylabel='Acc. Bias z')
+    #ax2.locator_params(axis = 'y', nbins = 5)
+    ax2.set_xticks([])
+    ax2.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    ax2.plot(stamps/1e9, bias_acc[:,2], color='blue')
+
+    ax0.set_ylim([acc_min, acc_max])
+    ax1.set_ylim([acc_min, acc_max])
+    ax2.set_ylim([acc_min, acc_max])
+    
+    #ax0.legend(ncol=2,  loc='lower left', borderaxespad=0.2)
+    
+    # Find min-max range of gyroscope bias
+    gyro_min = 1.1*np.min(bias_gyr)
+    gyro_max = 1.1*np.max(bias_gyr)
+    
+    # Plot gyroscope bias
+    ax3 = fig.add_subplot(614, ylabel='Gyro. Bias x')
+    ax3.set_xticks([])
+    ax3.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    #ax3.locator_params(axis = 'y', nbins = 5)
+    ax3.plot(stamps/1e9, bias_gyr[:,0], color='blue')
+    ax4 = fig.add_subplot(615, ylabel='Gyro. Bias y')
+    ax4.set_xticks([])
+    ax4.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    #ax4.locator_params(axis = 'y', nbins = 5)
+    ax4.plot(stamps/1e9, bias_gyr[:,1], color='blue')
+    ax5 = fig.add_subplot(616, ylabel='Gyro. Bias z', xlabel='Time [s]')
+    #ax5.locator_params(axis = 'y', nbins = 5)
+    ax5.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.3f'%y))
+    ax5.plot(stamps/1e9, bias_gyr[:,2], color='blue')
+    
+    ax3.set_ylim([gyro_min, gyro_max])
+    ax4.set_ylim([gyro_min, gyro_max])
+    ax5.set_ylim([gyro_min, gyro_max])
+    
+    #ax3.legend(ncol=2, loc='lower left') 
+    
+    ax5.tick_params('x',top='off')
+    fig.tight_layout()
+    fig.savefig(results_dir+'/biases'+FORMAT)
+    
+    return 0

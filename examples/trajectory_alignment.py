@@ -19,6 +19,7 @@ data_dir = test_utils.get_test_data_dir('ze_applanix_gt_data')
 
 ta = traj_analysis.TrajectoryAnalysis('.')
 ta.load_data(data_dir)
+ta.load_estimator_results(data_dir)
 ta.align_trajectory('sim3', 300, -1)
 ta.plot_aligned_trajectory()
 ta.compute_rms_errors()

@@ -70,6 +70,17 @@ def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_
     return t_es, p_es, q_es, t_gt, p_gt, q_gt    
     
 
+def load_estimator_results(filename):
+    logger = logging.getLogger(__name__)
+    stamp = utils.read_nanosecond_timestamps_from_csv_file(filename, 0, ',')
+    data = np.genfromtxt(filename, delimiter=',', dtype=np.float64, skip_header=1)[:,1:]
+    velocity = data[:,7:10]    
+    bias_gyr = data[:,10:13]
+    bias_acc = data[:,13:17]
+    return stamp, velocity, bias_gyr, bias_acc
+        
+    
+    
 # -----------------------------------------------------------------------------
 # DEPRECATED
 
