@@ -47,10 +47,10 @@ def plot_trajectory(results_dir, p_gt, p_es, align_first_idx = 0, align_last_idx
     p_gt_0 = p_gt - p_gt[0,:]
     ax.plot(p_es_0[:,0], p_es_0[:,1], 'b-', label='Estimate')
     ax.plot(p_gt_0[:,0], p_gt_0[:,1], 'r-', label='Groundtruth')
-    if align_last_idx > 0:
-        ax.plot(p_es_0[align_first_idx:align_last_idx,0], p_es_0[align_first_idx:align_last_idx,1], 'g-', linewidth=2, label='aligned')
-        for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[align_first_idx:align_last_idx:10,:],p_gt_0[align_first_idx:align_last_idx:10,:]):
-            ax.plot([x1,x2],[y1,y2],'-',color="gray")
+    #if align_last_idx < len(p_gt):
+    #    ax.plot(p_es_0[align_first_idx:align_last_idx,0], p_es_0[align_first_idx:align_last_idx,1], 'g-', linewidth=2, label='aligned')
+    for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[align_first_idx:align_last_idx:10,:],p_gt_0[align_first_idx:align_last_idx:10,:]):
+        ax.plot([x1,x2],[y1,y2],'-',color="gray")
     
     ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     #ax.set_ylim([-0.5, 5])
