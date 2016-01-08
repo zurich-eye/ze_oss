@@ -3,7 +3,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
-#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <glog/logging.h>
 
 #include <ze/common/stl_utils.h>
@@ -13,11 +13,11 @@ namespace ze {
 template <typename DerivedVec>
 std::pair<typename DerivedVec::Scalar, bool> median(const Eigen::MatrixBase<DerivedVec>& v)
 {
-  EIGEN_STATIC_ASSERT_VECTOR_ONLY(ev)
+  EIGEN_STATIC_ASSERT_VECTOR_ONLY(DerivedVec);
   if(v.size() == 0)
   {
     LOG(WARNING) << "Median computation of empty vector.";
-    return std::make_pair(0, false);
+    return std::make_pair(0.0, false);
   }
   std::vector<typename DerivedVec::Scalar> w = eigenVectorToStlVector(v);
   const size_t center = w.size() / 2;
