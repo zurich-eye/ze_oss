@@ -9,22 +9,6 @@
 
 namespace ze {
 
-// -----------------------------------------------------------------------------
-// Scale Estimators
-float UnitScaleEstimator::compute(std::vector<float>& /*errors*/) const
-{
-  return 1.0f;
-}
-
-float MADScaleEstimator::compute(std::vector<float>& errors) const
-{
-
-}
-
-float NormalDistributionScaleEstimator::compute(std::vector<float>& errors) const
-{
-
-}
 
 //------------------------------------------------------------------------------
 // Weight Functions

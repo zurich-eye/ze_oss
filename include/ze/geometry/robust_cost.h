@@ -28,9 +28,11 @@ template <typename Scalar>
 struct MADScaleEstimator
 {
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& normed_errors) const
+  static Scalar compute(const Vector& normed_errors)
   {
-    std::pair<Scalar, bool> res = median(normed_errors);
+    Vector absolute_error(normed_errors.size());
+    absolute_error = normed_errors.array().abs();
+    std::pair<Scalar, bool> res = median(absolute_error);
     CHECK(res.second);
     return 1.48f * res.first; // 1.48f / 0.6745
   }
@@ -41,15 +43,18 @@ template <typename Scalar>
 struct NormalDistributionScaleEstimator
 {
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& normed_errors) const
+  static Scalar compute(const Vector& normed_errors)
   {
-    const Scalar mean = normed_errors.sum() / normed_errors.size();
-    Scalar variance = 0.0;
+    // normed errors should not have absolute values.
+    const int n = normed_errors.size();
+    CHECK(n > 1);
+    const Scalar mean = normed_errors.sum() / n;
+    Scalar sum2 = 0.0;
     for(int i = 0; i < normed_errors.size(); ++i)
     {
-      variance += (normed_errors(i) - mean) * (normed_errors(i) - mean);
+      sum2 += (normed_errors(i) - mean) * (normed_errors(i) - mean);
     }
-    return std::sqrt(var); // return standard deviation
+    return std::sqrt(sum2 / (n - 1));
   }
 };
 
