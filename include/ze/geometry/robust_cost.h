@@ -45,7 +45,7 @@ struct NormalDistributionScaleEstimator
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
   static Scalar compute(const Vector& normed_errors)
   {
-    // normed errors should not have absolute values.
+    // normed_errors should not have absolute values.
     const int n = normed_errors.size();
     CHECK(n > 1);
     const Scalar mean = normed_errors.sum() / n;
