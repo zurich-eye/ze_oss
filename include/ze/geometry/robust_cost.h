@@ -17,7 +17,7 @@ template <typename Scalar>
 struct UnitScaleEstimator
 {
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static constexpr Scalar compute(const Vector& normed_errors)
+  static constexpr Scalar compute(const Vector& /*errors*/)
   {
     return 1.0;
   }
@@ -28,10 +28,10 @@ template <typename Scalar>
 struct MADScaleEstimator
 {
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& normed_errors)
+  static Scalar compute(const Vector& errors)
   {
-    Vector absolute_error(normed_errors.size());
-    absolute_error = normed_errors.array().abs();
+    Vector absolute_error(errors.size());
+    absolute_error = errors.array().abs();
     std::pair<Scalar, bool> res = median(absolute_error);
     CHECK(res.second);
     return 1.48f * res.first; // 1.48f / 0.6745
@@ -43,16 +43,16 @@ template <typename Scalar>
 struct NormalDistributionScaleEstimator
 {
   using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& normed_errors)
+  static Scalar compute(const Vector& errors)
   {
     // normed_errors should not have absolute values.
-    const int n = normed_errors.size();
+    const int n = errors.size();
     CHECK(n > 1);
-    const Scalar mean = normed_errors.sum() / n;
+    const Scalar mean = errors.sum() / n;
     Scalar sum2 = 0.0;
-    for(int i = 0; i < normed_errors.size(); ++i)
+    for(int i = 0; i < errors.size(); ++i)
     {
-      sum2 += (normed_errors(i) - mean) * (normed_errors(i) - mean);
+      sum2 += (errors(i) - mean) * (errors(i) - mean);
     }
     return std::sqrt(sum2 / (n - 1));
   }
@@ -64,41 +64,58 @@ struct NormalDistributionScaleEstimator
 // Weight-Functions for M-Estimators
 // http://research.microsoft.com/en-us/um/people/zhang/inria/publis/tutorial-estim/node24.html
 
-class WeightFunction
+template <typename Scalar, typename Implementation>
+struct WeightFunction
 {
-public:
-  WeightFunction() = default;
-  virtual ~WeightFunction() = default;
-  virtual float weight(const float& normed_errors) const = 0;
-};
-typedef std::shared_ptr<WeightFunction> WeightFunctionPtr;
-
-class UnitWeightFunction : public WeightFunction
-{
-public:
-  using WeightFunction::WeightFunction;
-  virtual ~UnitWeightFunction() = default;
-  virtual float weight(const float& normed_errors) const;
+  using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  static Vector weightVectorized(const Vector& error_vec)
+  {
+    Vector weights(error_vec.size());
+    for(int i = 0; i < error_vec.size(); ++i)
+    {
+      weights(i) = Implementation::weight(error_vec(i));
+    }
+    return weights;
+  }
 };
 
-class TukeyWeightFunction : public WeightFunction
+template <typename Scalar>
+struct UnitWeightFunction : public WeightFunction<Scalar, UnitWeightFunction<Scalar>>
 {
-public:
-  TukeyWeightFunction(const float b = 4.6851f);
-  virtual ~TukeyWeightFunction() = default;
-  virtual float weight(const float& normed_errors) const;
-private:
-  float b_square_;
+  static constexpr Scalar weight(const Scalar& /*normed_error*/)
+  {
+    return 1.0;
+  }
 };
 
-class HuberWeightFunction : public WeightFunction
+template <typename Scalar>
+struct TukeyWeightFunction : public WeightFunction<Scalar, TukeyWeightFunction<Scalar>>
 {
-public:
-  HuberWeightFunction(const float k = 1.345f);
-  virtual ~HuberWeightFunction() = default;
-  virtual float weight(const float& normed_errors) const;
-private:
-  float k_;
+  static constexpr Scalar b_square = 4.6851 * 4.6851;
+  static Scalar weight(const Scalar& error)
+  {
+    const Scalar x_square = error * error;
+    if(x_square <= b_square)
+    {
+      const Scalar tmp = 1.0f - x_square / b_square;
+      return tmp * tmp;
+    }
+    else
+    {
+      return 0.0f;
+    }
+  }
+};
+
+template <typename Scalar>
+struct HuberWeightFunction : public WeightFunction<Scalar, HuberWeightFunction<Scalar>>
+{
+  static constexpr Scalar k = 1.345;
+  static Scalar weight(const Scalar& normed_error)
+  {
+    const Scalar abs_error = std::abs(normed_error);
+    return (abs_error < k) ? 1.0f : k / abs_error;
+  }
 };
 
 } // namespace ze

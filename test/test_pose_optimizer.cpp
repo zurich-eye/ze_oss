@@ -41,11 +41,16 @@ TEST(NllsPoseOptimizerTests, testSolver)
     pix_noisy(1,i) += px_noise(gen);
   }
 
+  // Perturb pose:
   ze::Timer t;
-  PoseOptimizer optimizer(pix_noisy, pos_W, T_C_B, cam, T_B_W);
-  for(size_t i = 0; i < 10; ++i)
-    optimizer.evaluateError(T_B_W, nullptr, nullptr);
-  std::cout << "evaluateError took " << t.stop() * 1000 << " ms\n";
+  Transformation T_B_W_perturbed =
+      T_B_W * Transformation::exp((Eigen::Matrix<double, 6, 1>() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished());
+  PoseOptimizer optimizer(pix_noisy, pos_W, T_C_B, cam, 1.0);
+  optimizer.optimize(T_B_W);
+  std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+  Transformation T_err = T_B_W * T_B_W_perturbed.inverse();
+  std::cout << T_err << std::endl;
+
 }
 
 

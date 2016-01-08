@@ -25,4 +25,22 @@ TEST(RobustCostTest, testScaleEstimators)
   EXPECT_TRUE(std::abs(s3 - 3.0) < 0.2);
 }
 
+TEST(RobustCostTest, testWeightFunctions)
+{
+  // Generate normally distributed errors with standard deviation 3.0
+  std::ranlux24 gen;
+  std::normal_distribution<double> noise(0.0, 3.0);
+  constexpr int n = 10;
+  Eigen::VectorXd errors(n);
+  errors.setZero();
+  for(int i = 0; i < n; ++i)
+    errors(i) = noise(gen);
+
+  Eigen::VectorXd errors_scaled =
+      ze::HuberWeightFunction<double>::weightVectorized(errors);
+
+  std::cout << errors.transpose() << std::endl;
+  std::cout << errors_scaled.transpose() << std::endl;
+}
+
 ZE_UNITTEST_ENTRYPOINT
