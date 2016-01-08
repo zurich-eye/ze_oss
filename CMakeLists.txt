@@ -18,6 +18,8 @@ set(HEADERS
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
+  include/ze/common/statistics.h
+  include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
