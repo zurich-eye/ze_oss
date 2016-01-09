@@ -13,7 +13,7 @@ class PoseOptimizer : public LeastSquaresSolver<6, Transformation, PoseOptimizer
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using WeightFunction = TukeyWeightFunction<double>;
+  using WeightFunction = UnitWeightFunction<double>;
 
   PoseOptimizer(const Keypoints& measurements,
                 const Positions& landmarks,

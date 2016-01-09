@@ -31,7 +31,7 @@ double PoseOptimizer::evaluateError(
   Keypoints px_est = cam_.projectVectorized(p_C);
 
   // Compute difference between bearing vectors.
-  Keypoints px_err = px_ - px_est;
+  Keypoints px_err = px_est - px_;
 
   Eigen::VectorXd px_err_norm = px_err.colwise().norm();
 
@@ -50,20 +50,21 @@ double PoseOptimizer::evaluateError(
   if(H && g)
   {
     // Projection Jacobian transposed:
-    Eigen::Matrix<double, 6, Eigen::Dynamic> J_proj_tr =
-        cam_.dProject_dBearingVectorized(p_C);
+    //Eigen::Matrix<double, 6, Eigen::Dynamic> J_proj_tr =
+    //    cam_.dProject_dBearingVectorized(p_C);
 
-    Positions p_B = T_B_W.transformVectorized(p_W_);
     Eigen::Matrix3d R_C_B = T_C_B_.getRotation().getRotationMatrix();
     for(int i = 0; i < px_.cols(); ++i)
     {
       // Jacobian computation.
       Eigen::Matrix<double, 3, 6> G_x;
       G_x.block<3,3>(0,0) = Eigen::Matrix3d::Identity();
-      G_x.block<3,3>(0,3) = - skewSymmetric(p_B.col(i));
+      G_x.block<3,3>(0,3) = - skewSymmetric(p_W_.col(i));
+
+      Eigen::Matrix<double, 2, 3> J_cam = cam_.dProject_dBearing(p_C.col(i));
       Eigen::Matrix<double, 2, 6> J =
-          Eigen::Map<Eigen::Matrix<double, 3, 2>>(J_proj_tr.col(i).data()).transpose()
-          * R_C_B * G_x; // TODO: can use property of skew symmetric, to use point in camera coordinates!
+          //Eigen::Map<Eigen::Matrix<double, 3, 2>>(J_proj_tr.col(i).data()).transpose()
+          J_cam * R_C_B * T_B_W.getRotationMatrix() * G_x; // TODO: can use property of skew symmetric, to use point in camera coordinates!
 
       // Whiten Jacobian:
       J /= px_measurement_sigma_;
@@ -82,7 +83,7 @@ void PoseOptimizer::update(
     const Transformation& T_Bold_W, const UpdateVector& dx,
     Transformation& T_Bnew_W)
 {
-  T_Bnew_W = Transformation::exp(dx)*T_Bold_W;
+  T_Bnew_W = T_Bold_W * Transformation::exp(dx);
 }
 
 } // namespace ze
