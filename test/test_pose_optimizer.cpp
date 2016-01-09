@@ -16,7 +16,7 @@ TEST(NllsPoseOptimizerTests, testSolver)
   T_C_B.setRandom(); // Random camera to imu/body transformation.
   T_B_W.setRandom(); // Random body transformation.
 
-  const size_t n = 200;
+  const size_t n = 120;
   PinholeCamera cam(640, 480, 329.11, 329.11, 320.0, 240.0);
   Keypoints pix_true = generateRandomKeypoints(640, 480, 10, n);
 
@@ -50,7 +50,6 @@ TEST(NllsPoseOptimizerTests, testSolver)
   std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
   Transformation T_err = T_B_W * T_B_W_perturbed.inverse();
   std::cout << T_err << std::endl;
-
 }
 
 
