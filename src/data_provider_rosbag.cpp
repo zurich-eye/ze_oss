@@ -38,9 +38,13 @@ DataProviderRosbag::DataProviderRosbag(
 
   std::vector<std::string> topics;
   for(auto it : img_topic_camidx_map_)
+  {
     topics.push_back(it.first);
+  }
   if(!imu_topic.empty())
+  {
     topics.push_back(imu_topic);
+  }
 
   bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics)));
   bag_view_it_ = bag_view_->begin();

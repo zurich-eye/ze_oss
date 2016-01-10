@@ -75,7 +75,7 @@ bool DataProviderCsv::spinOnce()
     const dataset::MeasurementBase::Ptr& data = buffer_it_->second;
     switch (data->type)
     {
-      case dataset::MeasurementType::kCamera:
+      case dataset::MeasurementType::Camera:
       {
         if(camera_callback_)
         {
@@ -93,7 +93,7 @@ bool DataProviderCsv::spinOnce()
         }
         break;
       }
-      case dataset::MeasurementType::kImu:
+      case dataset::MeasurementType::Imu:
       {
         if(imu_callback_)
         {

@@ -20,7 +20,9 @@ TEST(DataProviderTests, testCsv)
   {
     ++num_imu_measurements;
     if(stamp == expect_imu_stamp)
+    {
       expect_imu_stamp = 0;
+    }
   });
 
   size_t num_cam_measurements = 0;
@@ -30,7 +32,9 @@ TEST(DataProviderTests, testCsv)
   {
     ++num_cam_measurements;
     if(stamp == expect_cam_stamp)
+    {
       expect_cam_stamp = 0;
+    }
   });
 
   dp.spin();
@@ -62,9 +66,13 @@ TEST(DataProviderTests, testRosbag)
         [&](int64_t stamp, const cv::Mat& img, size_t cam_idx)
   {
     if(cam_idx == 0)
+    {
       ++num_cam0_measurements;
+    }
     if(cam_idx == 1)
+    {
       ++num_cam1_measurements;
+    }
   });
 
   dp.spin();

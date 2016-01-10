@@ -18,9 +18,9 @@ namespace ze {
 namespace dataset {
 
 enum class MeasurementType {
-  kImu,
-  kCamera,
-  kFeatureTrack,
+  Imu,
+  Camera,
+  FeatureTrack,
 };
 
 struct MeasurementBase
@@ -46,7 +46,7 @@ struct ImuMeasurement : public MeasurementBase
 
   ImuMeasurement() = delete;
   ImuMeasurement(int64_t stamp_ns, const Eigen::Vector3d& acc, const Eigen::Vector3d& gyr)
-    : MeasurementBase(stamp_ns, MeasurementType::kImu)
+    : MeasurementBase(stamp_ns, MeasurementType::Imu)
     , acc(acc)
     , gyr(gyr)
   {}
@@ -63,7 +63,7 @@ struct CameraMeasurement : public MeasurementBase
 
   CameraMeasurement() = delete;
   CameraMeasurement(int64_t stamp_ns, size_t cam_idx, const std::string& img_path)
-    : MeasurementBase(stamp_ns, MeasurementType::kCamera)
+    : MeasurementBase(stamp_ns, MeasurementType::Camera)
     , camera_index(cam_idx)
     , image_path_filename(img_path)
   {}
@@ -84,7 +84,7 @@ struct FeatureTrackMeasurement : public MeasurementBase
   FeatureTrackMeasurement(int64_t stamp_ns, size_t cam_idx, int track_id,
                           const Eigen::Vector2d& keypoint_measurement,
                           double keypoint_std_dev)
-    : MeasurementBase(stamp_ns, MeasurementType::kFeatureTrack)
+    : MeasurementBase(stamp_ns, MeasurementType::FeatureTrack)
     , camera_index(cam_idx)
     , track_id(track_id)
     , keypoint_measurement(keypoint_measurement)
@@ -137,11 +137,10 @@ private:
       const size_t camera_index,
       int64_t playback_delay);
 
-  // Buffer to chronologically sort the data.
+  //! Buffer to chronologically sort the data.
   DataBuffer buffer_;
 
-  // Points to the next published buffer value. Make sure buffer does not change
-  // once initialized!
+  //! Points to the next published buffer value. Buffer can't change once loaded!
   DataBuffer::const_iterator buffer_it_;
 };
 

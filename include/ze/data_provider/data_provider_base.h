@@ -36,17 +36,16 @@ public:
   DataProviderBase(data_provider::Type type);
   virtual ~DataProviderBase() = default;
 
-  // Process all callbacks. Waits until callback is processed.
+  //! Process all callbacks. Waits until callback is processed.
   virtual void spin() = 0;
 
-  // Read next data field and process callback. Waits until callback is processed.
-  // Returns false when datatset finished.
+  //! Read next data field and process callback. Returns false when datatset finished.
   virtual bool spinOnce() = 0;
 
-  // False if there is no more data to process or there was a shutdown signal.
+  //! False if there is no more data to process or there was a shutdown signal.
   virtual bool ok() const = 0;
 
-  // Stop data provider.
+  //! Stop data provider.
   virtual void shutdown();
 
   void registerImuCallback(const data_provider::ImuCallback& imu_callback);
