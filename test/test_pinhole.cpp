@@ -5,6 +5,7 @@
 
 #include <ze/common/test/entrypoint.h>
 #include <ze/common/test/utils.h>
+#include <ze/common/matrix.h>
 #include <ze/common/manifold.h>
 #include <ze/common/numerical_derivative.h>
 #include <ze/cameras/camera_impl.h>
