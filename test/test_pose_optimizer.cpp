@@ -1,5 +1,6 @@
 #include <random>
 #include <ze/common/test/entrypoint.h>
+#include <ze/common/matrix.h>
 #include <ze/common/timer.h>
 #include <ze/common/types.h>
 #include <ze/common/transformation.h>
@@ -40,16 +41,25 @@ TEST(NllsPoseOptimizerTests, testSolver)
     pix_noisy(0,i) += px_noise(gen);
     pix_noisy(1,i) += px_noise(gen);
   }
+  Bearings bearings_noisy = cam.backProjectVectorized(pix_noisy);
+  normalizeBearings(bearings_noisy);
 
   // Perturb pose:
-  ze::Timer t;
   Transformation T_B_W_perturbed =
       T_B_W * Transformation::exp((Eigen::Matrix<double, 6, 1>() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished());
-  PoseOptimizer optimizer(pix_noisy, pos_W, T_C_B, cam, 1.0);
-  optimizer.optimize(T_B_W_perturbed);
+
+  // Optimize using bearing vectors:
+  ze::Timer t;
+  PoseOptimizerBearingVectors optimizer(bearings_noisy, pos_W, T_C_B, 1.0);
+  Transformation T_B_W_estimate = T_B_W_perturbed;
+  optimizer.optimize(T_B_W_estimate);
   std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
-  Transformation T_err = T_B_W * T_B_W_perturbed.inverse();
+  Transformation T_err = T_B_W * T_B_W_estimate.inverse();
+
   std::cout << T_err << std::endl;
+  std::cout << "angle error = " << T_err.getRotation().log().norm() << std::endl;
+  std::cout << "pos error" << T_err.getPosition().norm() << std::endl;
+
 }
 
 

@@ -8,31 +8,30 @@
 
 namespace ze {
 
-class PoseOptimizer : public LeastSquaresSolver<6, Transformation, PoseOptimizer>
+class PoseOptimizerBearingVectors :
+    public LeastSquaresSolver<6, Transformation, PoseOptimizerBearingVectors>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
   using WeightFunction = UnitWeightFunction<double>;
 
-  PoseOptimizer(const Keypoints& measurements,
-                const Positions& landmarks,
-                const Transformation& T_C_B,
-                const PinholeCamera& cam,
-                double pixel_measurement_sigma);
+  PoseOptimizerBearingVectors(
+      const Bearings& measurements, const Positions& landmarks,
+      const Transformation& T_C_B, double pixel_measurement_sigma);
 
-  double evaluateError(const Transformation& T_B_W, HessianMatrix* H,
-                       GradientVector *g);
+  double evaluateError(
+      const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
 
-  void update(const Transformation& T_Bold_W, const UpdateVector& dx,
-              Transformation& T_Bnew_W);
+  void update(
+      const Transformation& T_Bold_W, const UpdateVector& dx,
+      Transformation& T_Bnew_W);
 
 private:
-  const Keypoints& px_;  ///< Bearing vectors corresponding to feature measurements.
+  const Bearings& f_;  ///< Bearing vectors corresponding to feature measurements.
   const Positions& p_W_;    ///< 3D points corresponding to features.
   const Transformation& T_C_B_;   ///< Camera-IMU extrinsic calibration.
-  const PinholeCamera& cam_;
-  double px_measurement_sigma_ = 1.0;
+  double measurement_sigma_ = 1.0;
 };
 
 } // namespace ze

@@ -10,6 +10,7 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
+  include/ze/geometry/jacobians.h
   include/ze/geometry/least_squares_solver.h
   include/ze/geometry/least_squares_solver-inl.h
   include/ze/geometry/pose_optimizer.h
