@@ -52,17 +52,10 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
     g_.setZero();
 
     // compute initial error
-    n_meas_ = 0;
     double new_chi2 = evaluateError(state, &H_, &g_);
 
-    // add prior
-    if(have_prior_)
-    {
-      applyPrior(state);
-    }
-
     // solve the linear system
-    if(!solve(H_, g_, dx_))
+    if(!solve(state, H_, g_, dx_))
     {
       LOG(WARNING) << "Matrix is close to singular! Stop Optimizing."
                    << "H = " << H_ << "g = " << g_;
@@ -75,7 +68,6 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
       VLOG(400) << "It. " << iter_
                 << "\t Failure"
                 << "\t new_chi2 = " << new_chi2
-                << "\t n_meas = " << n_meas_
                 << "\t Error increased. Stop optimizing.";
       state = old_state; // rollback
       break;
@@ -91,7 +83,6 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
     VLOG(400) << "It. " << iter_
               << "\t Success"
               << "\t new_chi2 = " << new_chi2
-              << "\t n_meas = " << n_meas_
               << "\t x_norm = " << x_norm;
     finishIteration();
 
@@ -113,8 +104,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
 
   // compute the initial error
   chi2_ = evaluateError(state, nullptr, nullptr);
-  VLOG(400) << "init chi2 = " << chi2_
-          << "\t n_meas = " << n_meas_;
+  VLOG(400) << "init chi2 = " << chi2_;
 
   // TODO: compute initial lambda
   // Hartley and Zisserman: "A typical init value of lambda is 10^-3 times the
@@ -149,26 +139,18 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
       g_.setZero();
 
       // linearize
-      n_meas_ = 0;
       evaluateError(state, &H_, &g_);
 
       // add damping term:
       H_ += (H_.diagonal()*mu_).asDiagonal();
 
-      // add prior
-      if(have_prior_)
-      {
-        applyPrior(state);
-      }
-
       // solve the linear system to obtain small perturbation in direction of gradient
-      if(solve(H_, g_, dx_))
+      if(solve(state, H_, g_, dx_))
       {
         // apply perturbation to the state
         update(state, dx_, new_model);
 
         // compute error with new model and compare to old error
-        n_meas_ = 0;
         new_chi2 = evaluateError(new_model, nullptr, nullptr);
         rho_ = chi2_-new_chi2;
       }
@@ -190,7 +172,6 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
         VLOG(400) << "It. " << iter_
                   << "\t Trial " << trials_
                   << "\t Success"
-                  << "\t n_meas = " << n_meas_
                   << "\t new_chi2 = " << new_chi2
                   << "\t mu = " << mu_
                   << "\t nu = " << nu_;
@@ -207,7 +188,6 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
         VLOG(400) << "It. " << iter_
                   << "\t Trial " << trials_
                   << "\t Failure"
-                  << "\t n_meas = " << n_meas_
                   << "\t new_chi2 = " << new_chi2
                   << "\t mu = " << mu_
                   << "\t nu = " << nu_;
@@ -225,22 +205,11 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
 }
 
 template <int D, typename T, typename Implementation>
-void LeastSquaresSolver<D, T, Implementation>::setPrior(
-    const T&  prior, const Eigen::Matrix<double, D, D>&  Information)
-{
-  have_prior_ = true;
-  prior_ = prior;
-  I_prior_ = Information;
-}
-
-template <int D, typename T, typename Implementation>
 void LeastSquaresSolver<D, T, Implementation>::reset()
 {
-  have_prior_ = false;
   chi2_ = 1e10;
   mu_ = solver_options_.mu_init;
   nu_ = solver_options_.nu_init;
-  n_meas_ = 0;
   iter_ = 0;
   trials_ = 0;
   stop_ = false;

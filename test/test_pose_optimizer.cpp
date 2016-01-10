@@ -9,7 +9,7 @@
 #include <ze/geometry/pose_optimizer.h>
 #include <ze/geometry/robust_cost.h>
 
-TEST(NllsPoseOptimizerTests, testSolver)
+TEST(PoseOptimizerTests, testSolver)
 {
   using namespace ze;
 
@@ -46,26 +46,76 @@ TEST(NllsPoseOptimizerTests, testSolver)
 
   // Perturb pose:
   Transformation T_B_W_perturbed =
-      T_B_W * Transformation::exp((Eigen::Matrix<double, 6, 1>() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished());
+      T_B_W * Transformation::exp((Vector6() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished());
 
   // Optimize using bearing vectors:
   PoseOptimizerFrameData data;
   data.f = bearings_noisy;
   data.p_W = pos_W;
   data.T_C_B = T_C_B;
-  ze::Timer t;
-  std::vector<PoseOptimizerFrameData> data_vec = { data };
-  PoseOptimizer optimizer(data_vec, 1.0);
-  Transformation T_B_W_estimate = T_B_W_perturbed;
-  optimizer.optimize(T_B_W_estimate);
-  std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
 
-  // Compute error:
-  Transformation T_err = T_B_W * T_B_W_estimate.inverse();
-  std::cout << T_err << std::endl;
-  std::cout << "angle error = " << T_err.getRotation().log().norm() << std::endl;
-  std::cout << "pos error" << T_err.getPosition().norm() << std::endl;
+  // Without prior:
+  {
+    double pos_prior_weight = 0.0;
+    double rot_prior_weight = 0.0;
+    ze::Timer t;
+    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
+    Transformation T_B_W_estimate = T_B_W_perturbed;
+    optimizer.optimize(T_B_W_estimate);
+    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
 
+    // Compute error:
+    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
+    double pos_error = T_err.getPosition().norm();
+    double ang_error = T_err.getRotation().log().norm();
+    CHECK_LT(pos_error, 0.005);
+    CHECK_LT(ang_error, 0.005);
+    std::cout << "ang error = " << ang_error << std::endl;
+    std::cout << "pos error = " << pos_error << std::endl;
+  }
+
+  // With rotation prior:
+  {
+    double pos_prior_weight = 0.0;
+    double rot_prior_weight = 10.0;
+    ze::Timer t;
+    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
+    Transformation T_B_W_estimate = T_B_W_perturbed;
+    optimizer.optimize(T_B_W_estimate);
+    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+
+    // Compute error:
+    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
+    double pos_error = T_err.getPosition().norm();
+    double ang_error = T_err.getRotation().log().norm();
+    CHECK_LT(pos_error, 0.005);
+    CHECK_LT(ang_error, 0.005);
+    std::cout << "ang error = " << ang_error << std::endl;
+    std::cout << "pos error = " << pos_error << std::endl;
+  }
+
+  // With position prior:
+  {
+    double pos_prior_weight = 10.0;
+    double rot_prior_weight = 0.0;
+    ze::Timer t;
+    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
+    Transformation T_B_W_estimate = T_B_W_perturbed;
+    optimizer.optimize(T_B_W_estimate);
+    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+
+    // Compute error:
+    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
+    double pos_error = T_err.getPosition().norm();
+    double ang_error = T_err.getRotation().log().norm();
+    CHECK_LT(pos_error, 0.005);
+    CHECK_LT(ang_error, 0.005);
+    std::cout << "ang error = " << ang_error << std::endl;
+    std::cout << "pos error = " << pos_error << std::endl;
+  }
 }
 
 

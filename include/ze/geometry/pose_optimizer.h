@@ -30,10 +30,13 @@ class PoseOptimizer :
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using WeightFunction = UnitWeightFunction<double>;
+  using ScaleEstimator = MADScaleEstimator<double>;
+  using WeightFunction = TukeyWeightFunction<double>;
 
   PoseOptimizer(
-      const std::vector<PoseOptimizerFrameData>& data, double measurement_sigma);
+      const std::vector<PoseOptimizerFrameData>& data,
+      const Transformation& T_B_W_prior,
+      const double prior_weight_pos, const double prior_weight_rot);
 
   double evaluateError(
       const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
@@ -44,7 +47,12 @@ public:
 
 private:
   const std::vector<PoseOptimizerFrameData>& data_;
-  double measurement_sigma_ = 1.0;
+  std::vector<double> measurement_sigma_;
+
+  // Prior:
+  const Transformation& T_B_W_prior_;
+  double prior_weight_pos_;
+  double prior_weight_rot_;
 };
 
 } // namespace ze

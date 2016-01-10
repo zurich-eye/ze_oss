@@ -74,11 +74,6 @@ public:
   /// Levenberg Marquardt optimization strategy
   void optimizeLevenbergMarquardt(State& state);
 
-  /// Add prior to optimization.
-  void setPrior(
-      const State&  prior,
-      const Eigen::Matrix<double, D, D>&  Information);
-
   /// Reset all parameters to restart the optimization
   void reset();
 
@@ -115,12 +110,13 @@ protected:
 
   /// Solve the linear system H*dx = g to obtain optimal perturbation dx.
   bool solve(
+      const State& state,
       const HessianMatrix& H,
       const GradientVector& g,
       UpdateVector& dx)
   {
     if(&LeastSquaresSolver::solve != &Implementation::solve)
-      return impl().solve(H, g, dx);
+      return impl().solve(state, H, g, dx);
     else
       return solveDefaultImpl(H, g, dx);
   }
@@ -132,12 +128,6 @@ protected:
       State& new_state)
   {
     impl().update(state, dx, new_state);
-  }
-
-  void applyPrior(const State& current_model)
-  {
-    if(&LeastSquaresSolver::applyPrior != &Implementation::applyPrior)
-      impl().applyPrior(current_model);
   }
 
   void startIteration()
@@ -170,14 +160,10 @@ protected:
   HessianMatrix  H_;        ///< Hessian or approximation Jacobian*Jacobian^T.
   GradientVector g_;        ///< Jacobian*residual.
   UpdateVector   dx_;       ///< Update step.
-  bool have_prior_ = false;
-  State prior_;
-  Eigen::Matrix<double, D, D> I_prior_; ///< Prior information matrix (inverse covariance)
   double chi2_ = 0.0;       ///< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
   double rho_ = 0.0;        ///< Error reduction: chi2-new_chi2.
   double mu_ = 0.01;        ///< Damping parameter.
   double nu_ = 2.0;         ///< Factor that specifies how much we increase mu at every trial.
-  size_t n_meas_ = 0;       ///< Number of measurements.
   bool stop_ = false;       ///< Stop flag.
   size_t iter_ = 0;         ///< Current Iteration.
   size_t trials_ = 0;       ///< Current number of trials.
