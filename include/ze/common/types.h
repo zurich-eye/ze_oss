@@ -16,8 +16,7 @@ using FloatType = double;
 //------------------------------------------------------------------------------
 // Typedefs of commonly used Eigen matrices and vectors.
 
-// Create handy typedefs and constants for square-size matrices
-// MatrixMN, MatrixN = MatrixNN, I_NxN, and Z_NxN, for M,N=1..9
+// MatrixMN, MatrixN = MatrixNN, I_NxN, and Z_NxN, for M,N=1..9.
 #define ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(SIZE, SUFFIX)         \
   using Matrix##SUFFIX = Eigen::Matrix<double, SIZE, SIZE>; \
   using Matrix1##SUFFIX = Eigen::Matrix<double, 1, SIZE>;   \
@@ -30,7 +29,7 @@ using FloatType = double;
   using Matrix8##SUFFIX = Eigen::Matrix<double, 8, SIZE>;   \
   using Matrix9##SUFFIX = Eigen::Matrix<double, 9, SIZE>;   \
   static const Eigen::MatrixBase<Matrix##SUFFIX>::IdentityReturnType I_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Identity(); \
-  static const Eigen::MatrixBase<Matrix##SUFFIX>::ConstantReturnType Z_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Zero();
+  static const Eigen::MatrixBase<Matrix##SUFFIX>::ConstantReturnType Z_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Zero()
 
 ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(1,1);
 ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(2,2);
