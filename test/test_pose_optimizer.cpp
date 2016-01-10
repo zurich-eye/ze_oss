@@ -26,7 +26,8 @@ TEST(PoseOptimizerTests, testSolver)
   // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
   std::ranlux24 gen;
   std::uniform_real_distribution<double> scale(1.0, 3.0);
-  for(size_t i = 0; i < n; ++i) {
+  for(size_t i = 0; i < n; ++i)
+  {
     pos_C.col(i) *= scale(gen);
   }
 
@@ -37,7 +38,8 @@ TEST(PoseOptimizerTests, testSolver)
   Keypoints pix_noisy = pix_true;
   const double stddev = 1.0;
   std::normal_distribution<double> px_noise(0.0, stddev);
-  for(size_t i = 0; i < n; ++i) {
+  for(size_t i = 0; i < n; ++i)
+  {
     pix_noisy(0,i) += px_noise(gen);
     pix_noisy(1,i) += px_noise(gen);
   }
