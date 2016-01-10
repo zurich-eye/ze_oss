@@ -36,7 +36,7 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(const Node& node, ze::Camera::
       {
         VLOG(1) << "load pinhole camera without distortion";
         camera = std::make_shared<ze::PinholeCamera>(
-              width, height, ze::CameraType::kPinhole, intrinsics);
+              width, height, ze::CameraType::Pinhole, intrinsics);
       }
       else if(camera_type == "pinhole" && distortion_type == "radial-tangential")
       {

@@ -6,8 +6,7 @@
 namespace ze {
 
 Keypoints generateRandomKeypoints(
-    const int image_width, const int image_height, const int margin,
-    const size_t count)
+    const int image_width, const int image_height, const int margin, const size_t count)
 {
   CHECK_GE(image_width, 0);
   CHECK_GE(image_height, 0);
