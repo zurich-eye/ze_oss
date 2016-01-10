@@ -8,17 +8,32 @@
 
 namespace ze {
 
-class PoseOptimizerBearingVectors :
-    public LeastSquaresSolver<6, Transformation, PoseOptimizerBearingVectors>
+//! Data required by the pose-optimizer per frame.
+struct PoseOptimizerFrameData
+{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  //! Measurements: Bearing vectors.
+  Bearings f;
+
+  //! Landmark positions. Must have same length
+  Positions p_W;
+
+  //! Extrinsic transformation between camera and body (i.e., imu) frame.
+  Transformation T_C_B;
+};
+
+//! Optimizes body pose by minimizing difference between bearing vectors.
+class PoseOptimizer :
+    public LeastSquaresSolver<6, Transformation, PoseOptimizer>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
   using WeightFunction = UnitWeightFunction<double>;
 
-  PoseOptimizerBearingVectors(
-      const Bearings& measurements, const Positions& landmarks,
-      const Transformation& T_C_B, double pixel_measurement_sigma);
+  PoseOptimizer(
+      const std::vector<PoseOptimizerFrameData>& data, double measurement_sigma);
 
   double evaluateError(
       const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
@@ -28,9 +43,7 @@ public:
       Transformation& T_Bnew_W);
 
 private:
-  const Bearings& f_;  ///< Bearing vectors corresponding to feature measurements.
-  const Positions& p_W_;    ///< 3D points corresponding to features.
-  const Transformation& T_C_B_;   ///< Camera-IMU extrinsic calibration.
+  const std::vector<PoseOptimizerFrameData>& data_;
   double measurement_sigma_ = 1.0;
 };
 
