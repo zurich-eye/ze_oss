@@ -9,7 +9,9 @@ TEST(BufferTest, testRemoveOlderThanTimestamp)
 {
   ze::Buffer<double, 2> buffer;
   for(int i = 1; i < 10; ++i)
+  {
     buffer.insert(i, Eigen::Vector2d(i, i));
+  }
 
   buffer.removeDataBeforeTimestamp(3);
   buffer.lock();
@@ -22,7 +24,9 @@ TEST(BufferTest, testRemoveOlderThan)
 {
   ze::Buffer<double, 2> buffer;
   for(int i = 1; i < 10; ++i)
+  {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
+  }
 
   buffer.removeDataOlderThan(3.0);
   buffer.lock();
@@ -35,7 +39,9 @@ TEST(BufferTest, testIterator)
 {
   ze::Buffer<double, 2> buffer;
   for(int i = 1; i < 10; ++i)
+  {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
+  }
 
   buffer.lock();
 
@@ -70,7 +76,9 @@ TEST(BufferTest, testNearestValue)
   EXPECT_FALSE(buffer.getNearestValue(ze::secToNanosec(1)).second);
 
   for(int i = 1; i < 10; ++i)
+  {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
+  }
 
   EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1)).first[0], 1);
   EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(0.4)).first[0], 1);
@@ -85,7 +93,9 @@ TEST(BufferTest, testOldestNewestValue)
   EXPECT_FALSE(buffer.getNewestValue().second);
 
   for(int i = 1; i < 10; ++i)
+  {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
+  }
 
   EXPECT_EQ(buffer.getNewestValue().first[0], 9);
   EXPECT_EQ(buffer.getOldestValue().first[0], 1);

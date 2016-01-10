@@ -17,7 +17,9 @@ Eigen::Matrix3d expmapDerivativeSO3(const Eigen::Vector3d& omega)
 {
   double theta2 = omega.dot(omega);
   if (theta2 <= std::numeric_limits<double>::epsilon())
+  {
     return I_3x3;
+  }
   double theta = std::sqrt(theta2);  // rotation angle
   // element of Lie algebra so(3): X = omega^, normalized by normx
   const Matrix3 Y = skewSymmetric(omega) / theta;
@@ -30,7 +32,9 @@ Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
 {
   double theta2 = omega.dot(omega);
   if (theta2 <= std::numeric_limits<double>::epsilon())
+  {
     return I_3x3;
+  }
   double theta = std::sqrt(theta2);  // rotation angle
   const Matrix3 X = skewSymmetric(omega); // element of Lie algebra so(3): X = omega^
   return I_3x3 + 0.5 * X

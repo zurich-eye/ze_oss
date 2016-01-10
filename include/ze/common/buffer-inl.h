@@ -26,9 +26,13 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestVal
   auto it_after = iterator_equal_or_after(stamp);
   int64_t dt_after = -1, dt_before = -1;
   if(it_after != buffer_.end())
+  {
     dt_after = it_after->first - stamp;
+  }
   if(it_before != buffer_.end())
+  {
     dt_before = stamp - it_before->first;
+  }
 
   // Select which entry is closest based on time difference.
   Vector result;
@@ -38,13 +42,22 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestVal
     return std::make_pair(Vector(), false);
   }
   else if(dt_after < 0)
+  {
     result = it_before->second;
+  }
   else if(dt_before < 0)
+  {
     result = it_after->second;
+  }
   else if(dt_after > 0 && dt_before > 0 && dt_after < dt_before)
+  {
     result = it_after->second;
+  }
   else
+  {
     result = it_before->second;
+  }
+
   return std::make_pair(result, true);
 }
 
@@ -53,7 +66,9 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getOldestValu
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if(buffer_.empty())
+  {
     return std::make_pair(Vector(), false);
+  }
   return std::make_pair(buffer_.begin()->second, true);
 }
 
@@ -62,7 +77,9 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNewestValu
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if(buffer_.empty())
+  {
     return std::make_pair(Vector(), false);
+  }
   return std::make_pair(buffer_.rbegin()->second, true);
 }
 
@@ -158,11 +175,17 @@ typename Buffer<Scalar,Dim>::VectorBuffer::iterator Buffer<Scalar,Dim>::iterator
   auto it = buffer_.lower_bound(stamp);
 
   if(it->first == stamp)
+  {
     return it; // Return iterator to key if exact key exists.
+  }
   if(stamp > buffer_.rbegin()->first)
+  {
     return (--buffer_.end()); // Pointer to last value.
+  }
   if(it == buffer_.begin())
+  {
     return buffer_.end(); // Invalid if data before first value.
+  }
   --it;
   return it;
 }

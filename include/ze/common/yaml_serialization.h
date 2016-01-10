@@ -31,10 +31,13 @@ bool safeGet(const YAML::Node& node, const std::string& key, ValueType* value)
     const YAML::Node sub_node = node[key];
     if(sub_node)
     {
-      try {
+      try
+      {
         *value = sub_node.as<ValueType>();
         success = true;
-      } catch(const YAML::Exception& e) {
+      }
+      catch(const YAML::Exception& e)
+      {
         LOG(ERROR) << "Error getting key \"" << key << "\" as type "
             << typeid(ValueType).name() << ": " << e.what();
       }
@@ -64,8 +67,10 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
     node["cols"] = cols;
     CHECK_GT(rows, 0);
     CHECK_GT(cols, 0);
-    for (IndexType i = 0; i < rows; ++i) {
-      for (IndexType j = 0; j < cols; ++j) {
+    for(IndexType i = 0; i < rows; ++i)
+    {
+      for(IndexType j = 0; j < cols; ++j)
+      {
         node["data"].push_back(M(i, j));
       }
     }
@@ -76,7 +81,8 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
   static bool decode(const Node& node,
                      Eigen::Matrix<Scalar, A, B, C, D, E>& M)
   {
-    if(!node.IsMap()) {
+    if(!node.IsMap())
+    {
       LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
       return false;
     }
@@ -85,18 +91,21 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
     IndexType rows = node["rows"].as<IndexType>();
     IndexType cols = node["cols"].as<IndexType>();
 
-    if(rows != A || cols != B) {
+    if(rows != A || cols != B)
+    {
       LOG(ERROR) << "The matrix is the wrong size (rows, cols). Wanted: (" << A << ","
           << B << "), got (" << rows << ", " << cols << ")";
       return false;
     }
 
     size_t expected_size = M.rows() * M.cols();
-    if (!node["data"].IsSequence()) {
+    if (!node["data"].IsSequence())
+    {
       LOG(ERROR) << "The matrix data is not a sequence.";
       return false;
     }
-    if(node["data"].size() != expected_size) {
+    if(node["data"].size() != expected_size)
+    {
       LOG(ERROR) << "The data sequence is the wrong size. Wanted: " << expected_size <<
           ", got: " << node["data"].size();
       return false;
@@ -104,9 +113,12 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
 
     YAML::const_iterator it = node["data"].begin();
     YAML::const_iterator it_end = node["data"].end();
-    if (rows > 0 && cols > 0) {
-      for (IndexType i = 0; i < rows; ++i) {
-        for (IndexType j = 0; j < cols; ++j) {
+    if(rows > 0 && cols > 0)
+    {
+      for(IndexType i = 0; i < rows; ++i)
+      {
+        for(IndexType j = 0; j < cols; ++j)
+        {
           CHECK(it != it_end);
           M(i, j) = it->as<Scalar>();
           ++it;
@@ -120,7 +132,8 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
   static bool decode(const Node& node,
                      Eigen::Matrix<Scalar, Eigen::Dynamic, B, C, D, E>& M)
   {
-    if(!node.IsMap()) {
+    if(!node.IsMap())
+    {
       LOG(ERROR) << "Unable to get parse the matrix because the node is not a map.";
       return false;
     }
@@ -154,10 +167,12 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
 
     YAML::const_iterator it = node["data"].begin();
     YAML::const_iterator it_end = node["data"].end();
-    if (rows > 0 && cols > 0)
+    if(rows > 0 && cols > 0)
     {
-      for (IndexType i = 0; i < rows; ++i) {
-        for (IndexType j = 0; j < cols; ++j) {
+      for(IndexType i = 0; i < rows; ++i)
+      {
+        for(IndexType j = 0; j < cols; ++j)
+        {
           CHECK(it != it_end);
           M(i, j) = it->as<Scalar>();
           ++it;
@@ -207,8 +222,10 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
     YAML::const_iterator it_end = node["data"].end();
     if (rows > 0 && cols > 0)
     {
-      for (IndexType i = 0; i < rows; ++i) {
-        for (IndexType j = 0; j < cols; ++j) {
+      for (IndexType i = 0; i < rows; ++i)
+      {
+        for (IndexType j = 0; j < cols; ++j)
+        {
           CHECK(it != it_end);
           M(i, j) = it->as<Scalar>();
           ++it;
@@ -250,9 +267,12 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
     }
     YAML::const_iterator it = node["data"].begin();
     YAML::const_iterator it_end = node["data"].end();
-    if (rows > 0 && cols > 0) {
-      for (IndexType i = 0; i < rows; ++i) {
-        for (IndexType j = 0; j < cols; ++j) {
+    if(rows > 0 && cols > 0)
+    {
+      for(IndexType i = 0; i < rows; ++i)
+      {
+        for(IndexType j = 0; j < cols; ++j)
+        {
           CHECK(it != it_end);
           M(i, j) = it->as<Scalar>();
           ++it;

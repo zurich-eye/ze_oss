@@ -38,8 +38,10 @@ TEST(TransformationTests, testExpLog)
     ze::Transformation T2 = ze::Transformation::exp(v);
     Eigen::Matrix4d TT1 = T1.getTransformationMatrix();
     Eigen::Matrix4d TT2 = T2.getTransformationMatrix();
-    for(int r = 0; r < 4; ++r) {
-      for(int c = 0; c < 4; ++c) {
+    for(int r = 0; r < 4; ++r)
+    {
+      for(int c = 0; c < 4; ++c)
+      {
         EXPECT_NEAR(TT1(r,c), TT2(r,c), 1e-6) << "Failed at (" << r << "," << c << ")";
       }
     }
