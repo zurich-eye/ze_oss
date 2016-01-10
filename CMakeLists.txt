@@ -15,6 +15,7 @@ set(HEADERS
   include/ze/common/buffer-inl.h
   include/ze/common/macros.h
   include/ze/common/manifold.h
+  include/ze/common/matrix.h
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
