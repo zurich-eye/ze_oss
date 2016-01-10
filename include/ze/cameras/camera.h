@@ -10,12 +10,11 @@
 namespace ze {
 
 enum class CameraType {
-  kPinhole = 0,
-  kPinholeFov = 1,
-  kPinholeEquidistant = 2,
-  kPinholeRadialTangential = 3
+  Pinhole = 0,
+  PinholeFov = 1,
+  PinholeEquidistant = 2,
+  PinholeRadialTangential = 3
 };
-std::string cameraTypeString(CameraType type);
 
 class Camera
 {
@@ -23,11 +22,12 @@ public:
   ZE_POINTER_TYPEDEFS(Camera);
   using Scalar = double;
   using Bearing  = Eigen::Matrix<Scalar, 3, 1>;
+  using Position  = Eigen::Matrix<Scalar, 3, 1>;
   using Keypoint  = Eigen::Matrix<Scalar, 2, 1>;
   using Bearings  = Eigen::Matrix<Scalar, 3, Eigen::Dynamic>;
+  using Positions  = Eigen::Matrix<Scalar, 3, Eigen::Dynamic>;
   using Keypoints  = Eigen::Matrix<Scalar, 2, Eigen::Dynamic>;
   using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
-
 
 public:
 
@@ -36,57 +36,57 @@ public:
 
   virtual ~Camera() = default;
 
-  // Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
+  //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
   static Ptr loadFromYaml(const std::string& path);
 
-  // Computes bearing vector from pixel coordinates. Z-component of returned
-  // bearing vector is 1.0.
+  //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
   virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
-  // Computes pixel coordinates from bearing vector.
+  //! Computes pixel coordinates from bearing vector.
   virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const = 0;
 
-  // Computes Jacobian of projection w.r.t. bearing vector.
-  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Bearing>& bearing) const = 0;
+  //! Computes Jacobian of projection w.r.t. bearing vector.
+  virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
 
-  // Block operations: Always prefer these functions to avoid cache misses.
-  // {
+  //!@{
+  //! Block operations: Always prefer these functions to avoid cache misses.
 
-  // Back projects a block of keypoints.
+  //! Back projects a block of keypoints.
   virtual Bearings backProjectVectorized(const Keypoints& px_vec) const;
 
-  // Projects a block of bearing vectors.
+  //! Projects a block of bearing vectors.
   virtual Keypoints projectVectorized(const Bearings& bearing_vec) const;
 
-  // Vectorized computation of projection Jacobian. Each column in the returned
-  // matrix corresponds to one Jacobian after column-major reshaping.
+  //! Vectorized computation of projection Jacobian. Column-wise reshaped.
   virtual Eigen::Matrix<Scalar, 6, Eigen::Dynamic>
-  dProject_dBearingVectorized(const Bearings& bearing_vec) const;
+  dProject_dLandmarkVectorized(const Positions& pos_vec) const;
+  //!@}
 
-  // }
-
-  // Print camera info.
+  //! Print camera info.
   void print(std::ostream& out, const std::string& s = "Camera: ") const;
 
-  // Image width in pixels.
+  //! Image width in pixels.
   inline int width() const { return width_; }
 
-  // Image height in pixels.
+  //! Image height in pixels.
   inline int height() const { return height_; }
 
-  // CameraType value representing the camera model used by the derived class.
+  //! CameraType value representing the camera model used by the derived class.
   inline CameraType type() const { return type_; }
 
-  // Name of the camera.
+  //! CameraType as descriptive string.
+  std::string typeString() const;
+
+  //! Name of the camera.
   inline const std::string& label() const { return label_; }
 
-  // Camera parameters
+  //! Camera parameters
   inline const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params() const { return params_; }
 
-  // Set user-specific camera label.
+  //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
 
-  // Return if pixel u is within image boundaries.
+  //! Return if pixel u is within image boundaries.
   template<typename DerivedKeyPoint>
   bool isVisible(const Eigen::MatrixBase<DerivedKeyPoint>& px) const
   {
@@ -98,7 +98,7 @@ public:
         && px[1] <  static_cast<DerivedScalar>(height_);
   }
 
-  // Return if pixel u is within image boundaries with margin.
+  //! Return if pixel u is within image boundaries with margin.
   template<typename DerivedKeyPoint>
   bool isVisibleWithMargin(
       const Eigen::MatrixBase<DerivedKeyPoint>& px,

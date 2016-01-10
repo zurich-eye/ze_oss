@@ -17,7 +17,7 @@ TEST(CameraPinholeTest, testProjectionJacobian)
   Eigen::Vector3d bearing = cam.backProject(Eigen::Vector2d(200, 300));
   Eigen::Vector2d px = cam.project(bearing);
   ASSERT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(px, Eigen::Vector2d(200, 300)));
-  Eigen::Matrix<double, 2, 3> H = cam.dProject_dBearing(bearing);
+  Eigen::Matrix<double, 2, 3> H = cam.dProject_dLandmark(bearing);
   Eigen::Matrix<double, 2, 3> H_numerical =
       ze::numericalDerivative<Eigen::Vector2d, Eigen::Vector3d>(
         std::bind(&ze::PinholeCamera::project, &cam, std::placeholders::_1),
@@ -53,8 +53,8 @@ TEST(CameraPinholeTest, testVectorized)
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(kps1, kps2));
   EXPECT_DOUBLE_EQ(bearings.col(0).norm(), 1.0);
 
-  Eigen::Matrix<double, 6, N> H_vec = cam->dProject_dBearingVectorized(bearings);
-  Eigen::Matrix<double, 2, 3> H1 = cam->dProject_dBearing(bearings.col(0));
+  Eigen::Matrix<double, 6, N> H_vec = cam->dProject_dLandmarkVectorized(bearings);
+  Eigen::Matrix<double, 2, 3> H1 = cam->dProject_dLandmark(bearings.col(0));
   Eigen::Matrix<double, 2, 3> H2 = Eigen::Map<Eigen::Matrix<double, 2, 3>>(H_vec.col(0).data());
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(H1, H2));
 }

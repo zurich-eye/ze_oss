@@ -8,6 +8,7 @@ namespace ze {
 class PinholeCamera : public Camera
 {
 public:
+  using Camera::Camera;
   using Scalar = typename Camera::Scalar;
   using Keypoint = typename Camera::Keypoint;
   using Bearing = typename Camera::Bearing;
@@ -15,10 +16,8 @@ public:
 
   static constexpr size_t dimension = 4;
 
-  using Camera::Camera;
-
   PinholeCamera(int width, int height, Scalar fx, Scalar fy, Scalar cx, Scalar cy)
-    : Camera(width, height, CameraType::kPinhole,
+    : Camera(width, height, CameraType::Pinhole,
              (Eigen::Matrix<Scalar, 4, 1>() << fx, fy, cx, cy).finished())
   {}
 
@@ -38,10 +37,10 @@ public:
     return px;
   }
 
-  virtual Matrix23 dProject_dBearing(const Eigen::Ref<const Bearing>& bearing) const override
+  virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const override
   {
     Matrix23 H;
-    internal::PinholeProjection::dProject_dBearing(bearing.data(), this->params_.data(), H.data());
+    internal::PinholeProjection::dProject_dBearing(pos.data(), this->params_.data(), H.data());
     return H;
   }
 };
