@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Eigen/Core>
 #include <ze/common/types.h>
 
 namespace ze {
