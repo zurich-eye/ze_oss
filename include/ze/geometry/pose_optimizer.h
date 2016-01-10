@@ -16,7 +16,7 @@ struct PoseOptimizerFrameData
   //! Measurements: Bearing vectors.
   Bearings f;
 
-  //! Landmark positions. Must have same length
+  //! Landmark positions. Each column corresponds to a bearing measurement.
   Positions p_W;
 
   //! Extrinsic transformation between camera and body (i.e., imu) frame.
