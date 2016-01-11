@@ -10,14 +10,14 @@
 #include <imp/core/memory_storage.hpp>
 #include <imp/core/pixel.hpp>
 
-namespace imp {
+namespace ze {
 
 template<typename Pixel>
 class LinearMemory : public LinearMemoryBase
 {
 public:
-  using Memory = imp::MemoryStorage<Pixel>;
-  using Deallocator = imp::MemoryDeallocator<Pixel>;
+  using Memory = ze::MemoryStorage<Pixel>;
+  using Deallocator = ze::MemoryDeallocator<Pixel>;
 
 public:
   LinearMemory() = delete;
@@ -79,30 +79,30 @@ private:
 
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef LinearMemory<imp::Pixel8uC1> LinearMemory8uC1;
-typedef LinearMemory<imp::Pixel8uC2> LinearMemory8uC2;
-typedef LinearMemory<imp::Pixel8uC3> LinearMemory8uC3;
-typedef LinearMemory<imp::Pixel8uC4> LinearMemory8uC4;
+typedef LinearMemory<ze::Pixel8uC1> LinearMemory8uC1;
+typedef LinearMemory<ze::Pixel8uC2> LinearMemory8uC2;
+typedef LinearMemory<ze::Pixel8uC3> LinearMemory8uC3;
+typedef LinearMemory<ze::Pixel8uC4> LinearMemory8uC4;
 
-typedef LinearMemory<imp::Pixel16uC1> LinearMemory16uC1;
-typedef LinearMemory<imp::Pixel16uC2> LinearMemory16uC2;
-typedef LinearMemory<imp::Pixel16uC3> LinearMemory16uC3;
-typedef LinearMemory<imp::Pixel16uC4> LinearMemory16uC4;
+typedef LinearMemory<ze::Pixel16uC1> LinearMemory16uC1;
+typedef LinearMemory<ze::Pixel16uC2> LinearMemory16uC2;
+typedef LinearMemory<ze::Pixel16uC3> LinearMemory16uC3;
+typedef LinearMemory<ze::Pixel16uC4> LinearMemory16uC4;
 
-typedef LinearMemory<imp::Pixel32uC1> LinearMemory32uC1;
-typedef LinearMemory<imp::Pixel32uC2> LinearMemory32uC2;
-typedef LinearMemory<imp::Pixel32uC3> LinearMemory32uC3;
-typedef LinearMemory<imp::Pixel32uC4> LinearMemory32uC4;
+typedef LinearMemory<ze::Pixel32uC1> LinearMemory32uC1;
+typedef LinearMemory<ze::Pixel32uC2> LinearMemory32uC2;
+typedef LinearMemory<ze::Pixel32uC3> LinearMemory32uC3;
+typedef LinearMemory<ze::Pixel32uC4> LinearMemory32uC4;
 
-typedef LinearMemory<imp::Pixel32sC1> LinearMemory32sC1;
-typedef LinearMemory<imp::Pixel32sC2> LinearMemory32sC2;
-typedef LinearMemory<imp::Pixel32sC3> LinearMemory32sC3;
-typedef LinearMemory<imp::Pixel32sC4> LinearMemory32sC4;
+typedef LinearMemory<ze::Pixel32sC1> LinearMemory32sC1;
+typedef LinearMemory<ze::Pixel32sC2> LinearMemory32sC2;
+typedef LinearMemory<ze::Pixel32sC3> LinearMemory32sC3;
+typedef LinearMemory<ze::Pixel32sC4> LinearMemory32sC4;
 
-typedef LinearMemory<imp::Pixel32fC1> LinearMemory32fC1;
-typedef LinearMemory<imp::Pixel32fC2> LinearMemory32fC2;
-typedef LinearMemory<imp::Pixel32fC3> LinearMemory32fC3;
-typedef LinearMemory<imp::Pixel32fC4> LinearMemory32fC4;
+typedef LinearMemory<ze::Pixel32fC1> LinearMemory32fC1;
+typedef LinearMemory<ze::Pixel32fC2> LinearMemory32fC2;
+typedef LinearMemory<ze::Pixel32fC3> LinearMemory32fC3;
+typedef LinearMemory<ze::Pixel32fC4> LinearMemory32fC4;
 
 
 

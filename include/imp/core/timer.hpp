@@ -6,7 +6,7 @@
 #include <string>
 #include <glog/logging.h>
 
-namespace imp {
+namespace ze {
 
 class SingleShotTimer
 {

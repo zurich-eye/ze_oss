@@ -8,9 +8,9 @@
 #include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
 
-namespace imp {
+namespace ze {
 
-template<typename Pixel, typename imp::PixelType pixel_type>
+template<typename Pixel, typename ze::PixelType pixel_type>
 class Image : public ImageBase
 {
 public:
@@ -18,17 +18,17 @@ public:
   using pixel_t = Pixel;
 
 protected:
-  Image(imp::PixelOrder pixel_order = imp::PixelOrder::undefined)
+  Image(ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
     : ImageBase(pixel_type, pixel_order)
   { ; }
 
   Image(std::uint32_t width, std::uint32_t height,
-        PixelOrder pixel_order = imp::PixelOrder::undefined)
+        PixelOrder pixel_order = ze::PixelOrder::undefined)
     : ImageBase(width, height, pixel_type, pixel_order)
   { ; }
 
-  Image(const imp::Size2u &size,
-        imp::PixelOrder pixel_order = imp::PixelOrder::undefined)
+  Image(const ze::Size2u &size,
+        ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
     : ImageBase(size, pixel_type, pixel_order)
   { ; }
 
@@ -108,7 +108,7 @@ public:
   {
     if (this->width() != dst.width() || this->height() != dst.height())
     {
-      throw imp::Exception("Copying failed: Image size differs.", __FILE__, __FUNCTION__, __LINE__);
+      throw ze::Exception("Copying failed: Image size differs.", __FILE__, __FUNCTION__, __LINE__);
     }
 
     // check if dst image is on the gpu and the src image is not so we can
@@ -142,7 +142,7 @@ public:
   {
     if (this->size()!= from.size())
     {
-      throw imp::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
+      throw ze::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
     }
 
     if (from.isGpuMemory())
@@ -186,28 +186,28 @@ public:
 
 //-----------------------------------------------------------------------------
 // convenience typedefs
-typedef Image<imp::Pixel8uC1, imp::PixelType::i8uC1> Image8uC1;
-typedef Image<imp::Pixel8uC2, imp::PixelType::i8uC2> Image8uC2;
-typedef Image<imp::Pixel8uC3, imp::PixelType::i8uC3> Image8uC3;
-typedef Image<imp::Pixel8uC4, imp::PixelType::i8uC4> Image8uC4;
+typedef Image<ze::Pixel8uC1, ze::PixelType::i8uC1> Image8uC1;
+typedef Image<ze::Pixel8uC2, ze::PixelType::i8uC2> Image8uC2;
+typedef Image<ze::Pixel8uC3, ze::PixelType::i8uC3> Image8uC3;
+typedef Image<ze::Pixel8uC4, ze::PixelType::i8uC4> Image8uC4;
 
-typedef Image<imp::Pixel16uC1, imp::PixelType::i16uC1> Image16uC1;
-typedef Image<imp::Pixel16uC2, imp::PixelType::i16uC2> Image16uC2;
-typedef Image<imp::Pixel16uC3, imp::PixelType::i16uC3> Image16uC3;
-typedef Image<imp::Pixel16uC4, imp::PixelType::i16uC4> Image16uC4;
+typedef Image<ze::Pixel16uC1, ze::PixelType::i16uC1> Image16uC1;
+typedef Image<ze::Pixel16uC2, ze::PixelType::i16uC2> Image16uC2;
+typedef Image<ze::Pixel16uC3, ze::PixelType::i16uC3> Image16uC3;
+typedef Image<ze::Pixel16uC4, ze::PixelType::i16uC4> Image16uC4;
 
-typedef Image<imp::Pixel32sC1, imp::PixelType::i32sC1> Image32sC1;
-typedef Image<imp::Pixel32sC2, imp::PixelType::i32sC2> Image32sC2;
-typedef Image<imp::Pixel32sC3, imp::PixelType::i32sC3> Image32sC3;
-typedef Image<imp::Pixel32sC4, imp::PixelType::i32sC4> Image32sC4;
+typedef Image<ze::Pixel32sC1, ze::PixelType::i32sC1> Image32sC1;
+typedef Image<ze::Pixel32sC2, ze::PixelType::i32sC2> Image32sC2;
+typedef Image<ze::Pixel32sC3, ze::PixelType::i32sC3> Image32sC3;
+typedef Image<ze::Pixel32sC4, ze::PixelType::i32sC4> Image32sC4;
 
-typedef Image<imp::Pixel32fC1, imp::PixelType::i32fC1> Image32fC1;
-typedef Image<imp::Pixel32fC2, imp::PixelType::i32fC2> Image32fC2;
-typedef Image<imp::Pixel32fC3, imp::PixelType::i32fC3> Image32fC3;
-typedef Image<imp::Pixel32fC4, imp::PixelType::i32fC4> Image32fC4;
+typedef Image<ze::Pixel32fC1, ze::PixelType::i32fC1> Image32fC1;
+typedef Image<ze::Pixel32fC2, ze::PixelType::i32fC2> Image32fC2;
+typedef Image<ze::Pixel32fC3, ze::PixelType::i32fC3> Image32fC3;
+typedef Image<ze::Pixel32fC4, ze::PixelType::i32fC4> Image32fC4;
 
 // convenience typedefs
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 using ImagePtr = typename std::shared_ptr<Image<Pixel,pixel_type>>;
 
 

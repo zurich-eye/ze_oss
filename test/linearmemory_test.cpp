@@ -76,8 +76,8 @@ class LinearMemoryTest : public ::testing::Test
   size_t pixel_bit_depth_ = 8*sizeof(Pixel);
 
   size_t numel_ = 123;
-  imp::Roi1u roi_ = imp::Roi1u(numel_/3, numel_/3);
-  imp::LinearMemory<Pixel> linmem_;
+  ze::Roi1u roi_ = ze::Roi1u(numel_/3, numel_/3);
+  ze::LinearMemory<Pixel> linmem_;
 
   Pixel pixel1_;
   Pixel pixel2_;
@@ -85,11 +85,11 @@ class LinearMemoryTest : public ::testing::Test
 
 // The list of types we want to test.
 typedef testing::Types<
-imp::Pixel8uC1, imp::Pixel8uC2, imp::Pixel8uC3, imp::Pixel8uC4,
-imp::Pixel16uC1, imp::Pixel16uC2, imp::Pixel16uC3, imp::Pixel16uC4,
-imp::Pixel32sC1, imp::Pixel32sC2, imp::Pixel32sC3, imp::Pixel32sC4,
-imp::Pixel32uC1, imp::Pixel32uC2, imp::Pixel32uC3, imp::Pixel32uC4,
-imp::Pixel32fC1, imp::Pixel32fC2, imp::Pixel32fC3, imp::Pixel32fC4> PixelTypes;
+ze::Pixel8uC1, ze::Pixel8uC2, ze::Pixel8uC3, ze::Pixel8uC4,
+ze::Pixel16uC1, ze::Pixel16uC2, ze::Pixel16uC3, ze::Pixel16uC4,
+ze::Pixel32sC1, ze::Pixel32sC2, ze::Pixel32sC3, ze::Pixel32sC4,
+ze::Pixel32uC1, ze::Pixel32uC2, ze::Pixel32uC3, ze::Pixel32uC4,
+ze::Pixel32fC1, ze::Pixel32fC2, ze::Pixel32fC3, ze::Pixel32fC4> PixelTypes;
 
 TYPED_TEST_CASE(LinearMemoryTest, PixelTypes);
 
@@ -149,7 +149,7 @@ TYPED_TEST(LinearMemoryTest, CheckValues)
 TYPED_TEST(LinearMemoryTest, CheckValuesInConstLinearMemory)
 {
   this->setValue();
-  const imp::LinearMemory<TypeParam> const_linmem(this->linmem_);
+  const ze::LinearMemory<TypeParam> const_linmem(this->linmem_);
   for (std::uint32_t i=0; i<this->numel_; ++i)
   {
     ASSERT_EQ(const_linmem[i], this->pixel1_);

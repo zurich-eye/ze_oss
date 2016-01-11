@@ -15,7 +15,7 @@ TEST(IMPCoreTestSuite,roiTest)
   //
   {
     std::uint32_t x=1, len=10;
-    imp::Roi1u roi(x,len);
+    ze::Roi1u roi(x,len);
     ASSERT_TRUE(x == roi.x());
     ASSERT_TRUE(len == roi.length());
 
@@ -28,7 +28,7 @@ TEST(IMPCoreTestSuite,roiTest)
   //
   {
     std::int32_t x=1, y=2, w=10, h=13;
-    imp::Roi2i roi(x,y,w,h);
+    ze::Roi2i roi(x,y,w,h);
     ASSERT_TRUE(x == roi.x());
     ASSERT_TRUE(y == roi.y());
     ASSERT_TRUE(w == roi.width());

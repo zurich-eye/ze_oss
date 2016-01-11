@@ -7,7 +7,7 @@
 #include <imp/core/image.hpp>
 #include <imp/core/memory_storage.hpp>
 
-namespace imp {
+namespace ze {
 
 /**
  * @brief The ImageRaw class is an image (surprise) holding raw memory
@@ -24,15 +24,15 @@ namespace imp {
  *   - Pixel: The pixel's memory representation (e.g. imp::Pixel8uC1 for single-channel unsigned 8-bit images)
  *   - pixel_type: The internal enum for specifying the pixel's type more specificly
  */
-template<typename Pixel, imp::PixelType pixel_type>
-class ImageRaw : public imp::Image<Pixel, pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
+class ImageRaw : public ze::Image<Pixel, pixel_type>
 {
 public:
   using Ptr = typename std::shared_ptr<ImageRaw<Pixel,pixel_type>>;
 
   using Base = Image<Pixel, pixel_type>;
-  using Memory = imp::MemoryStorage<Pixel>;
-  using Deallocator = imp::MemoryDeallocator<Pixel>;
+  using Memory = ze::MemoryStorage<Pixel>;
+  using Deallocator = ze::MemoryDeallocator<Pixel>;
 
 public:
   ImageRaw() = default;
@@ -46,7 +46,7 @@ public:
   /**
    * @brief ImageRaw construcs an image of given \a size
    */
-  ImageRaw(const imp::Size2u& size);
+  ImageRaw(const ze::Size2u& size);
 
   /**
    * @brief ImageRaw copy constructs an image from the given image \a from
@@ -106,31 +106,31 @@ protected:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImageRaw<imp::Pixel8uC1, imp::PixelType::i8uC1> ImageRaw8uC1;
-typedef ImageRaw<imp::Pixel8uC2, imp::PixelType::i8uC2> ImageRaw8uC2;
-typedef ImageRaw<imp::Pixel8uC3, imp::PixelType::i8uC3> ImageRaw8uC3;
-typedef ImageRaw<imp::Pixel8uC4, imp::PixelType::i8uC4> ImageRaw8uC4;
+typedef ImageRaw<ze::Pixel8uC1, ze::PixelType::i8uC1> ImageRaw8uC1;
+typedef ImageRaw<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageRaw8uC2;
+typedef ImageRaw<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageRaw8uC3;
+typedef ImageRaw<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageRaw8uC4;
 
-typedef ImageRaw<imp::Pixel16uC1, imp::PixelType::i16uC1> ImageRaw16uC1;
-typedef ImageRaw<imp::Pixel16uC2, imp::PixelType::i16uC2> ImageRaw16uC2;
-typedef ImageRaw<imp::Pixel16uC3, imp::PixelType::i16uC3> ImageRaw16uC3;
-typedef ImageRaw<imp::Pixel16uC4, imp::PixelType::i16uC4> ImageRaw16uC4;
+typedef ImageRaw<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageRaw16uC1;
+typedef ImageRaw<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageRaw16uC2;
+typedef ImageRaw<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageRaw16uC3;
+typedef ImageRaw<ze::Pixel16uC4, ze::PixelType::i16uC4> ImageRaw16uC4;
 
-typedef ImageRaw<imp::Pixel32sC1, imp::PixelType::i32sC1> ImageRaw32sC1;
-typedef ImageRaw<imp::Pixel32sC2, imp::PixelType::i32sC2> ImageRaw32sC2;
-typedef ImageRaw<imp::Pixel32sC3, imp::PixelType::i32sC3> ImageRaw32sC3;
-typedef ImageRaw<imp::Pixel32sC4, imp::PixelType::i32sC4> ImageRaw32sC4;
+typedef ImageRaw<ze::Pixel32sC1, ze::PixelType::i32sC1> ImageRaw32sC1;
+typedef ImageRaw<ze::Pixel32sC2, ze::PixelType::i32sC2> ImageRaw32sC2;
+typedef ImageRaw<ze::Pixel32sC3, ze::PixelType::i32sC3> ImageRaw32sC3;
+typedef ImageRaw<ze::Pixel32sC4, ze::PixelType::i32sC4> ImageRaw32sC4;
 
-typedef ImageRaw<imp::Pixel32fC1, imp::PixelType::i32fC1> ImageRaw32fC1;
-typedef ImageRaw<imp::Pixel32fC2, imp::PixelType::i32fC2> ImageRaw32fC2;
-typedef ImageRaw<imp::Pixel32fC3, imp::PixelType::i32fC3> ImageRaw32fC3;
-typedef ImageRaw<imp::Pixel32fC4, imp::PixelType::i32fC4> ImageRaw32fC4;
+typedef ImageRaw<ze::Pixel32fC1, ze::PixelType::i32fC1> ImageRaw32fC1;
+typedef ImageRaw<ze::Pixel32fC2, ze::PixelType::i32fC2> ImageRaw32fC2;
+typedef ImageRaw<ze::Pixel32fC3, ze::PixelType::i32fC3> ImageRaw32fC3;
+typedef ImageRaw<ze::Pixel32fC4, ze::PixelType::i32fC4> ImageRaw32fC4;
 
 // shared pointers
-template <typename Pixel, imp::PixelType pixel_type>
+template <typename Pixel, ze::PixelType pixel_type>
 using ImageRawPtr = typename ImageRaw<Pixel,pixel_type>::Ptr;
 
-template <typename Pixel, imp::PixelType pixel_type>
+template <typename Pixel, ze::PixelType pixel_type>
 using ImageRawConstPtr = typename ImageRaw<Pixel,pixel_type>::ConstPtr;
 
 

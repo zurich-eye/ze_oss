@@ -7,7 +7,7 @@
 
 #include <imp/core/size.hpp>
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
 /**
@@ -18,7 +18,7 @@ template<typename T, std::uint8_t DIM, typename Derived>
 struct RoiBase
 {
   std::array<T, DIM> pt; //!< internal data storage for all dimensions' 'left-upper' corner
-  imp::Size<T, DIM> sz; //!< size of the given roi
+  ze::Size<T, DIM> sz; //!< size of the given roi
 
   RoiBase()
   {
@@ -30,7 +30,7 @@ struct RoiBase
    * @param lu array of the left-upper corner of the format {a1, a2, a3, ...., aN}
    * @param sz Size of the \a DIM-dimensional ROI
    */
-  RoiBase(const std::array<T,DIM>& lu, const imp::Size<T,DIM>& sz)
+  RoiBase(const std::array<T,DIM>& lu, const ze::Size<T,DIM>& sz)
     : pt(lu)
     , sz(sz)
   {
@@ -40,7 +40,7 @@ struct RoiBase
    * @brief RoiBase initialized max size only. The top-left corner will be ZEROS
    * @param sz The ROI's size in all dimensions.
    */
-  RoiBase(const imp::Size<T,DIM>& sz)
+  RoiBase(const ze::Size<T,DIM>& sz)
     : sz(sz)
   {
     std::fill(pt.begin(), pt.end(), 0);
@@ -91,11 +91,11 @@ struct RoiBase
   /**
    * @brief size of the ROI
    */
-  imp::Size<T, DIM>& size() {return sz;}
+  ze::Size<T, DIM>& size() {return sz;}
   /**
    * @brief size of the ROI (const)
    */
-  const imp::Size<T, DIM>& size() const {return reinterpret_cast<const imp::Size<T, DIM>&>(sz);}
+  const ze::Size<T, DIM>& size() const {return reinterpret_cast<const ze::Size<T, DIM>&>(sz);}
 
 };
 

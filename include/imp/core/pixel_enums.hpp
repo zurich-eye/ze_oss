@@ -1,7 +1,7 @@
 #ifndef IMP_PIXEL_ENUMS_HPP
 #define IMP_PIXEL_ENUMS_HPP
 
-namespace imp {
+namespace ze {
 
 /**
  * @brief The PixelType enum defines a pixel's bit depth and number of channels.

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace imp {
+namespace ze {
 
 enum class InterpolationMode
 {

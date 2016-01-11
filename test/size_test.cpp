@@ -10,16 +10,16 @@
 TEST(IMPCoreTestSuite,testSize)
 {
   {
-    imp::Size1u sz1u;
+    ze::Size1u sz1u;
     EXPECT_EQ(0, sz1u.length());
     std::uint32_t len=101;
-    imp::Size1u sz(len);
+    ze::Size1u sz(len);
     EXPECT_EQ(len, sz.length());
     EXPECT_EQ(len, sz.data()[0]);
     EXPECT_EQ(len, sz);
   }
   {
-    imp::Size2u sz2u;
+    ze::Size2u sz2u;
     EXPECT_EQ(0, sz2u.width());
     EXPECT_EQ(0, sz2u.height());
 
@@ -27,7 +27,7 @@ TEST(IMPCoreTestSuite,testSize)
     const std::int32_t w=10, h=13;
     const std::int32_t area = w*h;
 
-    imp::Size2i sz(w,h);
+    ze::Size2i sz(w,h);
     EXPECT_EQ(w, sz.width());
     EXPECT_EQ(h, sz.height());
 
@@ -38,10 +38,10 @@ TEST(IMPCoreTestSuite,testSize)
     EXPECT_EQ(area, sz.prod());
 
     // comparison operator tests
-    imp::Size2i a(123,456);
-    imp::Size2i b(123,456);
-    imp::Size2i c(124,456);
-    imp::Size2i d(124,457);
+    ze::Size2i a(123,456);
+    ze::Size2i b(123,456);
+    ze::Size2i c(124,456);
+    ze::Size2i d(124,457);
 
     ASSERT_TRUE((a == b));
     ASSERT_FALSE((a != b));

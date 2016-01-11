@@ -13,7 +13,7 @@
 #  define CUDA_DEVICE
 #endif
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
 template<typename _T>

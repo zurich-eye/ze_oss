@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-namespace imp {
+namespace ze {
 
 /** Exception with additional error information
  */
@@ -41,7 +41,7 @@ public:
   int line_;
 };
 
-#define IMP_THROW_EXCEPTION(msg) throw imp::Exception(msg, __FILE__, __FUNCTION__, __LINE__)
+#define IMP_THROW_EXCEPTION(msg) throw ze::Exception(msg, __FILE__, __FUNCTION__, __LINE__)
 
 }
 

@@ -8,7 +8,7 @@
 #include <imp/core/roi.hpp>
 #include <imp/core/types.hpp>
 
-namespace imp {
+namespace ze {
 
 /**
  * @brief The ImageBase class is the base class of all our image representations.
@@ -24,7 +24,7 @@ public:
 protected:
   ImageBase() = delete;
 
-  ImageBase(PixelType pixel_type, PixelOrder pixel_order = imp::PixelOrder::undefined)
+  ImageBase(PixelType pixel_type, PixelOrder pixel_order = ze::PixelOrder::undefined)
     : pixel_type_(pixel_type)
     , pixel_order_(pixel_order)
     , size_(0,0)
@@ -34,7 +34,7 @@ protected:
 
   ImageBase(std::uint32_t width, std::uint32_t height,
             PixelType pixel_type,
-            PixelOrder pixel_order = imp::PixelOrder::undefined)
+            PixelOrder pixel_order = ze::PixelOrder::undefined)
     : pixel_type_(pixel_type)
     , pixel_order_(pixel_order)
     , size_(width, height)
@@ -43,7 +43,7 @@ protected:
   }
 
   ImageBase(const Size2u &size, PixelType pixel_type,
-            PixelOrder pixel_order = imp::PixelOrder::undefined)
+            PixelOrder pixel_order = ze::PixelOrder::undefined)
     : pixel_type_(pixel_type)
     , pixel_order_(pixel_order)
     , size_(size)
@@ -72,7 +72,7 @@ public:
     return *this;
   }
 
-  virtual void setRoi(const imp::Roi2u& roi)
+  virtual void setRoi(const ze::Roi2u& roi)
   {
     roi_ = roi;
   }

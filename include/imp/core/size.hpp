@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
 /**

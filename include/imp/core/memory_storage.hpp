@@ -11,7 +11,7 @@
 #include <imp/core/size.hpp>
 #include <imp/core/types.hpp>
 
-namespace imp {
+namespace ze {
 
 //--------------------------------------------------------------------------
 template <typename Pixel, int memaddr_align=32, bool align_rows=true>
@@ -37,7 +37,7 @@ public:
   {
     if (num_elements == 0)
     {
-      throw imp::Exception("Failed to allocate memory: num_elements=0");
+      throw ze::Exception("Failed to allocate memory: num_elements=0");
     }
 
     // restrict the memory address alignment to be in the interval ]0,128] and
@@ -81,7 +81,7 @@ public:
   {
     if (width == 0 || height == 0)
     {
-      throw imp::Exception("Failed to allocate memory: width or height is zero");
+      throw ze::Exception("Failed to allocate memory: width or height is zero");
     }
 
     // restrict the memory address alignment to be in the interval ]0,128] and
@@ -106,7 +106,7 @@ public:
    * @param init_with_zeros Flag if the memory elements should be zeroed out (default=false).
    * @return
    */
-  static Pixel* alignedAlloc(imp::Size2u size, size_t* pitch,
+  static Pixel* alignedAlloc(ze::Size2u size, size_t* pitch,
                              bool init_with_zeros=false)
   {
     return alignedAlloc(size[0], size[1], pitch, init_with_zeros);

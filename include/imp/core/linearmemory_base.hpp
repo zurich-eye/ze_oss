@@ -5,7 +5,7 @@
 #include <imp/core/size.hpp>
 #include <imp/core/roi.hpp>
 
-namespace imp {
+namespace ze {
 
 /** \brief LinearMemory Base class for linear memory classes.
   */
@@ -35,11 +35,11 @@ public:
     return size_.length();
   }
 
-  inline imp::Size1u size() const { return size_; }
-  inline imp::Roi1u roi() const { return roi_; }
+  inline ze::Size1u size() const { return size_; }
+  inline ze::Roi1u roi() const { return roi_; }
 
   /** Sets a region-of-interest (clamps towards boundaries [0, length[) */
-  void setRoi(const imp::Roi1u& roi)
+  void setRoi(const ze::Roi1u& roi)
   {
     roi_.x() = std::max(0u, std::min(this->length()-1, roi.x()));
     std::uint32_t remaining_elements = this->length()-roi_.x();
@@ -48,7 +48,7 @@ public:
 
   void resetRoi()
   {
-    roi_ = imp::Roi1u(size_);
+    roi_ = ze::Roi1u(size_);
   }
 
   /** Returns the total amount of bytes saved in the data buffer. */
@@ -64,8 +64,8 @@ public:
   virtual bool isGpuMemory() const = 0;
 
 protected:
-  imp::Size1u size_;
-  imp::Roi1u roi_;
+  ze::Size1u size_;
+  ze::Roi1u roi_;
 
 };
 
