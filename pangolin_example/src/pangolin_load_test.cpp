@@ -35,13 +35,13 @@ int main( int argc, char* argv[] )
   CHECK_GE(argc,2) << "Usage: pangolin_load_test image_location";
   const std::string filename(argv[1]);
 
-  std::shared_ptr<imp::ImageRaw8uC1> im_8uC1;
-  imp::pangolinBridgeLoad(im_8uC1, filename, imp::PixelOrder::gray);
+  std::shared_ptr<ze::ImageRaw8uC1> im_8uC1;
+  ze::pangolinBridgeLoad(im_8uC1, filename, ze::PixelOrder::gray);
 
   VLOG(2) << "Read Lena (png) from " << filename
           << ": " << im_8uC1->width() << "x" << im_8uC1->height() << "(" << im_8uC1->pitch() << ")";
 
-  imp::imshow(*im_8uC1, "Lena");
+  ze::imshow(*im_8uC1, "Lena");
 
   return EXIT_SUCCESS;
 }
