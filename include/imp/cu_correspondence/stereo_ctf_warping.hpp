@@ -14,7 +14,7 @@
 //#include <imp/cu_correspondence/solver_stereo_abstract.hpp>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward declarations
@@ -30,9 +30,9 @@ class StereoCtFWarping
 public:
   using Parameters = VariationalStereoParameters;
 
-  using ImageGpu32fC1 = imp::cu::ImageGpu32fC1;
-  using ImageGpu32fC2 = imp::cu::ImageGpu32fC2;
-  using ImagePyramid32fC1 = imp::ImagePyramid32fC1;
+  using ImageGpu32fC1 = ze::cu::ImageGpu32fC1;
+  using ImageGpu32fC2 = ze::cu::ImageGpu32fC2;
+  using ImagePyramid32fC1 = ze::ImagePyramid32fC1;
 
   using Cameras = std::vector<cu::PinholeCamera>;
   using CamerasPyramid = std::vector<Cameras>;

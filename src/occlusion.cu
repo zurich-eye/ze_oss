@@ -4,7 +4,7 @@
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_texture.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ void occlusionCandidatesUniqunessMapping(
     const ImageGpu32fC1::Ptr& disp)
 {
   occ->setValue(0.0f);
-  std::shared_ptr<imp::cu::Texture2D> disp_tex = disp->genTexture();
-  imp::cu::Fragmentation<> frag(disp->size());
+  std::shared_ptr<ze::cu::Texture2D> disp_tex = disp->genTexture();
+  ze::cu::Fragmentation<> frag(disp->size());
   k_occlusionCandidatesUniqunessMapping
       <<<
         frag.dimGrid, frag.dimBlock
@@ -65,4 +65,4 @@ void occlusionCandidatesUniqunessMapping(
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze

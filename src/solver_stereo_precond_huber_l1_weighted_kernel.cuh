@@ -8,7 +8,7 @@
 #include <imp/cuda_toolkit/helper_math.h>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------

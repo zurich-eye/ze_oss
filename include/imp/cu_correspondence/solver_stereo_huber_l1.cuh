@@ -7,7 +7,7 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/core/size.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward decl
@@ -25,7 +25,7 @@ public:
   virtual ~SolverStereoHuberL1();
 
   SolverStereoHuberL1(const Parameters::Ptr& params,
-                      imp::Size2u size, size_t level);
+                      ze::Size2u size, size_t level);
 
   virtual void init() override;
   virtual void init(const SolverStereoAbstract& rhs) override;

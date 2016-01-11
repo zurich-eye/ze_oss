@@ -7,7 +7,7 @@
 #include <imp/cuda_toolkit/helper_math.h>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -22,8 +22,8 @@ __device__ Pixel k_linearized_update(Pixel& d_srcdst, Texture2D& lin_tex,
 {
   Pixel lin;
   tex2DFetch(lin, lin_tex, x, y);
-  d_srcdst = imp::cu::max(lin-lin_step,
-                          imp::cu::min(lin+lin_step, d_srcdst));
+  d_srcdst = ze::cu::max(lin-lin_step,
+                          ze::cu::min(lin+lin_step, d_srcdst));
   return d_srcdst;
 }
 

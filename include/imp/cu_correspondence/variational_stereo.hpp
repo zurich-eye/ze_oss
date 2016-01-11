@@ -9,13 +9,13 @@
 
 
 // forward declarations
-namespace imp{
+namespace ze{
 namespace cu{
 class StereoCtFWarping;
 }
 }
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
@@ -25,7 +25,7 @@ class VariationalStereo
 {
 public:
   //! @todo (MWE) first do the implementation with specific type (32fC1) and later generalize
-  using ImageGpu32fC1 = imp::cu::ImageGpu32fC1;
+  using ImageGpu32fC1 = ze::cu::ImageGpu32fC1;
   using Parameters = VariationalStereoParameters;
 
 public:

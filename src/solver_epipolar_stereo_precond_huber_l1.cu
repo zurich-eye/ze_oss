@@ -21,7 +21,7 @@
 
 #define USE_EDGES 1
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -32,12 +32,12 @@ SolverEpipolarStereoPrecondHuberL1::~SolverEpipolarStereoPrecondHuberL1()
 
 //------------------------------------------------------------------------------
 SolverEpipolarStereoPrecondHuberL1::SolverEpipolarStereoPrecondHuberL1(
-    const std::shared_ptr<Parameters>& params, imp::Size2u size, size_t level,
+    const std::shared_ptr<Parameters>& params, ze::Size2u size, size_t level,
     const std::vector<cu::PinholeCamera>& cams,
     const cu::Matrix3f& F,
     const cu::SE3<float>& T_mov_fix,
-    const imp::cu::ImageGpu32fC1& depth_proposal,
-    const imp::cu::ImageGpu32fC1& depth_proposal_sigma2)
+    const ze::cu::ImageGpu32fC1& depth_proposal,
+    const ze::cu::ImageGpu32fC1& depth_proposal_sigma2)
   : SolverStereoAbstract(params, size, level)
 {
   u_.reset(new ImageGpu32fC1(size));
@@ -85,8 +85,8 @@ SolverEpipolarStereoPrecondHuberL1::SolverEpipolarStereoPrecondHuberL1(
       LOG(INFO) << "depth proposal downscaled to level: " << level << "; size: " << size
                 << "; downscale_factor: " << downscale_factor;
 
-    imp::cu::resample(*depth_proposal_, depth_proposal);
-    imp::cu::resample(*depth_proposal_sigma2_, depth_proposal_sigma2);
+    ze::cu::resample(*depth_proposal_, depth_proposal);
+    ze::cu::resample(*depth_proposal_sigma2_, depth_proposal_sigma2);
   }
 
   F_ = F;
@@ -126,17 +126,17 @@ void SolverEpipolarStereoPrecondHuberL1::init(const SolverStereoAbstract& rhs)
 
   if(params_->ctf.apply_median_filter)
   {
-    imp::cu::filterMedian3x3(*from->u0_, *from->u_);
-    imp::cu::resample(*u_, *from->u0_, imp::InterpolationMode::point, false);
+    ze::cu::filterMedian3x3(*from->u0_, *from->u_);
+    ze::cu::resample(*u_, *from->u0_, ze::InterpolationMode::point, false);
   }
   else
   {
-    imp::cu::resample(*u_, *from->u_, imp::InterpolationMode::point, false);
+    ze::cu::resample(*u_, *from->u_, ze::InterpolationMode::point, false);
   }
   *u_ *= inv_sf;
 
-  imp::cu::resample(*pu_, *from->pu_, imp::InterpolationMode::point, false);
-  imp::cu::resample(*q_, *from->q_, imp::InterpolationMode::point, false);
+  ze::cu::resample(*pu_, *from->pu_, ze::InterpolationMode::point, false);
+  ze::cu::resample(*q_, *from->q_, ze::InterpolationMode::point, false);
 }
 
 //------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
                                    cudaAddressModeClamp, cudaReadModeElementType);
 
   // compute edge weight
-  imp::cu::naturalEdges(*g_, *images.at(0),
+  ze::cu::naturalEdges(*g_, *images.at(0),
                         params_->edge_sigma, params_->edge_alpha, params_->edge_q);
 
   // warping
@@ -270,5 +270,5 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

@@ -2,7 +2,7 @@
 
 #include <imp/cu_correspondence/stereo_ctf_warping.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------

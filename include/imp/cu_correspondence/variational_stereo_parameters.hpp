@@ -6,7 +6,7 @@
 #include <imp/cu_correspondence/stereo_solver_enum.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // the parameter struct

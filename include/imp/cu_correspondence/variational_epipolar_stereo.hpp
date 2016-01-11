@@ -12,7 +12,7 @@
 #include <imp/cu_correspondence/variational_stereo_parameters.hpp>
 #include <imp/cu_correspondence/variational_stereo.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
@@ -22,7 +22,7 @@ namespace cu {
 class VariationalEpipolarStereo : public VariationalStereo
 {
 public:
-  using VectorImage = imp::cu::ImageGpu32fC2;
+  using VectorImage = ze::cu::ImageGpu32fC2;
   using Cameras = std::vector<cu::PinholeCamera>;
 
 public:

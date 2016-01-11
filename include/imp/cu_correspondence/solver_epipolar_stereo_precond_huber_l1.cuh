@@ -11,7 +11,7 @@
 #include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/core/size.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward decl
@@ -28,12 +28,12 @@ public:
   virtual ~SolverEpipolarStereoPrecondHuberL1();
 
   SolverEpipolarStereoPrecondHuberL1(const Parameters::Ptr& params,
-                                     imp::Size2u size, size_t level,
+                                     ze::Size2u size, size_t level,
                                      const std::vector<cu::PinholeCamera>& cams,
                                      const cu::Matrix3f& F,
                                      const cu::SE3<float>& T_mov_fix,
                                      const ImageGpu32fC1& depth_proposal,
-                                     const imp::cu::ImageGpu32fC1& depth_proposal_sigma2);
+                                     const ze::cu::ImageGpu32fC1& depth_proposal_sigma2);
 
   virtual void init();
   virtual void init(const SolverStereoAbstract& rhs);
@@ -84,6 +84,6 @@ protected:
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_EPIPOLAR_STEREO_PRECOND_HUBER_L1_CUH

@@ -13,7 +13,7 @@
 #include "warped_gradients_kernel.cuh"
 #include "solver_precond_huber_l1_kernel.cuh"
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ SolverStereoPrecondHuberL1::~SolverStereoPrecondHuberL1()
 //------------------------------------------------------------------------------
 SolverStereoPrecondHuberL1::SolverStereoPrecondHuberL1(
     const Parameters::Ptr& params,
-    imp::Size2u size,
+    ze::Size2u size,
     size_t level)
   : SolverStereoAbstract(params, size, level)
 {
@@ -68,17 +68,17 @@ void SolverStereoPrecondHuberL1::init(const SolverStereoAbstract& rhs)
 
   if(params_->ctf.apply_median_filter)
   {
-    imp::cu::filterMedian3x3(*from->u0_, *from->u_);
-    imp::cu::resample(*u_, *from->u0_, imp::InterpolationMode::point, false);
+    ze::cu::filterMedian3x3(*from->u0_, *from->u_);
+    ze::cu::resample(*u_, *from->u0_, ze::InterpolationMode::point, false);
   }
   else
   {
-    imp::cu::resample(*u_, *from->u_, imp::InterpolationMode::point, false);
+    ze::cu::resample(*u_, *from->u_, ze::InterpolationMode::point, false);
   }
   *u_ *= inv_sf;
 
-  imp::cu::resample(*pu_, *from->pu_, imp::InterpolationMode::point, false);
-  imp::cu::resample(*q_, *from->q_, imp::InterpolationMode::point, false);
+  ze::cu::resample(*pu_, *from->pu_, ze::InterpolationMode::point, false);
+  ze::cu::resample(*q_, *from->q_, ze::InterpolationMode::point, false);
 }
 
 //------------------------------------------------------------------------------
@@ -156,5 +156,5 @@ void SolverStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

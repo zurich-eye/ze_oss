@@ -8,7 +8,7 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/core/size.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward decl
@@ -26,7 +26,7 @@ public:
 
   SolverStereoPrecondHuberL1Weighted(
       const Parameters::Ptr& params,
-      imp::Size2u size, size_t level);
+      ze::Size2u size, size_t level);
 
   virtual void init() override;
   virtual void init(const SolverStereoAbstract& rhs) override;
@@ -47,7 +47,7 @@ protected:
   std::unique_ptr<ImageGpu32fC1> it_; //!< temporal gradients between warped and fixed image
   std::unique_ptr<ImageGpu32fC1> xi_; //!< preconditioner
   std::unique_ptr<ImageGpu32fC1> g_; //!< (edge) image for weighting the regularizer
-  imp::cu::ImageGpu32fC1::Ptr occ_; //!< estimation of occluded pixels
+  ze::cu::ImageGpu32fC1::Ptr occ_; //!< estimation of occluded pixels
 
   // textures
   std::shared_ptr<Texture2D> lambda_tex_; //!< For pointwise lambda

@@ -9,7 +9,7 @@
 #include <imp/cu_correspondence/variational_stereo_parameters.hpp>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
@@ -18,8 +18,8 @@ namespace cu {
 class SolverStereoAbstract
 {
 public:
-  using ImageGpu32fC1 = imp::cu::ImageGpu32fC1;
-  using ImageGpu32fC2 = imp::cu::ImageGpu32fC2;
+  using ImageGpu32fC1 = ze::cu::ImageGpu32fC1;
+  using ImageGpu32fC2 = ze::cu::ImageGpu32fC2;
   using Parameters = VariationalStereoParameters;
 
 public:
@@ -27,7 +27,7 @@ public:
   virtual ~SolverStereoAbstract() = default;
 
   SolverStereoAbstract(Parameters::Ptr params,
-                       imp::Size2u size, std::uint16_t level)
+                       ze::Size2u size, std::uint16_t level)
     : params_(params)
     , size_(size)
     , level_(level)
@@ -55,12 +55,12 @@ public:
 
 
   // setters / getters
-  inline imp::Size2u size() { return size_; }
+  inline ze::Size2u size() { return size_; }
   inline std::uint16_t level() { return level_; }
 
 protected:
   Parameters::Ptr params_; //!< configuration parameters
-  imp::Size2u size_;
+  ze::Size2u size_;
   std::uint16_t level_; //!< level number in the ctf pyramid (0=finest .. n=coarsest)
 };
 

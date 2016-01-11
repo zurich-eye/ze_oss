@@ -9,7 +9,7 @@
 #include <imp/cu_core/cu_se3.cuh>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------

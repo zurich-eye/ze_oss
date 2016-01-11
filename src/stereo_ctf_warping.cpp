@@ -11,7 +11,7 @@
 
 #include <imp/cu_core/cu_utils.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void StereoCtFWarping::solve()
 
   if (!this->ready())
   {
-    throw imp::Exception("not initialized correctly. bailing out.",
+    throw ze::Exception("not initialized correctly. bailing out.",
                          __FILE__, __FUNCTION__, __LINE__);
   }
 

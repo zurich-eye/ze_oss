@@ -1,7 +1,7 @@
 #ifndef STEREO_SOLVER_ENUM_HPP
 #define STEREO_SOLVER_ENUM_HPP
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 enum class StereoPDSolver
