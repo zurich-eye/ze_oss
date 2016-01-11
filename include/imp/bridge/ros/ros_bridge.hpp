@@ -15,64 +15,64 @@
 
 using imgenc = sensor_msgs::image_encodings;
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
 void getPixelTypeFromRosImageEncoding(
-    imp::PixelType& pixel_type,
-    imp::PixelOrder& pixel_order,
+    ze::PixelType& pixel_type,
+    ze::PixelOrder& pixel_order,
     const std::string& encoding)
 {
   //! @todo (MWE) we do not support bayer or YUV images yet.
   if (encoding == enc::BGR8)
   {
-    pixel_type = imp::PixelType::i8uC3;
-    pixel_order = imp::PixelOrder::bgr;
+    pixel_type = ze::PixelType::i8uC3;
+    pixel_order = ze::PixelOrder::bgr;
   }
   else if (encoding == enc::MONO8)
   {
-    pixel_type = imp::PixelType::i8uC1;
-    pixel_order = imp::PixelOrder::gray;
+    pixel_type = ze::PixelType::i8uC1;
+    pixel_order = ze::PixelOrder::gray;
   }
   else if (encoding == enc::RGB8)
   {
-    pixel_type = imp::PixelType::i8uC3;
-    pixel_order = imp::PixelOrder::rgb;
+    pixel_type = ze::PixelType::i8uC3;
+    pixel_order = ze::PixelOrder::rgb;
   }
   else if (encoding == enc::MONO16)
   {
-    pixel_type = imp::PixelType::i16C1;
-    pixel_order = imp::PixelOrder::gray;
+    pixel_type = ze::PixelType::i16C1;
+    pixel_order = ze::PixelOrder::gray;
   }
   else if (encoding == enc::BGR16)
   {
-    pixel_type = imp::PixelType::i16uC3;
-    pixel_order = imp::PixelOrder::bgr;
+    pixel_type = ze::PixelType::i16uC3;
+    pixel_order = ze::PixelOrder::bgr;
   }
   else if (encoding == enc::RGB16)
   {
-    pixel_type = imp::PixelType::i16uC3;
-    pixel_order = imp::PixelOrder::rgb;
+    pixel_type = ze::PixelType::i16uC3;
+    pixel_order = ze::PixelOrder::rgb;
   }
   else if (encoding == enc::BGRA8)
   {
-    pixel_type = imp::PixelType::i8uC4;
-    pixel_order = imp::PixelOrder::bgra;
+    pixel_type = ze::PixelType::i8uC4;
+    pixel_order = ze::PixelOrder::bgra;
   }
   else if (encoding == enc::RGBA8)
   {
-    pixel_type = imp::PixelType::i8uC4;
-    pixel_order = imp::PixelOrder::rgba;
+    pixel_type = ze::PixelType::i8uC4;
+    pixel_order = ze::PixelOrder::rgba;
   }
   else if (encoding == enc::BGRA16)
   {
-    pixel_type = imp::PixelType::i16uC4;
-    pixel_order = imp::PixelOrder::bgra;
+    pixel_type = ze::PixelType::i16uC4;
+    pixel_order = ze::PixelOrder::bgra;
   }
   else if (encoding == enc::RGBA16)
   {
-    pixel_type = imp::PixelType::i16uC4;
-    pixel_order = imp::PixelOrder::rgba;
+    pixel_type = ze::PixelType::i16uC4;
+    pixel_order = ze::PixelOrder::rgba;
   }
   else
   {
@@ -91,14 +91,14 @@ void getPixelTypeFromRosImageEncoding(
 
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
-imp::cu::ImageGpu<Pixel,pixel_type>::Ptr toImageGpu(
+template<typename Pixel, ze::PixelType pixel_type>
+ze::cu::ImageGpu<Pixel,pixel_type>::Ptr toImageGpu(
     const sensor_msgs::Image& src/*,
     imp::PixelOrder pixel_order*/)
 {
-  imp::PixelType src_pixel_type;
-  imp::PixelOrder src_pixel_order;
-  imp::getPixelTypeFromRosImageEncoding(src_pixel_type, src_pixel_order, src.encoding);
+  ze::PixelType src_pixel_type;
+  ze::PixelOrder src_pixel_order;
+  ze::getPixelTypeFromRosImageEncoding(src_pixel_type, src_pixel_order, src.encoding);
 
 
   int bit_depth = imgenc::bitDepth(src.encoding);
@@ -112,13 +112,13 @@ imp::cu::ImageGpu<Pixel,pixel_type>::Ptr toImageGpu(
 
   switch (src_pixel_type)
   {
-  case imp::PixelType::i8uC1:
+  case ze::PixelType::i8uC1:
   {
-    imp::ImageRaw8uC1 src_wrapped(
-          const_cast<imp::Pixel8uC1*>(&src.data[0]),
+    ze::ImageRaw8uC1 src_wrapped(
+          const_cast<ze::Pixel8uC1*>(&src.data[0]),
         width, height, pitch, true);
-    imp::cu::ImageGpu8uC1::Ptr dst =
-        std::make_shared<imp::cu::ImageGpu (width, height);
+    ze::cu::ImageGpu8uC1::Ptr dst =
+        std::make_shared<ze::cu::ImageGpu (width, height);
     dst->copyFrom(src_wrapped);
     return dst;
   }
