@@ -7,7 +7,7 @@
 
 // #include <imp/cu_core/cu_image_gpu.cuh>
 
-namespace imp
+namespace ze
 {
 
 ////------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace imp
 
 //------------------------------------------------------------------------------
 inline pangolin::View& setupPangolinView(
-    const imp::Size2u& sz,
+    const ze::Size2u& sz,
     const std::string& title = "-")
 {
   // Create OpenGL window in single line
@@ -65,10 +65,10 @@ inline void setupPangolinViewLayout(
 }
 
 //------------------------------------------------------------------------------
-inline void imshow(const imp::Image8uC1& im, const std::string& title="-")
+inline void imshow(const ze::Image8uC1& im, const std::string& title="-")
 {
-  pangolin::View& container = imp::setupPangolinView(im.size(), title);
-  imp::setupPangolinViewLayout(container, 1, {(float)im.width()/im.height()});
+  pangolin::View& container = ze::setupPangolinView(im.size(), title);
+  ze::setupPangolinViewLayout(container, 1, {(float)im.width()/im.height()});
   pangolin::GlTexture tex8(im.width(), im.height(), GL_LUMINANCE8);
 
   while(!pangolin::ShouldQuit())

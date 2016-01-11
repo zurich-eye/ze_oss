@@ -4,20 +4,20 @@
 #include <pangolin/image/image_io.h>
 #include <imp/core/image_raw.hpp>
 
-namespace imp
+namespace ze
 {
 
 //------------------------------------------------------------------------------
 //template<typename Pixel, imp::PixelType pixel_type>
-void pangolinBridgeLoad(imp::ImageRaw8uC1::Ptr& out,
-                        const std::string& filename, imp::PixelOrder pixel_order)
+void pangolinBridgeLoad(ze::ImageRaw8uC1::Ptr& out,
+                        const std::string& filename, ze::PixelOrder pixel_order)
 {
   // try to load an image with pangolin first
   pangolin::TypedImage im = pangolin::LoadImage(
         filename, pangolin::ImageFileType::ImageFileTypePng);
 
   //! @todo (MWE) FIX input output channel formatting, etc.
-  out.reset(new imp::ImageRaw8uC1(reinterpret_cast<imp::Pixel8uC1*>(im.ptr),
+  out.reset(new ze::ImageRaw8uC1(reinterpret_cast<ze::Pixel8uC1*>(im.ptr),
                                   im.w, im.h, im.pitch));
 //  switch (im.fmt.channels)
 //  {
