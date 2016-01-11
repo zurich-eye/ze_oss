@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
   std::uint64_t num_rounds = 1e8;
 
   {
-    imp::SingleShotTimer timer("posix_memalign");
+    ze::SingleShotTimer timer("posix_memalign");
 
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   }
 
   {
-    imp::SingleShotTimer timer("aligned_alloc");
+    ze::SingleShotTimer timer("aligned_alloc");
 
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
