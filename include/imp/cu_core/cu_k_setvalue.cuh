@@ -9,7 +9,7 @@
 #include <imp/cu_core/cu_gpu_data.cuh>
 #endif
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------

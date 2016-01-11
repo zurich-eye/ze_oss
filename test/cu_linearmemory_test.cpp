@@ -121,30 +121,30 @@ class CuLinearMemoryTest : public ::testing::Test
   size_t pixel_bit_depth_ = 8*sizeof(Pixel);
 
   size_t numel_ = 10000;
-  imp::LinearMemory<Pixel> linmem_;
-  imp::LinearMemory<Pixel> linmem_copy_;
-  imp::cu::LinearMemory<Pixel> cu_linmem_;
+  ze::LinearMemory<Pixel> linmem_;
+  ze::LinearMemory<Pixel> linmem_copy_;
+  ze::cu::LinearMemory<Pixel> cu_linmem_;
   Pixel cu_linmem_init0_pixel_val_ = Pixel(0);
-  imp::cu::LinearMemory<Pixel> cu_linmem_init0_;
-  imp::cu::LinearMemory<Pixel> cu_linmem_init_rand_;
+  ze::cu::LinearMemory<Pixel> cu_linmem_init0_;
+  ze::cu::LinearMemory<Pixel> cu_linmem_init_rand_;
   Pixel cu_linmem_init_rand_pixel_val_;
 
-  imp::Roi1u roi_ = imp::Roi1u(numel_/3, numel_/3);
+  ze::Roi1u roi_ = ze::Roi1u(numel_/3, numel_/3);
   Pixel cu_linmem_roi_init_rand_pixel_val_;
-  imp::LinearMemory<Pixel> linmem_init0_cp_;
-  imp::LinearMemory<Pixel> linmem_init_rand_cp_;
+  ze::LinearMemory<Pixel> linmem_init0_cp_;
+  ze::LinearMemory<Pixel> linmem_init_rand_cp_;
 
-  imp::cu::LinearMemory<Pixel> cu_roi_linmem_;
-  imp::LinearMemory<Pixel> roi_linmem_copy_;
+  ze::cu::LinearMemory<Pixel> cu_roi_linmem_;
+  ze::LinearMemory<Pixel> roi_linmem_copy_;
 };
 
 // The list of types we want to test.
 typedef testing::Types<
-imp::Pixel8uC1, imp::Pixel8uC2, imp::Pixel8uC3, imp::Pixel8uC4,
-imp::Pixel16uC1, imp::Pixel16uC2, imp::Pixel16uC3, imp::Pixel16uC4,
-imp::Pixel32sC1, imp::Pixel32sC2, imp::Pixel32sC3, imp::Pixel32sC4,
-imp::Pixel32uC1, imp::Pixel32uC2, imp::Pixel32uC3, imp::Pixel32uC4,
-imp::Pixel32fC1, imp::Pixel32fC2, imp::Pixel32fC3, imp::Pixel32fC4
+ze::Pixel8uC1, ze::Pixel8uC2, ze::Pixel8uC3, ze::Pixel8uC4,
+ze::Pixel16uC1, ze::Pixel16uC2, ze::Pixel16uC3, ze::Pixel16uC4,
+ze::Pixel32sC1, ze::Pixel32sC2, ze::Pixel32sC3, ze::Pixel32sC4,
+ze::Pixel32uC1, ze::Pixel32uC2, ze::Pixel32uC3, ze::Pixel32uC4,
+ze::Pixel32fC1, ze::Pixel32fC2, ze::Pixel32fC3, ze::Pixel32fC4
 > PixelTypes;
 
 TYPED_TEST_CASE(CuLinearMemoryTest, PixelTypes);

@@ -4,18 +4,18 @@
 #include <memory>
 #include <imp/cu_core/cu_image_gpu.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
  * @brief Finding min and max pixel value of given image
  * @note For multi-channel images, the seperate channels are not handeled individually.
  */
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min, Pixel& max);
 
 template<typename Pixel>
-void minMax(const Texture2D& img_tex, Pixel& min, Pixel& max, const imp::Roi2u& roi);
+void minMax(const Texture2D& img_tex, Pixel& min, Pixel& max, const ze::Roi2u& roi);
 
 //template<typename Pixel, imp::PixelType pixel_type>
 //void sum(const ImageGpu<Pixel, pixel_type>& img, double& sum);

@@ -5,7 +5,7 @@
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_matrix.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
@@ -49,9 +49,9 @@ public:
   }
 
   __host__ __device__ __forceinline__
-  imp::cu::Matrix3f intrinsics()
+  ze::cu::Matrix3f intrinsics()
   {
-    imp::cu::Matrix3f K;
+    ze::cu::Matrix3f K;
     K(0,0) = f_.x;
     K(0,1) = 0.0f;
     K(0,2) = c_.x;

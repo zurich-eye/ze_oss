@@ -6,7 +6,7 @@
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_matrix.cuh>
 
-namespace imp
+namespace ze
 {
 namespace cu
 {
@@ -169,7 +169,7 @@ public:
   }
 
 private:
-  imp::cu::Matrix<Type, 3, 4> data_;
+  ze::cu::Matrix<Type, 3, 4> data_;
 };
 
 template<typename Type>

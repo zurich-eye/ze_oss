@@ -7,7 +7,7 @@
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_linearmemory.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -63,8 +63,8 @@ __global__ void k_minMax(Pixel* d_col_mins, Pixel* d_col_maxs,
     for (; yy<roi_y+roi_height; ++yy)
     {
       val = (Pixel)src[yy*src_stride+xx];
-      cur_min = imp::cu::min(cur_min, val);
-      cur_max = imp::cu::max(cur_max, val);
+      cur_min = ze::cu::min(cur_min, val);
+      cur_max = ze::cu::max(cur_max, val);
     }
 
     d_col_mins[x] = cur_min;
@@ -74,12 +74,12 @@ __global__ void k_minMax(Pixel* d_col_mins, Pixel* d_col_maxs,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const imp::Roi2u& roi)
+void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const ze::Roi2u& roi)
 {
   Fragmentation<512,1> frag(roi.width(), 1);
 
-  imp::cu::LinearMemory<Pixel> d_col_mins(roi.width());
-  imp::cu::LinearMemory<Pixel> d_col_maxs(roi.width());
+  ze::cu::LinearMemory<Pixel> d_col_mins(roi.width());
+  ze::cu::LinearMemory<Pixel> d_col_maxs(roi.width());
   IMP_CUDA_CHECK();
   d_col_mins.setValue(Pixel(0));
   d_col_maxs.setValue(Pixel(0));
@@ -91,8 +91,8 @@ void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const imp:
            roi.x(), roi.y(), roi.width(), roi.height(), img_tex);
   IMP_CUDA_CHECK();
 
-  imp::LinearMemory<Pixel> h_col_mins(d_col_mins.length());
-  imp::LinearMemory<Pixel> h_col_maxs(d_col_maxs.length());
+  ze::LinearMemory<Pixel> h_col_mins(d_col_mins.length());
+  ze::LinearMemory<Pixel> h_col_maxs(d_col_maxs.length());
   h_col_mins.setValue(Pixel(0));
   h_col_maxs.setValue(Pixel(0));
 
@@ -104,19 +104,19 @@ void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const imp:
 
   for (auto i=1u; i<roi.width(); ++i)
   {
-    min_val = imp::cu::min(min_val, h_col_mins(i));
-    max_val = imp::cu::max(max_val, h_col_maxs(i));
+    min_val = ze::cu::min(min_val, h_col_mins(i));
+    max_val = ze::cu::max(max_val, h_col_maxs(i));
   }
 
   IMP_CUDA_CHECK();
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_val)
 {
   IMP_CUDA_CHECK();
-  imp::Roi2u roi = img.roi();
+  ze::Roi2u roi = img.roi();
 
 //  std::shared_ptr<Texture2D> img_tex = img.genTexture(
 //        false, cudaFilterModePoint, cudaAddressModeClamp, cudaReadModeElementType);
@@ -124,12 +124,12 @@ void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_v
 #if 1
   std::shared_ptr<Texture2D> img_tex = img.genTexture();
   IMP_CUDA_CHECK();
-  imp::cu::minMax(*img_tex, min_val, max_val, roi);
+  ze::cu::minMax(*img_tex, min_val, max_val, roi);
   IMP_CUDA_CHECK();
 #else
 
-  imp::cu::LinearMemory<Pixel> d_col_mins(roi.width());
-  imp::cu::LinearMemory<Pixel> d_col_maxs(roi.width());
+  ze::cu::LinearMemory<Pixel> d_col_mins(roi.width());
+  ze::cu::LinearMemory<Pixel> d_col_maxs(roi.width());
   IMP_CUDA_CHECK();
   d_col_mins.setValue(Pixel(0));
   d_col_maxs.setValue(Pixel(0));
@@ -143,8 +143,8 @@ void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_v
            roi.x(), roi.y(), roi.width(), roi.height());
   IMP_CUDA_CHECK();
 
-  imp::LinearMemory<Pixel> h_col_mins(d_col_mins.length());
-  imp::LinearMemory<Pixel> h_col_maxs(d_col_maxs.length());
+  ze::LinearMemory<Pixel> h_col_mins(d_col_mins.length());
+  ze::LinearMemory<Pixel> h_col_maxs(d_col_maxs.length());
   h_col_mins.setValue(Pixel(0));
   h_col_maxs.setValue(Pixel(0));
 
@@ -156,8 +156,8 @@ void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_v
 
   for (auto i=1u; i<roi.width(); ++i)
   {
-    min_val = imp::cu::min(min_val, h_col_mins(i));
-    max_val = imp::cu::max(max_val, h_col_maxs(i));
+    min_val = ze::cu::min(min_val, h_col_mins(i));
+    max_val = ze::cu::max(max_val, h_col_maxs(i));
   }
 
   IMP_CUDA_CHECK();
@@ -167,25 +167,25 @@ void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_v
 
 
 // template instantiations for all our image types
-template void minMax(const ImageGpu8uC1& img, imp::Pixel8uC1& min, imp::Pixel8uC1& max);
-template void minMax(const ImageGpu8uC2& img, imp::Pixel8uC2& min, imp::Pixel8uC2& max);
-//template void minMax(const ImageGpu8uC3& img, imp::Pixel8uC3& min, imp::Pixel8uC3& max);
-template void minMax(const ImageGpu8uC4& img, imp::Pixel8uC4& min, imp::Pixel8uC4& max);
+template void minMax(const ImageGpu8uC1& img, ze::Pixel8uC1& min, ze::Pixel8uC1& max);
+template void minMax(const ImageGpu8uC2& img, ze::Pixel8uC2& min, ze::Pixel8uC2& max);
+//template void minMax(const ImageGpu8uC3& img, ze::Pixel8uC3& min, ze::Pixel8uC3& max);
+template void minMax(const ImageGpu8uC4& img, ze::Pixel8uC4& min, ze::Pixel8uC4& max);
 
-template void minMax(const ImageGpu16uC1& img, imp::Pixel16uC1& min, imp::Pixel16uC1& max);
-template void minMax(const ImageGpu16uC2& img, imp::Pixel16uC2& min, imp::Pixel16uC2& max);
-//template void minMax(const ImageGpu16uC3& img, imp::Pixel16uC3& min, imp::Pixel16uC3& max);
-template void minMax(const ImageGpu16uC4& img, imp::Pixel16uC4& min, imp::Pixel16uC4& max);
+template void minMax(const ImageGpu16uC1& img, ze::Pixel16uC1& min, ze::Pixel16uC1& max);
+template void minMax(const ImageGpu16uC2& img, ze::Pixel16uC2& min, ze::Pixel16uC2& max);
+//template void minMax(const ImageGpu16uC3& img, ze::Pixel16uC3& min, ze::Pixel16uC3& max);
+template void minMax(const ImageGpu16uC4& img, ze::Pixel16uC4& min, ze::Pixel16uC4& max);
 
-template void minMax(const ImageGpu32sC1& img, imp::Pixel32sC1& min, imp::Pixel32sC1& max);
-template void minMax(const ImageGpu32sC2& img, imp::Pixel32sC2& min, imp::Pixel32sC2& max);
-//template void minMax(const ImageGpu32sC3& img, imp::Pixel32sC3& min, imp::Pixel32sC3& max);
-template void minMax(const ImageGpu32sC4& img, imp::Pixel32sC4& min, imp::Pixel32sC4& max);
+template void minMax(const ImageGpu32sC1& img, ze::Pixel32sC1& min, ze::Pixel32sC1& max);
+template void minMax(const ImageGpu32sC2& img, ze::Pixel32sC2& min, ze::Pixel32sC2& max);
+//template void minMax(const ImageGpu32sC3& img, ze::Pixel32sC3& min, ze::Pixel32sC3& max);
+template void minMax(const ImageGpu32sC4& img, ze::Pixel32sC4& min, ze::Pixel32sC4& max);
 
-template void minMax(const ImageGpu32fC1& img, imp::Pixel32fC1& min, imp::Pixel32fC1& max);
-template void minMax(const ImageGpu32fC2& img, imp::Pixel32fC2& min, imp::Pixel32fC2& max);
-//template void minMax(const ImageGpu32fC3& img, imp::Pixel32fC3& min, imp::Pixel32fC3& max);
-template void minMax(const ImageGpu32fC4& img, imp::Pixel32fC4& min, imp::Pixel32fC4& max);
+template void minMax(const ImageGpu32fC1& img, ze::Pixel32fC1& min, ze::Pixel32fC1& max);
+template void minMax(const ImageGpu32fC2& img, ze::Pixel32fC2& min, ze::Pixel32fC2& max);
+//template void minMax(const ImageGpu32fC3& img, ze::Pixel32fC3& min, ze::Pixel32fC3& max);
+template void minMax(const ImageGpu32fC4& img, ze::Pixel32fC4& min, ze::Pixel32fC4& max);
 
 } // namespace cu
-} // namespace imp
+} // namespace ze

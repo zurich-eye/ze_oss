@@ -10,7 +10,7 @@
 #include <imp/core/pixel_enums.hpp>
 #include <imp/cu_core/cu_exception.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
@@ -36,7 +36,7 @@ struct Texture2D
 
   __host__ Texture2D(const void* data, size_t pitch,
                      cudaChannelFormatDesc channel_desc,
-                     imp::Size2u size,
+                     ze::Size2u size,
                      bool _normalized_coords = false,
                      cudaTextureFilterMode filter_mode = cudaFilterModePoint,
                      cudaTextureAddressMode address_mode = cudaAddressModeClamp,
@@ -62,7 +62,7 @@ struct Texture2D
     cudaError_t err = cudaCreateTextureObject(&tex_object, &tex_res, &tex_desc, 0);
     if  (err != ::cudaSuccess)
     {
-      throw imp::cu::Exception("Failed to create texture object", err,
+      throw ze::cu::Exception("Failed to create texture object", err,
                                __FILE__, __FUNCTION__, __LINE__);
     }
   }
@@ -72,7 +72,7 @@ struct Texture2D
     cudaError_t err = cudaDestroyTextureObject(tex_object);
     if  (err != ::cudaSuccess)
     {
-      throw imp::cu::Exception("Failed to destroy texture object", err,
+      throw ze::cu::Exception("Failed to destroy texture object", err,
                                __FILE__, __FUNCTION__, __LINE__);
     }
   }

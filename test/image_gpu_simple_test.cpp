@@ -16,7 +16,7 @@ TEST(IMPCuCoreTestSuite,imageGpuSimpleTest)
   //
   int width = 123;
   int height = 324;
-  imp::cu::ImageGpu8uC1 im(width, height);
+  ze::cu::ImageGpu8uC1 im(width, height);
   IMP_CUDA_CHECK();
   ASSERT_EQ(width, im.width());
   ASSERT_EQ(height, im.height());

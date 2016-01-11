@@ -10,9 +10,9 @@
 #include <imp/core/size.hpp>
 #include <imp/cu_core/cu_exception.hpp>
 
-namespace imp { namespace cu {
+namespace ze { namespace cu {
 
-template <typename Pixel, imp::PixelType pixel_type = imp::PixelType::undefined>
+template <typename Pixel, ze::PixelType pixel_type = ze::PixelType::undefined>
 struct MemoryStorage
 {
 public:
@@ -26,7 +26,7 @@ public:
   {
     if (num_elements == 0)
     {
-      throw imp::Exception("Failed to allocate memory: num_elements=0");
+      throw ze::Exception("Failed to allocate memory: num_elements=0");
     }
 
     const size_t memory_size = sizeof(Pixel) * num_elements;
@@ -41,7 +41,7 @@ public:
     }
     else if (cu_err != cudaSuccess)
     {
-      throw imp::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
+      throw ze::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
     }
 
     return p_data;
@@ -59,13 +59,13 @@ public:
   {
     if (width == 0 || height == 0)
     {
-      throw imp::cu::Exception("Failed to allocate memory: width or height is zero");
+      throw ze::cu::Exception("Failed to allocate memory: width or height is zero");
     }
 
     size_t width_bytes = width * sizeof(Pixel);
     //std::cout << "width_bytes: " << width_bytes << std::endl;
     const int align_bytes = 1536;
-    if (pixel_type == imp::PixelType::i8uC3 && width_bytes % align_bytes)
+    if (pixel_type == ze::PixelType::i8uC3 && width_bytes % align_bytes)
     {
       width_bytes += (align_bytes-(width_bytes%align_bytes));
     }
@@ -85,7 +85,7 @@ public:
     }
     else if (cu_err != cudaSuccess)
     {
-      throw imp::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
+      throw ze::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
     }
 
     return p_data;
@@ -98,7 +98,7 @@ public:
    * @param pitch Row alignment [bytes]
    * @return
    */
-  static Pixel* alignedAlloc(imp::Size2u size, size_t* pitch)
+  static Pixel* alignedAlloc(ze::Size2u size, size_t* pitch)
   {
     return alignedAlloc(size[0], size[1], pitch);
   }

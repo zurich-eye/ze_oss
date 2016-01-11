@@ -12,7 +12,7 @@
 #include <imp/cu_core/cu_pixel_conversion.hpp>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward declarations
@@ -35,16 +35,16 @@ class Texture2D;
  *
  * @warning Be careful with 8-bit 3-channel GPU memory as the stride is not divisable by 3!
  */
-template<typename Pixel, imp::PixelType pixel_type>
-class ImageGpu : public imp::Image<Pixel, pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
+class ImageGpu : public ze::Image<Pixel, pixel_type>
 {
 public:
   using Ptr = typename std::shared_ptr<ImageGpu<Pixel,pixel_type>>;
   using UPtr = typename std::unique_ptr<ImageGpu<Pixel,pixel_type>>;
 
   using Base = Image<Pixel, pixel_type>;
-  using Memory = imp::cu::MemoryStorage<Pixel>;
-  using Deallocator = imp::cu::MemoryDeallocator<Pixel>;
+  using Memory = ze::cu::MemoryStorage<Pixel>;
+  using Deallocator = ze::cu::MemoryDeallocator<Pixel>;
 
 public:
   ImageGpu() = delete;
@@ -53,13 +53,13 @@ public:
   /**
    * @brief ImageGpu construcs an image of given \a size
    */
-  ImageGpu(const imp::Size2u& size);
+  ImageGpu(const ze::Size2u& size);
 
   /**
    * @brief ImageGpu construcs an image of given size \a width x \a height
    */
   ImageGpu(std::uint32_t width, std::uint32_t height)
-    : ImageGpu(imp::Size2u(width,height)) {;}
+    : ImageGpu(ze::Size2u(width,height)) {;}
 
   /**
    * @brief ImageGpu copy constructs an image from the given image \a from
@@ -88,7 +88,7 @@ public:
 //           size_t pitch, bool use_ext_data_pointer = false);
 
   /** sets a region of interest */
-  virtual void setRoi(const imp::Roi2u& roi) override;
+  virtual void setRoi(const ze::Roi2u& roi) override;
 
   /**
    * @brief copyTo copies the internal image data to another class instance
@@ -114,8 +114,8 @@ public:
   /** Returns a cuda vector* that is pointing to the beginning for the data buffer.
    * @note this is mainly for convenience when calling cuda functions / kernels.
    */
-  auto cuData() -> decltype(imp::cu::toCudaVectorType(this->data()));
-  auto cuData() const -> decltype(imp::cu::toConstCudaVectorType(this->data()));
+  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data()));
+  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data()));
 
 
   /**
@@ -166,27 +166,27 @@ private:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImageGpu<imp::Pixel8uC1, imp::PixelType::i8uC1> ImageGpu8uC1;
-typedef ImageGpu<imp::Pixel8uC2, imp::PixelType::i8uC2> ImageGpu8uC2;
-typedef ImageGpu<imp::Pixel8uC3, imp::PixelType::i8uC3> ImageGpu8uC3;
-typedef ImageGpu<imp::Pixel8uC4, imp::PixelType::i8uC4> ImageGpu8uC4;
+typedef ImageGpu<ze::Pixel8uC1, ze::PixelType::i8uC1> ImageGpu8uC1;
+typedef ImageGpu<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageGpu8uC2;
+typedef ImageGpu<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageGpu8uC3;
+typedef ImageGpu<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageGpu8uC4;
 
-typedef ImageGpu<imp::Pixel16uC1, imp::PixelType::i16uC1> ImageGpu16uC1;
-typedef ImageGpu<imp::Pixel16uC2, imp::PixelType::i16uC2> ImageGpu16uC2;
-typedef ImageGpu<imp::Pixel16uC3, imp::PixelType::i16uC3> ImageGpu16uC3;
-typedef ImageGpu<imp::Pixel16uC4, imp::PixelType::i16uC4> ImageGpu16uC4;
+typedef ImageGpu<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageGpu16uC1;
+typedef ImageGpu<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageGpu16uC2;
+typedef ImageGpu<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageGpu16uC3;
+typedef ImageGpu<ze::Pixel16uC4, ze::PixelType::i16uC4> ImageGpu16uC4;
 
-typedef ImageGpu<imp::Pixel32sC1, imp::PixelType::i32sC1> ImageGpu32sC1;
-typedef ImageGpu<imp::Pixel32sC2, imp::PixelType::i32sC2> ImageGpu32sC2;
-typedef ImageGpu<imp::Pixel32sC3, imp::PixelType::i32sC3> ImageGpu32sC3;
-typedef ImageGpu<imp::Pixel32sC4, imp::PixelType::i32sC4> ImageGpu32sC4;
+typedef ImageGpu<ze::Pixel32sC1, ze::PixelType::i32sC1> ImageGpu32sC1;
+typedef ImageGpu<ze::Pixel32sC2, ze::PixelType::i32sC2> ImageGpu32sC2;
+typedef ImageGpu<ze::Pixel32sC3, ze::PixelType::i32sC3> ImageGpu32sC3;
+typedef ImageGpu<ze::Pixel32sC4, ze::PixelType::i32sC4> ImageGpu32sC4;
 
-typedef ImageGpu<imp::Pixel32fC1, imp::PixelType::i32fC1> ImageGpu32fC1;
-typedef ImageGpu<imp::Pixel32fC2, imp::PixelType::i32fC2> ImageGpu32fC2;
-typedef ImageGpu<imp::Pixel32fC3, imp::PixelType::i32fC3> ImageGpu32fC3;
-typedef ImageGpu<imp::Pixel32fC4, imp::PixelType::i32fC4> ImageGpu32fC4;
+typedef ImageGpu<ze::Pixel32fC1, ze::PixelType::i32fC1> ImageGpu32fC1;
+typedef ImageGpu<ze::Pixel32fC2, ze::PixelType::i32fC2> ImageGpu32fC2;
+typedef ImageGpu<ze::Pixel32fC3, ze::PixelType::i32fC3> ImageGpu32fC3;
+typedef ImageGpu<ze::Pixel32fC4, ze::PixelType::i32fC4> ImageGpu32fC4;
 
-template <typename Pixel, imp::PixelType pixel_type>
+template <typename Pixel, ze::PixelType pixel_type>
 using ImageGpuPtr = typename std::shared_ptr<ImageGpu<Pixel,pixel_type>>;
 
 } // namespace cu

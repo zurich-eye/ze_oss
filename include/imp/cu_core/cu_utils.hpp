@@ -13,7 +13,7 @@
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_exception.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -45,9 +45,9 @@ __host__ __device__ __forceinline__
 typename std::enable_if<std::is_integral<T>::value ||std::is_floating_point<T>::value, T>::type
 min(const T& a, const T& b, bool check_inf_or_nan=true)
 {
-  if (imp::cu::isfinite(a) && imp::cu::isfinite(b))
+  if (ze::cu::isfinite(a) && ze::cu::isfinite(b))
     return a<b ? a : b;
-  else if (imp::cu::isfinite(a))
+  else if (ze::cu::isfinite(a))
     return a;
   else
     return b;
@@ -119,9 +119,9 @@ __host__ __device__ __forceinline__
 typename std::enable_if<std::is_integral<T>::value ||std::is_floating_point<T>::value, T>::type
 max(const T& a, const T& b, bool check_inf_or_nan=true)
 {
-  if (imp::cu::isfinite(a) && imp::cu::isfinite(b))
+  if (ze::cu::isfinite(a) && ze::cu::isfinite(b))
     return a>b ? a : b;
-  else if (imp::cu::isfinite(a))
+  else if (ze::cu::isfinite(a))
     return a;
   else
     return b;
@@ -214,12 +214,12 @@ struct Fragmentation
   {
   }
 
-  Fragmentation(imp::Size2u sz)
+  Fragmentation(ze::Size2u sz)
     : dimGrid(divUp(sz.width(), dimBlock.x), divUp(sz.height(), dimBlock.y))
   {
   }
 
-  Fragmentation(imp::Roi2u roi)
+  Fragmentation(ze::Roi2u roi)
     : dimGrid(divUp(roi.width(), dimBlock.x), divUp(roi.height(), dimBlock.y))
   {
   }
@@ -259,7 +259,7 @@ static inline void checkCudaErrorState(const char* file, const char* function,
   cudaDeviceSynchronize();
   cudaError_t err = cudaGetLastError();
   if( err != ::cudaSuccess )
-    throw imp::cu::Exception("error state check", err, file, function, line);
+    throw ze::cu::Exception("error state check", err, file, function, line);
 }
 
 /** Macro for checking on cuda errors
@@ -267,7 +267,7 @@ static inline void checkCudaErrorState(const char* file, const char* function,
  * @todo (MWE) we should enable this whenever we compile in debug mode
  */
 #ifdef THROW_ON_CUDA_ERROR
-#  define IMP_CUDA_CHECK() imp::cu::checkCudaErrorState(__FILE__, __FUNCTION__, __LINE__)
+#  define IMP_CUDA_CHECK() ze::cu::checkCudaErrorState(__FILE__, __FUNCTION__, __LINE__)
 #else
 #  define IMP_CUDA_CHECK() cudaDeviceSynchronize()
 #endif
@@ -290,8 +290,8 @@ static inline float getFreeGPUMemory()
 
 static inline void printGPUMemoryUsage()
 {
-  float total = imp::cu::getTotalGPUMemory();
-  float free = imp::cu::getFreeGPUMemory();
+  float total = ze::cu::getTotalGPUMemory();
+  float free = ze::cu::getFreeGPUMemory();
 
   printf("GPU memory usage\n");
   printf("----------------\n");
@@ -305,7 +305,7 @@ static inline void printGPUMemoryUsage()
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_UTILS_CUH
 

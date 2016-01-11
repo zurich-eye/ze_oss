@@ -5,20 +5,21 @@
 #include <cuda_runtime_api.h>
 #include <imp/core/exception.hpp>
 
-namespace imp { namespace cu {
+namespace ze {
+namespace cu {
 
 /** Assertion with additional error information
  */
-class Exception : public imp::Exception
+class Exception : public ze::Exception
 {
 public:
   Exception() = default;
   virtual ~Exception() throw() = default;
 
-  using imp::Exception::Exception;
+  using ze::Exception::Exception;
 //  Exception(const std::string& msg,
 //            const char* file=nullptr, const char* function=nullptr, int line=0) throw()
-//    : imp::Exception(msg, file, function, line)
+//    : ze::Exception(msg, file, function, line)
 //  {
 //  }
 
@@ -55,10 +56,10 @@ public:
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #define IMP_CU_THROW_EXCEPTION(msg, err) \
-  throw imp::cu::Exception(msg, err, __FILE__, __FUNCTION__, __LINE__)
+  throw ze::cu::Exception(msg, err, __FILE__, __FUNCTION__, __LINE__)
 
 #endif // CUCORE_CU_EXCEPTION_HPP
 

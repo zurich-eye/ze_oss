@@ -43,7 +43,7 @@ TEST(IMPCuCoreTestSuite,minMaxTest_8uC1)
 
   size_t width = 123;
   size_t height = 324;
-  imp::ImageRaw8uC1 im(width,height);
+  ze::ImageRaw8uC1 im(width,height);
   std::uint8_t min_val = std::numeric_limits<std::uint8_t>::max();
   std::uint8_t max_val = std::numeric_limits<std::uint8_t>::lowest();
   for (size_t y=0; y<height; ++y)
@@ -52,17 +52,17 @@ TEST(IMPCuCoreTestSuite,minMaxTest_8uC1)
     {
       std::uint8_t random_value = random_val();
       im[y][x] = random_value;
-      min_val = imp::cu::min(min_val, random_value);
-      max_val = imp::cu::max(max_val, random_value);
+      min_val = ze::cu::min(min_val, random_value);
+      max_val = ze::cu::max(max_val, random_value);
     }
   }
 
   IMP_CUDA_CHECK();
-  imp::cu::ImageGpu8uC1 cu_im(im);
+  ze::cu::ImageGpu8uC1 cu_im(im);
   IMP_CUDA_CHECK();
-  imp::Pixel8uC1 min_pixel, max_pixel;
+  ze::Pixel8uC1 min_pixel, max_pixel;
   IMP_CUDA_CHECK();
-  imp::cu::minMax(cu_im, min_pixel, max_pixel);
+  ze::cu::minMax(cu_im, min_pixel, max_pixel);
   IMP_CUDA_CHECK();
 
   ASSERT_EQ(min_val, min_pixel);
@@ -77,7 +77,7 @@ TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
 
   size_t width = 1250;
   size_t height = 325;
-  imp::ImageRaw32fC1 im(width,height);
+  ze::ImageRaw32fC1 im(width,height);
   float min_val = std::numeric_limits<float>::max();
   float max_val = std::numeric_limits<float>::lowest();
   for (size_t y=0; y<height; ++y)
@@ -86,8 +86,8 @@ TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
     {
       float random_value = random_val();
       im[y][x] = random_value;
-      min_val = imp::cu::min(min_val, random_value);
-      max_val = imp::cu::max(max_val, random_value);
+      min_val = ze::cu::min(min_val, random_value);
+      max_val = ze::cu::max(max_val, random_value);
 
 //      std::cout << "random: [" << x << "][" << y << "]: " << random_value << std::endl;
     }
@@ -98,11 +98,11 @@ TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
   std::cout << "CPU min, max: " << min_val << " " << max_val << std::endl;
 
   IMP_CUDA_CHECK();
-  imp::cu::ImageGpu32fC1 cu_im(im);
+  ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
-  imp::Pixel32fC1 min_pixel, max_pixel;
+  ze::Pixel32fC1 min_pixel, max_pixel;
   IMP_CUDA_CHECK();
-  imp::cu::minMax(cu_im, min_pixel, max_pixel);
+  ze::cu::minMax(cu_im, min_pixel, max_pixel);
   IMP_CUDA_CHECK();
 
   std::cout << "GPU min, max: " << min_pixel << " " << max_pixel << std::endl;

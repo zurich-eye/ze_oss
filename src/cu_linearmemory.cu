@@ -5,7 +5,7 @@
 #include <imp/cu_core/cu_k_setvalue.cuh>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -18,24 +18,24 @@ LinearMemory<Pixel>::LinearMemory(const std::uint32_t& length)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-LinearMemory<Pixel>::LinearMemory(const imp::cu::LinearMemory<Pixel>& from)
-  : imp::cu::LinearMemory<Pixel>(from.length())
+LinearMemory<Pixel>::LinearMemory(const ze::cu::LinearMemory<Pixel>& from)
+  : ze::cu::LinearMemory<Pixel>(from.length())
 {
   if (from.data() == 0)
   {
-    throw imp::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
+    throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
   }
   this->copyFrom(from);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-LinearMemory<Pixel>::LinearMemory(const imp::LinearMemory<Pixel>& from)
-  : imp::cu::LinearMemory<Pixel>(from.length())
+LinearMemory<Pixel>::LinearMemory(const ze::LinearMemory<Pixel>& from)
+  : ze::cu::LinearMemory<Pixel>(from.length())
 {
   if (from.data() == 0)
   {
-    throw imp::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
+    throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
   }
   this->copyFrom(from);
 }
@@ -56,16 +56,16 @@ const Pixel* LinearMemory<Pixel>::data() const
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-auto LinearMemory<Pixel>::cuData() -> decltype(imp::cu::toCudaVectorType(this->data()))
+auto LinearMemory<Pixel>::cuData() -> decltype(ze::cu::toCudaVectorType(this->data()))
 {
-  return imp::cu::toCudaVectorType(this->data());
+  return ze::cu::toCudaVectorType(this->data());
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-auto LinearMemory<Pixel>::cuData() const -> decltype(imp::cu::toConstCudaVectorType(this->data()))
+auto LinearMemory<Pixel>::cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data()))
 {
-  return imp::cu::toConstCudaVectorType(this->data());
+  return ze::cu::toConstCudaVectorType(this->data());
 }
 
 //-----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void LinearMemory<Pixel>::setValue(const Pixel& value)
     cu::Fragmentation<32,1> frag(this->roi().length());
 
     // todo add roi to kernel!
-    imp::cu::k_setValue
+    ze::cu::k_setValue
         <<< frag.dimGrid, frag.dimBlock
         >>> (this->data(), this->roi().x(), this->roi().length(), value);
   }
@@ -91,7 +91,7 @@ void LinearMemory<Pixel>::setValue(const Pixel& value)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void LinearMemory<Pixel>::copyTo(imp::cu::LinearMemory<Pixel>& dst)
+void LinearMemory<Pixel>::copyTo(ze::cu::LinearMemory<Pixel>& dst)
 {
   if (dst.data() == 0 || !data_)
     IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
@@ -108,7 +108,7 @@ void LinearMemory<Pixel>::copyTo(imp::cu::LinearMemory<Pixel>& dst)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void LinearMemory<Pixel>::copyFrom(const imp::cu::LinearMemory<Pixel>& from)
+void LinearMemory<Pixel>::copyFrom(const ze::cu::LinearMemory<Pixel>& from)
 {
   if (from.data() == 0 || !data_)
     IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
@@ -125,7 +125,7 @@ void LinearMemory<Pixel>::copyFrom(const imp::cu::LinearMemory<Pixel>& from)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void LinearMemory<Pixel>::copyTo(imp::LinearMemory<Pixel>& dst)
+void LinearMemory<Pixel>::copyTo(ze::LinearMemory<Pixel>& dst)
 {
   if (dst.data() == 0 || !data_)
     IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
@@ -142,7 +142,7 @@ void LinearMemory<Pixel>::copyTo(imp::LinearMemory<Pixel>& dst)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void LinearMemory<Pixel>::copyFrom(const imp::LinearMemory<Pixel>& from)
+void LinearMemory<Pixel>::copyFrom(const ze::LinearMemory<Pixel>& from)
 {
   if (from.data() == 0 || !data_)
     IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
@@ -160,30 +160,30 @@ void LinearMemory<Pixel>::copyFrom(const imp::LinearMemory<Pixel>& from)
 
 //=============================================================================
 // Explicitely instantiate the desired classes
-template class LinearMemory<imp::Pixel8uC1>;
-template class LinearMemory<imp::Pixel8uC2>;
-template class LinearMemory<imp::Pixel8uC3>;
-template class LinearMemory<imp::Pixel8uC4>;
+template class LinearMemory<ze::Pixel8uC1>;
+template class LinearMemory<ze::Pixel8uC2>;
+template class LinearMemory<ze::Pixel8uC3>;
+template class LinearMemory<ze::Pixel8uC4>;
 
-template class LinearMemory<imp::Pixel16uC1>;
-template class LinearMemory<imp::Pixel16uC2>;
-template class LinearMemory<imp::Pixel16uC3>;
-template class LinearMemory<imp::Pixel16uC4>;
+template class LinearMemory<ze::Pixel16uC1>;
+template class LinearMemory<ze::Pixel16uC2>;
+template class LinearMemory<ze::Pixel16uC3>;
+template class LinearMemory<ze::Pixel16uC4>;
 
-template class LinearMemory<imp::Pixel32uC1>;
-template class LinearMemory<imp::Pixel32uC2>;
-template class LinearMemory<imp::Pixel32uC3>;
-template class LinearMemory<imp::Pixel32uC4>;
+template class LinearMemory<ze::Pixel32uC1>;
+template class LinearMemory<ze::Pixel32uC2>;
+template class LinearMemory<ze::Pixel32uC3>;
+template class LinearMemory<ze::Pixel32uC4>;
 
-template class LinearMemory<imp::Pixel32sC1>;
-template class LinearMemory<imp::Pixel32sC2>;
-template class LinearMemory<imp::Pixel32sC3>;
-template class LinearMemory<imp::Pixel32sC4>;
+template class LinearMemory<ze::Pixel32sC1>;
+template class LinearMemory<ze::Pixel32sC2>;
+template class LinearMemory<ze::Pixel32sC3>;
+template class LinearMemory<ze::Pixel32sC4>;
 
-template class LinearMemory<imp::Pixel32fC1>;
-template class LinearMemory<imp::Pixel32fC2>;
-template class LinearMemory<imp::Pixel32fC3>;
-template class LinearMemory<imp::Pixel32fC4>;
+template class LinearMemory<ze::Pixel32fC1>;
+template class LinearMemory<ze::Pixel32fC2>;
+template class LinearMemory<ze::Pixel32fC3>;
+template class LinearMemory<ze::Pixel32fC4>;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze

@@ -10,7 +10,7 @@
 # include <Eigen/Dense>
 #pragma GCC diagnostic pop
 
-namespace imp{
+namespace ze{
 namespace cu{
 
 //------------------------------------------------------------------------------

@@ -4,13 +4,13 @@
 #include <cuda_runtime.h>
 #include <imp/cu_core/cu_texture.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
 /** compute forward differences in x- and y- direction */
 static __device__ __forceinline__ float2 dp(
-    const imp::cu::Texture2D& tex, size_t x, size_t y)
+    const ze::cu::Texture2D& tex, size_t x, size_t y)
 {
   float2 grad = make_float2(0.0f, 0.0f);
   float cval = tex2DFetch<float>(tex, x, y);
@@ -22,7 +22,7 @@ static __device__ __forceinline__ float2 dp(
 //-----------------------------------------------------------------------------
 /** compute divergence using backward differences (adjugate from dp). */
 static __device__ __forceinline__
-float dpAd(const imp::cu::Texture2D& tex,
+float dpAd(const ze::cu::Texture2D& tex,
            size_t x, size_t y, size_t width, size_t height)
 {
   float2 c = tex2DFetch<float2>(tex, x,y);
@@ -47,7 +47,7 @@ float dpAd(const imp::cu::Texture2D& tex,
 //-----------------------------------------------------------------------------
 /** compute forward differences in x- and y- direction */
 static __device__ __forceinline__ float2 dpWeighted(
-    const imp::cu::Texture2D& tex, const imp::cu::Texture2D& g_tex,
+    const ze::cu::Texture2D& tex, const ze::cu::Texture2D& g_tex,
     size_t x, size_t y)
 {
   float cval = tex2DFetch<float>(tex, x, y);
@@ -61,7 +61,7 @@ static __device__ __forceinline__ float2 dpWeighted(
 //-----------------------------------------------------------------------------
 /** compute weighted divergence using backward differences (adjugate from dp). */
 static __device__ __forceinline__
-float dpAdWeighted(const imp::cu::Texture2D& tex, const imp::cu::Texture2D& g_tex,
+float dpAdWeighted(const ze::cu::Texture2D& tex, const ze::cu::Texture2D& g_tex,
                    size_t x, size_t y, size_t width, size_t height)
 {
   float2 c = tex2DFetch<float2>(tex, x, y);
@@ -88,10 +88,10 @@ float dpAdWeighted(const imp::cu::Texture2D& tex, const imp::cu::Texture2D& g_te
 //-----------------------------------------------------------------------------
 /** compute directed divergence using backward differences (adjugate from dp). */
 static __device__ __forceinline__
-float dpAdDirected(const imp::cu::Texture2D& tex,
-                   const imp::cu::Texture2D& tensor_a_tex,
-                   const imp::cu::Texture2D& tensor_b_tex,
-                   const imp::cu::Texture2D& tensor_c_tex,
+float dpAdDirected(const ze::cu::Texture2D& tex,
+                   const ze::cu::Texture2D& tensor_a_tex,
+                   const ze::cu::Texture2D& tensor_b_tex,
+                   const ze::cu::Texture2D& tensor_c_tex,
                    size_t x, size_t y, size_t width, size_t height)
 {
   float2 c = tex2DFetch<float2>(tex, x, y);
@@ -123,7 +123,7 @@ float dpAdDirected(const imp::cu::Texture2D& tex,
 //-----------------------------------------------------------------------------
 /** compute directed divergence using backward differences (adjugate from dp). */
 static __device__ __forceinline__
-float dpAdTensor(const imp::cu::Texture2D& tex, const imp::cu::Texture2D& g_tex,
+float dpAdTensor(const ze::cu::Texture2D& tex, const ze::cu::Texture2D& g_tex,
                  size_t x, size_t y, size_t width, size_t height)
 {
   float2 c = tex2DFetch<float2>(tex, x, y);
