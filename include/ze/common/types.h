@@ -10,6 +10,7 @@ namespace ze {
 using size_t    = std::size_t;
 using int64_t   = std::int64_t;   
 using uint8_t   = std::uint8_t;
+using uint32_t  = std::uint32_t;
 using uint64_t  = std::uint64_t;
 using FloatType = double;
 
@@ -54,6 +55,7 @@ using Vector6 = Eigen::Matrix<double, 6, 1>;
 using Vector7 = Eigen::Matrix<double, 7, 1>;
 using Vector8 = Eigen::Matrix<double, 8, 1>;
 using Vector9 = Eigen::Matrix<double, 9, 1>;
+using Vector2i = Eigen::Vector2i;
 
 //------------------------------------------------------------------------------
 // Feature containers.
