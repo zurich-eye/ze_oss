@@ -15,7 +15,7 @@
 #include <sensor_msgs/Image.h>
 
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
 class RofNode
@@ -30,11 +30,11 @@ public:
 
 
 private:
-  imp::cu::RofDenoising8uC1::Ptr rof_;
-  imp::ImageCv8uC1::Ptr cv_img_;
-  imp::ImageCv8uC1::Ptr cv_denoised_;
-  imp::cu::ImageGpu8uC1::Ptr img_;
-  imp::cu::ImageGpu8uC1::Ptr denoised_;
+  ze::cu::RofDenoising8uC1::Ptr rof_;
+  ze::ImageCv8uC1::Ptr cv_img_;
+  ze::ImageCv8uC1::Ptr cv_denoised_;
+  ze::cu::ImageGpu8uC1::Ptr img_;
+  ze::cu::ImageGpu8uC1::Ptr denoised_;
 };
 
 //------------------------------------------------------------------------------
@@ -51,17 +51,17 @@ void RofNode::imgCb(const sensor_msgs::ImageConstPtr &img_msg)
     return;
   }
 
-  imp::Size2u im_size((std::uint32_t)mat.cols, (std::uint32_t)mat.rows);
+  ze::Size2u im_size((std::uint32_t)mat.cols, (std::uint32_t)mat.rows);
 
   if (!rof_ || !cv_img_ || !img_ || im_size != cv_img_->size())
   {
-    rof_.reset(new imp::cu::RofDenoising8uC1());
+    rof_.reset(new ze::cu::RofDenoising8uC1());
 //    rof_->init(im_size);
 
-    cv_img_.reset(new imp::ImageCv8uC1(im_size));
-    cv_denoised_.reset(new imp::ImageCv8uC1(im_size));
-    img_.reset(new imp::cu::ImageGpu8uC1(im_size));
-    denoised_.reset(new imp::cu::ImageGpu8uC1(im_size));
+    cv_img_.reset(new ze::ImageCv8uC1(im_size));
+    cv_denoised_.reset(new ze::ImageCv8uC1(im_size));
+    img_.reset(new ze::cu::ImageGpu8uC1(im_size));
+    denoised_.reset(new ze::cu::ImageGpu8uC1(im_size));
   }
 
   cv_img_->cvMat() = mat;
@@ -78,7 +78,7 @@ void RofNode::paramCb(imp_ros_denoising::RofNodeConfig& config, uint32_t level)
 {
   if(!rof_)
     return;
-  rof_->params().lambda = imp::cu::max(1e-6, config.lambda);
+  rof_->params().lambda = ze::cu::max(1e-6, config.lambda);
 }
 
 
@@ -92,18 +92,18 @@ int main(int argc, char **argv)
 
   ros::NodeHandle nh;
   ROS_INFO("testing the RofNode");
-  imp::RofNode rof_node;
+  ze::RofNode rof_node;
 
   // reconfigure stuff
   dynamic_reconfigure::Server<imp_ros_denoising::RofNodeConfig> server;
   dynamic_reconfigure::Server<imp_ros_denoising::RofNodeConfig>::CallbackType f;
-  f = boost::bind(&imp::RofNode::paramCb, &rof_node, _1, _2);
+  f = boost::bind(&ze::RofNode::paramCb, &rof_node, _1, _2);
   server.setCallback(f);
 
 
   image_transport::ImageTransport it(nh);
   image_transport::Subscriber sub = it.subscribe(
-        "camera/image_raw", 1, &imp::RofNode::imgCb, &rof_node);
+        "camera/image_raw", 1, &ze::RofNode::imgCb, &rof_node);
 
   ros::spin();
   return EXIT_SUCCESS;
