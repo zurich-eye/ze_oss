@@ -26,17 +26,17 @@ int main(int argc, char** argv)
     }
     std::string in_filename(argv[1]);
 
-    std::shared_ptr<imp::cu::ImageGpu32fC1> im;
-    imp::cu::cvBridgeLoad(im, in_filename, imp::PixelOrder::gray);
+    std::shared_ptr<ze::cu::ImageGpu32fC1> im;
+    ze::cu::cvBridgeLoad(im, in_filename, ze::PixelOrder::gray);
 
-    std::unique_ptr<imp::cu::ImageGpu32fC1> edges(
-          new imp::cu::ImageGpu32fC1(*im));
+    std::unique_ptr<ze::cu::ImageGpu32fC1> edges(
+          new ze::cu::ImageGpu32fC1(*im));
     IMP_CUDA_CHECK();
 
-    imp::cu::naturalEdges(*edges, *im, 1.f, 10.f, 0.7f);
+    ze::cu::naturalEdges(*edges, *im, 1.f, 10.f, 0.7f);
 
-    imp::cu::cvBridgeShow("image", *im);
-    imp::cu::cvBridgeShow("edges", *edges, true);
+    ze::cu::cvBridgeShow("image", *im);
+    ze::cu::cvBridgeShow("edges", *edges, true);
 
     cv::waitKey();
   }

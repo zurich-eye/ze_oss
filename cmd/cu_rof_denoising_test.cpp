@@ -27,12 +27,12 @@ int main(int argc, char** argv)
 
     // ROF denoising 8uC1
     {
-      std::shared_ptr<imp::cu::ImageGpu8uC1> cu_im;
-      imp::cu::cvBridgeLoad(cu_im, in_filename, imp::PixelOrder::gray);
-      std::shared_ptr<imp::cu::ImageGpu8uC1> cu_im_denoised(
-            new imp::cu::ImageGpu8uC1(*cu_im));
+      std::shared_ptr<ze::cu::ImageGpu8uC1> cu_im;
+      ze::cu::cvBridgeLoad(cu_im, in_filename, ze::PixelOrder::gray);
+      std::shared_ptr<ze::cu::ImageGpu8uC1> cu_im_denoised(
+            new ze::cu::ImageGpu8uC1(*cu_im));
 
-      imp::cu::RofDenoising8uC1 rof;
+      ze::cu::RofDenoising8uC1 rof;
       rof.params().primal_dual_energy_check_iter = 10;
       rof.params().primal_dual_gap_tolerance = 1e-3;
 
@@ -40,8 +40,8 @@ int main(int argc, char** argv)
       rof.denoise(cu_im_denoised, cu_im);
 
       // show results
-      imp::cu::cvBridgeShow("input 8u", *cu_im);
-      imp::cu::cvBridgeShow("denoised 8u", *cu_im_denoised);
+      ze::cu::cvBridgeShow("input 8u", *cu_im);
+      ze::cu::cvBridgeShow("denoised 8u", *cu_im_denoised);
     }
 
     std::cout << "-------------------------------------------------------------"
@@ -49,20 +49,20 @@ int main(int argc, char** argv)
 
     // ROF denoising 32fC1
     {
-      std::shared_ptr<imp::cu::ImageGpu32fC1> cu_im;
-      imp::cu::cvBridgeLoad(cu_im, in_filename, imp::PixelOrder::gray);
-      std::shared_ptr<imp::cu::ImageGpu32fC1> cu_im_denoised(
-            new imp::cu::ImageGpu32fC1(*cu_im));
+      std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im;
+      ze::cu::cvBridgeLoad(cu_im, in_filename, ze::PixelOrder::gray);
+      std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im_denoised(
+            new ze::cu::ImageGpu32fC1(*cu_im));
 
-      imp::cu::RofDenoising32fC1 rof;
+      ze::cu::RofDenoising32fC1 rof;
       rof.params().primal_dual_energy_check_iter = 10;
       rof.params().primal_dual_gap_tolerance = 1e-3;
 
       std::cout << "\n" << rof << std::endl;
       rof.denoise(cu_im_denoised, cu_im);
 
-      imp::cu::cvBridgeShow("input 32f", *cu_im);
-      imp::cu::cvBridgeShow("denoised 32f", *cu_im_denoised);
+      ze::cu::cvBridgeShow("input 32f", *cu_im);
+      ze::cu::cvBridgeShow("denoised 32f", *cu_im_denoised);
     }
 
     cv::waitKey();

@@ -27,10 +27,10 @@ int main(int argc, char** argv)
 
     // get image minmax
     {
-      std::shared_ptr<imp::cu::ImageGpu8uC1> cu_im;
-      imp::cu::cvBridgeLoad(cu_im, in_filename, imp::PixelOrder::gray);
-      imp::Pixel8uC1 min_pixel, max_pixel;
-      imp::cu::minMax(*cu_im, min_pixel, max_pixel);
+      std::shared_ptr<ze::cu::ImageGpu8uC1> cu_im;
+      ze::cu::cvBridgeLoad(cu_im, in_filename, ze::PixelOrder::gray);
+      ze::Pixel8uC1 min_pixel, max_pixel;
+      ze::cu::minMax(*cu_im, min_pixel, max_pixel);
       std::cout << "min: " << (int)min_pixel << ", max: " << (int)max_pixel << std::endl;
     }
 

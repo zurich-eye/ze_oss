@@ -26,35 +26,35 @@ int main(int argc, char** argv)
 
     // 8uC1
     {
-      std::shared_ptr<imp::cu::ImageGpu8uC1> cu_im;
-      imp::cu::cvBridgeLoad(cu_im, in_filename, imp::PixelOrder::gray);
-      std::shared_ptr<imp::cu::ImageGpu8uC1> cu_im_denoised(
-            new imp::cu::ImageGpu8uC1(*cu_im));
+      std::shared_ptr<ze::cu::ImageGpu8uC1> cu_im;
+      ze::cu::cvBridgeLoad(cu_im, in_filename, ze::PixelOrder::gray);
+      std::shared_ptr<ze::cu::ImageGpu8uC1> cu_im_denoised(
+            new ze::cu::ImageGpu8uC1(*cu_im));
 
-      imp::cu::TvL1Denoising8uC1 tvl1;
+      ze::cu::TvL1Denoising8uC1 tvl1;
       tvl1.params().lambda = 0.5f;
       std::cout << "\n" << tvl1 << std::endl << std::endl;
       tvl1.denoise(cu_im_denoised, cu_im);
 
       // show results
-      imp::cu::cvBridgeShow("input 8u", *cu_im);
-      imp::cu::cvBridgeShow("denoised 8u", *cu_im_denoised);
+      ze::cu::cvBridgeShow("input 8u", *cu_im);
+      ze::cu::cvBridgeShow("denoised 8u", *cu_im_denoised);
     }
 
     // 32fC1
     {
-      std::shared_ptr<imp::cu::ImageGpu32fC1> cu_im;
-      imp::cu::cvBridgeLoad(cu_im, in_filename, imp::PixelOrder::gray);
-      std::shared_ptr<imp::cu::ImageGpu32fC1> cu_im_denoised(
-            new imp::cu::ImageGpu32fC1(*cu_im));
+      std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im;
+      ze::cu::cvBridgeLoad(cu_im, in_filename, ze::PixelOrder::gray);
+      std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im_denoised(
+            new ze::cu::ImageGpu32fC1(*cu_im));
 
-      imp::cu::TvL1Denoising32fC1 tvl1;
+      ze::cu::TvL1Denoising32fC1 tvl1;
       tvl1.params().lambda = 0.5f;
       std::cout << "\n" << tvl1 << std::endl << std::endl;
       tvl1.denoise(cu_im_denoised, cu_im);
 
-      imp::cu::cvBridgeShow("input 32f", *cu_im);
-      imp::cu::cvBridgeShow("denoised 32f", *cu_im_denoised);
+      ze::cu::cvBridgeShow("input 32f", *cu_im);
+      ze::cu::cvBridgeShow("denoised 32f", *cu_im_denoised);
     }
 
     cv::waitKey();

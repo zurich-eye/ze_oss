@@ -30,20 +30,20 @@ int main(int /*argc*/, char** /*argv*/)
 {
   try
   {
-    imp::ImageCv32fC1::Ptr cv_im0;
-    imp::cvBridgeLoad(cv_im0,
+    ze::ImageCv32fC1::Ptr cv_im0;
+    ze::cvBridgeLoad(cv_im0,
                       "/home/mwerlberger/data/epipolar_stereo_test/00000.png",
-                      imp::PixelOrder::gray);
+                      ze::PixelOrder::gray);
 
-    imp::ImageCv32fC1::Ptr cv_im1;
-    imp::cvBridgeLoad(cv_im1,
+    ze::ImageCv32fC1::Ptr cv_im1;
+    ze::cvBridgeLoad(cv_im1,
                       "/home/mwerlberger/data/epipolar_stereo_test/00001.png",
-                      imp::PixelOrder::gray);
+                      ze::PixelOrder::gray);
 
     // rectify images for testing
 
-    imp::cu::ImageGpu32fC1::Ptr im0 = std::make_shared<imp::cu::ImageGpu32fC1>(*cv_im0);
-    imp::cu::ImageGpu32fC1::Ptr im1 = std::make_shared<imp::cu::ImageGpu32fC1>(*cv_im1);
+    ze::cu::ImageGpu32fC1::Ptr im0 = std::make_shared<ze::cu::ImageGpu32fC1>(*cv_im0);
+    ze::cu::ImageGpu32fC1::Ptr im1 = std::make_shared<ze::cu::ImageGpu32fC1>(*cv_im1);
 
 
     Eigen::Quaterniond q_world_im0(0.14062777, 0.98558398, 0.02351040, -0.09107859);
@@ -51,11 +51,11 @@ int main(int /*argc*/, char** /*argv*/)
     Eigen::Vector3d t_world_im0(-0.12617580, 0.50447008, 0.15342121);
     Eigen::Vector3d t_world_im1(-0.11031053, 0.50314023, 0.15158643);
 
-    imp::cu::PinholeCamera cu_cam(414.09, 413.799, 355.567, 246.337);
+    ze::cu::PinholeCamera cu_cam(414.09, 413.799, 355.567, 246.337);
 
     // im0: fixed image; im1: moving image
-    imp::cu::Matrix3f F_fix_mov;
-    imp::cu::Matrix3f F_mov_fix;
+    ze::cu::Matrix3f F_fix_mov;
+    ze::cu::Matrix3f F_mov_fix;
     Eigen::Matrix3d F_fm, F_mf;
     { // compute fundamental matrix
       Eigen::Matrix3d R_world_mov = q_world_im1.matrix();
@@ -90,27 +90,27 @@ int main(int /*argc*/, char** /*argv*/)
     }
 
     // compute SE3 transformation
-    imp::cu::SE3<float> T_world_fix(
+    ze::cu::SE3<float> T_world_fix(
           static_cast<float>(q_world_im0.w()), static_cast<float>(q_world_im0.x()),
           static_cast<float>(q_world_im0.y()), static_cast<float>(q_world_im0.z()),
           static_cast<float>(t_world_im0.x()), static_cast<float>(t_world_im0.y()),
           static_cast<float>(t_world_im0.z()));
-    imp::cu::SE3<float> T_world_mov(
+    ze::cu::SE3<float> T_world_mov(
           static_cast<float>(q_world_im1.w()), static_cast<float>(q_world_im1.x()),
           static_cast<float>(q_world_im1.y()), static_cast<float>(q_world_im1.z()),
           static_cast<float>(t_world_im1.x()), static_cast<float>(t_world_im1.y()),
           static_cast<float>(t_world_im1.z()));
-    imp::cu::SE3<float> T_mov_fix = T_world_mov.inv() * T_world_fix;
+    ze::cu::SE3<float> T_mov_fix = T_world_mov.inv() * T_world_fix;
     // end .. compute SE3 transformation
 
     std::cout << "T_mov_fix:\n" << T_mov_fix << std::endl;
 
 
-    std::unique_ptr<imp::cu::VariationalEpipolarStereo> stereo(
-          new imp::cu::VariationalEpipolarStereo());
+    std::unique_ptr<ze::cu::VariationalEpipolarStereo> stereo(
+          new ze::cu::VariationalEpipolarStereo());
 
     stereo->parameters()->verbose = 1;
-    stereo->parameters()->solver = imp::cu::StereoPDSolver::EpipolarPrecondHuberL1;
+    stereo->parameters()->solver = ze::cu::StereoPDSolver::EpipolarPrecondHuberL1;
     stereo->parameters()->ctf.scale_factor = 0.8f;
     stereo->parameters()->ctf.iters = 30;
     stereo->parameters()->ctf.warps  = 5;
@@ -120,8 +120,8 @@ int main(int /*argc*/, char** /*argv*/)
     stereo->addImage(im0);
     stereo->addImage(im1);
 
-    imp::cu::ImageGpu32fC1::Ptr cu_mu = std::make_shared<imp::cu::ImageGpu32fC1>(im0->size());
-    imp::cu::ImageGpu32fC1::Ptr cu_sigma2 = std::make_shared<imp::cu::ImageGpu32fC1>(im0->size());
+    ze::cu::ImageGpu32fC1::Ptr cu_mu = std::make_shared<ze::cu::ImageGpu32fC1>(im0->size());
+    ze::cu::ImageGpu32fC1::Ptr cu_sigma2 = std::make_shared<ze::cu::ImageGpu32fC1>(im0->size());
     cu_mu->setValue(-5.f);
     cu_sigma2->setValue(0.0f);
 
@@ -132,26 +132,26 @@ int main(int /*argc*/, char** /*argv*/)
     
     stereo->solve();
 
-    std::shared_ptr<imp::cu::ImageGpu32fC1> d_disp = stereo->getDisparities();
+    std::shared_ptr<ze::cu::ImageGpu32fC1> d_disp = stereo->getDisparities();
 
 
     {
-      imp::Pixel32fC1 min_val,max_val;
-      imp::cu::minMax(*d_disp, min_val, max_val);
+      ze::Pixel32fC1 min_val,max_val;
+      ze::cu::minMax(*d_disp, min_val, max_val);
       std::cout << "disp: min: " << min_val.x << " max: " << max_val.x << std::endl;
     }
 
-    imp::cu::cvBridgeShow("im0", *im0);
-    imp::cu::cvBridgeShow("im1", *im1);
+    ze::cu::cvBridgeShow("im0", *im0);
+    ze::cu::cvBridgeShow("im1", *im1);
 //    *d_disp *= -1;
     {
-      imp::Pixel32fC1 min_val,max_val;
-      imp::cu::minMax(*d_disp, min_val, max_val);
+      ze::Pixel32fC1 min_val,max_val;
+      ze::cu::minMax(*d_disp, min_val, max_val);
       std::cout << "disp: min: " << min_val.x << " max: " << max_val.x << std::endl;
     }
 
-    imp::cu::cvBridgeShow("disparities", *d_disp, -18.0f, 11.0f);
-    imp::cu::cvBridgeShow("disparities minmax", *d_disp, true);
+    ze::cu::cvBridgeShow("disparities", *d_disp, -18.0f, 11.0f);
+    ze::cu::cvBridgeShow("disparities minmax", *d_disp, true);
     cv::waitKey();
   }
   catch (std::exception& e)

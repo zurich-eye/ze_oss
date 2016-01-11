@@ -18,7 +18,7 @@
 
 int main(int argc, char** argv)
 {
-  using Stereo = imp::cu::VariationalStereo;
+  using Stereo = ze::cu::VariationalStereo;
   using StereoParameters = Stereo::Parameters;
 
   try
@@ -32,21 +32,21 @@ int main(int argc, char** argv)
     std::string in_right(argv[2]);
 
 
-    imp::cu::ImageGpu32fC1::Ptr left_32fC1;
-    imp::cu::cvBridgeLoad(left_32fC1, in_left, imp::PixelOrder::gray);
-    imp::cu::ImageGpu32fC1::Ptr right_32fC1;
-    imp::cu::cvBridgeLoad(right_32fC1, in_right, imp::PixelOrder::gray);
+    ze::cu::ImageGpu32fC1::Ptr left_32fC1;
+    ze::cu::cvBridgeLoad(left_32fC1, in_left, ze::PixelOrder::gray);
+    ze::cu::ImageGpu32fC1::Ptr right_32fC1;
+    ze::cu::cvBridgeLoad(right_32fC1, in_right, ze::PixelOrder::gray);
 
     {
-      imp::Pixel32fC1 min_val,max_val;
-      imp::cu::minMax(*left_32fC1, min_val, max_val);
+      ze::Pixel32fC1 min_val,max_val;
+      ze::cu::minMax(*left_32fC1, min_val, max_val);
       std::cout << "disp: min: " << min_val.x << " max: " << max_val.x << std::endl;
     }
 
 
     StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
     stereo_params->verbose = 10;
-    stereo_params->solver = imp::cu::StereoPDSolver::PrecondHuberL1Weighted;
+    stereo_params->solver = ze::cu::StereoPDSolver::PrecondHuberL1Weighted;
     stereo_params->ctf.scale_factor = 0.8f;
     stereo_params->ctf.iters = 50;
     stereo_params->ctf.warps  = 10;
@@ -59,38 +59,38 @@ int main(int argc, char** argv)
 
     stereo->solve();
 
-    imp::cu::ImageGpu32fC1::Ptr d_disp = stereo->getDisparities();
-    imp::cu::ImageGpu32fC1::Ptr d_occ = stereo->getOcclusion();
+    ze::cu::ImageGpu32fC1::Ptr d_disp = stereo->getDisparities();
+    ze::cu::ImageGpu32fC1::Ptr d_occ = stereo->getOcclusion();
 
     {
-      imp::Pixel32fC1 min_val,max_val;
-      imp::cu::minMax(*d_disp, min_val, max_val);
+      ze::Pixel32fC1 min_val,max_val;
+      ze::cu::minMax(*d_disp, min_val, max_val);
       std::cout << "disp: min: " << min_val.x << " max: " << max_val.x << std::endl;
     }
 
-    imp::cu::cvBridgeShow("left image", *left_32fC1);
-    imp::cu::cvBridgeShow("right image", *right_32fC1);
+    ze::cu::cvBridgeShow("left image", *left_32fC1);
+    ze::cu::cvBridgeShow("right image", *right_32fC1);
     *d_disp *= -1;
     {
-      imp::Pixel32fC1 min_val,max_val;
-      imp::cu::minMax(*d_disp, min_val, max_val);
+      ze::Pixel32fC1 min_val,max_val;
+      ze::cu::minMax(*d_disp, min_val, max_val);
       std::cout << "disp: min: " << min_val.x << " max: " << max_val.x << std::endl;
     }
 
-    imp::cu::cvBridgeShow("disparities", *d_disp, true);
+    ze::cu::cvBridgeShow("disparities", *d_disp, true);
 
     if (d_occ)
     {
-      imp::cu::cvBridgeShow("occlusions", *d_occ, true);
+      ze::cu::cvBridgeShow("occlusions", *d_occ, true);
     }
 
     // get primal energy
-    imp::cu::ImageGpu32fC1::Ptr d_ep = stereo->computePrimalEnergy();
+    ze::cu::ImageGpu32fC1::Ptr d_ep = stereo->computePrimalEnergy();
     if (d_ep)
     {
-      imp::cu::cvBridgeShow("primal energy", *d_ep, true);
-      imp::Pixel32fC1 ep_min, ep_max;
-      imp::cu::minMax(*d_ep, ep_min, ep_max);
+      ze::cu::cvBridgeShow("primal energy", *d_ep, true);
+      ze::Pixel32fC1 ep_min, ep_max;
+      ze::cu::minMax(*d_ep, ep_min, ep_max);
       std::cout << "primal energy: min: " << ep_min.x << " max: " << ep_max.x << std::endl;
     }
 
