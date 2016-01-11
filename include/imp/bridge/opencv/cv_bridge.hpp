@@ -7,12 +7,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
 
-namespace imp {
+namespace ze {
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
-                  const std::string& filename, imp::PixelOrder pixel_order)
+                  const std::string& filename, ze::PixelOrder pixel_order)
 {
   cv::Mat mat;
   if (pixel_order == PixelOrder::gray)
@@ -27,7 +27,7 @@ void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
 
   switch(pixel_type)
   {
-  case imp::PixelType::i8uC1:
+  case ze::PixelType::i8uC1:
     if (pixel_order == PixelOrder::gray)
     {
       out = std::make_shared<ImageCv<Pixel,pixel_type>>(mat);
@@ -38,7 +38,7 @@ void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
       cv::cvtColor(mat, out->cvMat(), CV_BGR2GRAY);
     }
   break;
-  case imp::PixelType::i32fC1:
+  case ze::PixelType::i32fC1:
     out = std::make_shared<ImageCv<Pixel,pixel_type>>(mat.cols, mat.rows);
     if (mat.channels() > 1)
     {
@@ -47,12 +47,12 @@ void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
     mat.convertTo(out->cvMat(), CV_32F, 1./255.);
   break;
   default:
-    throw imp::Exception("Conversion for reading given pixel_type not supported yet.", __FILE__, __FUNCTION__, __LINE__);
+    throw ze::Exception("Conversion for reading given pixel_type not supported yet.", __FILE__, __FUNCTION__, __LINE__);
   }
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void cvBridgeSave(const std::string& filename, const ImageCv<Pixel,pixel_type>& img, bool normalize=false)
 {
   if (normalize)
@@ -63,7 +63,7 @@ void cvBridgeSave(const std::string& filename, const ImageCv<Pixel,pixel_type>& 
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& img,
                   bool normalize=false)
 {
@@ -81,7 +81,7 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& i
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, typename T, imp::PixelType pixel_type>
+template<typename Pixel, typename T, ze::PixelType pixel_type>
 void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& img,
                   const T& min, const T& max)
 {

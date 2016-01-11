@@ -6,7 +6,7 @@
 #include <imp/core/pixel_enums.hpp>
 #include <imp/core/image.hpp>
 
-namespace imp {
+namespace ze {
 
 /**
  * @brief The ImageCv class is an image holding an OpenCV matrix (cv::Mat) for the image data
@@ -18,8 +18,8 @@ namespace imp {
  * your code.
  *
  */
-template<typename Pixel, imp::PixelType pixel_type>
-class ImageCv : public imp::Image<Pixel, pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
+class ImageCv : public ze::Image<Pixel, pixel_type>
 {
 public:
   using Base = Image<Pixel, pixel_type>;
@@ -33,10 +33,10 @@ public:
   virtual ~ImageCv() = default;
 
   ImageCv(std::uint32_t width, std::uint32_t height);
-  ImageCv(const imp::Size2u& size);
+  ImageCv(const ze::Size2u& size);
   ImageCv(const ImageCv<Pixel, pixel_type>& from);
   ImageCv(const Base& from);
-  ImageCv(cv::Mat mat, imp::PixelOrder pixel_order_=imp::PixelOrder::undefined);
+  ImageCv(cv::Mat mat, ze::PixelOrder pixel_order_=ze::PixelOrder::undefined);
 //  ImageCv(Pixel* data, std::uint32_t width, std::uint32_t height,
 //          size_t pitch, bool use_ext_data_pointer = false);
 
@@ -76,25 +76,25 @@ protected:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImageCv<imp::Pixel8uC1, imp::PixelType::i8uC1> ImageCv8uC1;
-typedef ImageCv<imp::Pixel8uC2, imp::PixelType::i8uC2> ImageCv8uC2;
-typedef ImageCv<imp::Pixel8uC3, imp::PixelType::i8uC3> ImageCv8uC3;
-typedef ImageCv<imp::Pixel8uC4, imp::PixelType::i8uC4> ImageCv8uC4;
+typedef ImageCv<ze::Pixel8uC1, ze::PixelType::i8uC1> ImageCv8uC1;
+typedef ImageCv<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageCv8uC2;
+typedef ImageCv<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageCv8uC3;
+typedef ImageCv<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageCv8uC4;
 
-typedef ImageCv<imp::Pixel16uC1, imp::PixelType::i16uC1> ImageCv16uC1;
-typedef ImageCv<imp::Pixel16uC2, imp::PixelType::i16uC2> ImageCv16uC2;
-typedef ImageCv<imp::Pixel16uC3, imp::PixelType::i16uC3> ImageCv16uC3;
-typedef ImageCv<imp::Pixel16uC4, imp::PixelType::i16uC4> ImageCv16uC4;
+typedef ImageCv<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageCv16uC1;
+typedef ImageCv<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageCv16uC2;
+typedef ImageCv<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageCv16uC3;
+typedef ImageCv<ze::Pixel16uC4, ze::PixelType::i16uC4> ImageCv16uC4;
 
-typedef ImageCv<imp::Pixel32sC1, imp::PixelType::i32sC1> ImageCv32sC1;
-typedef ImageCv<imp::Pixel32sC2, imp::PixelType::i32sC2> ImageCv32sC2;
-typedef ImageCv<imp::Pixel32sC3, imp::PixelType::i32sC3> ImageCv32sC3;
-typedef ImageCv<imp::Pixel32sC4, imp::PixelType::i32sC4> ImageCv32sC4;
+typedef ImageCv<ze::Pixel32sC1, ze::PixelType::i32sC1> ImageCv32sC1;
+typedef ImageCv<ze::Pixel32sC2, ze::PixelType::i32sC2> ImageCv32sC2;
+typedef ImageCv<ze::Pixel32sC3, ze::PixelType::i32sC3> ImageCv32sC3;
+typedef ImageCv<ze::Pixel32sC4, ze::PixelType::i32sC4> ImageCv32sC4;
 
-typedef ImageCv<imp::Pixel32fC1, imp::PixelType::i32fC1> ImageCv32fC1;
-typedef ImageCv<imp::Pixel32fC2, imp::PixelType::i32fC2> ImageCv32fC2;
-typedef ImageCv<imp::Pixel32fC3, imp::PixelType::i32fC3> ImageCv32fC3;
-typedef ImageCv<imp::Pixel32fC4, imp::PixelType::i32fC4> ImageCv32fC4;
+typedef ImageCv<ze::Pixel32fC1, ze::PixelType::i32fC1> ImageCv32fC1;
+typedef ImageCv<ze::Pixel32fC2, ze::PixelType::i32fC2> ImageCv32fC2;
+typedef ImageCv<ze::Pixel32fC3, ze::PixelType::i32fC3> ImageCv32fC3;
+typedef ImageCv<ze::Pixel32fC4, ze::PixelType::i32fC4> ImageCv32fC4;
 
 
 //typedef ImageCv<std::uint8_t, imp::PixelType::i8uC1> ImageCv8uC1;
@@ -104,14 +104,14 @@ typedef ImageCv<imp::Pixel32fC4, imp::PixelType::i32fC4> ImageCv32fC4;
 
 // shared pointers
 
-template <typename Pixel, imp::PixelType pixel_type>
+template <typename Pixel, ze::PixelType pixel_type>
 using ImageCvPtr = typename std::shared_ptr<ImageCv<Pixel,pixel_type>>;
 
 //template <typename Pixel, imp::PixelType pixel_type>
 //using ConstImageCvPtrRef = typename ImageCv<Pixel,pixel_type>::ConstPtrRef;
 
 
-template <typename Pixel, imp::PixelType pixel_type>
+template <typename Pixel, ze::PixelType pixel_type>
 using ImageCvConstPtr = typename ImageCv<Pixel,pixel_type>::ConstPtr;
 
 
