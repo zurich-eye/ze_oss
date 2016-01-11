@@ -1,7 +1,7 @@
 #include <imp/cu_imgproc/cu_variational_denoising.cuh>
 #include <imp/cu_core/cu_texture.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -32,5 +32,5 @@ __host__ void VariationalDenoising::init(const Size2u& size)
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

@@ -11,13 +11,13 @@
 #include <imp/cu_core/cu_math.cuh>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
 __global__ void k_initRofSolver(Pixel32fC1* d_u, Pixel32fC1* d_u_prev, size_t stride_u,
                                 Pixel32fC2* d_p, size_t stride_p,
-                                imp::cu::Texture2D f_tex,
+                                ze::cu::Texture2D f_tex,
                                 size_t width, size_t height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -76,7 +76,7 @@ __global__ void k_rofDualUpdate(
 
 //-----------------------------------------------------------------------------
 __global__ void k_convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
-                                    imp::cu::Texture2D u_tex,
+                                    ze::cu::Texture2D u_tex,
                                     size_t width, size_t height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -102,7 +102,7 @@ __global__ void k_rofPrimalEnergy(Pixel32fC1* d_ep,  size_t stride,
     float2 dp_u = dp(u_tex, x, y);
     float f = tex2DFetch<float>(f_tex, x, y);
     float u = tex2DFetch<float>(u_tex, x, y);
-    d_ep[y*stride + x] = length(dp_u) + lambda/2.0f * imp::cu::sqr(u-f);
+    d_ep[y*stride + x] = length(dp_u) + lambda/2.0f * ze::cu::sqr(u-f);
   }
 }
 
@@ -118,7 +118,7 @@ __global__ void k_rofDualEnergy(Pixel32fC1* d_ed,  size_t stride,
   {
     float f = tex2DFetch<float>(f_tex, x, y);
     float div = dpAd(p_tex, x, y, width, height);
-    d_ed[y*stride + x] = -imp::cu::sqr(div)/(2.0f*lambda) - div*f;
+    d_ed[y*stride + x] = -ze::cu::sqr(div)/(2.0f*lambda) - div*f;
   }
 }
 
@@ -127,7 +127,7 @@ __global__ void k_rofDualEnergy(Pixel32fC1* d_ed,  size_t stride,
 //#############################################################################
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void RofDenoising<Pixel, pixel_type>::init(const Size2u& size)
 {
   Base::init(size);
@@ -154,7 +154,7 @@ void RofDenoising<Pixel, pixel_type>::init(const Size2u& size)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void RofDenoising<Pixel, pixel_type>::denoise(const std::shared_ptr<ImageBase>& dst,
                                               const std::shared_ptr<ImageBase>& src)
 {
@@ -165,7 +165,7 @@ void RofDenoising<Pixel, pixel_type>::denoise(const std::shared_ptr<ImageBase>& 
 
   if (src->size() != dst->size())
   {
-    throw imp::cu::Exception("Input and output image are not of the same size.",
+    throw ze::cu::Exception("Input and output image are not of the same size.",
                              __FILE__, __FUNCTION__, __LINE__);
   }
 
@@ -239,14 +239,14 @@ void RofDenoising<Pixel, pixel_type>::denoise(const std::shared_ptr<ImageBase>& 
   }
   break;
   default:
-    throw imp::cu::Exception("Unsupported PixelType.",
+    throw ze::cu::Exception("Unsupported PixelType.",
                              __FILE__, __FUNCTION__, __LINE__);
   }
   IMP_CUDA_CHECK();
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
     double& primal_energy, double& dual_energy)
 {
@@ -267,7 +267,7 @@ void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
 
   // TODO sum
   primal_energy = 10.0;
-  imp::cu::minMax(*primal_energies_, ep_min, ep_max);
+  ze::cu::minMax(*primal_energies_, ep_min, ep_max);
   IMP_CUDA_CHECK();
 
   k_rofDualEnergy
@@ -277,7 +277,7 @@ void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
            size_.width(), size_.height(), params_.lambda,
            *f_tex_, *p_tex_);
   dual_energy = 20.0;
-  imp::cu::minMax(*dual_energies_, ed_min, ed_max);
+  ze::cu::minMax(*dual_energies_, ed_min, ed_max);
 
   std::cout << "!!! primal: min: " << ep_min << "; max: " << ep_max << std::endl;
   std::cout << "!!! dual  : min: " << ed_min << "; max: " << ed_max << std::endl;
@@ -286,7 +286,7 @@ void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void RofDenoising<Pixel, pixel_type>::print(std::ostream& os) const
 {
   os << "ROF Denoising:" << std::endl;
@@ -296,8 +296,8 @@ void RofDenoising<Pixel, pixel_type>::print(std::ostream& os) const
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class RofDenoising<imp::Pixel8uC1, imp::PixelType::i8uC1>;
-template class RofDenoising<imp::Pixel32fC1, imp::PixelType::i32fC1>;
+template class RofDenoising<ze::Pixel8uC1, ze::PixelType::i8uC1>;
+template class RofDenoising<ze::Pixel32fC1, ze::PixelType::i32fC1>;
 
 } // namespace cu
-              } // namespace imp
+} // namespace ze

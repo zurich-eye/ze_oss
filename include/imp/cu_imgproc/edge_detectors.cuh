@@ -6,7 +6,7 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /** Compute 'natural' image edges as a function like g = exp(-alpha*(norm)^q)
@@ -17,7 +17,7 @@ namespace cu {
  * @todo (MWE) add a tmp image as input param so we don't have to allocate memory
  *             for the internal denoising all the time.
  */
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
                   const ImageGpu<Pixel, pixel_type>& src,
                   float sigma=1.0f, float alpha=10.f, float q=.5f,

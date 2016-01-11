@@ -12,9 +12,7 @@
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_texture.cuh>
 
-
-
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -96,7 +94,7 @@ __global__ void k_gauss(Pixel* dst, const size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
                  const Texture2D& src_tex,
                  float sigma, int kernel_size,
@@ -149,7 +147,7 @@ void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
 
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
                  const ImageGpu<Pixel, pixel_type>& src,
                  float sigma, int kernel_size,
@@ -159,11 +157,11 @@ void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false,(src.bitDepth()<32) ? cudaFilterModePoint
                                                : cudaFilterModeLinear);
-  imp::Roi2u roi = src.roi();
+  ze::Roi2u roi = src.roi();
   if (dst.roi().size() != roi.size())
      dst.setRoi(roi);
 
-  imp::cu::filterGauss(dst, *src_tex, sigma, kernel_size, tmp_img);
+  ze::cu::filterGauss(dst, *src_tex, sigma, kernel_size, tmp_img);
 
   IMP_CUDA_CHECK();
 }
@@ -192,7 +190,7 @@ template void filterGauss(ImageGpu32fC4& dst, const ImageGpu32fC4& src, float si
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 

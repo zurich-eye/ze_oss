@@ -5,13 +5,13 @@
 #include <imp/core/pixel_enums.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 /**
  * @brief Image resampling from \a src to \a dst image
  */
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void resample(ImageGpu<Pixel, pixel_type>& dst,
               const ImageGpu<Pixel, pixel_type>& src,
               InterpolationMode interp = InterpolationMode::linear,

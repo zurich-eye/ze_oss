@@ -14,9 +14,7 @@
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_texture.cuh>
 
-
-
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -258,7 +256,7 @@ __global__ void  k_median3x3(Pixel* dst, const size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void filterMedian3x3(ImageGpu<Pixel, pixel_type>& dst,
                      const ImageGpu<Pixel, pixel_type>& src)
 {

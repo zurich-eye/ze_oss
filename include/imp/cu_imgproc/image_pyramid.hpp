@@ -10,22 +10,22 @@
 #include <imp/core/size.hpp>
 #include <imp/core/image.hpp>
 
-namespace imp {
+namespace ze {
 
 /**
  * @brief The ImagePyramid class holds an image scale pyramid
  *
  * @todo (MWE) roi support (propagated automatically from finest to coarser level)
  */
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 class ImagePyramid
 {
 public:
   using Ptr = std::shared_ptr<ImagePyramid>;
 
   // typedefs for convenience
-  using Image = typename imp::Image<Pixel, pixel_type>;
-  using ImagePtr = typename imp::ImagePtr<Pixel, pixel_type>;
+  using Image = typename ze::Image<Pixel, pixel_type>;
+  using ImagePtr = typename ze::ImagePtr<Pixel, pixel_type>;
   using ImageLevels = std::vector<ImagePtr>;
 
 public:
@@ -53,7 +53,7 @@ public:
   void clear() noexcept;
 
   /** Setting up levels. */
-  void init(const imp::Size2u& size);
+  void init(const ze::Size2u& size);
 
   /** Initializing the images. */
   void updateImage(ImagePtr img_level0, InterpolationMode interp);
@@ -119,25 +119,25 @@ private:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImagePyramid<imp::Pixel8uC1, imp::PixelType::i8uC1> ImagePyramid8uC1;
-typedef ImagePyramid<imp::Pixel8uC2, imp::PixelType::i8uC2> ImagePyramid8uC2;
-typedef ImagePyramid<imp::Pixel8uC3, imp::PixelType::i8uC3> ImagePyramid8uC3;
-typedef ImagePyramid<imp::Pixel8uC4, imp::PixelType::i8uC4> ImagePyramid8uC4;
+typedef ImagePyramid<ze::Pixel8uC1, ze::PixelType::i8uC1> ImagePyramid8uC1;
+typedef ImagePyramid<ze::Pixel8uC2, ze::PixelType::i8uC2> ImagePyramid8uC2;
+typedef ImagePyramid<ze::Pixel8uC3, ze::PixelType::i8uC3> ImagePyramid8uC3;
+typedef ImagePyramid<ze::Pixel8uC4, ze::PixelType::i8uC4> ImagePyramid8uC4;
 
-typedef ImagePyramid<imp::Pixel16uC1, imp::PixelType::i16uC1> ImagePyramid16uC1;
-typedef ImagePyramid<imp::Pixel16uC2, imp::PixelType::i16uC2> ImagePyramid16uC2;
-typedef ImagePyramid<imp::Pixel16uC3, imp::PixelType::i16uC3> ImagePyramid16uC3;
-typedef ImagePyramid<imp::Pixel16uC4, imp::PixelType::i16uC4> ImagePyramid16uC4;
+typedef ImagePyramid<ze::Pixel16uC1, ze::PixelType::i16uC1> ImagePyramid16uC1;
+typedef ImagePyramid<ze::Pixel16uC2, ze::PixelType::i16uC2> ImagePyramid16uC2;
+typedef ImagePyramid<ze::Pixel16uC3, ze::PixelType::i16uC3> ImagePyramid16uC3;
+typedef ImagePyramid<ze::Pixel16uC4, ze::PixelType::i16uC4> ImagePyramid16uC4;
 
-typedef ImagePyramid<imp::Pixel32sC1, imp::PixelType::i32sC1> ImagePyramid32sC1;
-typedef ImagePyramid<imp::Pixel32sC2, imp::PixelType::i32sC2> ImagePyramid32sC2;
-typedef ImagePyramid<imp::Pixel32sC3, imp::PixelType::i32sC3> ImagePyramid32sC3;
-typedef ImagePyramid<imp::Pixel32sC4, imp::PixelType::i32sC4> ImagePyramid32sC4;
+typedef ImagePyramid<ze::Pixel32sC1, ze::PixelType::i32sC1> ImagePyramid32sC1;
+typedef ImagePyramid<ze::Pixel32sC2, ze::PixelType::i32sC2> ImagePyramid32sC2;
+typedef ImagePyramid<ze::Pixel32sC3, ze::PixelType::i32sC3> ImagePyramid32sC3;
+typedef ImagePyramid<ze::Pixel32sC4, ze::PixelType::i32sC4> ImagePyramid32sC4;
 
-typedef ImagePyramid<imp::Pixel32fC1, imp::PixelType::i32fC1> ImagePyramid32fC1;
-typedef ImagePyramid<imp::Pixel32fC2, imp::PixelType::i32fC2> ImagePyramid32fC2;
-typedef ImagePyramid<imp::Pixel32fC3, imp::PixelType::i32fC3> ImagePyramid32fC3;
-typedef ImagePyramid<imp::Pixel32fC4, imp::PixelType::i32fC4> ImagePyramid32fC4;
+typedef ImagePyramid<ze::Pixel32fC1, ze::PixelType::i32fC1> ImagePyramid32fC1;
+typedef ImagePyramid<ze::Pixel32fC2, ze::PixelType::i32fC2> ImagePyramid32fC2;
+typedef ImagePyramid<ze::Pixel32fC3, ze::PixelType::i32fC3> ImagePyramid32fC3;
+typedef ImagePyramid<ze::Pixel32fC4, ze::PixelType::i32fC4> ImagePyramid32fC4;
 
 
 } // namespace imp

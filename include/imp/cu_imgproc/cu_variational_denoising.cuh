@@ -7,7 +7,7 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 // forward declarations
@@ -28,7 +28,7 @@ struct VariationalDenoisingParams
 class VariationalDenoising
 {
 public:
-  typedef imp::cu::Fragmentation<16> Fragmentation;
+  typedef ze::cu::Fragmentation<16> Fragmentation;
   typedef std::shared_ptr<Fragmentation> FragmentationPtr;
 
 public:
@@ -36,8 +36,8 @@ public:
   virtual ~VariationalDenoising();
 
   virtual void init(const Size2u& size);
-  virtual void  __host__  denoise(const std::shared_ptr<imp::ImageBase>& dst,
-                                  const std::shared_ptr<imp::ImageBase>& src) = 0;
+  virtual void  __host__  denoise(const std::shared_ptr<ze::ImageBase>& dst,
+                                  const std::shared_ptr<ze::ImageBase>& src) = 0;
 
   inline dim3 dimGrid() {return fragmentation_->dimGrid;}
   inline dim3 dimBlock() {return fragmentation_->dimBlock;}
@@ -60,15 +60,15 @@ protected:
   }
 
 
-  imp::cu::ImageGpu32fC1::Ptr u_;
-  imp::cu::ImageGpu32fC1::Ptr u_prev_;
-  imp::cu::ImageGpu32fC2::Ptr p_;
+  ze::cu::ImageGpu32fC1::Ptr u_;
+  ze::cu::ImageGpu32fC1::Ptr u_prev_;
+  ze::cu::ImageGpu32fC2::Ptr p_;
 
   // cuda textures
-  std::shared_ptr<imp::cu::Texture2D> f_tex_;
-  std::shared_ptr<imp::cu::Texture2D> u_tex_;
-  std::shared_ptr<imp::cu::Texture2D> u_prev_tex_;
-  std::shared_ptr<imp::cu::Texture2D> p_tex_;
+  std::shared_ptr<ze::cu::Texture2D> f_tex_;
+  std::shared_ptr<ze::cu::Texture2D> u_tex_;
+  std::shared_ptr<ze::cu::Texture2D> u_prev_tex_;
+  std::shared_ptr<ze::cu::Texture2D> p_tex_;
 
   Size2u size_;
   FragmentationPtr fragmentation_;

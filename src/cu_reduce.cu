@@ -13,7 +13,7 @@
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_imgproc/cu_image_filter.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
@@ -34,13 +34,13 @@ __global__ void k_reduce(Pixel* d_dst, size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void reduce(ImageGpu<Pixel, pixel_type>& dst,
             const ImageGpu<Pixel, pixel_type>& src,
-            imp::InterpolationMode interp, bool gauss_prefilter)
+            ze::InterpolationMode interp, bool gauss_prefilter)
 {
-  imp::Roi2u src_roi = src.roi();
-  imp::Roi2u dst_roi = dst.roi();
+  ze::Roi2u src_roi = src.roi();
+  ze::Roi2u dst_roi = dst.roi();
 
   // scale factor for x/y > 0 && < 1 (for multiplication with dst coords in the kernel!)
   float sf_x = static_cast<float>(src_roi.width()) / static_cast<float>(dst_roi.width());
@@ -57,7 +57,7 @@ void reduce(ImageGpu<Pixel, pixel_type>& dst,
     if (kernel_size % 2 == 0)
       kernel_size++;
 
-    imp::cu::filterGauss(*filtered, src, sigma, kernel_size);
+    ze::cu::filterGauss(*filtered, src, sigma, kernel_size);
   }
 
   cudaTextureFilterMode tex_filter_mode = (interp == InterpolationMode::linear) ?
@@ -125,5 +125,5 @@ template void reduce(ImageGpu32fC4& dst, const ImageGpu32fC4& src, Interpolation
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

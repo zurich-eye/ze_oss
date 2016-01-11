@@ -11,13 +11,13 @@
 #include <imp/cu_core/cu_math.cuh>
 
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
 __global__ void k_initTvL1Solver(Pixel32fC1* d_u, Pixel32fC1* d_u_prev, size_t stride_u,
                                  Pixel32fC2* d_p, size_t stride_p,
-                                 imp::cu::Texture2D f_tex,
+                                 ze::cu::Texture2D f_tex,
                                  size_t width, size_t height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -91,7 +91,7 @@ __global__ void k_tvL1DualUpdate(
 //-----------------------------------------------------------------------------
 //! @todo (MWE) move to a common place (also needed for other algorithms!)
 __global__ void k_tvL1convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
-                                    imp::cu::Texture2D u_tex,
+                                    ze::cu::Texture2D u_tex,
                                     size_t width, size_t height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -107,7 +107,7 @@ __global__ void k_tvL1convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
 //#############################################################################
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void TvL1Denoising<Pixel, pixel_type>::init(const Size2u& size)
 {
   Base::init(size);
@@ -134,7 +134,7 @@ void TvL1Denoising<Pixel, pixel_type>::init(const Size2u& size)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void TvL1Denoising<Pixel, pixel_type>::denoise(const ImageBase::Ptr& dst,
                                                const ImageBase::Ptr& src)
 {
@@ -145,7 +145,7 @@ void TvL1Denoising<Pixel, pixel_type>::denoise(const ImageBase::Ptr& dst,
 
   if (src->size() != dst->size())
   {
-    throw imp::cu::Exception("Input and output image are not of the same size.",
+    throw ze::cu::Exception("Input and output image are not of the same size.",
                              __FILE__, __FUNCTION__, __LINE__);
   }
 
@@ -209,14 +209,14 @@ void TvL1Denoising<Pixel, pixel_type>::denoise(const ImageBase::Ptr& dst,
   }
   break;
   default:
-    throw imp::cu::Exception("Unsupported PixelType.",
+    throw ze::cu::Exception("Unsupported PixelType.",
                              __FILE__, __FUNCTION__, __LINE__);
   }
   IMP_CUDA_CHECK();
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void TvL1Denoising<Pixel, pixel_type>::print(std::ostream& os) const
 {
   os << "TvL1 Denoising:" << std::endl;
@@ -226,8 +226,8 @@ void TvL1Denoising<Pixel, pixel_type>::print(std::ostream& os) const
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class TvL1Denoising<imp::Pixel8uC1, imp::PixelType::i8uC1>;
-template class TvL1Denoising<imp::Pixel32fC1, imp::PixelType::i32fC1>;
+template class TvL1Denoising<ze::Pixel8uC1, ze::PixelType::i8uC1>;
+template class TvL1Denoising<ze::Pixel32fC1, ze::PixelType::i32fC1>;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze

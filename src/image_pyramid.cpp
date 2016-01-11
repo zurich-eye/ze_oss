@@ -8,11 +8,10 @@
 #include <imp/cu_imgproc/cu_reduce.cuh>
 
 
-namespace imp {
-
+namespace ze {
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 ImagePyramid<Pixel,pixel_type>::ImagePyramid(ImagePtr img, float scale_factor,
                                              std::uint32_t size_bound,
                                              size_t max_num_levels)
@@ -21,11 +20,11 @@ ImagePyramid<Pixel,pixel_type>::ImagePyramid(ImagePtr img, float scale_factor,
   , max_num_levels_(max_num_levels)
 {
   this->init(img->size());
-  this->updateImage(img, imp::InterpolationMode::linear);
+  this->updateImage(img, ze::InterpolationMode::linear);
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void ImagePyramid<Pixel,pixel_type>::clear() noexcept
 {
   levels_.clear();
@@ -33,12 +32,12 @@ void ImagePyramid<Pixel,pixel_type>::clear() noexcept
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
-void ImagePyramid<Pixel,pixel_type>::init(const imp::Size2u& size)
+template<typename Pixel, ze::PixelType pixel_type>
+void ImagePyramid<Pixel,pixel_type>::init(const ze::Size2u& size)
 {
   if (scale_factor_<=0.0 || scale_factor_>=1)
   {
-    throw imp::Exception("Initializing image pyramid with scale factor <=0 or >=1 not possible.",
+    throw ze::Exception("Initializing image pyramid with scale factor <=0 or >=1 not possible.",
                          __FILE__, __FUNCTION__, __LINE__);
   }
 
@@ -64,7 +63,7 @@ void ImagePyramid<Pixel,pixel_type>::init(const imp::Size2u& size)
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void ImagePyramid<Pixel,pixel_type>::updateImage(ImagePtr img_level0,
                                                  InterpolationMode interp)
 {
@@ -81,18 +80,18 @@ void ImagePyramid<Pixel,pixel_type>::updateImage(ImagePtr img_level0,
     // init level memory with either ImageGpu or ImageRaw
     if(img_level0->isGpuMemory())
     {
-      using ImageGpu = typename imp::cu::ImageGpu<Pixel,pixel_type>;
+      using ImageGpu = typename ze::cu::ImageGpu<Pixel,pixel_type>;
       typename ImageGpu::Ptr img = std::make_shared<ImageGpu>(sz);
       typename ImageGpu::Ptr prev = std::dynamic_pointer_cast<ImageGpu>(levels_.back());
-      imp::cu::reduce(*img, *prev, interp, true);
+      ze::cu::reduce(*img, *prev, interp, true);
       levels_.push_back(img);
     }
     else
     {
-      using ImageRaw = imp::ImageRaw<Pixel,pixel_type>;
+      using ImageRaw = ze::ImageRaw<Pixel,pixel_type>;
       typename ImageRaw::Ptr img = std::make_shared<ImageRaw>(sz);
       //! @todo (MWE) cpu reduction
-      throw imp::Exception("CPU reduction not yet implemented.", __FILE__, __FUNCTION__, __LINE__);
+      throw ze::Exception("CPU reduction not yet implemented.", __FILE__, __FUNCTION__, __LINE__);
       levels_.push_back(img);
     }
   }
@@ -102,26 +101,26 @@ void ImagePyramid<Pixel,pixel_type>::updateImage(ImagePtr img_level0,
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class ImagePyramid<imp::Pixel8uC1, imp::PixelType::i8uC1>;
-template class ImagePyramid<imp::Pixel8uC2, imp::PixelType::i8uC2>;
+template class ImagePyramid<ze::Pixel8uC1, ze::PixelType::i8uC1>;
+template class ImagePyramid<ze::Pixel8uC2, ze::PixelType::i8uC2>;
 //template class ImagePyramid<imp::Pixel8uC3, imp::PixelType::i8uC3>;
-template class ImagePyramid<imp::Pixel8uC4, imp::PixelType::i8uC4>;
+template class ImagePyramid<ze::Pixel8uC4, ze::PixelType::i8uC4>;
 
-template class ImagePyramid<imp::Pixel16uC1, imp::PixelType::i16uC1>;
-template class ImagePyramid<imp::Pixel16uC2, imp::PixelType::i16uC2>;
+template class ImagePyramid<ze::Pixel16uC1, ze::PixelType::i16uC1>;
+template class ImagePyramid<ze::Pixel16uC2, ze::PixelType::i16uC2>;
 //template class ImagePyramid<imp::Pixel16uC3, imp::PixelType::i16uC3>;
-template class ImagePyramid<imp::Pixel16uC4, imp::PixelType::i16uC4>;
+template class ImagePyramid<ze::Pixel16uC4, ze::PixelType::i16uC4>;
 
-template class ImagePyramid<imp::Pixel32sC1, imp::PixelType::i32sC1>;
-template class ImagePyramid<imp::Pixel32sC2, imp::PixelType::i32sC2>;
+template class ImagePyramid<ze::Pixel32sC1, ze::PixelType::i32sC1>;
+template class ImagePyramid<ze::Pixel32sC2, ze::PixelType::i32sC2>;
 //template class ImagePyramid<imp::Pixel32sC3, imp::PixelType::i32sC3>;
-template class ImagePyramid<imp::Pixel32sC4, imp::PixelType::i32sC4>;
+template class ImagePyramid<ze::Pixel32sC4, ze::PixelType::i32sC4>;
 
-template class ImagePyramid<imp::Pixel32fC1, imp::PixelType::i32fC1>;
-template class ImagePyramid<imp::Pixel32fC2, imp::PixelType::i32fC2>;
+template class ImagePyramid<ze::Pixel32fC1, ze::PixelType::i32fC1>;
+template class ImagePyramid<ze::Pixel32fC2, ze::PixelType::i32fC2>;
 //template class ImagePyramid<imp::Pixel32fC3, imp::PixelType::i32fC3>;
-template class ImagePyramid<imp::Pixel32fC4, imp::PixelType::i32fC4>;
+template class ImagePyramid<ze::Pixel32fC4, ze::PixelType::i32fC4>;
 
 
-} // namespace imp
+} // namespace ze
 

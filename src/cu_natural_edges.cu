@@ -14,7 +14,7 @@
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_imgproc/cu_image_filter.cuh>
 
-namespace imp {
+namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ __global__ void k_naturalEdges(EdgePixel *g, const size_t stride,
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, imp::PixelType pixel_type>
+template<typename Pixel, ze::PixelType pixel_type>
 void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
                   const ImageGpu<Pixel, pixel_type>& src,
                   float sigma, float alpha, float q,
@@ -108,7 +108,7 @@ void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
     tmp_denoised->setRoi(roi);
   }
 
-  imp::cu::filterGauss(*tmp_denoised, src, sigma);
+  ze::cu::filterGauss(*tmp_denoised, src, sigma);
 
   std::shared_ptr<Texture2D> src_tex =
       tmp_denoised->genTexture(
@@ -145,6 +145,6 @@ template void naturalEdges(ImageGpu32fC1& dst, const ImageGpu32fC1& src, float s
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IM_CU_EDGE_DETECTORS_NATURAL_EDGES_IMPL_CUH
