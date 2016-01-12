@@ -160,7 +160,7 @@ public:
   /** Returns the distance in bytes between starts of consecutive rows. */
   virtual size_t pitch() const = 0;
 
-  /** Returns the distnace in pixels between starts of consecutive rows. */
+  /** Returns the distance in pixels between starts of consecutive rows. */
   virtual size_t stride() const = 0;
 
   /** Returns the bit depth of the data pointer. */

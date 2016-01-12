@@ -171,7 +171,7 @@ public:
     return this->width() * sizeof(Pixel);
   }
 
-  /** Returns the distnace in pixels between starts of consecutive rows. */
+  /** Returns the distance in pixels between starts of consecutive rows. */
   virtual size_t stride() const override
   {
     return this->pitch()/sizeof(Pixel);
