@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <vector>
 #include <kindr/minimal/quat-transformation.h>
 #include <ze/common/matrix.h>
 
@@ -8,6 +9,9 @@ namespace ze {
 
 using Transformation = kindr::minimal::QuatTransformation;
 using Quaternion = kindr::minimal::RotationQuaternion;
+
+using TransformationVector = std::vector<Transformation, Eigen::aligned_allocator<Transformation>>;
+using QuaternionVector = std::vector<Transformation, Eigen::aligned_allocator<Quaternion>>;
 
 // -----------------------------------------------------------------------------
 // Transformation utils
