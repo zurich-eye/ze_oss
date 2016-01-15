@@ -40,4 +40,20 @@ std::map<size_t, Transformation> loadIndexedPosesFromCsv(const std::string& file
   return poses;
 }
 
+void loadDepthmapFromFile(
+    const std::string& filename, float* data, const size_t data_size)
+{
+  CHECK_NOTNULL(data);
+  std::ifstream fs;
+  openFileStream(filename, &fs);
+  float* data_ptr = data;
+  for(size_t i = 0; i < data_size; ++i, ++data_ptr)
+  {
+    fs >> (*data_ptr);
+    CHECK(fs.peek() != '\n' || i == data_size - 1)
+        << "Did not read full depthmap. Num elements read = " <<  i
+        << " of expected " << data_size;
+  }
+}
+
 } // namespace ze
