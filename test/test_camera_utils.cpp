@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 #include <ze/cameras/camera_utils.h>
 
 TEST(CameraUtilsTest, randomKeypoints)
