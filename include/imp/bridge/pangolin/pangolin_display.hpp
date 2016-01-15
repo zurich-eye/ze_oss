@@ -4,6 +4,8 @@
 #include <imp/core/size.hpp>
 #include <imp/core/image.hpp>
 #include <pangolin/display/display.h>
+#include <pangolin/display/view.h>
+#include <pangolin/gl/gl.h>
 
 // #include <imp/cu_core/cu_image_gpu.cuh>
 
