@@ -1,5 +1,5 @@
 #include <random>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 #include <ze/common/matrix.h>
 #include <ze/common/timer.h>
 #include <ze/common/types.h>
