@@ -1,9 +1,13 @@
 #pragma once
 
+#include <map>
 #include <cstdlib>
 #include <string>
 #include <glog/logging.h>
+#include <ze/common/types.h>
 #include <ze/common/path_utils.h>
+#include <ze/common/string_utils.h>
+#include <ze/common/transformation.h>
 
 namespace ze {
 
@@ -19,5 +23,10 @@ std::string getTestDataDir(const std::string& dataset_name)
   CHECK(isDir(path)) << "Dataset does not exist: " << path;
   return path;
 }
+/*
+std::map<size_t, Transformation> loadIndexedPosesFromCsv(const std::string& filename)
+{
 
+}
+*/
 } // namespace ze

@@ -13,6 +13,7 @@ include(ze_setup)
 set(HEADERS
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
+  include/ze/common/file_utils.h
   include/ze/common/macros.h
   include/ze/common/manifold.h
   include/ze/common/matrix.h
