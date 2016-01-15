@@ -8,6 +8,7 @@
 #include <ze/common/matrix.h>
 #include <ze/common/manifold.h>
 #include <ze/common/numerical_derivative.h>
+#include <ze/common/path_utils.h>
 #include <ze/cameras/camera_impl.h>
 #include <ze/cameras/camera_utils.h>
 
