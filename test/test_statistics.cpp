@@ -1,6 +1,6 @@
 #include <cmath>
 #include <utility>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 #include <ze/common/statistics.h>
 
 TEST(StatisticsTest, testMedian)

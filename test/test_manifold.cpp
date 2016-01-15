@@ -1,8 +1,7 @@
 #include <cmath>
 
-#include <ze/common/test/entrypoint.h>
-#include <ze/common/manifold.h>
-#include <ze/common/test/manifold.h>
+#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_manifold.h>
 
 TEST(ManifoldTests, testScalarTraits)
 {

@@ -23,14 +23,14 @@ set(HEADERS
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
+  include/ze/common/test_entrypoint.h
+  include/ze/common/test_manifold.h
+  include/ze/common/test_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
   include/ze/common/transformation.h
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
-  include/ze/common/test/entrypoint.h
-  include/ze/common/test/manifold.h
-  include/ze/common/test/utils.h
   )
 
 set(SOURCES
