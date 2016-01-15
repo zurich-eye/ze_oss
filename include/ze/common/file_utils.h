@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+#include <iostream>
 #include <ze/common/path_utils.h>
 #include <ze/common/string_utils.h>
 
@@ -10,10 +12,10 @@ void openFileStream(
     std::ifstream* fs)
 {
   CHECK_NOTNULL(fs);
-  CHECK(fileExists(filename));
+  CHECK(fileExists(filename)) << "File does not exist: " << filename;
   fs->open(filename.c_str(), std::ios::in);
   CHECK(*fs);
-  CHECK(fs->is_open()) << "Failed to open file " << filename;
+  CHECK(fs->is_open()) << "Failed to open file: " << filename;
   CHECK(!fs->eof()) << "File seems to contain no content!";
 }
 
