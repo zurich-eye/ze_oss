@@ -2,24 +2,9 @@
 
 #include <stdexcept>
 #include <glog/logging.h>
+#include <ze/common/matrix.h>
 
 namespace ze {
-namespace internal {
-
-inline double norm_max(const Eigen::VectorXd & v)
-{
-  double max = -1;
-  for (int i=0; i<v.size(); i++)
-  {
-    double abs = std::fabs(v[i]);
-    if(abs > max){
-      max = abs;
-    }
-  }
-  return max;
-}
-
-} // namespace internal
 
 template <int D, typename T, typename Implementation>
 LeastSquaresSolver<D, T, Implementation>::LeastSquaresSolver(
@@ -30,9 +15,9 @@ LeastSquaresSolver<D, T, Implementation>::LeastSquaresSolver(
 template <int D, typename T, typename Implementation>
 void LeastSquaresSolver<D, T, Implementation>::optimize(State& state)
 {
-  if(solver_options_.strategy == StrategyType::GaussNewton)
+  if(solver_options_.strategy == SolverStrategy::GaussNewton)
     optimizeGaussNewton(state);
-  else if(solver_options_.strategy == StrategyType::LevenbergMarquardt)
+  else if(solver_options_.strategy == SolverStrategy::LevenbergMarquardt)
     optimizeLevenbergMarquardt(state);
 }
 
@@ -79,7 +64,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
     old_state = state;
     state = new_state;
     chi2_ = new_chi2;
-    double x_norm = internal::norm_max(dx_);
+    double x_norm = normMax(dx_);
     VLOG(400) << "It. " << iter_
               << "\t Success"
               << "\t new_chi2 = " << new_chi2
@@ -166,7 +151,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
         // update decrased the error -> success
         state = new_model;
         chi2_ = new_chi2;
-        stop_ = internal::norm_max(dx_) < solver_options_.eps;
+        stop_ = normMax(dx_) < solver_options_.eps;
         mu_ *= std::max(1./3., std::min(1.-std::pow(2*rho_-1,3), 2./3.));
         nu_ = 2.;
         VLOG(400) << "It. " << iter_
@@ -222,7 +207,7 @@ bool LeastSquaresSolver<D, T, Implementation>::solveDefaultImpl(
     UpdateVector& dx)
 {
   dx = H.ldlt().solve(g);
-  if((bool) std::isnan((double) dx[0]))
+  if(std::isnan(dx[0]))
     return false;
   return true;
 }

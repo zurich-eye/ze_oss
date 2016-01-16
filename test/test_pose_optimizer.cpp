@@ -65,7 +65,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();
@@ -73,8 +73,8 @@ TEST(PoseOptimizerTests, testSolver)
     double ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
-    std::cout << "ang error = " << ang_error << std::endl;
-    std::cout << "pos error = " << pos_error << std::endl;
+    VLOG(1) << "ang error = " << ang_error;
+    VLOG(1) << "pos error = " << pos_error;
   }
 
   // With rotation prior:
@@ -86,7 +86,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();
@@ -94,8 +94,8 @@ TEST(PoseOptimizerTests, testSolver)
     double ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
-    std::cout << "ang error = " << ang_error << std::endl;
-    std::cout << "pos error = " << pos_error << std::endl;
+    VLOG(1) << "ang error = " << ang_error;
+    VLOG(1) << "pos error = " << pos_error;
   }
 
   // With position prior:
@@ -107,7 +107,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    std::cout << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();
@@ -115,8 +115,8 @@ TEST(PoseOptimizerTests, testSolver)
     double ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
-    std::cout << "ang error = " << ang_error << std::endl;
-    std::cout << "pos error = " << pos_error << std::endl;
+    VLOG(1) << "ang error = " << ang_error;
+    VLOG(1) << "pos error = " << pos_error;
   }
 }
 
