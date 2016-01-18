@@ -135,6 +135,11 @@ template class ImageRaw<ze::Pixel8uC2, ze::PixelType::i8uC2>;
 template class ImageRaw<ze::Pixel8uC3, ze::PixelType::i8uC3>;
 template class ImageRaw<ze::Pixel8uC4, ze::PixelType::i8uC4>;
 
+template class ImageRaw<ze::Pixel16sC1, ze::PixelType::i16sC1>;
+template class ImageRaw<ze::Pixel16sC2, ze::PixelType::i16sC2>;
+template class ImageRaw<ze::Pixel16sC3, ze::PixelType::i16sC3>;
+template class ImageRaw<ze::Pixel16sC4, ze::PixelType::i16sC4>;
+
 template class ImageRaw<ze::Pixel16uC1, ze::PixelType::i16uC1>;
 template class ImageRaw<ze::Pixel16uC2, ze::PixelType::i16uC2>;
 template class ImageRaw<ze::Pixel16uC3, ze::PixelType::i16uC3>;
