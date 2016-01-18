@@ -240,6 +240,11 @@ typedef Pixel2<std::uint8_t> Pixel8uC2;
 typedef Pixel3<std::uint8_t> Pixel8uC3;
 typedef Pixel4<std::uint8_t> Pixel8uC4;
 
+typedef Pixel1<std::int16_t> Pixel16sC1;
+typedef Pixel2<std::int16_t> Pixel16sC2;
+typedef Pixel3<std::int16_t> Pixel16sC3;
+typedef Pixel4<std::int16_t> Pixel16sC4;
+
 typedef Pixel1<std::uint16_t> Pixel16uC1;
 typedef Pixel2<std::uint16_t> Pixel16uC2;
 typedef Pixel3<std::uint16_t> Pixel16uC3;

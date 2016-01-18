@@ -13,6 +13,10 @@ enum class PixelType
   i8uC2,  //!< interleaved, 8-bit unsigned, 2 channel
   i8uC3,  //!< interleaved, 8-bit unsigned, 3 channel
   i8uC4,  //!< interleaved, 8-bit unsigned, 4 channel
+  i16sC1, //!< interleaved, 16-bit signed, 1 channel
+  i16sC2, //!< interleaved, 16-bit signed, 2 channel
+  i16sC3, //!< interleaved, 16-bit signed, 3 channel
+  i16sC4, //!< interleaved, 16-bit signed, 4 channel
   i16uC1, //!< interleaved, 16-bit unsigned, 1 channel
   i16uC2, //!< interleaved, 16-bit unsigned, 2 channel
   i16uC3, //!< interleaved, 16-bit unsigned, 3 channel

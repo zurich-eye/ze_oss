@@ -111,6 +111,11 @@ typedef ImageRaw<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageRaw8uC2;
 typedef ImageRaw<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageRaw8uC3;
 typedef ImageRaw<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageRaw8uC4;
 
+typedef ImageRaw<ze::Pixel16sC1, ze::PixelType::i16sC1> ImageRaw16sC1;
+typedef ImageRaw<ze::Pixel16sC2, ze::PixelType::i16sC2> ImageRaw16sC2;
+typedef ImageRaw<ze::Pixel16sC3, ze::PixelType::i16sC3> ImageRaw16sC3;
+typedef ImageRaw<ze::Pixel16sC4, ze::PixelType::i16sC4> ImageRaw16sC4;
+
 typedef ImageRaw<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageRaw16uC1;
 typedef ImageRaw<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageRaw16uC2;
 typedef ImageRaw<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageRaw16uC3;
