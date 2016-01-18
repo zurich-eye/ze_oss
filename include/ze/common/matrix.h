@@ -5,9 +5,9 @@
 namespace ze {
 
 //! Skew symmetric matrix.
-Eigen::Matrix3d skewSymmetric(Eigen::Vector3d w)
+Matrix3 skewSymmetric(Vector3 w)
 {
-  return (Eigen::Matrix3d() <<
+  return (Matrix3() <<
           0.0, -w.z(), +w.y(),
           +w.z(), 0.0, -w.x(),
           -w.y(), +w.x(), 0.0).finished();
@@ -17,6 +17,21 @@ Eigen::Matrix3d skewSymmetric(Eigen::Vector3d w)
 inline void normalizeBearings(Bearings& bearings)
 {
   bearings = bearings.array().rowwise() / bearings.colwise().norm().array();
+}
+
+//! Get element with max norm in a vector.
+inline FloatType normMax(const Vector& v)
+{
+  FloatType max = -1.0;
+  for(int i = 0; i < v.size(); ++i)
+  {
+    FloatType abs = std::abs(v[i]);
+    if(abs > max)
+    {
+      max = abs;
+    }
+  }
+  return max;
 }
 
 } // namespace ze

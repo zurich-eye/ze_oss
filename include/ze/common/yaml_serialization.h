@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Core>
+
 #include <glog/logging.h>
 #include <yaml-cpp/yaml.h>
 
@@ -142,6 +144,8 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
         IndexType;
     IndexType rows = node["rows"].as<IndexType>();
     IndexType cols = node["cols"].as<IndexType>();
+    CHECK_GE(rows, 0);
+    CHECK_GE(cols, 0);
 
     if(cols != B)
     {
@@ -195,6 +199,8 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
     typedef typename Eigen::Matrix<Scalar, A, Eigen::Dynamic, C, D, E>::Index IndexType;
     IndexType rows = node["rows"].as<IndexType>();
     IndexType cols = node["cols"].as<IndexType>();
+    CHECK_GE(rows, 0);
+    CHECK_GE(cols, 0);
 
     if(rows != A)
     {
@@ -250,6 +256,8 @@ struct convert<Eigen::Matrix<Scalar_, A_, B_, C_, D_, E_> >
                                    E>::Index IndexType;
     IndexType rows = node["rows"].as<IndexType>();
     IndexType cols = node["cols"].as<IndexType>();
+    CHECK_GE(rows, 0);
+    CHECK_GE(cols, 0);
 
     M.resize(rows, cols);
 
