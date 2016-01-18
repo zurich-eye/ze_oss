@@ -3,6 +3,7 @@
 #include <limits>
 #include <vector>
 #include <kindr/minimal/quat-transformation.h>
+#include <ze/common/types.h>
 #include <ze/common/matrix.h>
 
 namespace ze {
@@ -17,14 +18,14 @@ using QuaternionVector = std::vector<Transformation, Eigen::aligned_allocator<Qu
 // Transformation utils
 
 // Right Jacobian for Exponential map in SO(3)
-Eigen::Matrix3d expmapDerivativeSO3(const Eigen::Vector3d& omega)
+inline Matrix3 expmapDerivativeSO3(const Vector3& omega)
 {
-  double theta2 = omega.dot(omega);
-  if (theta2 <= std::numeric_limits<double>::epsilon())
+  FloatType theta2 = omega.dot(omega);
+  if (theta2 <= std::numeric_limits<FloatType>::epsilon())
   {
     return I_3x3;
   }
-  double theta = std::sqrt(theta2);  // rotation angle
+  FloatType theta = std::sqrt(theta2);  // rotation angle
   // element of Lie algebra so(3): X = omega^, normalized by normx
   const Matrix3 Y = skewSymmetric(omega) / theta;
   return I_3x3 - ((1 - std::cos(theta)) / (theta)) * Y
@@ -32,14 +33,14 @@ Eigen::Matrix3d expmapDerivativeSO3(const Eigen::Vector3d& omega)
 }
 
 // Right Jacobian for Log map in SO(3)
-Eigen::Matrix3d logmapDerivativeSO3(const Eigen::Vector3d& omega)
+inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
 {
-  double theta2 = omega.dot(omega);
-  if (theta2 <= std::numeric_limits<double>::epsilon())
+  FloatType theta2 = omega.dot(omega);
+  if (theta2 <= std::numeric_limits<FloatType>::epsilon())
   {
     return I_3x3;
   }
-  double theta = std::sqrt(theta2);  // rotation angle
+  FloatType theta = std::sqrt(theta2);  // rotation angle
   const Matrix3 X = skewSymmetric(omega); // element of Lie algebra so(3): X = omega^
   return I_3x3 + 0.5 * X
       + (1 / (theta * theta) - (1 + std::cos(theta)) / (2 * theta * std::sin(theta))) * X * X;

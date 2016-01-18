@@ -8,6 +8,7 @@ namespace ze {
 //------------------------------------------------------------------------------
 // Scalars and fp precision.
 using size_t    = std::size_t;
+using int16_t   = std::int16_t;
 using int64_t   = std::int64_t;   
 using uint8_t   = std::uint8_t;
 using uint32_t  = std::uint32_t;

@@ -5,7 +5,7 @@
 namespace ze {
 
 //! Skew symmetric matrix.
-Matrix3 skewSymmetric(Vector3 w)
+inline Matrix3 skewSymmetric(Vector3 w)
 {
   return (Matrix3() <<
           0.0, -w.z(), +w.y(),
