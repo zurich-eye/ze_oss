@@ -22,8 +22,7 @@ TEST(BenchmarkTest, testInterface)
   runTimingBenchmark(fun1, 5, 2);
 
   auto fun2 = std::bind(foo, 1, 2);
-  int64_t duration_ns = runTimingBenchmark(fun2, 1000, 100);
-  VLOG(1) << "fun2 took" << nanosecToMillisec(duration_ns) << "ms";
+  int64_t duration_ns = runTimingBenchmark(fun2, 1000, 100, "foo", true);
 }
 
 ZE_UNITTEST_ENTRYPOINT
