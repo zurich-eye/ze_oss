@@ -14,6 +14,7 @@
 
   <depend>ze_cmake</depend>
   <depend>imp_core</depend>
+  <depend>imp_imgproc</depend>
   <depend>imp_cu_core</depend>
   <depend>imp_3rdparty_cuda_toolkit</depend>
   

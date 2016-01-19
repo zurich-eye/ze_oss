@@ -1,145 +1,48 @@
-#ifndef IMP_IMAGEPYRAMID_HPP
-#define IMP_IMAGEPYRAMID_HPP
+#pragma once
 
-#include <vector>
-#include <memory>
+#include <imp/imgproc/image_pyramid.h>
 
-#include <imp/core/types.hpp>
-#include <imp/core/pixel_enums.hpp>
-#include <imp/core/pixel.hpp>
-#include <imp/core/size.hpp>
-#include <imp/core/image.hpp>
+#include <imp/cu_core/cu_image_gpu.cuh>
+#include <imp/cu_imgproc/cu_reduce.cuh>
 
 namespace ze {
 
-/**
- * @brief The ImagePyramid class holds an image scale pyramid
- *
- * @todo (MWE) roi support (propagated automatically from finest to coarser level)
- */
+/*
+// Factory method
 template<typename Pixel, ze::PixelType pixel_type>
-class ImagePyramid
+ImagePyramid<Pixel,pixel_type>::Ptr createPyramid(
+    ImagePtr img_level0, InterpolationMode interp)
 {
-public:
-  using Ptr = std::shared_ptr<ImagePyramid>;
+  // TODO sanity checks
 
-  // typedefs for convenience
-  using Image = typename ze::Image<Pixel, pixel_type>;
-  using ImagePtr = typename ze::ImagePtr<Pixel, pixel_type>;
-  using ImageLevels = std::vector<ImagePtr>;
+  levels_.push_back(img_level0);
+  Size2u sz0 =  img_level0->size();
 
-public:
-  ImagePyramid() = delete;
-  virtual ~ImagePyramid() = default;
-
-  /**
-   * @brief ImagePyramid constructs an empy image pyramid
-   * @param size Image size of level 0
-   * @param scale_factor multiplicative level-to-level scale factor
-   * @param size_bound_ minimum size of the shorter side on coarsest level
-   * @param max_num_levels maximum number of levels
-   */
-//  ImagePyramid(const imp::Size2u& size, float scale_factor, std::uint32_t size_bound_=8,
-//               size_t max_num_levels=UINT32_MAX);
-
-  ImagePyramid(ImagePtr img, float scale_factor=0.5f, std::uint32_t size_bound_=8,
-               size_t max_num_levels=UINT32_MAX);
-
-//  ImagePyramid(ImagePtr img, float scale_factor, std::uint32_t size_bound_=8,
-//               size_t max_num_levels=UINT32_MAX);
-
-
-  /** Clearing image pyramid, not resetting parameters though. */
-  void clear() noexcept;
-
-  /** Setting up levels. */
-  void init(const ze::Size2u& size);
-
-  /** Initializing the images. */
-  void updateImage(ImagePtr img_level0, InterpolationMode interp);
-
-  /*
-   * Getters / Setters
-   */
-
-  /** Returns the image pyramid (all levels) */
-  inline ImageLevels& levels() {return levels_;}
-  inline const ImageLevels& levels() const {return levels_;}
-
-  /** Returns the actual number of levels saved in the pyramid. */
-  inline size_t numLevels() {return num_levels_;}
-
-  /** Returns a shared pointer to the \a i-th image of the pyramid level. */
-  inline ImagePtr operator[] (size_t i) {return levels_[i];}
-  inline const ImagePtr operator[] (size_t i) const {return levels_[i];}
-
-  /** Returns a shared pointer to the \a i-th image of the pyramid level. */
-  inline ImagePtr at(size_t i) {return levels_.at(i);}
-  inline const ImagePtr at(size_t i) const {return levels_.at(i);}
-
-  /** Returns the size of the i-th image. */
-  inline Size2u size(size_t i) {return this->at(i)->size();}
-
-  /** Sets the multiplicative level-to-level scale factor
-   *  (most likely in the interval [0.5,1.0[)
-   */
-  inline void setScaleFactor(const float& scale_factor) {scale_factor_ = scale_factor;}
-  /** Returns the multiplicative level-to-level scale factor. */
-  inline float scaleFactor() const {return scale_factor_;}
-
-  /** Returns the multiplicative scale-factor from \a i-th level to 0-level. */
-  inline float scaleFactor(const size_t& i) const {return scale_factors_.at(i);}
-
-  /** Sets the user defined maximum number of pyramid levels. */
-  inline void setMaxNumLevels(const size_t& max_num_levels)
+  for (size_t i=1; i<num_levels_; ++i)
   {
-    max_num_levels_ = max_num_levels;
+    Size2u sz(static_cast<std::uint32_t>(sz0.width()*scale_factors_[i] + 0.5f),
+              static_cast<std::uint32_t>(sz0.height()*scale_factors_[i] + 0.5f));
+
+    // init level memory with either ImageGpu or ImageRaw
+    if(img_level0->isGpuMemory())
+    {
+      using ImageGpu = typename ze::cu::ImageGpu<Pixel,pixel_type>;
+      typename ImageGpu::Ptr img = std::make_shared<ImageGpu>(sz);
+      typename ImageGpu::Ptr prev = std::dynamic_pointer_cast<ImageGpu>(levels_.back());
+      ze::cu::reduce(*img, *prev, interp, true);
+      levels_.push_back(img);
+    }
+    else
+    {
+      using ImageRaw = ze::ImageRaw<Pixel,pixel_type>;
+      typename ImageRaw::Ptr img = std::make_shared<ImageRaw>(sz);
+      //! @todo (MWE) cpu reduction
+      throw ze::Exception("CPU reduction not yet implemented.", __FILE__, __FUNCTION__, __LINE__);
+      levels_.push_back(img);
+    }
   }
-  /** Returns the user defined maximum number of pyramid levels. */
-  inline size_t maxNumLevels() const {return max_num_levels_;}
+}
+*/
 
 
-  /** Sets the user defined size bound for the coarsest level (short side). */
-  inline void sizeBound(const std::uint32_t& size_bound) {size_bound_ = size_bound;}
-  /** Returns the user defined size bound for the coarsest level (short side). */
-  inline std::uint32_t sizeBound() const {return size_bound_;}
-
-private:
-
-
-private:
-  ImageLevels levels_; //!< Image pyramid levels holding shared_ptrs to images.
-  std::vector<float> scale_factors_; //!< Scale factors (multiplicative) towards the 0-level.
-  float scale_factor_ = 0.5f; //!< Scale factor between pyramid levels
-  std::uint32_t size_bound_ = 8; //!< User defined minimum size of coarsest level (short side).
-  size_t max_num_levels_ = UINT32_MAX; //!< User defined maximum number of pyramid levels.
-  size_t num_levels_ = UINT32_MAX; //!< actual number of levels dependent on the current setting.
-};
-
-//-----------------------------------------------------------------------------
-// convenience typedefs
-// (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImagePyramid<ze::Pixel8uC1, ze::PixelType::i8uC1> ImagePyramid8uC1;
-typedef ImagePyramid<ze::Pixel8uC2, ze::PixelType::i8uC2> ImagePyramid8uC2;
-typedef ImagePyramid<ze::Pixel8uC3, ze::PixelType::i8uC3> ImagePyramid8uC3;
-typedef ImagePyramid<ze::Pixel8uC4, ze::PixelType::i8uC4> ImagePyramid8uC4;
-
-typedef ImagePyramid<ze::Pixel16uC1, ze::PixelType::i16uC1> ImagePyramid16uC1;
-typedef ImagePyramid<ze::Pixel16uC2, ze::PixelType::i16uC2> ImagePyramid16uC2;
-typedef ImagePyramid<ze::Pixel16uC3, ze::PixelType::i16uC3> ImagePyramid16uC3;
-typedef ImagePyramid<ze::Pixel16uC4, ze::PixelType::i16uC4> ImagePyramid16uC4;
-
-typedef ImagePyramid<ze::Pixel32sC1, ze::PixelType::i32sC1> ImagePyramid32sC1;
-typedef ImagePyramid<ze::Pixel32sC2, ze::PixelType::i32sC2> ImagePyramid32sC2;
-typedef ImagePyramid<ze::Pixel32sC3, ze::PixelType::i32sC3> ImagePyramid32sC3;
-typedef ImagePyramid<ze::Pixel32sC4, ze::PixelType::i32sC4> ImagePyramid32sC4;
-
-typedef ImagePyramid<ze::Pixel32fC1, ze::PixelType::i32fC1> ImagePyramid32fC1;
-typedef ImagePyramid<ze::Pixel32fC2, ze::PixelType::i32fC2> ImagePyramid32fC2;
-typedef ImagePyramid<ze::Pixel32fC3, ze::PixelType::i32fC3> ImagePyramid32fC3;
-typedef ImagePyramid<ze::Pixel32fC4, ze::PixelType::i32fC4> ImagePyramid32fC4;
-
-
-} // namespace imp
-
-#endif // IMP_IMAGEPYRAMID_HPP
+} // namespace ze

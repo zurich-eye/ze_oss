@@ -17,7 +17,6 @@ set(HEADERS
   )
 
 set(SOURCES
-  src/image_pyramid.cpp
   )
 
 set(CU_HDRS
