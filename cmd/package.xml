@@ -4,7 +4,7 @@
   <description>
     IMP command line tools for calling specific algorithms mainly for testing purpose.
   </description>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <license>tbd</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
