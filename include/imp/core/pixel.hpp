@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <imp/core/pixel_enums.hpp>
 
 #ifdef WITH_CUDA
 #  include<cuda_runtime_api.h>
@@ -298,6 +299,38 @@ using Vec32fC3 = Vec3<float>;
 using Vec32fC4 = Vec4<float>;
 
 
+//------------------------------------------------------------------------------
+// Pixel traits.
+template<typename> struct pixel_type { static constexpr PixelType type = PixelType::undefined; };
+template<> struct pixel_type <Pixel8uC1> { static constexpr PixelType type = PixelType::i8uC1; };
+template<> struct pixel_type <Pixel8uC2> { static constexpr PixelType type = PixelType::i8uC2; };
+template<> struct pixel_type <Pixel8uC3> { static constexpr PixelType type = PixelType::i8uC3; };
+template<> struct pixel_type <Pixel8uC4> { static constexpr PixelType type = PixelType::i8uC4; };
+
+template<> struct pixel_type <Pixel16sC1> { static constexpr PixelType type = PixelType::i16sC1; };
+template<> struct pixel_type <Pixel16sC2> { static constexpr PixelType type = PixelType::i16sC2; };
+template<> struct pixel_type <Pixel16sC3> { static constexpr PixelType type = PixelType::i16sC3; };
+template<> struct pixel_type <Pixel16sC4> { static constexpr PixelType type = PixelType::i16sC4; };
+
+template<> struct pixel_type <Pixel16uC1> { static constexpr PixelType type = PixelType::i16uC1; };
+template<> struct pixel_type <Pixel16uC2> { static constexpr PixelType type = PixelType::i16uC2; };
+template<> struct pixel_type <Pixel16uC3> { static constexpr PixelType type = PixelType::i16uC3; };
+template<> struct pixel_type <Pixel16uC4> { static constexpr PixelType type = PixelType::i16uC4; };
+
+template<> struct pixel_type <Pixel32uC1> { static constexpr PixelType type = PixelType::i32uC1; };
+template<> struct pixel_type <Pixel32uC2> { static constexpr PixelType type = PixelType::i32uC2; };
+template<> struct pixel_type <Pixel32uC3> { static constexpr PixelType type = PixelType::i32uC3; };
+template<> struct pixel_type <Pixel32uC4> { static constexpr PixelType type = PixelType::i32uC4; };
+
+template<> struct pixel_type <Pixel32sC1> { static constexpr PixelType type = PixelType::i32sC1; };
+template<> struct pixel_type <Pixel32sC2> { static constexpr PixelType type = PixelType::i32sC2; };
+template<> struct pixel_type <Pixel32sC3> { static constexpr PixelType type = PixelType::i32sC3; };
+template<> struct pixel_type <Pixel32sC4> { static constexpr PixelType type = PixelType::i32sC4; };
+
+template<> struct pixel_type <Pixel32fC1> { static constexpr PixelType type = PixelType::i32fC1; };
+template<> struct pixel_type <Pixel32fC2> { static constexpr PixelType type = PixelType::i32fC2; };
+template<> struct pixel_type <Pixel32fC3> { static constexpr PixelType type = PixelType::i32fC3; };
+template<> struct pixel_type <Pixel32fC4> { static constexpr PixelType type = PixelType::i32fC4; };
 
 //------------------------------------------------------------------------------
 // comparison operators
