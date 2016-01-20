@@ -4,7 +4,7 @@
   <description>
     IMP CUDA depth estimation / range image module
   </description>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <license>tbd</license>
   
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
