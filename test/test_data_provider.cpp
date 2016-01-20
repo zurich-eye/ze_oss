@@ -3,6 +3,7 @@
 
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
+#include <ze/common/path_utils.h>
 #include <ze/data_provider/data_provider_csv.h>
 #include <ze/data_provider/data_provider_rosbag.h>
 
