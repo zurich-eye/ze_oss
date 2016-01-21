@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>imp_bridge_pangolin</name>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <description>The imp_bridge_pangolin package</description>
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
   <license>TODO</license>
