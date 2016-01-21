@@ -4,7 +4,7 @@
   <description>
     IMP CUDA image processing module
   </description>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <license>tbd</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
