@@ -14,8 +14,8 @@ TEST(TestUtilsTest, testLoadCsvPoses)
 
   std::string data_path = getTestDataDir("synthetic_room_pinhole");
   std::string filename = data_path + "/traj_gt.csv";
-  std::map<size_t, Transformation> poses = loadIndexedPosesFromCsv(filename);
-  EXPECT_EQ(poses.size(), 50);
+  std::map<int64_t, Transformation> poses = loadIndexedPosesFromCsv(filename);
+  EXPECT_EQ(poses.size(), 50u);
   EXPECT_DOUBLE_EQ(poses[1].getPosition().x(), 1.499260);
 }
 

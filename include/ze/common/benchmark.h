@@ -43,12 +43,11 @@ uint64_t runTimingBenchmark(
 
   if(print_results)
   {
-    std::cout << "Benchmark: " << benchmark_name << "\n"
-              << "> Time for " << num_iter_per_epoch << " iterations: "
-              << nanosecToMillisec(min_time) << " milliseconds\n"
-              << "> Time for 1 iteration: "
-              << nanosecToMillisec(min_time) / num_iter_per_epoch << " milliseconds"
-              << std::endl;
+    VLOG(1) << "Benchmark: " << benchmark_name << "\n"
+            << "> Time for " << num_iter_per_epoch << " iterations: "
+            << nanosecToMillisec(min_time) << " milliseconds\n"
+            << "> Time for 1 iteration: "
+            << nanosecToMillisec(min_time) / num_iter_per_epoch << " milliseconds";
   }
 
   return min_time;

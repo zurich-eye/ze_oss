@@ -22,9 +22,9 @@ std::string getTestDataDir(const std::string& dataset_name)
   return path;
 }
 
-std::map<size_t, Transformation> loadIndexedPosesFromCsv(const std::string& filename)
+std::map<int64_t, Transformation> loadIndexedPosesFromCsv(const std::string& filename)
 {
-  std::map<size_t, Transformation> poses;
+  std::map<int64_t, Transformation> poses;
   std::ifstream fs;
   openFileStream(filename, &fs);
   std::string line;
@@ -41,7 +41,7 @@ std::map<size_t, Transformation> loadIndexedPosesFromCsv(const std::string& file
 }
 
 void loadDepthmapFromFile(
-    const std::string& filename, float* data, const size_t data_size)
+    const std::string& filename, const size_t data_size, float* data)
 {
   CHECK_NOTNULL(data);
   std::ifstream fs;
