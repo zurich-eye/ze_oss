@@ -4,7 +4,7 @@
   <description>
     ROS nodes for denoising functionalities
   </description>
-  <version>0.1.2</version>
+  <version>0.1.3</version>
   <license>tbd</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
