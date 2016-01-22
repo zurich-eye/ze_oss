@@ -24,12 +24,12 @@ int main(int /*argc*/, char** /*argv*/)
       std::shared_ptr<ze::cu::ImageGpu8uC1> d1_lena_8uC1(
             new ze::cu::ImageGpu8uC1(h1_lena_8uC1));
 
-      ze::ImagePyramid8uC1 pyr(d1_lena_8uC1);
+      ze::ImagePyramid8uC1::Ptr pyr = ze::createImagePyramidGpu<ze::Pixel8uC1>(d1_lena_8uC1);
 
-      assert(pyr.numLevels()==7);
-      assert(pyr.size(pyr.numLevels()-1).width() == 8);
+      assert(pyr->numLevels()==7);
+      assert(pyr->size(pyr->numLevels()-1).width() == 8);
 
-      ze::ImagePyramid8uC1::ImageLevels levels = pyr.levels();
+      ze::ImagePyramid8uC1::ImageLevels levels = pyr->levels();
 
       int level_id=0;
       for (auto img : levels)
@@ -48,8 +48,8 @@ int main(int /*argc*/, char** /*argv*/)
       h1_lena_32fC1.cvMat() /= 255.f;
       std::shared_ptr<ze::cu::ImageGpu32fC1> d1_lena_32fC1(
             new ze::cu::ImageGpu32fC1(h1_lena_32fC1));
-      ze::ImagePyramid32fC1 pyr(d1_lena_32fC1, 0.5f);
-      ze::ImagePyramid32fC1::ImageLevels levels = pyr.levels();
+      ze::ImagePyramid32fC1::Ptr pyr = ze::createImagePyramidGpu<ze::Pixel32fC1>(d1_lena_32fC1);
+      ze::ImagePyramid32fC1::ImageLevels levels = pyr->levels();
 
       int level_id=0;
       for (auto img : levels)

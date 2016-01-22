@@ -17,6 +17,7 @@
   <depend>eigen_catkin</depend>
   <depend>ze_cmake</depend>
   <depend>imp_core</depend>
+  <depend>imp_imgproc</depend>
   <depend>imp_cu_core</depend>
   <depend>imp_cu_imgproc</depend>
   <depend>imp_bridge_opencv</depend>
