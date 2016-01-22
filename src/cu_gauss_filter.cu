@@ -94,11 +94,11 @@ __global__ void k_gauss(Pixel* dst, const size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
+template<typename Pixel>
+void filterGauss(ImageGpu<Pixel>& dst,
                  const Texture2D& src_tex,
                  float sigma, int kernel_size,
-                 ImageGpuPtr<Pixel, pixel_type> tmp_img)
+                 ImageGpuPtr<Pixel> tmp_img)
 //                 cudaStream_t stream);
 {
   Roi2u roi = dst.roi();
@@ -111,7 +111,7 @@ void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
   // temporary variable for filtering (separabel kernel!)
   if (!tmp_img || dst.roi().size() != tmp_img->size());
   {
-    tmp_img.reset(new ImageGpu<Pixel, pixel_type>(roi.size()));
+    tmp_img.reset(new ImageGpu<Pixel>(roi.size()));
   }
 
   // fragmentation
@@ -147,11 +147,11 @@ void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
 
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void filterGauss(ImageGpu<Pixel, pixel_type>& dst,
-                 const ImageGpu<Pixel, pixel_type>& src,
+template<typename Pixel>
+void filterGauss(ImageGpu<Pixel>& dst,
+                 const ImageGpu<Pixel>& src,
                  float sigma, int kernel_size,
-                 ImageGpuPtr<Pixel, pixel_type> tmp_img)
+                 ImageGpuPtr<Pixel> tmp_img)
 //                 cudaStream_t stream);
 {
   std::shared_ptr<Texture2D> src_tex =

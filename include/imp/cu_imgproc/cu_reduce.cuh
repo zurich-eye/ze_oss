@@ -11,9 +11,9 @@ namespace cu {
 /**
  * @brief Image reduction from \a src to \a dst image
  */
-template<typename Pixel, ze::PixelType pixel_type>
-void reduce(ImageGpu<Pixel, pixel_type>& dst,
-            const ImageGpu<Pixel, pixel_type>& src,
+template<typename Pixel>
+void reduce(ImageGpu<Pixel>& dst,
+            const ImageGpu<Pixel>& src,
             InterpolationMode interp = InterpolationMode::linear,
             bool gauss_prefilter=true);
 

@@ -12,13 +12,13 @@
 namespace ze {
 namespace cu {
 
-template<typename Pixel, ze::PixelType pixel_type>
+template<typename Pixel>
 class RofDenoising  : public ze::cu::VariationalDenoising
 {
 public:
   using Base = VariationalDenoising;
-  using ImageGpu = ze::cu::ImageGpu<Pixel, pixel_type>;
-  using Ptr = std::shared_ptr<RofDenoising<Pixel,pixel_type>>;
+  using ImageGpu = ze::cu::ImageGpu<Pixel>;
+  using Ptr = std::shared_ptr<RofDenoising<Pixel>>;
 
 public:
   RofDenoising() = default;
@@ -46,8 +46,8 @@ private:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef RofDenoising<ze::Pixel8uC1, ze::PixelType::i8uC1> RofDenoising8uC1;
-typedef RofDenoising<ze::Pixel32fC1, ze::PixelType::i32fC1> RofDenoising32fC1;
+typedef RofDenoising<ze::Pixel8uC1> RofDenoising8uC1;
+typedef RofDenoising<ze::Pixel32fC1> RofDenoising32fC1;
 
 } // namespace cu
 } // namespace imp

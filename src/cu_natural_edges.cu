@@ -89,11 +89,11 @@ __global__ void k_naturalEdges(EdgePixel *g, const size_t stride,
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
-                  const ImageGpu<Pixel, pixel_type>& src,
+template<typename Pixel>
+void naturalEdges(ImageGpu<Pixel>& dst,
+                  const ImageGpu<Pixel>& src,
                   float sigma, float alpha, float q,
-                  ImageGpuPtr<Pixel, pixel_type> tmp_denoised)
+                  ImageGpuPtr<Pixel> tmp_denoised)
 {
   Roi2u roi = src.roi();
   dst.setRoi(roi);
@@ -101,7 +101,7 @@ void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
   // temporary variable for filtering (separabel kernel!)
   if (!tmp_denoised || src.size() != tmp_denoised->size())
   {
-    tmp_denoised.reset(new ImageGpu<Pixel, pixel_type>(roi.size()));
+    tmp_denoised.reset(new ImageGpu<Pixel>(roi.size()));
   }
   else
   {

@@ -17,11 +17,11 @@ namespace cu {
  * @todo (MWE) add a tmp image as input param so we don't have to allocate memory
  *             for the internal denoising all the time.
  */
-template<typename Pixel, ze::PixelType pixel_type>
-void naturalEdges(ImageGpu<Pixel, pixel_type>& dst,
-                  const ImageGpu<Pixel, pixel_type>& src,
+template<typename Pixel>
+void naturalEdges(ImageGpu<Pixel>& dst,
+                  const ImageGpu<Pixel>& src,
                   float sigma=1.0f, float alpha=10.f, float q=.5f,
-                  ImageGpuPtr<Pixel, pixel_type> tmp_denoised=nullptr);
+                  ImageGpuPtr<Pixel> tmp_denoised=nullptr);
 
 } // namespace cu
 } // namespace imp

@@ -256,13 +256,13 @@ __global__ void  k_median3x3(Pixel* dst, const size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void filterMedian3x3(ImageGpu<Pixel, pixel_type>& dst,
-                     const ImageGpu<Pixel, pixel_type>& src)
+template<typename Pixel>
+void filterMedian3x3(ImageGpu<Pixel>& dst,
+                     const ImageGpu<Pixel>& src)
 {
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, (src.bitDepth()<32) ? cudaFilterModePoint
-                                                  : cudaFilterModeLinear);
+                                                : cudaFilterModeLinear);
 
   constexpr std::uint16_t block_size = 16;
   Fragmentation<block_size, block_size> frag(src.roi());

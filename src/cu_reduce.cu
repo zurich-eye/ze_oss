@@ -34,9 +34,9 @@ __global__ void k_reduce(Pixel* d_dst, size_t stride,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void reduce(ImageGpu<Pixel, pixel_type>& dst,
-            const ImageGpu<Pixel, pixel_type>& src,
+template<typename Pixel>
+void reduce(ImageGpu<Pixel>& dst,
+            const ImageGpu<Pixel>& src,
             ze::InterpolationMode interp, bool gauss_prefilter)
 {
   ze::Roi2u src_roi = src.roi();
@@ -46,12 +46,12 @@ void reduce(ImageGpu<Pixel, pixel_type>& dst,
   float sf_x = static_cast<float>(src_roi.width()) / static_cast<float>(dst_roi.width());
   float sf_y = static_cast<float>(src_roi.height()) / static_cast<float>(dst_roi.height());
 
-  std::unique_ptr<ImageGpu<Pixel,pixel_type>> filtered;
+  std::unique_ptr<ImageGpu<Pixel>> filtered;
   if (gauss_prefilter)
   {
     float sf = .5f*(sf_x+sf_y);
 
-    filtered.reset(new ImageGpu<Pixel, pixel_type>(src.size()));
+    filtered.reset(new ImageGpu<Pixel>(src.size()));
     float sigma = 1/(3*sf) ;  // empirical magic
     std::uint16_t kernel_size = std::ceil(6.0f*sigma);
     if (kernel_size % 2 == 0)

@@ -127,8 +127,8 @@ __global__ void k_rofDualEnergy(Pixel32fC1* d_ed,  size_t stride,
 //#############################################################################
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void RofDenoising<Pixel, pixel_type>::init(const Size2u& size)
+template<typename Pixel>
+void RofDenoising<Pixel>::init(const Size2u& size)
 {
   Base::init(size);
   IMP_CUDA_CHECK();
@@ -154,8 +154,8 @@ void RofDenoising<Pixel, pixel_type>::init(const Size2u& size)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void RofDenoising<Pixel, pixel_type>::denoise(const std::shared_ptr<ImageBase>& dst,
+template<typename Pixel>
+void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
                                               const std::shared_ptr<ImageBase>& src)
 {
   if (params_.verbose)
@@ -246,8 +246,8 @@ void RofDenoising<Pixel, pixel_type>::denoise(const std::shared_ptr<ImageBase>& 
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
+template<typename Pixel>
+void RofDenoising<Pixel>::primalDualEnergy(
     double& primal_energy, double& dual_energy)
 {
   if (!primal_energies_ || !dual_energies_)
@@ -286,8 +286,8 @@ void RofDenoising<Pixel, pixel_type>::primalDualEnergy(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void RofDenoising<Pixel, pixel_type>::print(std::ostream& os) const
+template<typename Pixel>
+void RofDenoising<Pixel>::print(std::ostream& os) const
 {
   os << "ROF Denoising:" << std::endl;
   this->Base::print(os);
@@ -296,8 +296,8 @@ void RofDenoising<Pixel, pixel_type>::print(std::ostream& os) const
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class RofDenoising<ze::Pixel8uC1, ze::PixelType::i8uC1>;
-template class RofDenoising<ze::Pixel32fC1, ze::PixelType::i32fC1>;
+template class RofDenoising<ze::Pixel8uC1>;
+template class RofDenoising<ze::Pixel32fC1>;
 
 } // namespace cu
 } // namespace ze

@@ -107,8 +107,8 @@ __global__ void k_tvL1convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
 //#############################################################################
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void TvL1Denoising<Pixel, pixel_type>::init(const Size2u& size)
+template<typename Pixel>
+void TvL1Denoising<Pixel>::init(const Size2u& size)
 {
   Base::init(size);
   IMP_CUDA_CHECK();
@@ -134,8 +134,8 @@ void TvL1Denoising<Pixel, pixel_type>::init(const Size2u& size)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void TvL1Denoising<Pixel, pixel_type>::denoise(const ImageBase::Ptr& dst,
+template<typename Pixel>
+void TvL1Denoising<Pixel>::denoise(const ImageBase::Ptr& dst,
                                                const ImageBase::Ptr& src)
 {
   if (params_.verbose)
@@ -216,8 +216,8 @@ void TvL1Denoising<Pixel, pixel_type>::denoise(const ImageBase::Ptr& dst,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void TvL1Denoising<Pixel, pixel_type>::print(std::ostream& os) const
+template<typename Pixel>
+void TvL1Denoising<Pixel>::print(std::ostream& os) const
 {
   os << "TvL1 Denoising:" << std::endl;
   this->Base::print(os);
@@ -226,8 +226,8 @@ void TvL1Denoising<Pixel, pixel_type>::print(std::ostream& os) const
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class TvL1Denoising<ze::Pixel8uC1, ze::PixelType::i8uC1>;
-template class TvL1Denoising<ze::Pixel32fC1, ze::PixelType::i32fC1>;
+template class TvL1Denoising<ze::Pixel8uC1>;
+template class TvL1Denoising<ze::Pixel32fC1>;
 
 } // namespace cu
 } // namespace ze
