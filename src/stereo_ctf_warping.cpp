@@ -96,7 +96,8 @@ bool StereoCtFWarping::ready()
 void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 {
   // generate image pyramid
-  ImagePyramid32fC1::Ptr pyr(new ImagePyramid32fC1(image, params_->ctf.scale_factor, 4));
+  ImagePyramid32fC1::Ptr pyr =
+      createImagePyramidGpu<Pixel32fC1>(image, params_->ctf.scale_factor, 4);
 
   // update number of levels
   if (params_->ctf.levels > pyr->numLevels())
@@ -139,7 +140,7 @@ void StereoCtFWarping::solve()
   lev_images.clear();
   for (auto pyr : image_pyramids_)
   {
-    lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->at(lev)));
+    lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->atShared(lev)));
   }
   levels_.at(lev)->solve(lev_images);
 
@@ -154,7 +155,7 @@ void StereoCtFWarping::solve()
     lev_images.clear();
     for (auto pyr : image_pyramids_)
     {
-      lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->at(lev-1)));
+      lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->atShared(lev-1)));
     }
     levels_.at(lev-1)->solve(lev_images);
   }
