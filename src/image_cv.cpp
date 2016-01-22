@@ -9,41 +9,41 @@
 namespace ze {
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageCv<Pixel, pixel_type>::ImageCv(std::uint32_t width, std::uint32_t height)
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(std::uint32_t width, std::uint32_t height)
   : Base(width, height)
-  , mat_(height, width, ze::pixelTypeToCv(pixel_type))
+  , mat_(height, width, ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageCv<Pixel, pixel_type>::ImageCv(const ze::Size2u& size)
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(const ze::Size2u& size)
   : Base(size)
-  , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type))
+  , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageCv<Pixel, pixel_type>::ImageCv(const ImageCv<Pixel, pixel_type>& from)
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(const ImageCv<Pixel>& from)
   : Base(from)
   , mat_(from.cvMat())
 {
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageCv<Pixel, pixel_type>::ImageCv(const Image<Pixel, pixel_type>& from)
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(const Image<Pixel>& from)
   : Base(from)
-  , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type))
+  , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
   from.copyTo(*this);
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageCv<Pixel, pixel_type>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
   : Base(mat.cols, mat.rows, pixel_order)
   , mat_(mat)
 {
@@ -86,7 +86,7 @@ ImageCv<Pixel, pixel_type>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
 
 ////-----------------------------------------------------------------------------
 //template<typename Pixel, imp::PixelType pixel_type>
-//ImageCv<Pixel, pixel_type>
+//ImageCv<Pixel>
 //::ImageCv(Pixel* data, std::uint32_t width, std::uint32_t height,
 //           size_t pitch, bool use_ext_data_pointer)
 //  : Base(width, height)
@@ -127,23 +127,22 @@ ImageCv<Pixel, pixel_type>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
 //}
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-cv::Mat& ImageCv<Pixel, pixel_type>::cvMat()
+template<typename Pixel>
+cv::Mat& ImageCv<Pixel>::cvMat()
 {
   return mat_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-const cv::Mat& ImageCv<Pixel, pixel_type>::cvMat() const
+template<typename Pixel>
+const cv::Mat& ImageCv<Pixel>::cvMat() const
 {
   return mat_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-Pixel* ImageCv<Pixel, pixel_type>::data(
-    std::uint32_t ox, std::uint32_t oy)
+template<typename Pixel>
+Pixel* ImageCv<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
 {
   if (ox > this->width() || oy > this->height())
   {
@@ -154,9 +153,8 @@ Pixel* ImageCv<Pixel, pixel_type>::data(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-const Pixel* ImageCv<Pixel, pixel_type>::data(
-    std::uint32_t ox, std::uint32_t oy) const
+template<typename Pixel>
+const Pixel* ImageCv<Pixel>::data(std::uint32_t ox, std::uint32_t oy) const
 {
   if (ox > this->width() || oy > this->height())
   {
@@ -168,8 +166,8 @@ const Pixel* ImageCv<Pixel, pixel_type>::data(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void ImageCv<Pixel,pixel_type>::setValue(const Pixel& value)
+template<typename Pixel>
+void ImageCv<Pixel>::setValue(const Pixel& value)
 {
   mat_ = cv::Scalar::all(value);
 }
@@ -178,25 +176,25 @@ void ImageCv<Pixel,pixel_type>::setValue(const Pixel& value)
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class ImageCv<ze::Pixel8uC1, ze::PixelType::i8uC1>;
-template class ImageCv<ze::Pixel8uC2, ze::PixelType::i8uC2>;
-template class ImageCv<ze::Pixel8uC3, ze::PixelType::i8uC3>;
-template class ImageCv<ze::Pixel8uC4, ze::PixelType::i8uC4>;
+template class ImageCv<ze::Pixel8uC1>;
+template class ImageCv<ze::Pixel8uC2>;
+template class ImageCv<ze::Pixel8uC3>;
+template class ImageCv<ze::Pixel8uC4>;
 
-template class ImageCv<ze::Pixel16uC1, ze::PixelType::i16uC1>;
-template class ImageCv<ze::Pixel16uC2, ze::PixelType::i16uC2>;
-template class ImageCv<ze::Pixel16uC3, ze::PixelType::i16uC3>;
-template class ImageCv<ze::Pixel16uC4, ze::PixelType::i16uC4>;
+template class ImageCv<ze::Pixel16uC1>;
+template class ImageCv<ze::Pixel16uC2>;
+template class ImageCv<ze::Pixel16uC3>;
+template class ImageCv<ze::Pixel16uC4>;
 
-template class ImageCv<ze::Pixel32sC1, ze::PixelType::i32sC1>;
-template class ImageCv<ze::Pixel32sC2, ze::PixelType::i32sC2>;
-template class ImageCv<ze::Pixel32sC3, ze::PixelType::i32sC3>;
-template class ImageCv<ze::Pixel32sC4, ze::PixelType::i32sC4>;
+template class ImageCv<ze::Pixel32sC1>;
+template class ImageCv<ze::Pixel32sC2>;
+template class ImageCv<ze::Pixel32sC3>;
+template class ImageCv<ze::Pixel32sC4>;
 
-template class ImageCv<ze::Pixel32fC1, ze::PixelType::i32fC1>;
-template class ImageCv<ze::Pixel32fC2, ze::PixelType::i32fC2>;
-template class ImageCv<ze::Pixel32fC3, ze::PixelType::i32fC3>;
-template class ImageCv<ze::Pixel32fC4, ze::PixelType::i32fC4>;
+template class ImageCv<ze::Pixel32fC1>;
+template class ImageCv<ze::Pixel32fC2>;
+template class ImageCv<ze::Pixel32fC3>;
+template class ImageCv<ze::Pixel32fC4>;
 
 
 } // namespace imp

@@ -11,31 +11,31 @@ namespace ze {
 namespace cu {
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void cvBridgeLoad(ze::cu::ImageGpuPtr<Pixel,pixel_type>& out, const std::string& filename,
+template<typename Pixel>
+void cvBridgeLoad(ze::cu::ImageGpuPtr<Pixel>& out, const std::string& filename,
                   ze::PixelOrder pixel_order)
 {
-  ImageCvPtr<Pixel,pixel_type> cv_img;
-  ze::cvBridgeLoad<Pixel,pixel_type>(cv_img, filename, pixel_order);
-  out = std::make_shared<ze::cu::ImageGpu<Pixel,pixel_type>>(*cv_img);
+  ImageCvPtr<Pixel> cv_img;
+  ze::cvBridgeLoad<Pixel>(cv_img, filename, pixel_order);
+  out = std::make_shared<ze::cu::ImageGpu<Pixel>>(*cv_img);
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
+template<typename Pixel>
 void cvBridgeShow(const std::string& winname,
-                  const ze::cu::ImageGpu<Pixel,pixel_type>& img, bool normalize=false)
+                  const ze::cu::ImageGpu<Pixel>& img, bool normalize=false)
 {
-  const ImageCv<Pixel, pixel_type> cv_img(img);
+  const ImageCv<Pixel> cv_img(img);
   ze::cvBridgeShow(winname, cv_img, normalize);
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, typename T, ze::PixelType pixel_type>
+template<typename Pixel, typename T>
 void cvBridgeShow(const std::string& winname,
-                  const ze::cu::ImageGpu<Pixel, pixel_type>& img,
+                  const ze::cu::ImageGpu<Pixel>& img,
                   const T& min, const T& max)
 {
-  const ImageCv<Pixel, pixel_type> cv_img(img);
+  const ImageCv<Pixel> cv_img(img);
   ze::cvBridgeShow(winname, cv_img, min, max);
 }
 

@@ -10,8 +10,8 @@
 namespace ze {
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
+template<typename Pixel>
+void cvBridgeLoad(ImageCvPtr<Pixel>& out,
                   const std::string& filename, ze::PixelOrder pixel_order)
 {
   cv::Mat mat;
@@ -25,21 +25,21 @@ void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
     mat = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
   }
 
-  switch(pixel_type)
+  switch(pixel_type<Pixel>::type)
   {
   case ze::PixelType::i8uC1:
     if (pixel_order == PixelOrder::gray)
     {
-      out = std::make_shared<ImageCv<Pixel,pixel_type>>(mat);
+      out = std::make_shared<ImageCv<Pixel>>(mat);
     }
     else
     {
-      out = std::make_shared<ImageCv<Pixel,pixel_type>>(mat.cols, mat.rows);
+      out = std::make_shared<ImageCv<Pixel>>(mat.cols, mat.rows);
       cv::cvtColor(mat, out->cvMat(), CV_BGR2GRAY);
     }
   break;
   case ze::PixelType::i32fC1:
-    out = std::make_shared<ImageCv<Pixel,pixel_type>>(mat.cols, mat.rows);
+    out = std::make_shared<ImageCv<Pixel>>(mat.cols, mat.rows);
     if (mat.channels() > 1)
     {
       cv::cvtColor(mat, mat, CV_BGR2GRAY);
@@ -52,8 +52,8 @@ void cvBridgeLoad(ImageCvPtr<Pixel,pixel_type>& out,
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void cvBridgeSave(const std::string& filename, const ImageCv<Pixel,pixel_type>& img, bool normalize=false)
+template<typename Pixel>
+void cvBridgeSave(const std::string& filename, const ImageCv<Pixel>& img, bool normalize=false)
 {
   if (normalize)
   {
@@ -63,8 +63,8 @@ void cvBridgeSave(const std::string& filename, const ImageCv<Pixel,pixel_type>& 
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& img,
+template<typename Pixel>
+void cvBridgeShow(const std::string& winname, const ImageCv<Pixel>& img,
                   bool normalize=false)
 {
   if (normalize)
@@ -81,8 +81,8 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& i
 }
 
 //------------------------------------------------------------------------------
-template<typename Pixel, typename T, ze::PixelType pixel_type>
-void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& img,
+template<typename Pixel, typename T>
+void cvBridgeShow(const std::string& winname, const ImageCv<Pixel>& img,
                   const T& min, const T& max)
 {
   cv::Mat norm_mat = img.cvMat().clone();
@@ -99,7 +99,7 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel,pixel_type>& i
 //  cvmat
 //};
 //
-//template<typename Pixel, imp::PixelType pixel_type>
+//template<typename Pixel>
 //std::shared_ptr<> ocv_bridge_imread(const std::string& filename, OcvBridgeLoadAs load_as=OcvBridgeLoadAs::raw)
 //{
 //  switch (load_as)
