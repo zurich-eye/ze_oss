@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include <ze/common/types.h>
 #include <imp/core/macros.hpp>
 #include <imp/core/image_base.hpp>
 #include <imp/core/exception.hpp>
@@ -57,6 +58,18 @@ public:
   Pixel& pixel(std::uint32_t x, std::uint32_t y)
   {
     return *data(x, y);
+  }
+
+  /** Get Pixel value at position x,y. */
+  Pixel pixel(const Vector2i& px) const
+  {
+    return *data(px(0), px(1));
+  }
+
+  /** Get Pixel value at position x,y. */
+  Pixel& pixel(const Vector2i& px)
+  {
+    return *data(px(0), px(1));
   }
 
   /** Get Pixel value at position x,y. */

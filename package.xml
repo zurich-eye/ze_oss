@@ -13,6 +13,7 @@
   <buildtool_depend>catkin_simple</buildtool_depend>
 
   <depend>ze_cmake</depend>
+  <depend>ze_common</depend>
 
   <test_depend>gtest</test_depend>
 </package>
