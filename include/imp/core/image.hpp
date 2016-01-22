@@ -61,21 +61,15 @@ public:
   }
 
   /** Get Pixel value at position x,y. */
-  Pixel pixel(const Vector2i& px) const
-  {
-    return *data(px(0), px(1));
-  }
-
-  /** Get Pixel value at position x,y. */
-  Pixel& pixel(const Vector2i& px)
-  {
-    return *data(px(0), px(1));
-  }
-
-  /** Get Pixel value at position x,y. */
   Pixel operator()(std::uint32_t x, std::uint32_t y) const
   {
     return *data(x, y);
+  }
+
+  /** Get Pixel value at position x,y. */
+  Pixel operator()(const Vector2i& px) const
+  {
+    return *data(px(0), px(1));
   }
 
   /** Get Pointer to beginning of row \a row (y index).
