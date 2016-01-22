@@ -24,13 +24,13 @@ namespace ze {
  *   - Pixel: The pixel's memory representation (e.g. imp::Pixel8uC1 for single-channel unsigned 8-bit images)
  *   - pixel_type: The internal enum for specifying the pixel's type more specificly
  */
-template<typename Pixel, ze::PixelType pixel_type>
-class ImageRaw : public ze::Image<Pixel, pixel_type>
+template<typename Pixel>
+class ImageRaw : public ze::Image<Pixel>
 {
 public:
-  using Ptr = typename std::shared_ptr<ImageRaw<Pixel,pixel_type>>;
+  using Ptr = typename std::shared_ptr<ImageRaw<Pixel>>;
 
-  using Base = Image<Pixel, pixel_type>;
+  using Base = Image<Pixel>;
   using Memory = ze::MemoryStorage<Pixel>;
   using Deallocator = ze::MemoryDeallocator<Pixel>;
 
@@ -106,40 +106,38 @@ protected:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImageRaw<ze::Pixel8uC1, ze::PixelType::i8uC1> ImageRaw8uC1;
-typedef ImageRaw<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageRaw8uC2;
-typedef ImageRaw<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageRaw8uC3;
-typedef ImageRaw<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageRaw8uC4;
+typedef ImageRaw<ze::Pixel8uC1> ImageRaw8uC1;
+typedef ImageRaw<ze::Pixel8uC2> ImageRaw8uC2;
+typedef ImageRaw<ze::Pixel8uC3> ImageRaw8uC3;
+typedef ImageRaw<ze::Pixel8uC4> ImageRaw8uC4;
 
-typedef ImageRaw<ze::Pixel16sC1, ze::PixelType::i16sC1> ImageRaw16sC1;
-typedef ImageRaw<ze::Pixel16sC2, ze::PixelType::i16sC2> ImageRaw16sC2;
-typedef ImageRaw<ze::Pixel16sC3, ze::PixelType::i16sC3> ImageRaw16sC3;
-typedef ImageRaw<ze::Pixel16sC4, ze::PixelType::i16sC4> ImageRaw16sC4;
+typedef ImageRaw<ze::Pixel16sC1> ImageRaw16sC1;
+typedef ImageRaw<ze::Pixel16sC2> ImageRaw16sC2;
+typedef ImageRaw<ze::Pixel16sC3> ImageRaw16sC3;
+typedef ImageRaw<ze::Pixel16sC4> ImageRaw16sC4;
 
-typedef ImageRaw<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageRaw16uC1;
-typedef ImageRaw<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageRaw16uC2;
-typedef ImageRaw<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageRaw16uC3;
-typedef ImageRaw<ze::Pixel16uC4, ze::PixelType::i16uC4> ImageRaw16uC4;
+typedef ImageRaw<ze::Pixel16uC1> ImageRaw16uC1;
+typedef ImageRaw<ze::Pixel16uC2> ImageRaw16uC2;
+typedef ImageRaw<ze::Pixel16uC3> ImageRaw16uC3;
+typedef ImageRaw<ze::Pixel16uC4> ImageRaw16uC4;
 
-typedef ImageRaw<ze::Pixel32sC1, ze::PixelType::i32sC1> ImageRaw32sC1;
-typedef ImageRaw<ze::Pixel32sC2, ze::PixelType::i32sC2> ImageRaw32sC2;
-typedef ImageRaw<ze::Pixel32sC3, ze::PixelType::i32sC3> ImageRaw32sC3;
-typedef ImageRaw<ze::Pixel32sC4, ze::PixelType::i32sC4> ImageRaw32sC4;
+typedef ImageRaw<ze::Pixel32sC1> ImageRaw32sC1;
+typedef ImageRaw<ze::Pixel32sC2> ImageRaw32sC2;
+typedef ImageRaw<ze::Pixel32sC3> ImageRaw32sC3;
+typedef ImageRaw<ze::Pixel32sC4> ImageRaw32sC4;
 
-typedef ImageRaw<ze::Pixel32fC1, ze::PixelType::i32fC1> ImageRaw32fC1;
-typedef ImageRaw<ze::Pixel32fC2, ze::PixelType::i32fC2> ImageRaw32fC2;
-typedef ImageRaw<ze::Pixel32fC3, ze::PixelType::i32fC3> ImageRaw32fC3;
-typedef ImageRaw<ze::Pixel32fC4, ze::PixelType::i32fC4> ImageRaw32fC4;
+typedef ImageRaw<ze::Pixel32fC1> ImageRaw32fC1;
+typedef ImageRaw<ze::Pixel32fC2> ImageRaw32fC2;
+typedef ImageRaw<ze::Pixel32fC3> ImageRaw32fC3;
+typedef ImageRaw<ze::Pixel32fC4> ImageRaw32fC4;
 
 // shared pointers
-template <typename Pixel, ze::PixelType pixel_type>
-using ImageRawPtr = typename ImageRaw<Pixel,pixel_type>::Ptr;
+template <typename Pixel>
+using ImageRawPtr = typename ImageRaw<Pixel>::Ptr;
 
-template <typename Pixel, ze::PixelType pixel_type>
-using ImageRawConstPtr = typename ImageRaw<Pixel,pixel_type>::ConstPtr;
-
+template <typename Pixel>
+using ImageRawConstPtr = typename ImageRaw<Pixel>::ConstPtr;
 
 } // namespace imp
-
 
 #endif // IMP_IMAGE_RAW_HPP

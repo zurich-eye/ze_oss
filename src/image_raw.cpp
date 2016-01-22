@@ -8,24 +8,24 @@
 namespace ze {
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>::ImageRaw(std::uint32_t width, std::uint32_t height)
+template<typename Pixel>
+ImageRaw<Pixel>::ImageRaw(std::uint32_t width, std::uint32_t height)
   : Base(width, height)
 {
   data_.reset(Memory::alignedAlloc(width, height, &pitch_));
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>::ImageRaw(const ze::Size2u& size)
+template<typename Pixel>
+ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size)
   : Base(size)
 {
   data_.reset(Memory::alignedAlloc(size, &pitch_));
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>::ImageRaw(const ImageRaw& from)
+template<typename Pixel>
+ImageRaw<Pixel>::ImageRaw(const ImageRaw& from)
   : Base(from)
 {
   data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
@@ -33,8 +33,8 @@ ImageRaw<Pixel, pixel_type>::ImageRaw(const ImageRaw& from)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>::ImageRaw(const Image<Pixel, pixel_type>& from)
+template<typename Pixel>
+ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
   : Base(from)
 {
   data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
@@ -42,8 +42,8 @@ ImageRaw<Pixel, pixel_type>::ImageRaw(const Image<Pixel, pixel_type>& from)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>
+template<typename Pixel>
+ImageRaw<Pixel>
 ::ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
            size_t pitch, bool use_ext_data_pointer)
   : Base(width, height)
@@ -83,11 +83,11 @@ ImageRaw<Pixel, pixel_type>
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageRaw<Pixel, pixel_type>::ImageRaw(Pixel* data,
-                                      std::uint32_t width, std::uint32_t height,
-                                      size_t pitch,
-                                      const std::shared_ptr<void const>& tracked)
+template<typename Pixel>
+ImageRaw<Pixel>::ImageRaw(Pixel* data,
+                          std::uint32_t width, std::uint32_t height,
+                          size_t pitch,
+                          const std::shared_ptr<void const>& tracked)
   : Base(width, height)
 {
   if (data == nullptr || tracked == nullptr)
@@ -102,9 +102,8 @@ ImageRaw<Pixel, pixel_type>::ImageRaw(Pixel* data,
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-Pixel* ImageRaw<Pixel, pixel_type>::data(
-    std::uint32_t ox, std::uint32_t oy)
+template<typename Pixel>
+Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
 {
   if (ox > this->width() || oy > this->height())
   {
@@ -115,9 +114,8 @@ Pixel* ImageRaw<Pixel, pixel_type>::data(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-const Pixel* ImageRaw<Pixel, pixel_type>::data(
-    std::uint32_t ox, std::uint32_t oy) const
+template<typename Pixel>
+const Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy) const
 {
   if (ox > this->width() || oy > this->height())
   {
@@ -130,29 +128,29 @@ const Pixel* ImageRaw<Pixel, pixel_type>::data(
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class ImageRaw<ze::Pixel8uC1, ze::PixelType::i8uC1>;
-template class ImageRaw<ze::Pixel8uC2, ze::PixelType::i8uC2>;
-template class ImageRaw<ze::Pixel8uC3, ze::PixelType::i8uC3>;
-template class ImageRaw<ze::Pixel8uC4, ze::PixelType::i8uC4>;
+template class ImageRaw<ze::Pixel8uC1>;
+template class ImageRaw<ze::Pixel8uC2>;
+template class ImageRaw<ze::Pixel8uC3>;
+template class ImageRaw<ze::Pixel8uC4>;
 
-template class ImageRaw<ze::Pixel16sC1, ze::PixelType::i16sC1>;
-template class ImageRaw<ze::Pixel16sC2, ze::PixelType::i16sC2>;
-template class ImageRaw<ze::Pixel16sC3, ze::PixelType::i16sC3>;
-template class ImageRaw<ze::Pixel16sC4, ze::PixelType::i16sC4>;
+template class ImageRaw<ze::Pixel16sC1>;
+template class ImageRaw<ze::Pixel16sC2>;
+template class ImageRaw<ze::Pixel16sC3>;
+template class ImageRaw<ze::Pixel16sC4>;
 
-template class ImageRaw<ze::Pixel16uC1, ze::PixelType::i16uC1>;
-template class ImageRaw<ze::Pixel16uC2, ze::PixelType::i16uC2>;
-template class ImageRaw<ze::Pixel16uC3, ze::PixelType::i16uC3>;
-template class ImageRaw<ze::Pixel16uC4, ze::PixelType::i16uC4>;
+template class ImageRaw<ze::Pixel16uC1>;
+template class ImageRaw<ze::Pixel16uC2>;
+template class ImageRaw<ze::Pixel16uC3>;
+template class ImageRaw<ze::Pixel16uC4>;
 
-template class ImageRaw<ze::Pixel32sC1, ze::PixelType::i32sC1>;
-template class ImageRaw<ze::Pixel32sC2, ze::PixelType::i32sC2>;
-template class ImageRaw<ze::Pixel32sC3, ze::PixelType::i32sC3>;
-template class ImageRaw<ze::Pixel32sC4, ze::PixelType::i32sC4>;
+template class ImageRaw<ze::Pixel32sC1>;
+template class ImageRaw<ze::Pixel32sC2>;
+template class ImageRaw<ze::Pixel32sC3>;
+template class ImageRaw<ze::Pixel32sC4>;
 
-template class ImageRaw<ze::Pixel32fC1, ze::PixelType::i32fC1>;
-template class ImageRaw<ze::Pixel32fC2, ze::PixelType::i32fC2>;
-template class ImageRaw<ze::Pixel32fC3, ze::PixelType::i32fC3>;
-template class ImageRaw<ze::Pixel32fC4, ze::PixelType::i32fC4>;
+template class ImageRaw<ze::Pixel32fC1>;
+template class ImageRaw<ze::Pixel32fC2>;
+template class ImageRaw<ze::Pixel32fC3>;
+template class ImageRaw<ze::Pixel32fC4>;
 
 } // namespace imp
