@@ -31,18 +31,17 @@ class Texture2D;
  *
  * The template parameters are as follows:
  *   - Pixel: The pixel's memory representation (e.g. imp::Pixel8uC1 for single-channel unsigned 8-bit images)
- *   - pixel_type: The internal enum for specifying the pixel's type more specificly
  *
  * @warning Be careful with 8-bit 3-channel GPU memory as the stride is not divisable by 3!
  */
-template<typename Pixel, ze::PixelType pixel_type>
-class ImageGpu : public ze::Image<Pixel, pixel_type>
+template<typename Pixel>
+class ImageGpu : public ze::Image<Pixel>
 {
 public:
-  using Ptr = typename std::shared_ptr<ImageGpu<Pixel,pixel_type>>;
-  using UPtr = typename std::unique_ptr<ImageGpu<Pixel,pixel_type>>;
+  using Ptr = typename std::shared_ptr<ImageGpu<Pixel>>;
+  using UPtr = typename std::unique_ptr<ImageGpu<Pixel>>;
 
-  using Base = Image<Pixel, pixel_type>;
+  using Base = Image<Pixel>;
   using Memory = ze::cu::MemoryStorage<Pixel>;
   using Deallocator = ze::cu::MemoryDeallocator<Pixel>;
 
@@ -149,7 +148,7 @@ public:
 //  template<typename T>
 //  ImageGpu<Pixel, pixel_type>& operator*=(const T& rhs);
 
-  ImageGpu<Pixel, pixel_type>& operator*=(const Pixel& rhs);
+  ImageGpu<Pixel>& operator*=(const Pixel& rhs);
 
 
 protected:
@@ -166,28 +165,28 @@ private:
 //-----------------------------------------------------------------------------
 // convenience typedefs
 // (sync with explicit template class instantiations at the end of the cpp file)
-typedef ImageGpu<ze::Pixel8uC1, ze::PixelType::i8uC1> ImageGpu8uC1;
-typedef ImageGpu<ze::Pixel8uC2, ze::PixelType::i8uC2> ImageGpu8uC2;
-typedef ImageGpu<ze::Pixel8uC3, ze::PixelType::i8uC3> ImageGpu8uC3;
-typedef ImageGpu<ze::Pixel8uC4, ze::PixelType::i8uC4> ImageGpu8uC4;
+typedef ImageGpu<ze::Pixel8uC1> ImageGpu8uC1;
+typedef ImageGpu<ze::Pixel8uC2> ImageGpu8uC2;
+typedef ImageGpu<ze::Pixel8uC3> ImageGpu8uC3;
+typedef ImageGpu<ze::Pixel8uC4> ImageGpu8uC4;
 
-typedef ImageGpu<ze::Pixel16uC1, ze::PixelType::i16uC1> ImageGpu16uC1;
-typedef ImageGpu<ze::Pixel16uC2, ze::PixelType::i16uC2> ImageGpu16uC2;
-typedef ImageGpu<ze::Pixel16uC3, ze::PixelType::i16uC3> ImageGpu16uC3;
-typedef ImageGpu<ze::Pixel16uC4, ze::PixelType::i16uC4> ImageGpu16uC4;
+typedef ImageGpu<ze::Pixel16uC1> ImageGpu16uC1;
+typedef ImageGpu<ze::Pixel16uC2> ImageGpu16uC2;
+typedef ImageGpu<ze::Pixel16uC3> ImageGpu16uC3;
+typedef ImageGpu<ze::Pixel16uC4> ImageGpu16uC4;
 
-typedef ImageGpu<ze::Pixel32sC1, ze::PixelType::i32sC1> ImageGpu32sC1;
-typedef ImageGpu<ze::Pixel32sC2, ze::PixelType::i32sC2> ImageGpu32sC2;
-typedef ImageGpu<ze::Pixel32sC3, ze::PixelType::i32sC3> ImageGpu32sC3;
-typedef ImageGpu<ze::Pixel32sC4, ze::PixelType::i32sC4> ImageGpu32sC4;
+typedef ImageGpu<ze::Pixel32sC1> ImageGpu32sC1;
+typedef ImageGpu<ze::Pixel32sC2> ImageGpu32sC2;
+typedef ImageGpu<ze::Pixel32sC3> ImageGpu32sC3;
+typedef ImageGpu<ze::Pixel32sC4> ImageGpu32sC4;
 
-typedef ImageGpu<ze::Pixel32fC1, ze::PixelType::i32fC1> ImageGpu32fC1;
-typedef ImageGpu<ze::Pixel32fC2, ze::PixelType::i32fC2> ImageGpu32fC2;
-typedef ImageGpu<ze::Pixel32fC3, ze::PixelType::i32fC3> ImageGpu32fC3;
-typedef ImageGpu<ze::Pixel32fC4, ze::PixelType::i32fC4> ImageGpu32fC4;
+typedef ImageGpu<ze::Pixel32fC1> ImageGpu32fC1;
+typedef ImageGpu<ze::Pixel32fC2> ImageGpu32fC2;
+typedef ImageGpu<ze::Pixel32fC3> ImageGpu32fC3;
+typedef ImageGpu<ze::Pixel32fC4> ImageGpu32fC4;
 
-template <typename Pixel, ze::PixelType pixel_type>
-using ImageGpuPtr = typename std::shared_ptr<ImageGpu<Pixel,pixel_type>>;
+template <typename Pixel>
+using ImageGpuPtr = typename std::shared_ptr<ImageGpu<Pixel>>;
 
 } // namespace cu
 } // namespace imp

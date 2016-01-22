@@ -112,8 +112,8 @@ void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const ze::
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min_val, Pixel& max_val)
+template<typename Pixel>
+void minMax(const ImageGpu<Pixel>& img, Pixel& min_val, Pixel& max_val)
 {
   IMP_CUDA_CHECK();
   ze::Roi2u roi = img.roi();

@@ -17,33 +17,33 @@ namespace cu {
 
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageGpu<Pixel, pixel_type>::ImageGpu(const ze::Size2u& size)
+template<typename Pixel>
+ImageGpu<Pixel>::ImageGpu(const ze::Size2u& size)
   : Base(size)
 {
   data_.reset(Memory::alignedAlloc(this->size(), &pitch_));
-  channel_format_desc_ = toCudaChannelFormatDesc(pixel_type);
+  channel_format_desc_ = toCudaChannelFormatDesc(pixel_type<Pixel>::type);
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageGpu<Pixel, pixel_type>::ImageGpu(const ImageGpu& from)
+template<typename Pixel>
+ImageGpu<Pixel>::ImageGpu(const ImageGpu& from)
   : ImageGpu(from.size())
 {
   this->copyFrom(from);
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageGpu<Pixel, pixel_type>::ImageGpu(const Image<Pixel, pixel_type>& from)
+template<typename Pixel>
+ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
   : ImageGpu(from.size())
 {
   this->copyFrom(from);
 }
 
 ////-----------------------------------------------------------------------------
-//template<typename Pixel, ze::PixelType pixel_type>
-//ImageGpu<Pixel, pixel_type>
+//template<typename Pixel>
+//ImageGpu<Pixel>
 //::ImageGpu(Pixel* data, std::uint32_t width, std::uint32_t height,
 //           size_t pitch, bool use_ext_data_pointer)
 //  : Base(width, height)
@@ -84,23 +84,23 @@ ImageGpu<Pixel, pixel_type>::ImageGpu(const Image<Pixel, pixel_type>& from)
 //}
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-ImageGpu<Pixel, pixel_type>::~ImageGpu()
+template<typename Pixel>
+ImageGpu<Pixel>::~ImageGpu()
 {
   //  delete gpu_data_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void ImageGpu<Pixel, pixel_type>::setRoi(const ze::Roi2u& roi)
+template<typename Pixel>
+void ImageGpu<Pixel>::setRoi(const ze::Roi2u& roi)
 {
   this->roi_ = roi;
   //  gpu_data_.roi = roi;
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void ImageGpu<Pixel, pixel_type>::copyTo(ze::Image<Pixel, pixel_type>& dst) const
+template<typename Pixel>
+void ImageGpu<Pixel>::copyTo(ze::Image<Pixel>& dst) const
 {
   if (this->size()!= dst.size())
   {
@@ -120,8 +120,8 @@ void ImageGpu<Pixel, pixel_type>::copyTo(ze::Image<Pixel, pixel_type>& dst) cons
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void ImageGpu<Pixel, pixel_type>::copyFrom(const Image<Pixel, pixel_type>& from)
+template<typename Pixel>
+void ImageGpu<Pixel>::copyFrom(const Image<Pixel>& from)
 {
   if (this->size()!= from.size())
   {
@@ -140,8 +140,8 @@ void ImageGpu<Pixel, pixel_type>::copyFrom(const Image<Pixel, pixel_type>& from)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-Pixel* ImageGpu<Pixel, pixel_type>::data(
+template<typename Pixel>
+Pixel* ImageGpu<Pixel>::data(
     std::uint32_t ox, std::uint32_t oy)
 {
   //  if (ox > this->width() || oy > this->height())
@@ -158,8 +158,8 @@ Pixel* ImageGpu<Pixel, pixel_type>::data(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-const Pixel* ImageGpu<Pixel, pixel_type>::data(
+template<typename Pixel>
+const Pixel* ImageGpu<Pixel>::data(
     std::uint32_t ox, std::uint32_t oy) const
 {
   if (ox != 0 || oy != 0)
@@ -172,22 +172,22 @@ const Pixel* ImageGpu<Pixel, pixel_type>::data(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-auto ImageGpu<Pixel, pixel_type>::cuData() -> decltype(ze::cu::toCudaVectorType(this->data()))
+template<typename Pixel>
+auto ImageGpu<Pixel>::cuData() -> decltype(ze::cu::toCudaVectorType(this->data()))
 {
   return ze::cu::toCudaVectorType(this->data());
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-auto ImageGpu<Pixel, pixel_type>::cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data()))
+template<typename Pixel>
+auto ImageGpu<Pixel>::cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data()))
 {
   return ze::cu::toConstCudaVectorType(this->data());
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-void ImageGpu<Pixel, pixel_type>::setValue(const Pixel& value)
+template<typename Pixel>
+void ImageGpu<Pixel>::setValue(const Pixel& value)
 {
   if (sizeof(Pixel) == 1)
   {
@@ -206,8 +206,8 @@ void ImageGpu<Pixel, pixel_type>::setValue(const Pixel& value)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
-std::shared_ptr<Texture2D> ImageGpu<Pixel, pixel_type>::genTexture(
+template<typename Pixel>
+std::shared_ptr<Texture2D> ImageGpu<Pixel>::genTexture(
     bool normalized_coords,
     cudaTextureFilterMode filter_mode,
     cudaTextureAddressMode address_mode,
@@ -220,9 +220,9 @@ std::shared_ptr<Texture2D> ImageGpu<Pixel, pixel_type>::genTexture(
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel, ze::PixelType pixel_type>
+template<typename Pixel>
 //template<typename T>
-ImageGpu<Pixel, pixel_type>& ImageGpu<Pixel, pixel_type>::operator*=(const Pixel& rhs)
+ImageGpu<Pixel>& ImageGpu<Pixel>::operator*=(const Pixel& rhs)
 {
   // fragmentation
   cu::Fragmentation<> frag(this->size());
@@ -238,26 +238,26 @@ ImageGpu<Pixel, pixel_type>& ImageGpu<Pixel, pixel_type>::operator*=(const Pixel
 //=============================================================================
 // Explicitely instantiate the desired classes
 // (sync with typedefs at the end of the hpp file)
-template class ImageGpu<ze::Pixel8uC1, ze::PixelType::i8uC1>;
-template class ImageGpu<ze::Pixel8uC2, ze::PixelType::i8uC2>;
+template class ImageGpu<ze::Pixel8uC1>;
+template class ImageGpu<ze::Pixel8uC2>;
 // be careful with 8uC3 images as pitch values are not divisable by 3!
-template class ImageGpu<ze::Pixel8uC3, ze::PixelType::i8uC3>;
-template class ImageGpu<ze::Pixel8uC4, ze::PixelType::i8uC4>;
+template class ImageGpu<ze::Pixel8uC3>;
+template class ImageGpu<ze::Pixel8uC4>;
 
-template class ImageGpu<ze::Pixel16uC1, ze::PixelType::i16uC1>;
-template class ImageGpu<ze::Pixel16uC2, ze::PixelType::i16uC2>;
-template class ImageGpu<ze::Pixel16uC3, ze::PixelType::i16uC3>;
-template class ImageGpu<ze::Pixel16uC4, ze::PixelType::i16uC4>;
+template class ImageGpu<ze::Pixel16uC1>;
+template class ImageGpu<ze::Pixel16uC2>;
+template class ImageGpu<ze::Pixel16uC3>;
+template class ImageGpu<ze::Pixel16uC4>;
 
-template class ImageGpu<ze::Pixel32sC1, ze::PixelType::i32sC1>;
-template class ImageGpu<ze::Pixel32sC2, ze::PixelType::i32sC2>;
-template class ImageGpu<ze::Pixel32sC3, ze::PixelType::i32sC3>;
-template class ImageGpu<ze::Pixel32sC4, ze::PixelType::i32sC4>;
+template class ImageGpu<ze::Pixel32sC1>;
+template class ImageGpu<ze::Pixel32sC2>;
+template class ImageGpu<ze::Pixel32sC3>;
+template class ImageGpu<ze::Pixel32sC4>;
 
-template class ImageGpu<ze::Pixel32fC1, ze::PixelType::i32fC1>;
-template class ImageGpu<ze::Pixel32fC2, ze::PixelType::i32fC2>;
-template class ImageGpu<ze::Pixel32fC3, ze::PixelType::i32fC3>;
-template class ImageGpu<ze::Pixel32fC4, ze::PixelType::i32fC4>;
+template class ImageGpu<ze::Pixel32fC1>;
+template class ImageGpu<ze::Pixel32fC2>;
+template class ImageGpu<ze::Pixel32fC3>;
+template class ImageGpu<ze::Pixel32fC4>;
 
 } // namespace cu
 } // namespace ze

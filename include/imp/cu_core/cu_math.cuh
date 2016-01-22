@@ -11,14 +11,14 @@ namespace cu {
  * @brief Finding min and max pixel value of given image
  * @note For multi-channel images, the seperate channels are not handeled individually.
  */
-template<typename Pixel, ze::PixelType pixel_type>
-void minMax(const ImageGpu<Pixel, pixel_type>& img, Pixel& min, Pixel& max);
+template<typename Pixel>
+void minMax(const ImageGpu<Pixel>& img, Pixel& min, Pixel& max);
 
 template<typename Pixel>
 void minMax(const Texture2D& img_tex, Pixel& min, Pixel& max, const ze::Roi2u& roi);
 
-//template<typename Pixel, imp::PixelType pixel_type>
-//void sum(const ImageGpu<Pixel, pixel_type>& img, double& sum);
+//template<typename Pixel>
+//void sum(const ImageGpu<Pixel>& img, double& sum);
 
 //template<typename Pixel>
 //void sum(const Texture2D& img_tex, double& sum, const imp::Roi2u& roi);
