@@ -43,7 +43,7 @@ ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(8,8);
 ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(9,9);
 
 // Typedef arbitary length vector.
-using Vector  = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
+using VectorX  = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
 
 // Commonly used fixed size vectors.
 using Vector1 = Eigen::Matrix<FloatType, 1, 1>;
@@ -67,6 +67,11 @@ using Keypoints = Eigen::Matrix<FloatType, 2, Eigen::Dynamic, Eigen::ColMajor>;
 using Bearings = Eigen::Matrix<FloatType, 3, Eigen::Dynamic, Eigen::ColMajor>;
 using Positions = Eigen::Matrix<FloatType, 3, Eigen::Dynamic, Eigen::ColMajor>;
 using Gradients = Eigen::Matrix<FloatType, 2, Eigen::Dynamic, Eigen::ColMajor>;
+
+//------------------------------------------------------------------------------
+// Inertial containers.
+using ImuStamps = VectorX;
+using ImuAccGyr = Eigen::Matrix<FloatType, 6, Eigen::Dynamic, Eigen::ColMajor>;
 
 
 
