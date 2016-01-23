@@ -17,6 +17,8 @@
   <depend>minkindr</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
+  <depend>imp_core</depend>
+  <depend>imp_bridge_opencv</depend>
   <depend>cv_bridge</depend>
   <depend>rosbag</depend>
   <depend>sensor_msgs</depend>

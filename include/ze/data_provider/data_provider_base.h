@@ -13,27 +13,27 @@ class Mat;
 }
 
 namespace ze {
-namespace data_provider {
 
 using ImuCallback =
-  std::function<void (int64_t /*stamp*/, const Eigen::Vector3d& /*acc*/, const Eigen::Vector3d& /*gyr*/)>;
-
+  std::function<void (int64_t /*stamp*/,
+                      const Vector3& /*acc*/,
+                      const Vector3& /*gyr*/)>;
 using CameraCallback =
-  std::function<void (int64_t /*stamp*/, const cv::Mat& /*img*/, size_t /*camera-idx*/)>;
+  std::function<void (int64_t /*stamp*/,
+                      const cv::Mat& /*img*/,
+                      size_t /*camera-idx*/)>;
 
-enum class Type {
+enum class DataProviderType {
   Csv,
   Rosbag
 };
-
-} // namespace data_provider
 
 class DataProviderBase
 {
 public:
   ZE_POINTER_TYPEDEFS(DataProviderBase);
 
-  DataProviderBase(data_provider::Type type);
+  DataProviderBase(DataProviderType type);
   virtual ~DataProviderBase() = default;
 
   //! Process all callbacks. Waits until callback is processed.
@@ -48,14 +48,14 @@ public:
   //! Stop data provider.
   virtual void shutdown();
 
-  void registerImuCallback(const data_provider::ImuCallback& imu_callback);
+  void registerImuCallback(const ImuCallback& imu_callback);
 
-  void registerCameraCallback(const data_provider::CameraCallback& camera_callback);
+  void registerCameraCallback(const CameraCallback& camera_callback);
 
 protected:
-  data_provider::Type type_;
-  data_provider::ImuCallback imu_callback_;
-  data_provider::CameraCallback camera_callback_;
+  DataProviderType type_;
+  ImuCallback imu_callback_;
+  CameraCallback camera_callback_;
   std::atomic_bool shutdown_;
 };
 

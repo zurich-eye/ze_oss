@@ -46,7 +46,7 @@ DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
     const std::string& imu_topic,
     const std::map<std::string, size_t>& camera_topics)
-  : DataProviderBase(data_provider::Type::Csv)
+  : DataProviderBase(DataProviderType::Csv)
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 

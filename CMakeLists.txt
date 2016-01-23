@@ -14,12 +14,14 @@ set(HEADERS
   include/ze/data_provider/data_provider_base.h
   include/ze/data_provider/data_provider_csv.h
   include/ze/data_provider/data_provider_rosbag.h
+  include/ze/data_provider/frame_imu_synchronizer.h
   )
 
 set(SOURCES
   src/data_provider_base.cpp
   src/data_provider_csv.cpp
   src/data_provider_rosbag.cpp
+  src/frame_imu_synchronizer.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
