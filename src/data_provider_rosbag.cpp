@@ -10,6 +10,7 @@
 #include <ze/common/time.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/path_utils.h>
+#include <imp/bridge/opencv/image_cv.hpp>
 
 namespace ze {
 
@@ -77,7 +78,8 @@ bool DataProviderRosbag::spinOnce()
         {
           LOG(FATAL) << "Could not read image: " << e.what();
         }
-        camera_callback_(m_img->header.stamp.toNSec(), img, it->second);
+        auto img_ptr = std::make_shared<ImageCv8uC1>(img);
+        camera_callback_(m_img->header.stamp.toNSec(), img_ptr, it->second);
       }
       else
       {

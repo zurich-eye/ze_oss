@@ -8,6 +8,7 @@
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
 #include <ze/data_provider/data_provider_base.h>
+#include <imp/core/image_base.hpp>
 
 // fwd
 namespace cv {
@@ -69,7 +70,7 @@ struct CameraMeasurement : public MeasurementBase
   {}
   virtual ~CameraMeasurement() = default;
 
-  void getImage(cv::Mat* image) const;
+  ImageBase::Ptr getImage() const;
 
   const size_t camera_index;
   const std::string image_path_filename;

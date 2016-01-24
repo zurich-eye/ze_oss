@@ -3,20 +3,23 @@
 #include <fstream>
 #include <iostream>
 #include <glog/logging.h>
-#include <opencv2/highgui/highgui.hpp>
 
 #include <ze/common/time.h>
 #include <ze/common/string_utils.h>
+#include <imp/bridge/opencv/cv_bridge.hpp>
 
 namespace ze {
 
 namespace dataset {
 
-void CameraMeasurement::getImage(cv::Mat* img) const
+ImageBase::Ptr CameraMeasurement::getImage() const
 {
-  CHECK_NOTNULL(img);
-  *img = cv::imread(image_path_filename, CV_LOAD_IMAGE_GRAYSCALE);
-  CHECK_NOTNULL(img->data);
+  ImageCv8uC1::Ptr img;
+  cvBridgeLoad<Pixel8uC1, PixelType::i8uC1>(
+        img, image_path_filename, PixelOrder::gray);
+  CHECK_NOTNULL(img.get());
+  CHECK(img->numel() > 0);
+  return img;
 }
 
 } // namespace dataset
@@ -82,9 +85,7 @@ bool DataProviderCsv::spinOnce()
           dataset::CameraMeasurement::ConstPtr cam_data =
               std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
 
-          cv::Mat img;
-          cam_data->getImage(&img);
-
+          ImageBase::Ptr img = cam_data->getImage();
           camera_callback_(cam_data->stamp_ns, img, cam_data->camera_index);
         }
         else

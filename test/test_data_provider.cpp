@@ -5,9 +5,12 @@
 #include <ze/common/test/utils.h>
 #include <ze/data_provider/data_provider_csv.h>
 #include <ze/data_provider/data_provider_rosbag.h>
+#include <imp/core/image_base.hpp>
 
 TEST(DataProviderTests, testCsv)
 {
+  using namespace ze;
+
   std::string data_dir = ze::getTestDataDir("csv_dataset");
   EXPECT_FALSE(data_dir.empty());
 
@@ -16,7 +19,7 @@ TEST(DataProviderTests, testCsv)
   size_t num_imu_measurements = 0;
   int64_t expect_imu_stamp = 1403636579758555392;
   dp.registerImuCallback(
-        [&](int64_t stamp, const Eigen::Vector3d& acc, const Eigen::Vector3d& gyr)
+        [&](int64_t stamp, const Vector3& /*acc*/, const Vector3& /*gyr*/)
   {
     ++num_imu_measurements;
     if(stamp == expect_imu_stamp)
@@ -28,7 +31,7 @@ TEST(DataProviderTests, testCsv)
   size_t num_cam_measurements = 0;
   int64_t expect_cam_stamp = 1403636579763555584;
   dp.registerCameraCallback(
-        [&](int64_t stamp, const cv::Mat& img, size_t cam_idx)
+        [&](int64_t stamp, const ImageBase::Ptr& /*img*/, uint32_t /*cam_idx*/)
   {
     ++num_cam_measurements;
     if(stamp == expect_cam_stamp)
@@ -47,23 +50,25 @@ TEST(DataProviderTests, testCsv)
 
 TEST(DataProviderTests, testRosbag)
 {
+  using namespace ze;
+
   std::string data_dir = ze::getTestDataDir("rosbag_euroc_snippet");
   std::string bag_filename = data_dir + "/dataset.bag";
-  ASSERT_TRUE(ze::fileExists(bag_filename));
+  ASSERT_TRUE(fileExists(bag_filename));
 
-  ze::DataProviderRosbag dp(bag_filename, "/imu0", { {"/cam0/image_raw", 0},
-                                                     {"/cam1/image_raw", 1} });
+  DataProviderRosbag dp(bag_filename, "/imu0", { {"/cam0/image_raw", 0},
+                                                 {"/cam1/image_raw", 1} });
 
   size_t num_imu_measurements = 0;
   dp.registerImuCallback(
-        [&](int64_t stamp, const Eigen::Vector3d& acc, const Eigen::Vector3d& gyr)
+        [&](int64_t /*stamp*/, const Vector3& /*acc*/, const Vector3& /*gyr*/)
   {
     ++num_imu_measurements;
   });
 
   size_t num_cam0_measurements = 0, num_cam1_measurements = 0;
   dp.registerCameraCallback(
-        [&](int64_t stamp, const cv::Mat& img, size_t cam_idx)
+        [&](int64_t /*stamp*/, const ImageBase::Ptr& /*img*/, uint32_t cam_idx)
   {
     if(cam_idx == 0)
     {
