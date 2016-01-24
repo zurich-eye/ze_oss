@@ -49,13 +49,16 @@ public:
   //! Get newest value in buffer.
   std::pair<Vector, bool> getNewestValue() const;
 
+  //! Get timestamps of newest and oldest entry.
+  std::tuple<int64_t, int64_t, bool> getOldestAndNewestStamp() const;
+
   /*! @brief Get Values between timestamps.
    *
    * If timestamps are not matched, the values
    * are interpolated. Returns a vector of timestamps and a block matrix with
    * values as columns. Returns empty matrices if not successful.
    */
-  std::pair<Eigen::Matrix<int64_t, 1, Eigen::Dynamic>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+  std::pair<VectorX, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
   getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to);
 
   inline void clear()

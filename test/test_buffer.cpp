@@ -103,25 +103,26 @@ TEST(BufferTest, testOldestNewestValue)
 
 TEST(BufferTest, testInterpolation)
 {
-  Eigen::Vector2d value;
-  ze::Buffer<double, 2> buffer;
+  using namespace ze;
+
+  Buffer<FloatType, 2> buffer;
 
   for(int i = 0; i < 10; ++i)
-    buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
+    buffer.insert(secToNanosec(i), Vector2(i, i));
 
-  Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
-  Eigen::Matrix<double, 2, Eigen::Dynamic> values;
+  VectorX stamps;
+  Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
-        ze::secToNanosec(1.2), ze::secToNanosec(5.4));
-  EXPECT_EQ(stamps(0), ze::secToNanosec(1.2));
-  EXPECT_EQ(stamps(stamps.cols()-1), ze::secToNanosec(5.4));
+        secToNanosec(1.2), secToNanosec(5.4));
+  EXPECT_EQ(stamps(0), secToNanosec(1.2));
+  EXPECT_EQ(stamps(stamps.cols()-1), secToNanosec(5.4));
   EXPECT_DOUBLE_EQ(values(0, 0), 1.2);
   EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 5.4);
 
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
-        ze::secToNanosec(0), ze::secToNanosec(9));
-  EXPECT_EQ(stamps(0), ze::secToNanosec(0));
-  EXPECT_EQ(stamps(stamps.cols()-1), ze::secToNanosec(9));
+        secToNanosec(0), secToNanosec(9));
+  EXPECT_EQ(stamps(0), secToNanosec(0));
+  EXPECT_EQ(stamps(stamps.cols()-1), secToNanosec(9));
   EXPECT_DOUBLE_EQ(values(0, 0), 0);
   EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 9);
 }

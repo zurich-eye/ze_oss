@@ -84,12 +84,23 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNewestValu
 }
 
 template <typename Scalar, int Dim>
-std::pair<Eigen::Matrix<int64_t, 1, Eigen::Dynamic>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+std::tuple<int64_t, int64_t, bool> Buffer<Scalar,Dim>::getOldestAndNewestStamp() const
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  if(buffer_.empty())
+  {
+    return std::make_tuple(-1, -1, false);
+  }
+  return std::make_tuple(buffer_.begin()->first, buffer_.rbegin()->first, true);
+}
+
+template <typename Scalar, int Dim>
+std::pair<VectorX, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
 Buffer<Scalar,Dim>::getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to)
 {
   CHECK_GE(stamp_from, 0);
   CHECK_LT(stamp_from, stamp_to);
-  Eigen::Matrix<int64_t, 1, Eigen::Dynamic> stamps;
+  VectorX stamps;
   Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> values;
 
   std::lock_guard<std::mutex> lock(mutex_);
@@ -137,7 +148,7 @@ Buffer<Scalar,Dim>::getBetweenValuesInterpolated(int64_t stamp_from, int64_t sta
   n += 2;
 
   // Interpolate values at start and end and copy in output vector.
-  stamps.resize(1, n);
+  stamps.resize(n);
   values.resize(kDim, n);
   for(size_t i = 0; i < n; ++i)
   {
