@@ -3,10 +3,12 @@
 #include <ze/common/types.h>
 #include <ze/common/buffer.h>
 #include <ze/common/time.h>
-#include <ze/data_provider/data_provider_base.h>
 #include <imp/core/image_base.hpp>
 
 namespace ze {
+
+// fwd
+class DataProviderBase;
 
 using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
 using StampedImages = std::vector<StampedImage>;
@@ -15,11 +17,11 @@ using SynchronizedCameraImuCallback =
                       const ImuStamps& /*imu_timestamps*/,
                       const ImuAccGyr& /*imu_measurements*/)>;
 
-class FrameImuSynchronizer
+class CameraImuSynchronizer
 {
 public:
-  FrameImuSynchronizer(uint32_t num_frames,
-                       FloatType imu_buffer_length_seconds);
+  CameraImuSynchronizer(uint32_t num_frames,
+                        FloatType imu_buffer_length_seconds);
 
 
   //! Add Image to the frame synchronizer.
@@ -29,7 +31,7 @@ public:
   void addImuData(int64_t stamp, const Vector3& acc, const Vector3& gyr);
 
   //! Register callbacks in data provider to this class' addImgData and addImuData.
-  void subscribeDataProvider(const DataProviderBase::Ptr& data_provider);
+  void subscribeDataProvider(DataProviderBase& data_provider);
 
   //! When we have received all camera and IMU measurements since the last frame
   //! the callback that is registered here will be called.

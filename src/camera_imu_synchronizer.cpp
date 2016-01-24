@@ -1,4 +1,5 @@
-#include <ze/data_provider/frame_imu_synchronizer.h>
+#include <ze/data_provider/camera_imu_synchronizer.h>
+#include <ze/data_provider/data_provider_base.h>
 
 #include <functional>
 
@@ -6,18 +7,18 @@
 
 namespace ze {
 
-FrameImuSynchronizer::FrameImuSynchronizer(
+CameraImuSynchronizer::CameraImuSynchronizer(
     uint32_t num_frames, FloatType imu_buffer_length_seconds)
   : camera_rig_size_(num_frames)
   , img_buffer_(num_frames, std::make_pair(-1, nullptr))
   , imu_buffer_(imu_buffer_length_seconds)
 {}
 
-void FrameImuSynchronizer::addImgData(
+void CameraImuSynchronizer::addImgData(
     int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx)
 {
   CHECK_LT(camera_idx, camera_rig_size_);
-  if(img_buffer_.at(camera_idx).first == -1)
+  if(img_buffer_.at(camera_idx).first != -1)
   {
     LOG(WARNING) << "Received new camera image before the previous set was complete."
                  << " Unordered camera images are arriving!";
@@ -26,7 +27,7 @@ void FrameImuSynchronizer::addImgData(
   checkDataAndCallback();
 }
 
-void FrameImuSynchronizer::addImuData(
+void CameraImuSynchronizer::addImuData(
     int64_t stamp, const Vector3& acc, const Vector3& gyr)
 {
   Vector6 acc_gyr;
@@ -36,23 +37,23 @@ void FrameImuSynchronizer::addImuData(
   checkDataAndCallback();
 }
 
-void FrameImuSynchronizer::subscribeDataProvider(
-    const DataProviderBase::Ptr& data_provider)
+void CameraImuSynchronizer::subscribeDataProvider(
+    DataProviderBase& data_provider)
 {
   using namespace std::placeholders;
-  data_provider->registerCameraCallback(
-        std::bind(&FrameImuSynchronizer::addImgData, this, _1, _2, _3));
-  data_provider->registerImuCallback(
-        std::bind(&FrameImuSynchronizer::addImuData, this, _1, _2, _3));
+  data_provider.registerCameraCallback(
+        std::bind(&CameraImuSynchronizer::addImgData, this, _1, _2, _3));
+  data_provider.registerImuCallback(
+        std::bind(&CameraImuSynchronizer::addImuData, this, _1, _2, _3));
 }
 
-void FrameImuSynchronizer::registerCameraImuCallback(
+void CameraImuSynchronizer::registerCameraImuCallback(
     const SynchronizedCameraImuCallback& callback)
 {
   cam_imu_callback_ = callback;
 }
 
-void FrameImuSynchronizer::checkDataAndCallback()
+void CameraImuSynchronizer::checkDataAndCallback()
 {
   // Check if we have received all images from the cameras:
   int64_t max_stamp = std::numeric_limits<int64_t>::min();
@@ -123,7 +124,7 @@ void FrameImuSynchronizer::checkDataAndCallback()
   resetImgBuffer();
 }
 
-void FrameImuSynchronizer::resetImgBuffer()
+void CameraImuSynchronizer::resetImgBuffer()
 {
   for(StampedImage& it : img_buffer_)
   {

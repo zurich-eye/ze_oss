@@ -11,10 +11,10 @@ TEST(DataProviderTests, testCsv)
 {
   using namespace ze;
 
-  std::string data_dir = ze::getTestDataDir("csv_dataset");
+  std::string data_dir = getTestDataDir("csv_dataset");
   EXPECT_FALSE(data_dir.empty());
 
-  ze::DataProviderCsv dp(data_dir+"/data", "imu0", { {"cam0", 0} });
+  DataProviderCsv dp(data_dir+"/data", "imu0", { {"cam0", 0} });
 
   size_t num_imu_measurements = 0;
   int64_t expect_imu_stamp = 1403636579758555392;
@@ -52,7 +52,7 @@ TEST(DataProviderTests, testRosbag)
 {
   using namespace ze;
 
-  std::string data_dir = ze::getTestDataDir("rosbag_euroc_snippet");
+  std::string data_dir = getTestDataDir("rosbag_euroc_snippet");
   std::string bag_filename = data_dir + "/dataset.bag";
   ASSERT_TRUE(fileExists(bag_filename));
 
