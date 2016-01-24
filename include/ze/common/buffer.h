@@ -25,17 +25,17 @@ public:
 
   Buffer() = default;
   Buffer(FloatType buffer_size_seconds)
-    : buffer_size_seconds_(buffer_size_seconds)
+    : buffer_size_nanosec_(secToNanosec(buffer_size_seconds))
   {}
 
   inline void insert(int64_t stamp, const Vector& data)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     buffer_[stamp] = data;
-    if(buffer_size_seconds_ > 0.0)
+    if(buffer_size_nanosec_ > 0)
     {
       removeDataBeforeTimestamp_impl(
-            buffer_.rbegin()->first - secToNanosec(buffer_size_seconds_));
+            buffer_.rbegin()->first - buffer_size_nanosec_);
 
     }
   }
@@ -115,7 +115,7 @@ public:
 protected:
   mutable std::mutex mutex_;
   VectorBuffer buffer_;
-  FloatType buffer_size_seconds_ = - 1.0; // Negative means, no fixed size.
+  int64_t buffer_size_nanosec_ = -1; // Negative means, no fixed size.
 
   inline void removeDataBeforeTimestamp_impl(int64_t stamp)
   {
