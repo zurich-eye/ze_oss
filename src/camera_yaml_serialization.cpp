@@ -1,6 +1,7 @@
 #include <ze/cameras/camera_yaml_serialization.h>
 #include <ze/cameras/camera_impl.h>
 #include <ze/common/yaml_serialization.h>
+#include <ze/common/types.h>
 
 namespace YAML {
 
@@ -36,7 +37,7 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(const Node& node, ze::Camera::
       {
         VLOG(1) << "load pinhole camera without distortion";
         camera = std::make_shared<ze::PinholeCamera>(
-              width, height, ze::CameraType::Pinhole, intrinsics);
+              width, height, ze::CameraType::Pinhole, intrinsics, ze::Vector());
       }
       else if(camera_type == "pinhole" && distortion_type == "radial-tangential")
       {

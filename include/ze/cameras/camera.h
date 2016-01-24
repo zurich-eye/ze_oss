@@ -6,6 +6,7 @@
 #include <Eigen/Core>
 
 #include <ze/common/macros.h> 
+#include <ze/common/types.h>
 
 namespace ze {
 
@@ -20,19 +21,11 @@ class Camera
 {
 public:
   ZE_POINTER_TYPEDEFS(Camera);
-  using Scalar = double;
-  using Bearing  = Eigen::Matrix<Scalar, 3, 1>;
-  using Position  = Eigen::Matrix<Scalar, 3, 1>;
-  using Keypoint  = Eigen::Matrix<Scalar, 2, 1>;
-  using Bearings  = Eigen::Matrix<Scalar, 3, Eigen::Dynamic>;
-  using Positions  = Eigen::Matrix<Scalar, 3, Eigen::Dynamic>;
-  using Keypoints  = Eigen::Matrix<Scalar, 2, Eigen::Dynamic>;
-  using Matrix23 = Eigen::Matrix<Scalar, 2, 3>;
 
 public:
 
   Camera(const int width, const int height, const CameraType type,
-         const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params);
+         const Vector& projection_params, const Vector& distortion_params);
 
   virtual ~Camera() = default;
 
@@ -58,7 +51,7 @@ public:
   virtual Keypoints projectVectorized(const Bearings& bearing_vec) const;
 
   //! Vectorized computation of projection Jacobian. Column-wise reshaped.
-  virtual Eigen::Matrix<Scalar, 6, Eigen::Dynamic>
+  virtual Eigen::Matrix<FloatType, 6, Eigen::Dynamic>
   dProject_dLandmarkVectorized(const Positions& pos_vec) const;
   //!@}
 
@@ -81,7 +74,7 @@ public:
   inline const std::string& label() const { return label_; }
 
   //! Camera parameters
-  inline const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params() const { return params_; }
+  inline const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& params() const { return projection_params_; }
 
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
@@ -91,34 +84,41 @@ public:
   bool isVisible(const Eigen::MatrixBase<DerivedKeyPoint>& px) const
   {
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(DerivedKeyPoint, 2, 1);
-    typedef typename DerivedKeyPoint::Scalar DerivedScalar;
-    return px[0] >= static_cast<DerivedScalar>(0.0)
-        && px[1] >= static_cast<DerivedScalar>(0.0)
-        && px[0] <  static_cast<DerivedScalar>(width_)
-        && px[1] <  static_cast<DerivedScalar>(height_);
+    typedef typename DerivedKeyPoint::FloatType DerivedFloatType;
+    return px[0] >= static_cast<DerivedFloatType>(0.0)
+        && px[1] >= static_cast<DerivedFloatType>(0.0)
+        && px[0] <  static_cast<DerivedFloatType>(width_)
+        && px[1] <  static_cast<DerivedFloatType>(height_);
   }
 
   //! Return if pixel u is within image boundaries with margin.
   template<typename DerivedKeyPoint>
   bool isVisibleWithMargin(
       const Eigen::MatrixBase<DerivedKeyPoint>& px,
-      typename DerivedKeyPoint::Scalar margin) const
+      typename DerivedKeyPoint::FloatType margin) const
   {
-    typedef typename DerivedKeyPoint::Scalar DerivedScalar;
+    typedef typename DerivedKeyPoint::FloatType DerivedFloatType;
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(DerivedKeyPoint, 2, 1);
-    CHECK_LT(2 * margin, static_cast<DerivedScalar>(width_));
-    CHECK_LT(2 * margin, static_cast<DerivedScalar>(height_));
+    CHECK_LT(2 * margin, static_cast<DerivedFloatType>(width_));
+    CHECK_LT(2 * margin, static_cast<DerivedFloatType>(height_));
     return px[0] >= margin
         && px[1] >= margin
-        && px[0] < (static_cast<DerivedScalar>(width_) - margin)
-        && px[1] < (static_cast<DerivedScalar>(height_) - margin);
+        && px[0] < (static_cast<DerivedFloatType>(width_) - margin)
+        && px[1] < (static_cast<DerivedFloatType>(height_) - margin);
   }
 
 protected:
 
   int width_;
   int height_;
-  Eigen::Matrix<Scalar, Eigen::Dynamic, 1> params_; // Camera parameters (fx, fy, cx, cy, distortion params...)
+
+  //! Camera projection parameters, e.g., (fx, fy, cx, cy).
+  Vector projection_params_;
+
+  //! Camera distortion parameters, e.g., (k1, k2, r1, r2).
+  Vector distortion_params_;
+
+  //! Camera distortion parameters
   std::string label_;
   CameraType type_;
 };

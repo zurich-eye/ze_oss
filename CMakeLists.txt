@@ -22,6 +22,7 @@ set(SOURCES
   src/camera.cpp
   src/camera_utils.cpp
   src/camera_yaml_serialization.cpp
+  src/camera_impl.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

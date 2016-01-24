@@ -3,38 +3,34 @@
 #include <cmath>
 
 namespace ze {
-namespace internal {
 
 // Pure static camera projection and distortion models, intended to be used in
 // both GPU and CPU code. Parameter checking should be performed in interface
 // classes.
 
 // Pinhole projection model.
-struct PinholeProjection
+struct PinholeGeometry
 {
   template <typename T>
-  static void project(const T* bearing, const T* params, T* px)
+  static void project(const T* params, T* px)
   {
     const T fx = params[0];
     const T fy = params[1];
     const T cx = params[2];
     const T cy = params[3];
-    const T u = bearing[0] / bearing[2];
-    const T v = bearing[1] / bearing[2];
-    px[0] = u * fx + cx;
-    px[1] = v * fy + cy;
+    px[0] = px[0] * fx + cx;
+    px[1] = px[1] * fy + cy;
   }
 
   template <typename T>
-  static void backProject(const T* px, const T* params, T* bearing)
+  static void backProject(const T* params, T* px)
   {
     const T fx = params[0];
     const T fy = params[1];
     const T cx = params[2];
     const T cy = params[3];
-    bearing[0] = (px[0] - cx) / fx;
-    bearing[1] = (px[1] - cy) / fy;
-    bearing[2] = 1.0;
+    px[0] = (px[0] - cx) / fx;
+    px[1] = (px[1] - cy) / fy;
   }
 
   template <typename T>
@@ -53,10 +49,50 @@ struct PinholeProjection
   }
 };
 
+
+// -----------------------------------------------------------------------------
+
+enum class DistortionType
+{
+  No,
+  Fov,
+  RadTan,
+  Equidistant,
+};
+
+// Dummy distortion.
+struct NoDistortion
+{
+  static constexpr DistortionType type = DistortionType::No;
+
+  template <typename T>
+  static void distort(const T* params, T* px)
+  {}
+
+  template <typename T>
+  static void undistort(const T* params, T* px)
+  {}
+
+  template <typename T>
+  static void dDistort_dPx(const T* params, const T* /*px_unitplane*/, T* jac_colmajor)
+  {
+    T& J_00 = jac_colmajor[0];
+    T& J_10 = jac_colmajor[1];
+    T& J_01 = jac_colmajor[2];
+    T& J_11 = jac_colmajor[3];
+    J_00 = 1.0;
+    J_01 = 0.0;
+    J_10 = 0.0;
+    J_11 = 1.0;
+  }
+};
+
 // This class implements the FOV distortion model of Deverneay and Faugeras,
 // Straight lines have to be straight, 2001. In PTAM this model is called ATAN.
 struct FovDistortion
 {
+  static constexpr DistortionType type = DistortionType::Fov;
+
   template <typename T>
   static void distort(const T* params, T* px)
   {
@@ -83,6 +119,8 @@ struct FovDistortion
 // docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
 struct RadialTangentialDistortion
 {
+  static constexpr DistortionType type = DistortionType::RadTan;
+
   template <typename T>
   static void distort(const T* params, T* px)
   {
@@ -97,6 +135,31 @@ struct RadialTangentialDistortion
     const T cdist = (k1 + k2 * r2) * r2;
     px[0] += px[0] * cdist + p1 * xy2 + p2 * (r2 + 2.0 * xx);
     px[1] += px[1] * cdist + p2 * xy2 + p1 * (r2 + 2.0 * yy);
+  }
+
+  template <typename T>
+  static void dDistort_dPx(const T* params, const T* px_unitplane, T* jac_colmajor)
+  {
+    const T k1 = params[0];
+    const T k2 = params[1];
+    const T p1 = params[2];
+    const T p2 = params[3];
+    const T x = px_unitplane[0];
+    const T y = px_unitplane[1];
+    const T xx = x * x;
+    const T yy = y * y;
+    const T xy = x * y;
+    const T r2 = xx + yy;
+    const T k2_r2_x4 = k2 * r2 * 4.0;
+    const T cdist_p1 = (k1 + k2 * r2) * r2 + 1.0;
+    T& J_00 = jac_colmajor[0];
+    T& J_10 = jac_colmajor[1];
+    T& J_01 = jac_colmajor[2];
+    T& J_11 = jac_colmajor[3];
+    J_00 = cdist_p1 + k1 * 2.0 * xx + k2_r2_x4 * xx + 2.0 * p1 * y + 6.0 * p2 * x;
+    J_11 = cdist_p1 + k1 * 2.0 * yy + k2_r2_x4 * yy + 2.0 * p2 * x + 6.0 * p1 * y;
+    J_10 = 2.0 * k1 * xy + k2_r2_x4 * xy + 2.0 * p1 * x + 2.0 * p2 * y;
+    J_01 = J_10;
   }
 
   template <typename T>
@@ -127,6 +190,8 @@ struct RadialTangentialDistortion
 // and Fish-Eye Lenses" by Juho Kannala and Sami S. Brandt, PAMI.
 struct EquidistantDistortion
 {
+  static constexpr DistortionType type = DistortionType::Equidistant;
+
   template <typename T>
   static void distort(const T* params, T* px)
   {
@@ -169,5 +234,4 @@ struct EquidistantDistortion
   }
 };
 
-} // namespace internal
 } // namespace ze

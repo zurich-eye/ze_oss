@@ -13,7 +13,7 @@
 
 TEST(CameraPinholeTest, testProjectionJacobian)
 {
-  ze::PinholeCamera cam(752, 480, 310, 320, 376.0, 240.0);
+  ze::PinholeCamera cam = ze::createPinholeCamera(752, 480, 310, 320, 376.0, 240.0);
   Eigen::Vector3d bearing = cam.backProject(Eigen::Vector2d(200, 300));
   Eigen::Vector2d px = cam.project(bearing);
   ASSERT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(px, Eigen::Vector2d(200, 300)));

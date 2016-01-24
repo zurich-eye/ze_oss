@@ -6,14 +6,15 @@
 namespace ze {
 
 Camera::Camera(const int width, const int height, const CameraType type,
-               const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& params)
+               const Vector& projection_params, const Vector& distortion_params)
   : width_(width)
   , height_(height)
-  , params_(params)
+  , projection_params_(projection_params)
+  , distortion_params_(distortion_params)
   , type_(type)
 {}
 
-Camera::Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
+Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
 {
   Bearings bearings(3, px_vec.cols());
   for(int i = 0; i < px_vec.cols(); ++i)
@@ -23,7 +24,7 @@ Camera::Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
   return bearings;
 }
 
-Camera::Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
+Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
 {
   Keypoints px_vec(2, bearing_vec.cols());
   for(int i = 0; i < bearing_vec.cols(); ++i)
@@ -33,16 +34,17 @@ Camera::Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
   return px_vec;
 }
 
-Eigen::Matrix<Camera::Scalar, 6, Eigen::Dynamic>
+Eigen::Matrix<FloatType, 6, Eigen::Dynamic>
 Camera::dProject_dLandmarkVectorized(const Positions& pos_vec) const
 {
-  Eigen::Matrix<Scalar, 6, Eigen::Dynamic> H_vec(6, pos_vec.cols());
+  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> J_vec(6, pos_vec.cols());
   for(int i = 0; i < pos_vec.cols(); ++i)
   {
-    H_vec.col(i) =
-        Eigen::Map<Eigen::Matrix<Scalar, 6, 1>>(this->dProject_dLandmark(pos_vec.col(i)).data());
+    J_vec.col(i) =
+        Eigen::Map<Eigen::Matrix<FloatType, 6, 1>>(
+                this->dProject_dLandmark(pos_vec.col(i)).data());
   }
-  return H_vec;
+  return J_vec;
 }
 
 Camera::Ptr Camera::loadFromYaml(const std::string& path)
@@ -66,7 +68,7 @@ void Camera::print(std::ostream& out, const std::string& s) const
       << "  Label = " << label_ << "\n"
       << "  Model = " << typeString() << "\n"
       << "  Dimensions = " << width_ << "x" << height_ << "\n"
-      << "  Parameters = " << params_.transpose() << std::endl;
+      << "  Parameters = " << projection_params_.transpose() << std::endl;
 }
 
 std::string Camera::typeString() const
