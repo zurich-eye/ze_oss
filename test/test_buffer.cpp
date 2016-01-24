@@ -110,7 +110,7 @@ TEST(BufferTest, testInterpolation)
   for(int i = 0; i < 10; ++i)
     buffer.insert(secToNanosec(i), Vector2(i, i));
 
-  VectorX stamps;
+  Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
   Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(1.2), secToNanosec(5.4));

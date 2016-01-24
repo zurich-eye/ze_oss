@@ -70,7 +70,7 @@ using Gradients = Eigen::Matrix<FloatType, 2, Eigen::Dynamic, Eigen::ColMajor>;
 
 //------------------------------------------------------------------------------
 // Inertial containers.
-using ImuStamps = VectorX;
+using ImuStamps = Eigen::Matrix<int64_t, Eigen::Dynamic, 1>;
 using ImuAccGyr = Eigen::Matrix<FloatType, 6, Eigen::Dynamic, Eigen::ColMajor>;
 
 

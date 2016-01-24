@@ -95,12 +95,12 @@ std::tuple<int64_t, int64_t, bool> Buffer<Scalar,Dim>::getOldestAndNewestStamp()
 }
 
 template <typename Scalar, int Dim>
-std::pair<VectorX, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+std::pair<Eigen::Matrix<int64_t, Eigen::Dynamic, 1>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
 Buffer<Scalar,Dim>::getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to)
 {
   CHECK_GE(stamp_from, 0);
   CHECK_LT(stamp_from, stamp_to);
-  VectorX stamps;
+  Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
   Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> values;
 
   std::lock_guard<std::mutex> lock(mutex_);

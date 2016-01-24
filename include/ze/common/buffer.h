@@ -58,7 +58,7 @@ public:
    * are interpolated. Returns a vector of timestamps and a block matrix with
    * values as columns. Returns empty matrices if not successful.
    */
-  std::pair<VectorX, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
+  std::pair<Eigen::Matrix<int64_t, Eigen::Dynamic, 1>, Eigen::Matrix<Scalar, Dim, Eigen::Dynamic> >
   getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to);
 
   inline void clear()
