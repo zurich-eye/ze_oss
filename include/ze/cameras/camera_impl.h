@@ -60,6 +60,7 @@ public:
 // Convenience typedefs.
 // (sync with explicit template class instantiations at the end of the cpp file)
 typedef PinholeProjection<NoDistortion> PinholeCamera;
+typedef PinholeProjection<FovDistortion> FovCamera;
 typedef PinholeProjection<RadialTangentialDistortion> RadTanCamera;
 
 //-----------------------------------------------------------------------------
@@ -70,6 +71,15 @@ inline PinholeCamera createPinholeCamera(
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
                        (Vector4() << fx, fy, cx, cy).finished(), Vector());
+}
+
+inline FovCamera createFovCamera(
+    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
+    FloatType s)
+{
+  return FovCamera(width, height, CameraType::PinholeFov,
+                   (Vector4() << fx, fy, cx, cy).finished(),
+                   (Vector1() << s).finished());
 }
 
 inline RadTanCamera createRadTanCamera(

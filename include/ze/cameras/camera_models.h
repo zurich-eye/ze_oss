@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cmath>
 
 namespace ze {
@@ -98,7 +99,7 @@ struct FovDistortion
   {
     const T s = params[0];
     const T rad = std::sqrt(px[0] * px[0] + px[1] * px[1]);
-    const T factor = (rad < 0.001) ? 1.0 : std::atan(rad * 2.0 * std::tan(s / 2.0)) / s;
+    const T factor = (rad < 0.001) ? 1.0 : std::atan(rad * 2.0 * std::tan(s / 2.0)) / (s * rad);
     px[0] *= factor;
     px[1] *= factor;
   }
@@ -111,6 +112,47 @@ struct FovDistortion
     const T factor = (rad < 0.001) ? 1.0 : (std::tan(rad * s) / (2.0 * std::tan(s / 2.0))) / rad;
     px[0] *= factor;
     px[1] *= factor;
+  }
+
+  template <typename T>
+  static void dDistort_dPx(const T* params, const T* px_unitplane, T* jac_colmajor)
+  {
+    const T x = px_unitplane[0];
+    const T y = px_unitplane[1];
+    const T s = params[0];
+    const T xx = x * x;
+    const T yy = y * y;
+    const T rad_sq = xx + yy;
+    T& J_00 = jac_colmajor[0];
+    T& J_10 = jac_colmajor[1];
+    T& J_01 = jac_colmajor[2];
+    T& J_11 = jac_colmajor[3];
+    if(s * s < 1e-5)
+    {
+      // Distortion parameter very small.
+      J_00 = 1.0; J_01 = 0.0;
+      J_10 = 0.0; J_11 = 1.0;
+    }
+    else if(rad_sq < 1e-5) // Projection very close to image center
+    {
+      J_00 = 2.0 * std::tan(s / 2.0) / s;
+      J_11 = J_00;
+      J_01 = 0.0;
+      J_10 = 0.0;
+    }
+    else // Standard case
+    {
+      const T xy = x * y;
+      const T rad = std::sqrt(rad_sq);
+      const T tan_s_half = std::tan(s / 2.0);
+      const T nominator = std::atan(2.0 * tan_s_half * rad);
+      const T offset = nominator / (s * rad);
+      const T scale = 2.0 * tan_s_half / (s * (xx + yy) * (4 * tan_s_half * tan_s_half * (xx + yy) + 1)) - nominator / (s * rad * rad_sq);
+      J_00 = xx * scale + offset;
+      J_11 = yy * scale + offset;
+      J_01 = xy * scale;
+      J_10 = J_01;
+    }   
   }
 };
 
@@ -138,6 +180,28 @@ struct RadialTangentialDistortion
   }
 
   template <typename T>
+  static void undistort(const T* params, T* px)
+  {
+    const T k1 = params[0];
+    const T k2 = params[1];
+    const T p1 = params[2];
+    const T p2 = params[3];
+    T x0 = px[0], y0 = px[1];
+    for(int i = 0; i < 5; ++i)
+    {
+      const T xx = px[0] * px[0];
+      const T yy = px[1] * px[1];
+      const T xy2 = 2.0 * px[0] * px[1];
+      const T r2 = xx + yy;
+      const T icdist = 1.0 / (1.0 + (k1 + k2 * r2) * r2);
+      const T dx = p1 * xy2 + p2 * (r2 + 2.0 * xx);
+      const T dy = p2 * xy2 + p1 * (r2 + 2.0 * yy);
+      px[0] = (x0 - dx) * icdist;
+      px[1] = (y0 - dy) * icdist;
+    }
+  }
+
+  template <typename T>
   static void dDistort_dPx(const T* params, const T* px_unitplane, T* jac_colmajor)
   {
     const T k1 = params[0];
@@ -160,28 +224,6 @@ struct RadialTangentialDistortion
     J_11 = cdist_p1 + k1 * 2.0 * yy + k2_r2_x4 * yy + 2.0 * p2 * x + 6.0 * p1 * y;
     J_10 = 2.0 * k1 * xy + k2_r2_x4 * xy + 2.0 * p1 * x + 2.0 * p2 * y;
     J_01 = J_10;
-  }
-
-  template <typename T>
-  static void undistort(const T* params, T* px)
-  {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-    T x0 = px[0], y0 = px[1];
-    for(int i = 0; i < 5; ++i)
-    {
-      const T xx = px[0] * px[0];
-      const T yy = px[1] * px[1];
-      const T xy2 = 2.0 * px[0] * px[1];
-      const T r2 = xx + yy;
-      const T icdist = 1.0 / (1.0 + (k1 + k2 * r2) * r2);
-      const T dx = p1 * xy2 + p2 * (r2 + 2.0 * xx);
-      const T dy = p2 * xy2 + p1 * (r2 + 2.0 * yy);
-      px[0] = (x0 - dx) * icdist;
-      px[1] = (y0 - dy) * icdist;
-    }
   }
 };
 
