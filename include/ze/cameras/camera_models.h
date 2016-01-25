@@ -312,7 +312,7 @@ struct EquidistantDistortion
       T atan_rad_sq = atan_rad * atan_rad;
       T atan_rad_cubic = atan_rad_sq * atan_rad_sq;
 
-      T t1 = 1.0 / ((xx + yy) + 1.0);
+      T t1 = 1.0 / (xx + yy + 1.0);
       T t2 = k1 * atan_rad_sq
            + k2 * atan_rad_cubic
            + k3 * atan_rad_cubic * atan_rad_sq

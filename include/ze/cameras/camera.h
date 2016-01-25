@@ -84,27 +84,27 @@ public:
   bool isVisible(const Eigen::MatrixBase<DerivedKeyPoint>& px) const
   {
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(DerivedKeyPoint, 2, 1);
-    typedef typename DerivedKeyPoint::FloatType DerivedFloatType;
-    return px[0] >= static_cast<DerivedFloatType>(0.0)
-        && px[1] >= static_cast<DerivedFloatType>(0.0)
-        && px[0] <  static_cast<DerivedFloatType>(width_)
-        && px[1] <  static_cast<DerivedFloatType>(height_);
+    typedef typename DerivedKeyPoint::Scalar DerivedScalar;
+    return px[0] >= static_cast<DerivedScalar>(0.0)
+        && px[1] >= static_cast<DerivedScalar>(0.0)
+        && px[0] <  static_cast<DerivedScalar>(width_)
+        && px[1] <  static_cast<DerivedScalar>(height_);
   }
 
   //! Return if pixel u is within image boundaries with margin.
   template<typename DerivedKeyPoint>
   bool isVisibleWithMargin(
       const Eigen::MatrixBase<DerivedKeyPoint>& px,
-      typename DerivedKeyPoint::FloatType margin) const
+      typename DerivedKeyPoint::Scalar margin) const
   {
-    typedef typename DerivedKeyPoint::FloatType DerivedFloatType;
+    typedef typename DerivedKeyPoint::Scalar DerivedScalar;
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(DerivedKeyPoint, 2, 1);
-    CHECK_LT(2 * margin, static_cast<DerivedFloatType>(width_));
-    CHECK_LT(2 * margin, static_cast<DerivedFloatType>(height_));
+    CHECK_LT(2 * margin, static_cast<DerivedScalar>(width_));
+    CHECK_LT(2 * margin, static_cast<DerivedScalar>(height_));
     return px[0] >= margin
         && px[1] >= margin
-        && px[0] < (static_cast<DerivedFloatType>(width_) - margin)
-        && px[1] < (static_cast<DerivedFloatType>(height_) - margin);
+        && px[0] < (static_cast<DerivedScalar>(width_) - margin)
+        && px[1] < (static_cast<DerivedScalar>(height_) - margin);
   }
 
 protected:
