@@ -70,17 +70,47 @@ TEST(CameraImplTests, testEquidistantJacobian)
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 
-TEST(CameraImplTests, testYamlParsing)
+TEST(CameraImplTests, testYamlParsingPinhole)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
   ASSERT_TRUE(ze::fileExists(yaml_file));
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
   cam->print(std::cout);
-  EXPECT_DOUBLE_EQ(cam->params()(0), 320.0);
-  EXPECT_DOUBLE_EQ(cam->params()(1), 310.0);
-  EXPECT_DOUBLE_EQ(cam->params()(2), 376.5);
-  EXPECT_DOUBLE_EQ(cam->params()(3), 240.5);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(1), 310.0);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(2), 376.5);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(3), 240.5);
+}
+
+TEST(CameraImplTests, testYamlParsingFoV)
+{
+  std::string data_dir = ze::getTestDataDir("camera_models");
+  std::string yaml_file = data_dir + "/camera_pinhole_fov.yaml";
+  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  cam->print(std::cout);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), 0.940454);
+}
+
+TEST(CameraImplTests, testYamlParsingRadTan)
+{
+  std::string data_dir = ze::getTestDataDir("camera_models");
+  std::string yaml_file = data_dir + "/camera_pinhole_radtan.yaml";
+  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  cam->print(std::cout);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.28340811217029355);
+}
+
+TEST(CameraImplTests, testYamlParsingEquidistant)
+{
+  std::string data_dir = ze::getTestDataDir("camera_models");
+  std::string yaml_file = data_dir + "/camera_pinhole_equidistant.yaml";
+  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  cam->print(std::cout);
+  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.0027973061697674074);
 }
 
 TEST(CameraImplTests, testVectorized)

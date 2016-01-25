@@ -68,7 +68,8 @@ void Camera::print(std::ostream& out, const std::string& s) const
       << "  Label = " << label_ << "\n"
       << "  Model = " << typeString() << "\n"
       << "  Dimensions = " << width_ << "x" << height_ << "\n"
-      << "  Parameters = " << projection_params_.transpose() << std::endl;
+      << "  Proj. parameters = " << projection_params_.transpose() << "\n"
+      << "  Dist. parameters = " << distortion_params_.transpose() << std::endl;
 }
 
 std::string Camera::typeString() const

@@ -73,8 +73,11 @@ public:
   //! Name of the camera.
   inline const std::string& label() const { return label_; }
 
-  //! Camera parameters
-  inline const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& params() const { return projection_params_; }
+  //! Camera projection parameters.
+  inline const Vector& projectionParameters() const { return projection_params_; }
+
+  //! Camera distortion parameters.
+  inline const Vector& distortionParameters() const { return distortion_params_; }
 
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }

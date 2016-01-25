@@ -35,21 +35,27 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(const Node& node, ze::Camera::
     {
       if(camera_type == "pinhole" && distortion_type == "none")
       {
-        VLOG(1) << "load pinhole camera without distortion";
         camera = std::make_shared<ze::PinholeCamera>(
-              width, height, ze::CameraType::Pinhole, intrinsics, ze::Vector());
+              width, height, ze::CameraType::Pinhole, intrinsics,
+              distortion_parameters);
       }
       else if(camera_type == "pinhole" && distortion_type == "radial-tangential")
       {
-        LOG(FATAL) << "Camera model not yet supported.";
+        camera = std::make_shared<ze::RadTanCamera>(
+              width, height, ze::CameraType::PinholeRadialTangential, intrinsics,
+              distortion_parameters);
       }
       else if(camera_type == "pinhole" && distortion_type == "equidistant")
       {
-        LOG(FATAL) << "Camera model not yet supported.";
+        camera = std::make_shared<ze::EquidistantCamera>(
+              width, height, ze::CameraType::PinholeEquidistant, intrinsics,
+              distortion_parameters);
       }
       else if(camera_type == "pinhole" && distortion_type == "fisheye")
       {
-        LOG(FATAL) << "Camera model not yet supported.";
+        camera = std::make_shared<ze::FovCamera>(
+              width, height, ze::CameraType::PinholeFov, intrinsics,
+              distortion_parameters);
       }
       else
       {
