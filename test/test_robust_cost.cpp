@@ -1,7 +1,7 @@
 #include <cmath>
 #include <random>
 #include <utility>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 #include <ze/common/types.h>
 #include <ze/geometry/robust_cost.h>
 
