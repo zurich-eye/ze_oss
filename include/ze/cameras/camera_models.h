@@ -146,10 +146,12 @@ struct FovDistortion
     {
       const T xy = x * y;
       const T rad = std::sqrt(rad_sq);
-      const T tan_s_half = std::tan(s / 2.0);
-      const T nominator = std::atan(2.0 * tan_s_half * rad);
+      const T tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
+      const T nominator = std::atan(tan_s_half_x2 * rad);
       const T offset = nominator / (s * rad);
-      const T scale = 2.0 * tan_s_half / (s * (xx + yy) * (4 * tan_s_half * tan_s_half * (xx + yy) + 1)) - nominator / (s * rad * rad_sq);
+      const T scale =
+          tan_s_half_x2 / (s * (xx + yy) * (tan_s_half_x2 * tan_s_half_x2 * (xx + yy) + 1.0))
+          - nominator / (s * rad * rad_sq);
       J_00 = xx * scale + offset;
       J_11 = yy * scale + offset;
       J_01 = xy * scale;
@@ -318,6 +320,7 @@ struct EquidistantDistortion
            + k3 * atan_rad_cubic * atan_rad_sq
            + k4 * (atan_rad_cubic * atan_rad_cubic) + 1.0;
       T t3 = t1 * atan_rad_inv_rad;
+
       T offset = t2 * atan_rad_inv_rad;
       T scale  = t2 * (t1 / rad_sq - atan_rad_inv_rad / rad_sq)
           + atan_rad_inv_rad * t3 * (
