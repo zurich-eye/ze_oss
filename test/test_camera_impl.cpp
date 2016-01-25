@@ -25,6 +25,20 @@ TEST(CameraImplTests, testPinholeJacobian)
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 
+TEST(CameraImplTests, testFovJacobian)
+{
+  using namespace ze;
+  FovCamera cam = createFovCamera(752, 480, 310, 320, 376.0, 240.0, 0.947367);
+  Vector3 bearing = cam.backProject(Vector2(200, 300));
+  Vector2 px = cam.project(bearing);
+  ASSERT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-4));
+  Matrix23 H = cam.dProject_dLandmark(bearing);
+  Matrix23 H_numerical =
+      numericalDerivative<Vector2, Vector3>(
+        std::bind(&FovCamera::project, &cam, std::placeholders::_1), bearing);
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
+}
+
 TEST(CameraImplTests, testRadTanJacobian)
 {
   using namespace ze;
@@ -40,17 +54,18 @@ TEST(CameraImplTests, testRadTanJacobian)
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 
-TEST(CameraImplTests, testFovJacobian)
+TEST(CameraImplTests, testEquidistantJacobian)
 {
   using namespace ze;
-  FovCamera cam = createFovCamera(752, 480, 310, 320, 376.0, 240.0, 0.947367);
+  EquidistantCamera cam = createEquidistantCamera(752, 480, 310, 320, 376.0, 240.0,
+                                                  -0.00279, 0.02414, -0.04304, 0.03118);
   Vector3 bearing = cam.backProject(Vector2(200, 300));
   Vector2 px = cam.project(bearing);
-  ASSERT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-4));
+  ASSERT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-2));
   Matrix23 H = cam.dProject_dLandmark(bearing);
   Matrix23 H_numerical =
       numericalDerivative<Vector2, Vector3>(
-        std::bind(&FovCamera::project, &cam, std::placeholders::_1), bearing);
+        std::bind(&EquidistantCamera::project, &cam, std::placeholders::_1), bearing);
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 

@@ -2,13 +2,12 @@
 
 namespace ze {
 
-
 //-----------------------------------------------------------------------------
-// Explicitely instantiate the desired classes
+// Explicitely instantiate the desired classes.
 // (sync with typedefs at the end of the hpp file)
 template class PinholeProjection<NoDistortion>;
 template class PinholeProjection<FovDistortion>;
 template class PinholeProjection<RadialTangentialDistortion>;
-
+template class PinholeProjection<EquidistantDistortion>;
 
 } // namespace ze

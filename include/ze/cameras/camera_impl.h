@@ -62,6 +62,7 @@ public:
 typedef PinholeProjection<NoDistortion> PinholeCamera;
 typedef PinholeProjection<FovDistortion> FovCamera;
 typedef PinholeProjection<RadialTangentialDistortion> RadTanCamera;
+typedef PinholeProjection<EquidistantDistortion> EquidistantCamera;
 
 //-----------------------------------------------------------------------------
 // Convenience factory functions.
@@ -89,6 +90,15 @@ inline RadTanCamera createRadTanCamera(
   return RadTanCamera(width, height, CameraType::PinholeRadialTangential,
                        (Vector4() << fx, fy, cx, cy).finished(),
                        (Vector4() << k1, k2, r1, r2).finished());
+}
+
+inline EquidistantCamera createEquidistantCamera(
+    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
+    FloatType k1, FloatType k2, FloatType k3, FloatType k4)
+{
+  return EquidistantCamera(width, height, CameraType::PinholeEquidistant,
+                           (Vector4() << fx, fy, cx, cy).finished(),
+                           (Vector4() << k1, k2, k3, k4).finished());
 }
 
 } // namespace ze

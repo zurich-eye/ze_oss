@@ -51,7 +51,7 @@ struct PinholeGeometry
 };
 
 
-// -----------------------------------------------------------------------------
+
 
 enum class DistortionType
 {
@@ -61,6 +61,7 @@ enum class DistortionType
   Equidistant,
 };
 
+// -----------------------------------------------------------------------------
 // Dummy distortion.
 struct NoDistortion
 {
@@ -88,6 +89,7 @@ struct NoDistortion
   }
 };
 
+// -----------------------------------------------------------------------------
 // This class implements the FOV distortion model of Deverneay and Faugeras,
 // Straight lines have to be straight, 2001. In PTAM this model is called ATAN.
 struct FovDistortion
@@ -156,6 +158,7 @@ struct FovDistortion
   }
 };
 
+// -----------------------------------------------------------------------------
 // This class implements the radial and tangential distortion model used by
 // OpenCV and ROS. Reference:
 // docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
@@ -227,6 +230,7 @@ struct RadialTangentialDistortion
   }
 };
 
+// -----------------------------------------------------------------------------
 // This class implements the distortion model described in the paper:
 // "A Generic Camera Model and Calibration Method for Conventional, Wide-Angle,
 // and Fish-Eye Lenses" by Juho Kannala and Sami S. Brandt, PAMI.
@@ -273,6 +277,60 @@ struct EquidistantDistortion
     const T scaling = std::tan(theta) / thetad;
     px[0] *= scaling;
     px[1] *= scaling;
+  }
+
+  template <typename T>
+  static void dDistort_dPx(const T* params, const T* px_unitplane, T* jac_colmajor)
+  {
+    const T k1 = params[0];
+    const T k2 = params[1];
+    const T k3 = params[2];
+    const T k4 = params[3];
+    const T x = px_unitplane[0];
+    const T y = px_unitplane[1];
+    const T r = std::sqrt(x * x + y * y);
+
+    T& J_00 = jac_colmajor[0];
+    T& J_10 = jac_colmajor[1];
+    T& J_01 = jac_colmajor[2];
+    T& J_11 = jac_colmajor[3];
+
+    if(r < 1e-7)
+    {
+      J_00 = 1.0; J_01 = 0.0;
+      J_10 = 0.0; J_11 = 1.0;
+    }
+    else
+    {
+      T xx = x * x;
+      T yy = y * y;
+      T xy = x * y;
+      T rad_sq = xx + yy;
+      T rad = std::sqrt(rad_sq);
+      T atan_rad = std::atan(rad);
+      T atan_rad_inv_rad = atan_rad / rad;
+      T atan_rad_sq = atan_rad * atan_rad;
+      T atan_rad_cubic = atan_rad_sq * atan_rad_sq;
+
+      T t1 = 1.0 / ((xx + yy) + 1.0);
+      T t2 = k1 * atan_rad_sq
+           + k2 * atan_rad_cubic
+           + k3 * atan_rad_cubic * atan_rad_sq
+           + k4 * (atan_rad_cubic * atan_rad_cubic) + 1.0;
+      T t3 = t1 * atan_rad_inv_rad;
+      T offset = t2 * atan_rad_inv_rad;
+      T scale  = t2 * (t1 / rad_sq - atan_rad_inv_rad / rad_sq)
+          + atan_rad_inv_rad * t3 * (
+                2.0 * k1
+              + 4.0 * k2 * atan_rad_sq
+              + 6.0 * k3 * atan_rad_cubic
+              + 8.0 * k4 * atan_rad_cubic * atan_rad_sq);
+
+      J_11 = yy * scale + offset;
+      J_00 = xx * scale + offset;
+      J_01 = xy * scale;
+      J_10 = J_01;
+    }
   }
 };
 
