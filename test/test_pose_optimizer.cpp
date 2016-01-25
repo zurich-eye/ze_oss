@@ -18,7 +18,7 @@ TEST(PoseOptimizerTests, testSolver)
   T_B_W.setRandom(); // Random body transformation.
 
   const size_t n = 120;
-  PinholeCamera cam(640, 480, 329.11, 329.11, 320.0, 240.0);
+  PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
   Keypoints pix_true = generateRandomKeypoints(640, 480, 10, n);
 
   Positions pos_C = cam.backProjectVectorized(pix_true);
