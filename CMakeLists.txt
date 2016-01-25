@@ -31,8 +31,8 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
-catkin_add_gtest(test_pinhole test/test_pinhole.cpp)
-target_link_libraries(test_pinhole ${PROJECT_NAME})
+catkin_add_gtest(test_camera_impl test/test_camera_impl.cpp)
+target_link_libraries(test_camera_impl ${PROJECT_NAME})
 
 catkin_add_gtest(test_camera_utils test/test_camera_utils.cpp)
 target_link_libraries(test_camera_utils ${PROJECT_NAME})

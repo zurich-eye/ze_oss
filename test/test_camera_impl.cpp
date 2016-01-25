@@ -11,21 +11,36 @@
 #include <ze/cameras/camera_impl.h>
 #include <ze/cameras/camera_utils.h>
 
-TEST(CameraPinholeTest, testProjectionJacobian)
+TEST(CameraImplTests, testPinholeJacobian)
 {
-  ze::PinholeCamera cam = ze::createPinholeCamera(752, 480, 310, 320, 376.0, 240.0);
-  Eigen::Vector3d bearing = cam.backProject(Eigen::Vector2d(200, 300));
-  Eigen::Vector2d px = cam.project(bearing);
-  ASSERT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(px, Eigen::Vector2d(200, 300)));
-  Eigen::Matrix<double, 2, 3> H = cam.dProject_dLandmark(bearing);
-  Eigen::Matrix<double, 2, 3> H_numerical =
-      ze::numericalDerivative<Eigen::Vector2d, Eigen::Vector3d>(
-        std::bind(&ze::PinholeCamera::project, &cam, std::placeholders::_1),
-        bearing);
+  using namespace ze;
+  PinholeCamera cam = createPinholeCamera(752, 480, 310, 320, 376.0, 240.0);
+  Vector3 bearing = cam.backProject(Vector2(200, 300));
+  Vector2 px = cam.project(bearing);
+  ASSERT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(px, Vector2(200, 300)));
+  Matrix23 H = cam.dProject_dLandmark(bearing);
+  Matrix23 H_numerical =
+      numericalDerivative<Vector2, Vector3>(
+        std::bind(&PinholeCamera::project, &cam, std::placeholders::_1), bearing);
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 
-TEST(CameraPinholeTest, testYamlParsing)
+TEST(CameraImplTests, testRadTanJacobian)
+{
+  using namespace ze;
+  RadTanCamera cam = createRadTanCamera(752, 480, 310, 320, 376.0, 240.0,
+                                        -0.2834, 0.0739, 0.00019, 1.76e-05);
+  Vector3 bearing = cam.backProject(Vector2(200, 300));
+  Vector2 px = cam.project(bearing);
+  ASSERT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-2));
+  Matrix23 H = cam.dProject_dLandmark(bearing);
+  Matrix23 H_numerical =
+      numericalDerivative<Vector2, Vector3>(
+        std::bind(&RadTanCamera::project, &cam, std::placeholders::_1), bearing);
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
+}
+
+TEST(CameraImplTests, testYamlParsing)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
@@ -38,7 +53,7 @@ TEST(CameraPinholeTest, testYamlParsing)
   EXPECT_DOUBLE_EQ(cam->params()(3), 240.5);
 }
 
-TEST(CameraPinholeTest, testVectorized)
+TEST(CameraImplTests, testVectorized)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";

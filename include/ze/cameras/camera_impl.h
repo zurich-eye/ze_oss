@@ -72,4 +72,13 @@ inline PinholeCamera createPinholeCamera(
                        (Vector4() << fx, fy, cx, cy).finished(), Vector());
 }
 
+inline RadTanCamera createRadTanCamera(
+    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
+    FloatType k1, FloatType k2, FloatType r1, FloatType r2)
+{
+  return RadTanCamera(width, height, CameraType::PinholeRadialTangential,
+                       (Vector4() << fx, fy, cx, cy).finished(),
+                       (Vector4() << k1, k2, r1, r2).finished());
+}
+
 } // namespace ze
