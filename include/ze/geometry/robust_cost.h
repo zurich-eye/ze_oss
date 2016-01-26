@@ -16,8 +16,8 @@ namespace ze {
 template <typename Scalar>
 struct UnitScaleEstimator
 {
-  using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static constexpr Scalar compute(const Vector& /*errors*/)
+  using VectorX = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  static constexpr Scalar compute(const VectorX& /*errors*/)
   {
     return 1.0;
   }
@@ -27,10 +27,10 @@ struct UnitScaleEstimator
 template <typename Scalar>
 struct MADScaleEstimator
 {
-  using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& errors)
+  using VectorX = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  static Scalar compute(const VectorX& errors)
   {
-    Vector absolute_error(errors.size());
+    VectorX absolute_error(errors.size());
     absolute_error = errors.array().abs();
     std::pair<Scalar, bool> res = median(absolute_error);
     CHECK(res.second);
@@ -42,8 +42,8 @@ struct MADScaleEstimator
 template <typename Scalar>
 struct NormalDistributionScaleEstimator
 {
-  using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Scalar compute(const Vector& errors)
+  using VectorX = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  static Scalar compute(const VectorX& errors)
   {
     // normed_errors should not have absolute values.
     const int n = errors.size();
@@ -67,10 +67,10 @@ struct NormalDistributionScaleEstimator
 template <typename Scalar, typename Implementation>
 struct WeightFunction
 {
-  using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  static Vector weightVectorized(const Vector& error_vec)
+  using VectorX = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  static VectorX weightVectorized(const VectorX& error_vec)
   {
-    Vector weights(error_vec.size());
+    VectorX weights(error_vec.size());
     for(int i = 0; i < error_vec.size(); ++i)
     {
       weights(i) = Implementation::weight(error_vec(i));
