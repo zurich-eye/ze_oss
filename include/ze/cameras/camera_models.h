@@ -50,9 +50,6 @@ struct PinholeGeometry
   }
 };
 
-
-
-
 enum class DistortionType
 {
   No,
@@ -135,15 +132,17 @@ struct FovDistortion
       J_00 = 1.0; J_01 = 0.0;
       J_10 = 0.0; J_11 = 1.0;
     }
-    else if(rad_sq < 1e-5) // Projection very close to image center
+    else if(rad_sq < 1e-5)
     {
+      // Projection very close to image center
       J_00 = 2.0 * std::tan(s / 2.0) / s;
       J_11 = J_00;
       J_01 = 0.0;
       J_10 = 0.0;
     }
-    else // Standard case
+    else
     {
+      // Standard case
       const T xy = x * y;
       const T rad = std::sqrt(rad_sq);
       const T tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
