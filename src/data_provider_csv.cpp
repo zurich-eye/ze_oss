@@ -6,6 +6,7 @@
 
 #include <ze/common/time.h>
 #include <ze/common/string_utils.h>
+#include <ze/common/file_utils.h>
 #include <imp/bridge/opencv/cv_bridge.hpp>
 
 namespace ze {
@@ -15,35 +16,13 @@ namespace dataset {
 ImageBase::Ptr CameraMeasurement::loadImage() const
 {
   ImageCv8uC1::Ptr img;
-  cvBridgeLoad<Pixel8uC1, PixelType::i8uC1>(
-        img, image_path_filename, PixelOrder::gray);
+  cvBridgeLoad<Pixel8uC1>(img, image_path_filename, PixelOrder::gray);
   CHECK_NOTNULL(img.get());
   CHECK(img->numel() > 0);
   return img;
 }
 
 } // namespace dataset
-
-namespace utils {
-
-void checkHeaderAndOpenStream(
-    const std::string& filename,
-    const std::string& header,
-    std::ifstream* fs)
-{
-  CHECK_NOTNULL(fs);
-  VLOG(1) << "Reading file " << filename;
-  fs->open(filename.c_str(), std::ios::in);
-  CHECK(fs);
-  CHECK(fs->is_open()) << "Failed to open file " << filename;
-  CHECK(!fs->eof()) << "File seems to contain no content!";
-
-  std::string line;
-  std::getline(*fs, line);
-  CHECK_EQ(line, header) << "Invalid header.";
-}
-
-} // namespace utils
 
 DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
@@ -127,7 +106,7 @@ void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t play
 {
   const std::string kHeader = "#timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]";
   std::ifstream fs;
-  utils::checkHeaderAndOpenStream(data_dir+"/data.csv", kHeader, &fs);
+  openFileStreamAndCheckHeader(data_dir+"/data.csv", kHeader, &fs);
   std::string line;
   size_t i = 0;
   while(std::getline(fs, line))
@@ -156,7 +135,7 @@ void DataProviderCsv::loadCameraData(
 {
   const std::string kHeader = "#timestamp [ns],filename";
   std::ifstream fs;
-  utils::checkHeaderAndOpenStream(data_dir+"/data.csv", kHeader, &fs);
+  openFileStreamAndCheckHeader(data_dir+"/data.csv", kHeader, &fs);
   std::string line;
   size_t i = 0;
   while(std::getline(fs, line))
