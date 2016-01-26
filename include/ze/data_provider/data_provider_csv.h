@@ -70,7 +70,7 @@ struct CameraMeasurement : public MeasurementBase
   {}
   virtual ~CameraMeasurement() = default;
 
-  ImageBase::Ptr getImage() const;
+  ImageBase::Ptr loadImage() const;
 
   const size_t camera_index;
   const std::string image_path_filename;

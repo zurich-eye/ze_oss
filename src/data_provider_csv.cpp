@@ -12,7 +12,7 @@ namespace ze {
 
 namespace dataset {
 
-ImageBase::Ptr CameraMeasurement::getImage() const
+ImageBase::Ptr CameraMeasurement::loadImage() const
 {
   ImageCv8uC1::Ptr img;
   cvBridgeLoad<Pixel8uC1, PixelType::i8uC1>(
@@ -85,7 +85,7 @@ bool DataProviderCsv::spinOnce()
           dataset::CameraMeasurement::ConstPtr cam_data =
               std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
 
-          ImageBase::Ptr img = cam_data->getImage();
+          ImageBase::Ptr img = cam_data->loadImage();
           camera_callback_(cam_data->stamp_ns, img, cam_data->camera_index);
         }
         else

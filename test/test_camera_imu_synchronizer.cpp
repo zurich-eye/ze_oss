@@ -7,6 +7,7 @@
 #include <ze/data_provider/data_provider_rosbag.h>
 #include <ze/data_provider/camera_imu_synchronizer.h>
 #include <imp/core/image_base.hpp>
+#include <imp/bridge/opencv/image_cv.hpp>
 
 TEST(CameraImuSynchronizerTest, testCsv)
 {
