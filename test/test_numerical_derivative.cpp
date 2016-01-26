@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 #include <ze/common/numerical_derivative.h>
 
 TEST(NumericalDerivativeTests, testLinearVector)

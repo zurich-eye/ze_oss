@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <ze/common/string_utils.h>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 
 
 TEST(StringUtilsTest, testTrim)

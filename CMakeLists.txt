@@ -13,6 +13,7 @@ include(ze_setup)
 set(HEADERS
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
+  include/ze/common/file_utils.h
   include/ze/common/macros.h
   include/ze/common/manifold.h
   include/ze/common/matrix.h
@@ -22,18 +23,19 @@ set(HEADERS
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
+  include/ze/common/test_entrypoint.h
+  include/ze/common/test_manifold.h
+  include/ze/common/test_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
   include/ze/common/transformation.h
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
-  include/ze/common/test/entrypoint.h
-  include/ze/common/test/manifold.h
-  include/ze/common/test/utils.h
   )
 
 set(SOURCES
   src/sample.cpp
+  src/test_utils.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -42,6 +44,12 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
+catkin_add_gtest(test_benchmark test/test_benchmark.cpp)
+target_link_libraries(test_benchmark ${PROJECT_NAME})
+
+catkin_add_gtest(test_test_utils test/test_test_utils.cpp)
+target_link_libraries(test_test_utils ${PROJECT_NAME})
+
 catkin_add_gtest(test_transformation test/test_transformation.cpp)
 target_link_libraries(test_transformation ${PROJECT_NAME})
 

@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <ze/common/buffer.h>
-#include <ze/common/test/entrypoint.h>
+#include <ze/common/test_entrypoint.h>
 
 
 TEST(BufferTest, testRemoveOlderThanTimestamp)
