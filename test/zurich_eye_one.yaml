@@ -1,0 +1,86 @@
+# ------------------------------------------------------------------------------
+# Function : Inertial sensor model parameter yaml test file.
+#            
+# Project  : Zurich Eye
+# Author   : Zurich Eye
+# Version  : V01  27JAN2016 Initial version.
+# Comment  : TODO() Move to "ze_test_data" after discussion.
+# ------------------------------------------------------------------------------
+
+label: "zuricheyeonetest"
+id: 412eab8e4058621f7036b5e765dfe812
+
+cameras:
+- camera:
+    label: cam0
+    id: 54812562fa109c40fe90b29a59dd7798
+    line-delay-nanoseconds: 0
+    image_height: 480
+    image_width: 752
+    type: pinhole
+    intrinsics:
+      cols: 1
+      rows: 4
+      data: [458.6548807207614, 457.2966964634893, 367.2158039615726, 248.37534060980727]
+    distortion:
+      type: radial-tangential  
+      parameters:
+        cols: 1
+        rows: 4
+        data: [-0.28340811217029355, 0.07395907389290132, 0.00019359502856909603,
+    1.7618711454538528e-05]
+  T_B_S:
+    cols: 4
+    rows: 4
+    data: [0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975,
+           0.999557249008, 0.0149672133247, 0.025715529948, -0.064676986768,
+          -0.0257744366974, 0.00375618835797, 0.999660727178, 0.00981073058949,
+           0.0, 0.0, 0.0, 1.0]
+
+# ------------------------------------------------------------------------------
+
+imus:
+- imu:
+    label: bmx0
+    id: 64812562fa109c40fe90b29a59dd7798
+
+    gyroscopes:
+      noise_model:
+        type: white-brownian
+        noise_density: 1.86e-4          # Gyro "white noise" density [rad/s/sqrt(Hz)]
+        bandwidth: 200                  # Gyro "white noise" bandwidth [Hz]
+        bias_noise_density: 2.66e-5     # Gyroscope bias driving noise density [rad/s^2/sqrt(Hz)]
+      intrinsic_model:
+        type: standard
+
+    accelerometers:
+      noise_model:
+        type: white-brownian
+        noise_density: 1.86e-3          # Accel "white noise" density [m/s^2/sqrt(Hz)]
+        bandwidth: 200                  # Accel "white noise" bandwidth [Hz]
+        bias_noise_density: 4.33e-4     # Accel bias driving noise density [m/s^3/sqrt(Hz)]
+      intrinsic_model:
+        type: bias-scale-misalignment
+        b0:                             # Accel bias at T0 [m/s^2]
+          cols: 3
+          rows: 1
+          data: [ 0.0,
+                  0.0,
+                  0.0 ]
+        T0:                             # Accel scale and misalignment matrix []
+          cols: 3
+          rows: 3
+          data: [ 1.0, 0.0, 0.0,
+                  0.0, 1.0, 0.0,
+                  0.0, 0.0, 1.0 ]
+
+    T_B_S:                              # Body to IMU IRA transform
+      cols: 4
+      rows: 4
+      data: [0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975,
+             0.999557249008, 0.0149672133247, 0.025715529948, -0.064676986768,
+            -0.0257744366974, 0.00375618835797, 0.999660727178, 0.00981073058949,
+             0.0, 0.0, 0.0, 1.0]
+
+# ------------------------------------------------------------------------------
+
