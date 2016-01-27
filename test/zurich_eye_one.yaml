@@ -61,22 +61,22 @@ imus:
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
         type: scale-misalignment
-        b0:                             # Bias at T0 [m/s^2]
+        b0:                             # Bias at T0 (25 degC) [m/s^2]
           cols: 3
           rows: 1
           data: [ 0.0,
                   0.0,
                   0.0 ]
-        T0:                             # Scale and misalignment matrix []
+        T0:                             # Scale and misalignment matrix at T0 []
           cols: 3
           rows: 3
           data: [ 1.0, 0.0, 0.0,
                   0.0, 1.0, 0.0,
                   0.0, 0.0, 1.0 ]
         delay: 1.00e-3                  # Delay [s]
-        range: 150                      # Range [m/s/s]
+        range: 150                      # Range [m/s^2]
 
-    T_B_S:                              # Body to IMU IRA transform
+    T_B_S:                              # Body to IMU reference axes transform
       cols: 4
       rows: 4
       data: [0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975,
