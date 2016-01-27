@@ -47,32 +47,34 @@ imus:
     gyroscopes:
       noise_model:
         type: white-brownian
-        noise_density: 1.86e-4          # Gyro "white noise" density [rad/s/sqrt(Hz)]
-        bandwidth: 200                  # Gyro "white noise" bandwidth [Hz]
-        bias_noise_density: 2.66e-5     # Gyroscope bias driving noise density [rad/s^2/sqrt(Hz)]
+        noise_density: 1.86e-4          # "white noise" density [rad/s/sqrt(Hz)]
+        bandwidth: 200                  # "white noise" bandwidth [Hz]
+        bias_noise_density: 2.66e-5     # Bias driving noise density [rad/s^2/sqrt(Hz)]
       intrinsic_model:
         type: standard
 
     accelerometers:
       noise_model:
         type: white-brownian
-        noise_density: 1.86e-3          # Accel "white noise" density [m/s^2/sqrt(Hz)]
-        bandwidth: 200                  # Accel "white noise" bandwidth [Hz]
-        bias_noise_density: 4.33e-4     # Accel bias driving noise density [m/s^3/sqrt(Hz)]
+        noise_density: 1.86e-3          # "white noise" density [m/s^2/sqrt(Hz)]
+        bandwidth: 200                  # "white noise" bandwidth [Hz]
+        bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
-        type: bias-scale-misalignment
-        b0:                             # Accel bias at T0 [m/s^2]
+        type: scale-misalignment
+        b0:                             # Bias at T0 [m/s^2]
           cols: 3
           rows: 1
           data: [ 0.0,
                   0.0,
                   0.0 ]
-        T0:                             # Accel scale and misalignment matrix []
+        T0:                             # Scale and misalignment matrix []
           cols: 3
           rows: 3
           data: [ 1.0, 0.0, 0.0,
                   0.0, 1.0, 0.0,
                   0.0, 0.0, 1.0 ]
+        delay: 1.00e-3                  # Delay [s]
+        range: 150                      # Range [m/s/s]
 
     T_B_S:                              # Body to IMU IRA transform
       cols: 4
