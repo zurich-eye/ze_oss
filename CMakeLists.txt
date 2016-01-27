@@ -36,6 +36,9 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 catkin_add_gtest(test_camera_impl test/test_camera_impl.cpp)
 target_link_libraries(test_camera_impl ${PROJECT_NAME})
 
+catkin_add_gtest(test_camera_rig test/test_camera_rig.cpp)
+target_link_libraries(test_camera_rig ${PROJECT_NAME})
+
 catkin_add_gtest(test_camera_utils test/test_camera_utils.cpp)
 target_link_libraries(test_camera_utils ${PROJECT_NAME})
 

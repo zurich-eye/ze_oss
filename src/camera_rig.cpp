@@ -37,9 +37,10 @@ CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
 void CameraRig::print(std::ostream& out, const std::string& s) const
 {
   out << s << "\n";
+  out << " Label = " << label_ << "\n";
   for(size_t i = 0; i < size(); ++i)
   {
-    out << "Camera #" << i << ": " << label_ << "\n";
+    out << " Camera " << i << ":";
     cameras_[i]->print(out, "");
     out << "  T_C_B = " << T_C_B_[i] << std::endl;
   }
