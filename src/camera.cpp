@@ -64,7 +64,7 @@ Camera::Ptr Camera::loadFromYaml(const std::string& path)
 
 void Camera::print(std::ostream& out, const std::string& s) const
 {
-  out << s << std::endl
+  out << s << "\n"
       << "  Label = " << label_ << "\n"
       << "  Model = " << typeString() << "\n"
       << "  Dimensions = " << width_ << "x" << height_ << "\n"
