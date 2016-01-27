@@ -25,7 +25,7 @@ public:
 public:
 
   Camera(const int width, const int height, const CameraType type,
-         const Vector& projection_params, const Vector& distortion_params);
+         const VectorX& projection_params, const VectorX& distortion_params);
 
   virtual ~Camera() = default;
 
@@ -74,10 +74,10 @@ public:
   inline const std::string& label() const { return label_; }
 
   //! Camera projection parameters.
-  inline const Vector& projectionParameters() const { return projection_params_; }
+  inline const VectorX& projectionParameters() const { return projection_params_; }
 
   //! Camera distortion parameters.
-  inline const Vector& distortionParameters() const { return distortion_params_; }
+  inline const VectorX& distortionParameters() const { return distortion_params_; }
 
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
@@ -88,10 +88,10 @@ protected:
   int height_;
 
   //! Camera projection parameters, e.g., (fx, fy, cx, cy).
-  Vector projection_params_;
+  VectorX projection_params_;
 
   //! Camera distortion parameters, e.g., (k1, k2, r1, r2).
-  Vector distortion_params_;
+  VectorX distortion_params_;
 
   //! Camera distortion parameters
   std::string label_;

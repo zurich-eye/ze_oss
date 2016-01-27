@@ -14,12 +14,14 @@ set(HEADERS
   include/ze/cameras/camera.h
   include/ze/cameras/camera_impl.h
   include/ze/cameras/camera_models.h
+  include/ze/cameras/camera_rig.h
   include/ze/cameras/camera_utils.h
   include/ze/cameras/camera_yaml_serialization.h
   )
 
 set(SOURCES
   src/camera.cpp
+  src/camera_rig.cpp
   src/camera_utils.cpp
   src/camera_yaml_serialization.cpp
   src/camera_impl.cpp

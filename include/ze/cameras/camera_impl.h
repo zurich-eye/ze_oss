@@ -71,7 +71,7 @@ inline PinholeCamera createPinholeCamera(
     int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy)
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
-                       (Vector4() << fx, fy, cx, cy).finished(), Vector());
+                       (Vector4() << fx, fy, cx, cy).finished(), VectorX());
 }
 
 inline FovCamera createFovCamera(
