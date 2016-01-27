@@ -23,6 +23,9 @@ public:
       const CameraVector& cameras,
       const std::string& label);
 
+  //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
+  static CameraRig::Ptr loadFromYaml(const std::string& yaml_file);
+
   //!@{
   //! Camera poses with respect to body frame.
 
@@ -42,19 +45,19 @@ public:
   //!@{
   //! Camera accessors:
 
-  //! Get the geometry object for camera i.
+  //! Get camera i.
   inline const Camera& at(size_t camera_index) const
   {
     return *cameras_.at(camera_index);
   }
 
-  //! Get the geometry object for camera i.
+  //! Get camera i.
   inline std::shared_ptr<Camera> atShared(size_t camera_index)
   {
     return cameras_.at(camera_index);
   }
 
-  //! Get the geometry object for camera i.
+  //! Get camera i.
   inline std::shared_ptr<const Camera> atShared(size_t camera_index) const
   {
     return cameras_.at(camera_index);
@@ -67,23 +70,20 @@ public:
   }
   //!@}
 
-  //! Print camera infos
-  void print(std::ostream& out, const std::string& s = "CameraRig:") const;
-
-  //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
-  static CameraRig::Ptr loadFromYaml(const std::string& yaml_file);
-
-  //! Get the number of cameras.
+  //! Get the number of cameras in rig.
   inline size_t size() const
   {
     return cameras_.size();
   }
 
-  //! Get a label for the camera.
+  //! Get of the camera rig.
   inline const std::string& getLabel() const
   {
     return label_;
   }
+
+  //! Print camera infos
+  void print(std::ostream& out, const std::string& s = "CameraRig:") const;
 
 private:
 
