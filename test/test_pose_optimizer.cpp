@@ -44,7 +44,6 @@ TEST(PoseOptimizerTests, testSolver)
     pix_noisy(1,i) += px_noise(gen);
   }
   Bearings bearings_noisy = cam.backProjectVectorized(pix_noisy);
-  normalizeBearings(bearings_noisy);
 
   // Perturb pose:
   Transformation T_B_W_perturbed =
