@@ -15,6 +15,7 @@ set(HEADERS
   include/ze/geometry/least_squares_solver-inl.h
   include/ze/geometry/pose_optimizer.h
   include/ze/geometry/robust_cost.h
+  include/ze/geometry/triangulation.h
   )
 
 set(SOURCES
