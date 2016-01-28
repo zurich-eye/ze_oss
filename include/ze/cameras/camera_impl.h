@@ -54,6 +54,13 @@ public:
     J(1, 2) = -fy * (pos.x() * J_dist(1, 0) + pos.y() * J_dist(1, 1)) * z_inv_sq;
     return J;
   }
+
+  virtual FloatType getAnglePerPixel() const override
+  {
+    //! @todo: Is this correct? And if yes, this is costlty to compute often!
+    return std::atan(1.0 / (2.0 * this->projection_params_[0]))
+         + std::atan(1.0 / (2.0 * this->projection_params_[1]));
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -71,7 +78,7 @@ inline PinholeCamera createPinholeCamera(
     int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy)
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
-                       (Vector4() << fx, fy, cx, cy).finished(), Vector());
+                       (Vector4() << fx, fy, cx, cy).finished(), VectorX());
 }
 
 inline FovCamera createFovCamera(

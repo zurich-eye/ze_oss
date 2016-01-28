@@ -6,7 +6,7 @@
 namespace ze {
 
 Camera::Camera(const int width, const int height, const CameraType type,
-               const Vector& projection_params, const Vector& distortion_params)
+               const VectorX& projection_params, const VectorX& distortion_params)
   : width_(width)
   , height_(height)
   , projection_params_(projection_params)
