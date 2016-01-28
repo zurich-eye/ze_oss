@@ -123,7 +123,6 @@ TEST(CameraImplTests, testVectorized)
   constexpr size_t N = 100;
   ze::Keypoints kps1 = ze::generateRandomKeypoints(cam->width(), cam->height(), 15, N);
   ze::Bearings bearings = cam->backProjectVectorized(kps1);
-  ze::normalizeBearings(bearings);
   ze::Keypoints kps2 = cam->projectVectorized(bearings);
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(kps1, kps2));
   EXPECT_DOUBLE_EQ(bearings.col(0).norm(), 1.0);
