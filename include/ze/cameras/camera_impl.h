@@ -55,11 +55,12 @@ public:
     return J;
   }
 
-  virtual FloatType getAnglePerPixel() const override
+  virtual FloatType getApproxAnglePerPixel() const override
   {
     //! @todo: Is this correct? And if yes, this is costlty to compute often!
-    return std::atan(1.0 / (2.0 * this->projection_params_[0]))
-         + std::atan(1.0 / (2.0 * this->projection_params_[1]));
+    // abs() because ICL-NUIM has negative focal length.
+    return std::atan(1.0 / (2.0 * std::abs(this->projection_params_[0])))
+         + std::atan(1.0 / (2.0 * std::abs(this->projection_params_[1])));
   }
 };
 

@@ -83,7 +83,7 @@ public:
   inline void setLabel(const std::string& label) { label_ = label; }
 
   //! Get angle corresponding to one pixel in image plane.
-  virtual FloatType getAnglePerPixel() const = 0;
+  virtual FloatType getApproxAnglePerPixel() const = 0;
 
 protected:
 
