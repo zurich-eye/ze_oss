@@ -67,7 +67,11 @@ using Gradient  = Eigen::Matrix<FloatType, 2, 1>;
 using Keypoints = Eigen::Matrix<FloatType, 2, Eigen::Dynamic, Eigen::ColMajor>;
 using Bearings  = Eigen::Matrix<FloatType, 3, Eigen::Dynamic, Eigen::ColMajor>;
 using Positions = Eigen::Matrix<FloatType, 3, Eigen::Dynamic, Eigen::ColMajor>;
-using Gradients = Eigen::Matrix<FloatType, 2, Eigen::Dynamic, Eigen::ColMajor>;
+
+using KeypointLevels = Eigen::Matrix<uint8_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
+using KeypointTypes  = Eigen::Matrix<uint8_t, Eigen::Dynamic, 1, Eigen::ColMajor>;
+using KeypointAngles = Eigen::Matrix<FloatType, Eigen::Dynamic, 1, Eigen::ColMajor>;
+using KeypointScores = Eigen::Matrix<FloatType, Eigen::Dynamic, 1, Eigen::ColMajor>;
 
 //------------------------------------------------------------------------------
 // Inertial containers.
