@@ -5,7 +5,8 @@
 namespace ze {
 
 template <typename Scalar, int Dim>
-std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestValue(int64_t stamp)
+std::tuple<int64_t, Eigen::Matrix<Scalar, Dim, 1>, bool>
+Buffer<Scalar,Dim>::getNearestValue(int64_t stamp)
 {
   CHECK_GE(stamp, 0);
 
@@ -13,13 +14,13 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestVal
   if(buffer_.empty())
   {
     LOG(WARNING) << "Buffer is empty.";
-    return std::make_pair(Vector(), false);
+    return std::make_tuple(-1, Vector(), false);
   }
 
   auto it_before = iterator_equal_or_before(stamp);
   if(it_before->first == stamp)
   {
-    return std::make_pair(it_before->second, true);
+    return std::make_tuple(it_before->first, it_before->second, true);
   }
 
   // Compute time difference between stamp and closest entries.
@@ -35,30 +36,25 @@ std::pair<Eigen::Matrix<Scalar, Dim, 1>, bool> Buffer<Scalar,Dim>::getNearestVal
   }
 
   // Select which entry is closest based on time difference.
-  Vector result;
+  std::pair<int64_t,Vector> result;
   if(dt_after < 0 && dt_before < 0)
   {
     CHECK(false) << "Should not occur.";
-    return std::make_pair(Vector(), false);
+    return std::make_tuple(-1, Vector(), false);
   }
   else if(dt_after < 0)
   {
-    result = it_before->second;
+    return std::make_tuple(it_before->first, it_before->second, true);
   }
   else if(dt_before < 0)
   {
-    result = it_after->second;
+    return std::make_tuple(it_after->first, it_after->second, true);
   }
   else if(dt_after > 0 && dt_before > 0 && dt_after < dt_before)
   {
-    result = it_after->second;
+    return std::make_tuple(it_after->first, it_after->second, true);
   }
-  else
-  {
-    result = it_before->second;
-  }
-
-  return std::make_pair(result, true);
+  return std::make_tuple(it_before->first, it_before->second, true);
 }
 
 template <typename Scalar, int Dim>
