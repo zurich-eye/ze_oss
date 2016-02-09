@@ -82,6 +82,10 @@ public:
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
 
+  //! Get angle corresponding to one pixel in image plane.
+  //! This is of course
+  virtual FloatType getAnglePerPixel() const = 0;
+
 protected:
 
   int width_;

@@ -54,6 +54,13 @@ public:
     J(1, 2) = -fy * (pos.x() * J_dist(1, 0) + pos.y() * J_dist(1, 1)) * z_inv_sq;
     return J;
   }
+
+  virtual FloatType getAnglePerPixel() const override
+  {
+    //! @todo: Is this correct? And if yes, this is costlty to compute often!
+    return std::atan(1.0 / (2.0 * this->projection_params_[0]))
+         + std::atan(1.0 / (2.0 * this->projection_params_[1]));
+  }
 };
 
 //-----------------------------------------------------------------------------
