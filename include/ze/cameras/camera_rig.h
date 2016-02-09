@@ -18,6 +18,9 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ZE_POINTER_TYPEDEFS(CameraRig);
 
+  //! Default constructor not available.
+  CameraRig() = delete;
+
   CameraRig(
       const TransformationVector& T_C_B,
       const CameraVector& cameras,
@@ -64,31 +67,19 @@ public:
   }
 
   //! Get all cameras.
-  inline const CameraVector& getCameraVector() const
-  {
-    return cameras_;
-  }
+  inline const CameraVector& getCameraVector() const { return cameras_; }
   //!@}
 
   //! Get the number of cameras in rig.
-  inline size_t size() const
-  {
-    return cameras_.size();
-  }
+  inline size_t size() const { return cameras_.size(); }
 
-  //! Get of the camera rig.
-  inline const std::string& getLabel() const
-  {
-    return label_;
-  }
+  //! Get label of rig.
+  inline const std::string& getLabel() const { return label_; }
 
-  //! Print camera infos
+  //! Print rig infos.
   void print(std::ostream& out, const std::string& s = "CameraRig:") const;
 
 private:
-
-  //! Default constructor not available.
-  CameraRig() = default;
 
   //! The mounting transformations.
   TransformationVector T_C_B_;

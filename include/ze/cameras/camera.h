@@ -70,14 +70,14 @@ public:
   //! CameraType as descriptive string.
   std::string typeString() const;
 
-  //! Name of the camera.
-  inline const std::string& label() const { return label_; }
-
   //! Camera projection parameters.
   inline const VectorX& projectionParameters() const { return projection_params_; }
 
   //! Camera distortion parameters.
   inline const VectorX& distortionParameters() const { return distortion_params_; }
+
+  //! Name of the camera.
+  inline const std::string& getLabel() const { return label_; }
 
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
