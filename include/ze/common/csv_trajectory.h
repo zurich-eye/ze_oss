@@ -83,6 +83,11 @@ public:
     }
   }
 
+  const Buffer<FloatType, 3>& getBuffer() const
+  {
+    return lla_buf_;
+  }
+
 protected:
   Buffer<FloatType, 3> lla_buf_;
 };
@@ -119,6 +124,11 @@ public:
         pose_buf_.insert(stamp, pose);
       }
     }
+  }
+
+  const Buffer<FloatType, 7>& getBuffer() const
+  {
+    return pose_buf_;
   }
 
 protected:
