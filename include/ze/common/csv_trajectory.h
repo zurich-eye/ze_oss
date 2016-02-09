@@ -12,7 +12,18 @@ namespace ze {
 class CSVTrajectory
 {
 public:
-  virtual void load() = 0;
+  virtual void load(const std::string& in_file_path) = 0;
+
+protected:
+  CSVTrajectory() { }
+  void readHeader(const std::string& in_file_path)
+  {
+    in_str_.open(in_file_path);
+    CHECK(in_str_.is_open());
+    std::string line;
+    getline(in_str_, line);
+    CHECK_EQ(line, header_);
+  }
 
   Vector3 readTranslation(const std::vector<std::string>& items)
   {
@@ -35,10 +46,7 @@ public:
     pose << readTranslation(items) << readOrientation(items);
     return pose;
   }
-
-
-protected:
-  CSVTrajectory() { }
+  std::ifstream in_str_;
   std::map<std::string, int> order_;
   std::string header_;
   const char delimiter_{','};
@@ -57,9 +65,22 @@ public:
     header_ = "timestamp, latitude, longitude, altitude";
   }
 
-  virtual void load() override
+  virtual void load(const std::string& in_file_path) override
   {
-
+    readHeader(in_file_path);
+    std::string line;
+    while(getline(in_str_, line))
+    {
+      if('%' != line.at(0) && '#' != line.at(0))
+      {
+        std::stringstream line_str(line);
+        std::vector<std::string> items = ze::splitString(line, delimiter_);
+        CHECK_GE(items.size(), 4u);
+        int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+        Vector3 lla = readTranslation(items);
+        lla_buf_.insert(stamp, lla);
+      }
+    }
   }
 
 protected:
@@ -82,9 +103,22 @@ public:
 
     header_ = "timestamp, x, y, z, qx, qy, qz, qw";
   }
-  virtual void load() override
+  virtual void load(const std::string& in_file_path) override
   {
-
+    readHeader(in_file_path);
+    std::string line;
+    while(getline(in_str_, line))
+    {
+      if('%' != line.at(0) && '#' != line.at(0))
+      {
+        std::stringstream line_str(line);
+        std::vector<std::string> items = ze::splitString(line, delimiter_);
+        CHECK_GE(items.size(), 8u);
+        int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+        Vector7 pose = readPose(items);
+        pose_buf_.insert(stamp, pose);
+      }
+    }
   }
 
 protected:
