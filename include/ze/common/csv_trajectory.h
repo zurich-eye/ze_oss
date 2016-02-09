@@ -43,7 +43,7 @@ protected:
   Vector7 readPose(const std::vector<std::string>& items)
   {
     Vector7 pose;
-    pose << readTranslation(items) << readOrientation(items);
+    pose << readTranslation(items), readOrientation(items);
     return pose;
   }
   std::ifstream in_str_;
