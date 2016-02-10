@@ -8,7 +8,7 @@
 #include <ze/common/time.h>
 #include <ze/common/test_utils.h>
 #include <ze/ts_match.h>
-
+#include <ze/common/csv_trajectory.h>
 #include <ze/common/test_entrypoint.h>
 
 // Matching parameters
