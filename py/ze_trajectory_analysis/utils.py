@@ -23,7 +23,7 @@ def read_nanosecond_timestamps_from_csv_file(filename, col=0, delimiter=','):
     """
     Read nanosecond timestamps from textfile.
     """
-    return np.genfromtxt(filename, usecols=(col), delimiter=delimiter, dtype=np.longlong, skip_header=1)
+    return np.genfromtxt(filename, usecols=(col), delimiter=delimiter, dtype=np.int64, skip_header=1)
 
 def get_rigid_body_trafo(quat,trans):
     """
