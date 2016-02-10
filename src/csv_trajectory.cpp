@@ -54,7 +54,6 @@ void LLASeries::load(const std::string& in_file_path)
   {
     if('%' != line.at(0) && '#' != line.at(0))
     {
-      std::stringstream line_str(line);
       std::vector<std::string> items = ze::splitString(line, delimiter_);
       CHECK_GE(items.size(), 4u);
       int64_t stamp = std::stoll(items[order_.find("ts")->second]);
@@ -67,6 +66,38 @@ void LLASeries::load(const std::string& in_file_path)
 const Buffer<FloatType, 3>& LLASeries::getBuffer() const
 {
   return lla_buf_;
+}
+
+PositionSeries::PositionSeries()
+{
+  order_["ts"] = 0;
+  order_["tx"] = 1;
+  order_["ty"] = 2;
+  order_["tz"] = 3;
+
+  header_ = "timestamp, tx, ty, tz";
+}
+
+void PositionSeries::load(const std::string& in_file_path)
+{
+  readHeader(in_file_path);
+  std::string line;
+  while(getline(in_str_, line))
+  {
+    if('%' != line.at(0) && '#' != line.at(0))
+    {
+      std::vector<std::string> items = ze::splitString(line, delimiter_);
+      CHECK_GE(items.size(), 4u);
+      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+      Vector3 position = readTranslation(items);
+      position_buf_.insert(stamp, position);
+    }
+  }
+}
+
+const Buffer<FloatType, 3>& PositionSeries::getBuffer() const
+{
+  return position_buf_;
 }
 
 PoseSeries::PoseSeries()
@@ -91,7 +122,6 @@ void PoseSeries::load(const std::string& in_file_path)
   {
     if('%' != line.at(0) && '#' != line.at(0))
     {
-      std::stringstream line_str(line);
       std::vector<std::string> items = ze::splitString(line, delimiter_);
       CHECK_GE(items.size(), 8u);
       int64_t stamp = std::stoll(items[order_.find("ts")->second]);

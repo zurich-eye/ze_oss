@@ -37,6 +37,17 @@ protected:
   Buffer<FloatType, 3> lla_buf_;
 };
 
+class PositionSeries : public CSVTrajectory
+{
+public:
+  PositionSeries();
+  virtual void load(const std::string& in_file_path) override;
+  const Buffer<FloatType, 3>& getBuffer() const;
+
+protected:
+  Buffer<FloatType, 3> position_buf_;
+};
+
 class PoseSeries : public CSVTrajectory
 {
 public:
