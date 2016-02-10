@@ -33,8 +33,6 @@ int main(int argc, char** argv)
       if('%' != line.at(0) && '#' != line.at(0))
       {
         std::vector<std::string> items = ze::splitString(line, ',');
-        //std::cout << "GT LINE: " << line << std::endl;
-        //std::cout << "\t TS: " << items[0] << std::endl;
         CHECK_GE(items.size(), 4u);
         int64_t stamp = std::stoll(items[0]);
         ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
@@ -74,12 +72,13 @@ int main(int argc, char** argv)
     std::string separator = ", ";
     for(const std::pair<int64_t, ze::Transformation>& it : es_poses)
     {
-      //ze::Vector3 gt_pos;
+      ze::Vector3 gt_pos;
       int64_t gt_stamp;
 
-      if(!ze::findNearestTS(gt_buffer,
-                            it.first,
-                            gt_stamp))
+      if(!ze::findNearestTimeStamp(gt_buffer,
+                                   it.first,
+                                   gt_stamp,
+                                   gt_pos))
       {
         ++n_skipped;
         continue;
@@ -87,13 +86,13 @@ int main(int argc, char** argv)
 
       // Write to file
       fs << gt_stamp << separator
-       //  << gt_pos.x() << separator
-       //  << gt_pos.y() << separator
-       //  << gt_pos.z() << separator
+         << gt_pos.x() << separator
+         << gt_pos.y() << separator
+         << gt_pos.z() << separator
          << it.first << separator
-      //   << it.second.getPosition().x() << separator
-      //   << it.second.getPosition().y() << separator
-      //   << it.second.getPosition().z()
+         << it.second.getPosition().x() << separator
+         << it.second.getPosition().y() << separator
+         << it.second.getPosition().z()
          << std::endl;
     }
 
