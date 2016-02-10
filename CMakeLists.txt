@@ -18,10 +18,11 @@ cs_add_executable(
 	src/match_stamps.cpp
 )
 
-cs_add_executable(
-  test_ts_match
-  test/test_ts_match.cpp
-)
+##########
+# GTESTS #
+##########
+catkin_add_gtest(test_ts_match test/test_ts_match.cpp)
+target_link_libraries(test_ts_match ${catkin_LIBRARIES})
 
 ##########
 # EXPORT #

@@ -18,7 +18,7 @@ bool findNearestTimeStamp(Buffer<BuffScalar, BuffDim>& in_buff,
 {
   bool success;
   int64_t offset_nsecs = ze::secToNanosec(offset_secs);
-  std::tie(out_ts, out_data, success) = in_buff.getNearestValue(in_ts + offset_nsecs);
+  std::tie(out_ts, out_data, success) = in_buff.getNearestValue(in_ts+offset_nsecs);
   if(!success)
   {
     return false;
