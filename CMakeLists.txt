@@ -18,6 +18,11 @@ cs_add_executable(
 	src/match_stamps.cpp
 )
 
+cs_add_executable(
+  test_ts_match
+  test/test_ts_match.cpp
+)
+
 ##########
 # EXPORT #
 ##########
