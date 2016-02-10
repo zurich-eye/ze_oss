@@ -14,7 +14,7 @@ DEFINE_string(filename_groundtruth, "", "Filename of groundtruth trajectory.");
 
 DEFINE_double(offset_sec, 0.0, "time offset added to the timestamps of the estimate");
 DEFINE_double(max_difference_sec, 0.02, "maximally allowed time difference for matching entries");
-    
+
 int main(int argc, char** argv)
 {
   google::InitGoogleLogging(argv[0]);
@@ -28,11 +28,16 @@ int main(int argc, char** argv)
     std::string line;
     while(std::getline(fs, line))
     {
-      std::vector<std::string> items = ze::splitString(line, ',');
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[0]);
-      ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-      gt_buffer.insert(stamp, pos);
+      if('%' != line.at(0) && '#' != line.at(0))
+      {
+        std::vector<std::string> items = ze::splitString(line, ',');
+        //std::cout << "GT LINE: " << line << std::endl;
+        //std::cout << "\t TS: " << items[0] << std::endl;
+        CHECK_GE(items.size(), 4u);
+        int64_t stamp = std::stoll(items[0]);
+        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
+        gt_buffer.insert(stamp, pos);
+      }
     }
   }
 
@@ -45,12 +50,15 @@ int main(int argc, char** argv)
     int64_t offset_nsec = ze::secToNanosec(FLAGS_offset_sec);
     while(std::getline(fs, line))
     {
-      std::vector<std::string> items = ze::splitString(line, ',');
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[0]);
-      ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-      ze::Quaternion rot(std::stod(items[7]), std::stod(items[4]), std::stod(items[5]), std::stod(items[6]));
-      es_poses.push_back(std::make_pair(stamp + offset_nsec, ze::Transformation(rot, pos)));
+      if('%' != line.at(0) && '#' != line.at(0))
+      {
+        std::vector<std::string> items = ze::splitString(line, ',');
+        CHECK_GE(items.size(), 4u);
+        int64_t stamp = std::stoll(items[0]);
+        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
+        ze::Quaternion rot(std::stod(items[7]), std::stod(items[4]), std::stod(items[5]), std::stod(items[6]));
+        es_poses.push_back(std::make_pair(stamp + offset_nsec, ze::Transformation(rot, pos)));
+      }
     }
   }
 
@@ -90,5 +98,5 @@ int main(int argc, char** argv)
             << ". Skipped " << n_skipped << " because of too large time difference.";
   }
 
-	return 0;
+  return 0;
 }
