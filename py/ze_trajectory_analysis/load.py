@@ -35,7 +35,7 @@ def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_
         match_stamps.write_matches_to_file(filename_matches, matches)
     else:
         logger.info("Load timestamp matches from file.")
-        matches = np.genfromtxt(filename_matches, dtype=np.longlong, delimiter=',', skip_header=1)
+        matches = np.genfromtxt(filename_matches, dtype=np.int64, delimiter=',', skip_header=1)
         
     # Create look-up table { es -> gt }
     matches_lut = dict([(row[0], row[1]) for row in matches])
