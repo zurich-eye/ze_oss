@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 
 #include <string>
+#include <ze/common/string_utils.h>
 
 namespace ze {
 
@@ -20,6 +21,11 @@ inline bool isDir(const std::string& filename)
     return S_ISDIR(buf.st_mode);
   }
   return false;
+}
+
+inline std::string joinPath(const std::string& s1, const std::string& s2)
+{
+  return std::string(ensureRightSlash(s1) + ensureNoLeftSlash(s2));
 }
 
 } // namespace ze

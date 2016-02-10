@@ -73,17 +73,17 @@ TEST(BufferTest, testIterator)
 TEST(BufferTest, testNearestValue)
 {
   ze::Buffer<double, 2> buffer;
-  EXPECT_FALSE(buffer.getNearestValue(ze::secToNanosec(1)).second);
+  EXPECT_FALSE(std::get<2>(buffer.getNearestValue(ze::secToNanosec(1))));
 
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
   }
 
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(0.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(11.0)).first[0], 9);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(1)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(0.4)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(1.4)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(11.0)))[0], 9);
 }
 
 TEST(BufferTest, testOldestNewestValue)
