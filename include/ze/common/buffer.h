@@ -41,7 +41,7 @@ public:
   }
 
   //! Get value with timestamp closest to stamp. Boolean in returns if successful.
-  std::pair<Vector, bool> getNearestValue(int64_t stamp);
+  std::tuple<int64_t, Vector, bool> getNearestValue(int64_t stamp);
 
   //! Get oldest value in buffer.
   std::pair<Vector, bool> getOldestValue() const;
