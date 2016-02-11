@@ -10,6 +10,20 @@ catkin_python_setup()
 
 include(ze_setup)
 
+#############
+# LIBRARIES #
+#############
+set(HEADERS
+  include/ze/trajectory_analysis/kitti_evaluation.h
+  )
+
+set(SOURCES
+  src/kitti_evaluation.cpp
+  )
+
+cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+
 ###############
 # EXECUTABLES #
 ###############
