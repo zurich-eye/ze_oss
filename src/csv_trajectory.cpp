@@ -43,7 +43,7 @@ LLASeries::LLASeries()
   order_["ty"] = 2;
   order_["tz"] = 3;
 
-  header_ = "timestamp, latitude, longitude, altitude";
+  header_ = "# timestamp, latitude, longitude, altitude";
 }
 
 void LLASeries::load(const std::string& in_file_path)
@@ -80,7 +80,7 @@ PositionSeries::PositionSeries()
   order_["ty"] = 2;
   order_["tz"] = 3;
 
-  header_ = "timestamp, tx, ty, tz";
+  header_ = "# timestamp, tx, ty, tz";
 }
 
 void PositionSeries::load(const std::string& in_file_path)
