@@ -8,10 +8,12 @@
 #include <ze/common/transformation.h>
 #include <ze/common/time.h>
 
-DEFINE_string(data_dir, "", "Path to data");
-DEFINE_string(filename_estimate, "", "Filename of estimated trajectory.");
-DEFINE_string(filename_groundtruth, "", "Filename of groundtruth trajectory.");
-
+DEFINE_string(data_dir, ".", "Path to data");
+DEFINE_string(filename_estimate, "traj_es.csv", "Filename of estimated trajectory.");
+DEFINE_string(filename_groundtruth, "traj_gt.csv", "Filename of groundtruth trajectory.");
+DEFINE_string(filename_matches, "traj_es_gt_matches.csv", "Filename of matched timestamps");
+DEFINE_uint64(stamp_index_estimate, 0, "Index of timestamp in estimate file.");
+DEFINE_uint64(stamp_index_groundtruth, 0, "Index of timestamp in estimate file.");
 DEFINE_double(offset_sec, 0.0, "time offset added to the timestamps of the estimate");
 DEFINE_double(max_difference_sec, 0.02, "maximally allowed time difference for matching entries");
 
@@ -21,8 +23,9 @@ int main(int argc, char** argv)
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   // Load groundtruth.
-  ze::Buffer<ze::FloatType,3> gt_buffer;
+  ze::Buffer<ze::FloatType,1> gt_stamps;
   {
+    ze::Vector1 dummy; // We misuse the Buffer class to easily find the closest timestamp.
     std::ifstream fs;
     ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_groundtruth), &fs);
     std::string line;
@@ -31,18 +34,15 @@ int main(int argc, char** argv)
       if('%' != line.at(0) && '#' != line.at(0))
       {
         std::vector<std::string> items = ze::splitString(line, ',');
-        //std::cout << "GT LINE: " << line << std::endl;
-        //std::cout << "\t TS: " << items[0] << std::endl;
-        CHECK_GE(items.size(), 4u);
-        int64_t stamp = std::stoll(items[0]);
-        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-        gt_buffer.insert(stamp, pos);
+        CHECK_GE(items.size(), FLAGS_stamp_index_groundtruth + 1);
+        int64_t stamp = std::stoll(items[FLAGS_stamp_index_groundtruth]);
+        gt_stamps.insert(stamp, dummy);
       }
     }
   }
 
-  // Load estimate.
-  std::vector<std::pair<int64_t, ze::Transformation>> es_poses;
+  // Load estimate stamps.
+  std::vector<int64_t> es_stamps;
   {
     std::ifstream fs;
     ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_estimate), &fs);
@@ -53,48 +53,35 @@ int main(int argc, char** argv)
       if('%' != line.at(0) && '#' != line.at(0))
       {
         std::vector<std::string> items = ze::splitString(line, ',');
-        CHECK_GE(items.size(), 4u);
-        int64_t stamp = std::stoll(items[0]);
-        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-        ze::Quaternion rot(std::stod(items[7]), std::stod(items[4]), std::stod(items[5]), std::stod(items[6]));
-        es_poses.push_back(std::make_pair(stamp + offset_nsec, ze::Transformation(rot, pos)));
+        CHECK_GE(items.size(), FLAGS_stamp_index_estimate + 1);
+        int64_t stamp = std::stoll(items[FLAGS_stamp_index_estimate]);
+        es_stamps.push_back(stamp + offset_nsec);
       }
     }
   }
 
-  // Now loop through all estimated poses and find closest groundtruth-stamp.
+  // Now loop through all estimate stamps and find closest groundtruth-stamp.
   {
     int64_t max_diff_nsec = ze::secToNanosec(FLAGS_max_difference_sec);
     int n_skipped = 0;
     std::ofstream fs;
-    ze::openOutputFileStream(ze::joinPath(FLAGS_data_dir, "matched_poses.csv"), &fs);
-    fs << "# gt-stamp, gt-x, gt-y, gt-z, es-stamp, es-x, es-y, es-z, es-qx, es-qy, es-qz, es-qw\n";
-    std::string separator = ", ";
-    for(const std::pair<int64_t, ze::Transformation>& it : es_poses)
+    ze::openOutputFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_matches), &fs);
+    fs << "# es-stamp [nsec], gt-stamp [nsec]\n";
+    for(const int64_t& es_stamp : es_stamps)
     {
       bool success;
-      ze::Vector3 gt_pos;
       int64_t gt_stamp;
-      std::tie(gt_stamp, gt_pos, success) = gt_buffer.getNearestValue(it.first);
+      std::tie(gt_stamp, std::ignore, success) = gt_stamps.getNearestValue(es_stamp);
       CHECK(success);
-      if(std::abs(gt_stamp - it.first) > max_diff_nsec)
+      if(std::abs(gt_stamp - es_stamp) > max_diff_nsec)
       {
         ++n_skipped;
         continue;
       }
-
-      // Write to file
-      fs << gt_stamp << separator
-         << gt_pos.x() << separator
-         << gt_pos.y() << separator
-         << gt_pos.z() << separator
-         << it.first << separator
-         << it.second.getPosition().x() << separator
-         << it.second.getPosition().y() << separator
-         << it.second.getPosition().z() << "\n";
+      fs << es_stamp << ", " << gt_stamp << "\n";
     }
 
-    VLOG(1) << "Wrote " << es_poses.size() - n_skipped << " matched poses to file"
+    VLOG(1) << "Wrote " << es_stamps.size() - n_skipped << " matched poses to file"
             << ". Skipped " << n_skipped << " because of too large time difference.";
   }
 
