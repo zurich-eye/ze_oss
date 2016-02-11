@@ -62,7 +62,7 @@ std::vector<RelativeError> calcSequenceErrors(
       int32_t last_frame = lastFrameFromSegmentLength(dist, first_frame, len);
 
       // continue, if sequence not long enough
-      if(last_frame == -1)
+      if (last_frame == -1)
       {
         continue;
       }
@@ -76,7 +76,7 @@ std::vector<RelativeError> calcSequenceErrors(
 
       // write to file
       errors.push_back(RelativeError(first_frame, rot_err/len, pos_err/len, len,
-                                     last_frame - first_frame));
+                                     last_frame - first_frame + 1));
     }
   }
 
