@@ -34,7 +34,7 @@ class TrajectoryAnalysis:
           
     def load_data(self, data_dir, data_format='csv',
                   filename_gt = 'traj_gt.csv', filename_es = 'traj_es.csv', 
-                  filename_matches = 'traj_matches.csv', rematch_timestamps = False, 
+                  filename_matches = 'traj_es_gt_matches.csv', rematch_timestamps = False, 
                   match_timestamps_offset = 0.0, rematch_timestamps_max_difference_sec = 0.02):
         """Loads the trajectory data.
         

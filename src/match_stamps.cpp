@@ -9,8 +9,8 @@
 #include <ze/common/time.h>
 
 DEFINE_string(data_dir, ".", "Path to data");
-DEFINE_string(filename_estimate, "traj_es.csv", "Filename of estimated trajectory.");
-DEFINE_string(filename_groundtruth, "traj_gt.csv", "Filename of groundtruth trajectory.");
+DEFINE_string(filename_es, "traj_es.csv", "Filename of estimated trajectory.");
+DEFINE_string(filename_gt, "traj_gt.csv", "Filename of groundtruth trajectory.");
 DEFINE_string(filename_matches, "traj_es_gt_matches.csv", "Filename of matched timestamps");
 DEFINE_uint64(stamp_index_estimate, 0, "Index of timestamp in estimate file.");
 DEFINE_uint64(stamp_index_groundtruth, 0, "Index of timestamp in estimate file.");
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
   {
     ze::Vector1 dummy; // We misuse the Buffer class to easily find the closest timestamp.
     std::ifstream fs;
-    ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_groundtruth), &fs);
+    ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_gt), &fs);
     std::string line;
     while(std::getline(fs, line))
     {
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
   std::vector<int64_t> es_stamps;
   {
     std::ifstream fs;
-    ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_estimate), &fs);
+    ze::openFileStream(ze::joinPath(FLAGS_data_dir, FLAGS_filename_es), &fs);
     std::string line;
     int64_t offset_nsec = ze::secToNanosec(FLAGS_offset_sec);
     while(std::getline(fs, line))

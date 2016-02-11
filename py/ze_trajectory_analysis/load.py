@@ -7,36 +7,38 @@ import os
 import logging
 import numpy as np
 import ze_trajectory_analysis.utils as utils
-import ze_trajectory_analysis.match_stamps as match_stamps
 
 # -----------------------------------------------------------------------------
 # Dataset loading
   
 def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_es.csv',
-                     filename_matches = 'traj_matches.csv', rematch_timestamps = False,
+                     filename_matches = 'traj_es_gt_matches.csv', rematch_timestamps = False,
                      match_timestamps_offset = 0.0, match_timestamps_max_difference_sec = 0.02):
     logger = logging.getLogger(__name__)
     
+    # generate or load matches:
+    if not os.path.exists(os.path.join(data_dir, filename_matches)) or rematch_timestamps:
+        logger.info("Find timestamp matches.")
+        match_command = "rosrun ze_trajectory_analysis match_stamps" \
+                        + " --data_dir=" + data_dir \
+                        + " --filename_es=" + filename_es \
+                        + " --filename_gt=" + filename_gt \
+                        + " --filename_matches=" + filename_matches \
+                        + " --offset_sec=" + str(match_timestamps_offset) \
+                        + " --max_difference_sec=" + str(match_timestamps_max_difference_sec)
+        logger.info("Executing command: "+match_command)
+        os.system(match_command)
+                            
+    # load data:
     filename_gt = utils.check_file_exists(os.path.join(data_dir, filename_gt))
     filename_es = utils.check_file_exists(os.path.join(data_dir, filename_es))
     filename_matches = os.path.join(data_dir, filename_matches)
-    
-    # load file:
     keys_gt = utils.read_nanosecond_timestamps_from_csv_file(filename_gt, 0, ',')        
     keys_es = utils.read_nanosecond_timestamps_from_csv_file(filename_es, 0, ',')
     data_es = np.genfromtxt(filename_es, delimiter=',', dtype=np.float64, skip_header=1)[:,1:]
     data_gt = np.genfromtxt(filename_gt, delimiter=',', dtype=np.float64, skip_header=1)[:,1:]
+    matches = np.genfromtxt(filename_matches, dtype=np.int64, delimiter=',', skip_header=1)
     
-    # generate or load matches:
-    if not os.path.exists(filename_matches) or rematch_timestamps:
-        logger.info("Find timestamp matches.")
-        matches = match_stamps.associate(keys_es, keys_gt, match_timestamps_offset,
-                                         match_timestamps_max_difference_sec)
-        match_stamps.write_matches_to_file(filename_matches, matches)
-    else:
-        logger.info("Load timestamp matches from file.")
-        matches = np.genfromtxt(filename_matches, dtype=np.int64, delimiter=',', skip_header=1)
-        
     # Create look-up table { es -> gt }
     matches_lut = dict([(row[0], row[1]) for row in matches])
     
@@ -71,7 +73,6 @@ def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_
     
 
 def load_estimator_results(filename):
-    logger = logging.getLogger(__name__)
     stamp = utils.read_nanosecond_timestamps_from_csv_file(filename, 0, ',')
     data = np.genfromtxt(filename, delimiter=',', dtype=np.float64, skip_header=1)[:,1:]
     velocity = data[:,7:10]    
