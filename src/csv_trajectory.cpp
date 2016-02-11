@@ -68,6 +68,11 @@ const Buffer<FloatType, 3>& LLASeries::getBuffer() const
   return lla_buf_;
 }
 
+Buffer<FloatType, 3>& LLASeries::getBuffer()
+{
+  return lla_buf_;
+}
+
 PositionSeries::PositionSeries()
 {
   order_["ts"] = 0;
@@ -100,6 +105,11 @@ const Buffer<FloatType, 3>& PositionSeries::getBuffer() const
   return position_buf_;
 }
 
+Buffer<FloatType, 3>& PositionSeries::getBuffer()
+{
+  return position_buf_;
+}
+
 PoseSeries::PoseSeries()
 {
   order_["ts"] = 0;
@@ -111,7 +121,7 @@ PoseSeries::PoseSeries()
   order_["qz"] = 6;
   order_["qw"] = 7;
 
-  header_ = "timestamp, x, y, z, qx, qy, qz, qw";
+  header_ = "# timestamp, x, y, z, qx, qy, qz, qw";
 }
 
 void PoseSeries::load(const std::string& in_file_path)
@@ -134,6 +144,17 @@ void PoseSeries::load(const std::string& in_file_path)
 const Buffer<FloatType, 7>& PoseSeries::getBuffer() const
 {
   return pose_buf_;
+}
+
+Buffer<FloatType, 7>& PoseSeries::getBuffer()
+{
+  return pose_buf_;
+}
+
+SWEResultSeries::SWEResultSeries()
+  : PoseSeries()
+{
+  header_ = "# timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz";
 }
 
 } // ze namespace

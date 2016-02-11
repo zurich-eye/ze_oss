@@ -32,6 +32,7 @@ public:
   LLASeries();
   virtual void load(const std::string& in_file_path) override;
   const Buffer<FloatType, 3>& getBuffer() const;
+  Buffer<FloatType, 3>& getBuffer();
 
 protected:
   Buffer<FloatType, 3> lla_buf_;
@@ -43,6 +44,7 @@ public:
   PositionSeries();
   virtual void load(const std::string& in_file_path) override;
   const Buffer<FloatType, 3>& getBuffer() const;
+  Buffer<FloatType, 3>& getBuffer();
 
 protected:
   Buffer<FloatType, 3> position_buf_;
@@ -54,9 +56,16 @@ public:
   PoseSeries();
   virtual void load(const std::string& in_file_path) override;
   const Buffer<FloatType, 7>& getBuffer() const;
+  Buffer<FloatType, 7>& getBuffer();
 
 protected:
   Buffer<FloatType, 7> pose_buf_;
+};
+
+class SWEResultSeries : public PoseSeries
+{
+public:
+  SWEResultSeries();
 };
 
 } // ze namespace
