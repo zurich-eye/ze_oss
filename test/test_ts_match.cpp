@@ -20,74 +20,43 @@ TEST(TimeStampMatcher, matchTest)
   std::string test_data_dir = ze::getTestDataDir("ze_ts_matching");
 
   // Load groundtruth.
-  ze::Buffer<ze::FloatType,3> gt_buffer;
-  {
-    std::ifstream fs;
-    ze::openFileStream(ze::joinPath(test_data_dir, "traj_gt.csv"), &fs);
-    std::string line;
-    while(std::getline(fs, line))
-    {
-      if('%' != line.at(0) && '#' != line.at(0))
-      {
-        std::vector<std::string> items = ze::splitString(line, ',');
-        EXPECT_GE(items.size(), 4u);
-        int64_t stamp = std::stoll(items[0]);
-        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-        gt_buffer.insert(stamp, pos);
-      }
-    }
-  }
+  ze::PoseSeries gt_poses;
+  gt_poses.load(ze::joinPath(test_data_dir, "traj_gt.csv"));
 
-  // Load estimate.
-  std::vector<std::pair<int64_t, ze::Transformation>> es_poses;
-  {
-    std::ifstream fs;
-    ze::openFileStream(ze::joinPath(test_data_dir, "traj_es.csv"), &fs);
-    std::string line;
-    int64_t offset_nsec = ze::secToNanosec(offset_sec);
-    while(std::getline(fs, line))
-    {
-      if('%' != line.at(0) && '#' != line.at(0))
-      {
-        std::vector<std::string> items = ze::splitString(line, ',');
-        EXPECT_GE(items.size(), 4u);
-        int64_t stamp = std::stoll(items[0]);
-        ze::Vector3 pos(std::stod(items[1]), std::stod(items[2]), std::stod(items[3]));
-        ze::Quaternion rot(std::stod(items[7]), std::stod(items[4]), std::stod(items[5]), std::stod(items[6]));
-        es_poses.push_back(std::make_pair(stamp + offset_nsec, ze::Transformation(rot, pos)));
-      }
-    }
-  }
+  // Load estimated trajectory.
+  ze::SWEResultSeries es_poses;
+  es_poses.load(ze::joinPath(test_data_dir, "traj_es.csv"));
 
   // Load matches to compare against
   std::map<int64_t, int64_t> matches;
+  std::ifstream fs;
+  ze::openFileStream(ze::joinPath(test_data_dir, "python_matches.csv"), &fs);
+  std::string line;
+  while(std::getline(fs, line))
   {
-    std::ifstream fs;
-    ze::openFileStream(ze::joinPath(test_data_dir, "python_matches.csv"), &fs);
-    std::string line;
-    while(std::getline(fs, line))
+    if('%' != line.at(0) && '#' != line.at(0))
     {
-      if('%' != line.at(0) && '#' != line.at(0))
-      {
-        std::vector<std::string> items = ze::splitString(line, ',');
-        EXPECT_GE(items.size(), 2u);
-        int64_t stamp_es = std::stoll(items[0]);
-        int64_t stamp_gt = std::stoll(items[1]);
-        matches[stamp_es] = stamp_gt;
-      }
+      std::vector<std::string> items = ze::splitString(line, ',');
+      EXPECT_GE(items.size(), 2u);
+      int64_t stamp_es = std::stoll(items[0]);
+      int64_t stamp_gt = std::stoll(items[1]);
+      matches[stamp_es] = stamp_gt;
     }
   }
 
   // Now loop through all estimated poses and find closest groundtruth-stamp.
+  auto & gt_buffer = gt_poses.getBuffer();
+  auto & es_buffer = es_poses.getBuffer();
+  es_buffer.lock();
   int n_skipped = 0, n_checked = 0;
-  for(const auto & it : es_poses)
+  for(const auto & pose : es_buffer.data())
   {
-    ze::Vector3 gt_pos;
-    int64_t gt_stamp;
+    ze::Vector7 matched_gt_pose;
+    int64_t matched_gt_stamp;
     if(!ze::findNearestTimeStamp(gt_buffer,
-                                 it.first,
-                                 gt_stamp,
-                                 gt_pos,
+                                 pose.first,
+                                 matched_gt_stamp,
+                                 matched_gt_pose,
                                  max_difference_sec,
                                  offset_sec))
     {
@@ -95,12 +64,13 @@ TEST(TimeStampMatcher, matchTest)
     }
     else
     {
-      EXPECT_LE(std::abs(it.first-gt_stamp), ze::secToNanosec(max_difference_sec));
-      EXPECT_EQ(matches.find(it.first)->second, gt_stamp);
+      EXPECT_LE(std::abs(pose.first-matched_gt_stamp), ze::secToNanosec(max_difference_sec));
+      EXPECT_EQ(matches.find(pose.first)->second, matched_gt_stamp);
       ++n_checked;
     }
   }
-  EXPECT_EQ(es_poses.size(), n_checked+n_skipped);
+  es_buffer.unlock();
+  EXPECT_EQ(es_buffer.size(), n_checked+n_skipped);
 }
 
 ZE_UNITTEST_ENTRYPOINT
