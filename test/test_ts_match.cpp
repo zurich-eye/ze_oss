@@ -45,16 +45,15 @@ TEST(TimeStampMatcher, matchTest)
   }
 
   // Now loop through all estimated poses and find closest groundtruth-stamp.
-  auto & gt_buffer = gt_poses.getBuffer();
-  auto & es_buffer = es_poses.getBuffer();
-  es_buffer.lock();
+  auto& gt_buffer = gt_poses.getBuffer();
+  auto es_poses_data = es_poses.getStampedTransformationVector();
   int n_skipped = 0, n_checked = 0;
-  for(const auto & pose : es_buffer.data())
+  for(const std::pair<int64_t, ze::Transformation>& stampd_pose : es_poses_data)
   {
     ze::Vector7 matched_gt_pose;
     int64_t matched_gt_stamp;
     if(!ze::findNearestTimeStamp(gt_buffer,
-                                 pose.first,
+                                 stampd_pose.first,
                                  matched_gt_stamp,
                                  matched_gt_pose,
                                  max_difference_sec,
@@ -64,13 +63,13 @@ TEST(TimeStampMatcher, matchTest)
     }
     else
     {
-      EXPECT_LE(std::abs(pose.first-matched_gt_stamp), ze::secToNanosec(max_difference_sec));
-      EXPECT_EQ(matches.find(pose.first)->second, matched_gt_stamp);
+      EXPECT_LE(std::abs(stampd_pose.first - matched_gt_stamp),
+                ze::secToNanosec(max_difference_sec));
+      EXPECT_EQ(matches.find(stampd_pose.first)->second, matched_gt_stamp);
       ++n_checked;
     }
   }
-  es_buffer.unlock();
-  EXPECT_EQ(es_buffer.size(), n_checked+n_skipped);
+  EXPECT_EQ(es_poses_data.size(), n_checked+n_skipped);
 }
 
 ZE_UNITTEST_ENTRYPOINT
