@@ -178,4 +178,19 @@ SWEResultSeries::SWEResultSeries()
   header_ = "# timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz";
 }
 
+EurocResultSeries::EurocResultSeries()
+  : PoseSeries()
+{
+  order_["ts"] = 0;
+  order_["tx"] = 1;
+  order_["ty"] = 2;
+  order_["tz"] = 3;
+  order_["qx"] = 5;
+  order_["qy"] = 6;
+  order_["qz"] = 7;
+  order_["qw"] = 4;
+
+  header_ = "#timestamp, p_RS_R_x [m], p_RS_R_y [m], p_RS_R_z [m], q_RS_w [], q_RS_x [], q_RS_y [], q_RS_z [], v_RS_R_x [m s^-1], v_RS_R_y [m s^-1], v_RS_R_z [m s^-1], b_w_RS_S_x [rad s^-1], b_w_RS_S_y [rad s^-1], b_w_RS_S_z [rad s^-1], b_a_RS_S_x [m s^-2], b_a_RS_S_y [m s^-2], b_a_RS_S_z [m s^-2]";
+}
+
 } // ze namespace
