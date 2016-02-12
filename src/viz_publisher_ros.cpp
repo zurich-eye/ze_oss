@@ -108,7 +108,6 @@ void VisualizerRos::drawCoordinateFrame(
     const FloatType size)
 {
   const Vector3& p = pose.getPosition();
-  const Matrix3 R = pose.getRotationMatrix();
 
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
@@ -195,7 +194,35 @@ void VisualizerRos::drawCoordinateFrames(
     const TransformationVector& poses,
     const FloatType size)
 {
-
+  visualization_msgs::Marker m;
+  m.header.frame_id = world_frame;
+  m.header.stamp = ros::Time::now();
+  m.ns = ns;
+  m.id = id;
+  m.type = visualization_msgs::Marker::LINE_LIST;
+  m.action = 0; // 0 = add/modify
+  m.scale.x = size * viz_scale_ * 0.05;
+  m.colors.reserve(poses.size() * 3);
+  m.points.reserve(poses.size() * 3);
+  FloatType length = size * viz_scale_;
+  for(const Transformation& T : poses)
+  {
+    const Vector3& p = T.getPosition();
+    const Matrix3 R = T.getRotationMatrix();
+    m.points.push_back(utils::getRosPoint(p));
+    m.colors.push_back(utils::getRosColor(Colors::Red));
+    m.points.push_back(utils::getRosPoint(p + R.col(0) * length));
+    m.colors.push_back(utils::getRosColor(Colors::Red));
+    m.points.push_back(utils::getRosPoint(p));
+    m.colors.push_back(utils::getRosColor(Colors::Green));
+    m.points.push_back(utils::getRosPoint(p + R.col(1) * length));
+    m.colors.push_back(utils::getRosColor(Colors::Green));
+    m.points.push_back(utils::getRosPoint(p));
+    m.colors.push_back(utils::getRosColor(Colors::Blue));
+    m.points.push_back(utils::getRosPoint(p + R.col(2) * length));
+    m.colors.push_back(utils::getRosColor(Colors::Blue));
+  }
+  pub_marker_.publish(m);
 }
 
 } // namespace ze
