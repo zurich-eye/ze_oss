@@ -35,7 +35,6 @@ inline void openOutputFileStream(
     std::ofstream* fs)
 {
   CHECK_NOTNULL(fs);
-  CHECK(fileExists(filename)) << "File does not exist: " << filename;
   fs->open(filename.c_str(), std::ios::out);
   CHECK(*fs);
   CHECK(fs->is_open()) << "Failed to open file: " << filename;
