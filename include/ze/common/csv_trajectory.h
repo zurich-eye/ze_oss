@@ -9,13 +9,17 @@
 
 namespace ze {
 
+using StampedTransformationVector =
+  std::vector<std::pair<int64_t, Transformation>,
+              Eigen::aligned_allocator<std::pair<int64_t, Transformation>>>;
+
 class CSVTrajectory
 {
 public:
   virtual void load(const std::string& in_file_path) = 0;
 
 protected:
-  CSVTrajectory();
+  CSVTrajectory() = default;
   void readHeader(const std::string& in_file_path);
   Vector3 readTranslation(const std::vector<std::string>& items);
   Vector4 readOrientation(const std::vector<std::string>& items);
@@ -54,9 +58,11 @@ class PoseSeries : public CSVTrajectory
 {
 public:
   PoseSeries();
+
   virtual void load(const std::string& in_file_path) override;
   const Buffer<FloatType, 7>& getBuffer() const;
   Buffer<FloatType, 7>& getBuffer();
+  StampedTransformationVector getStampedTransformationVector();
 
 protected:
   Buffer<FloatType, 7> pose_buf_;

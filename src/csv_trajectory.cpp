@@ -2,8 +2,13 @@
 
 namespace ze {
 
-CSVTrajectory::CSVTrajectory()
-{ }
+Transformation getTransformationFromVec7(const Vector7& data)
+{
+  Vector3 p = data.head<3>();
+  Quaternion q(data(6), data(3), data(4), data(5));
+  CHECK_DOUBLE_EQ(q.norm(), 1.0);
+  return Transformation(q, p);
+}
 
 void CSVTrajectory::readHeader(const std::string& in_file_path)
 {
@@ -16,17 +21,19 @@ void CSVTrajectory::readHeader(const std::string& in_file_path)
 
 Vector3 CSVTrajectory::readTranslation(const std::vector<std::string>& items)
 {
-  return Vector3(std::stod(items[order_.find("tx")->second]),
-      std::stod(items[order_.find("ty")->second]),
-      std::stod(items[order_.find("tz")->second]));
+  return Vector3(
+        std::stod(items[order_.find("tx")->second]),
+        std::stod(items[order_.find("ty")->second]),
+        std::stod(items[order_.find("tz")->second]));
 }
 
 Vector4 CSVTrajectory::readOrientation(const std::vector<std::string>& items)
 {
-  return Vector4(std::stod(items[order_.find("qx")->second]),
-      std::stod(items[order_.find("qy")->second]),
-      std::stod(items[order_.find("qz")->second]),
-      std::stod(items[order_.find("qw")->second]));
+  return Vector4(
+        std::stod(items[order_.find("qx")->second]),
+        std::stod(items[order_.find("qy")->second]),
+        std::stod(items[order_.find("qz")->second]),
+        std::stod(items[order_.find("qw")->second]));
 }
 
 Vector7 CSVTrajectory::readPose(const std::vector<std::string>& items)
@@ -149,6 +156,20 @@ const Buffer<FloatType, 7>& PoseSeries::getBuffer() const
 Buffer<FloatType, 7>& PoseSeries::getBuffer()
 {
   return pose_buf_;
+}
+
+StampedTransformationVector PoseSeries::getStampedTransformationVector()
+{
+  StampedTransformationVector vec;
+  pose_buf_.lock();
+  auto& data = pose_buf_.data();
+  vec.reserve(data.size());
+  for(const auto& it : data)
+  {
+    vec.push_back(std::make_pair(it.first, getTransformationFromVec7(it.second)));
+  }
+  pose_buf_.unlock();
+  return vec;
 }
 
 SWEResultSeries::SWEResultSeries()
