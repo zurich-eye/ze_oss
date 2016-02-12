@@ -1,19 +1,22 @@
 #pragma once
 
-#include <ros/ros.h>
-
+#include <memory>
 #include <ze/visualization/viz_interface.h>
+
+// fwd
+namespace ros {
+class Publisher;
+class NodeHandle;
+}
 
 namespace ze {
 
+//! @todo(cfo): Deal with multi-threaded publishing.
 class VisualizerRos : public VisualizerBase
 {
 public:
 
-  VisualizerRos() = delete;
-
-  VisualizerRos(const ros::NodeHandle& nh_private,
-                const std::string& marker_topic = "markers");
+  VisualizerRos();
 
   virtual ~VisualizerRos() = default;
 
@@ -66,8 +69,8 @@ public:
 
 private:
 
-  ros::NodeHandle pnh_;
-  ros::Publisher pub_marker_;
+  std::unique_ptr<ros::NodeHandle> nh_;
+  std::unique_ptr<ros::Publisher> pub_marker_;
   std::string world_frame = "world";  //!< World-frame
   double viz_scale_ = 1.0;            //!< Scale marker size
 };

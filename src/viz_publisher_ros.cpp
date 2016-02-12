@@ -1,5 +1,6 @@
 #include <ze/visualization/viz_publisher_ros.h>
 
+#include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -46,12 +47,21 @@ geometry_msgs::Pose getRosPose(const Transformation& pose)
 
 } // namespace utils
 
-VisualizerRos::VisualizerRos(
-    const ros::NodeHandle& nh_private,
-    const std::string& marker_topic)
-  : pnh_(nh_private)
-  , pub_marker_(pnh_.advertise<visualization_msgs::Marker>(marker_topic, 100))
-{}
+VisualizerRos::VisualizerRos()
+{
+  // Inititialize ROS it was not initialized before.
+  if(!ros::isInitialized())
+  {
+    VLOG(1) << "Initializting ROS";
+    int argc = 0;
+    std::string node_name = "ze_visualization";
+    ros::init(argc, nullptr, node_name);
+  }
+
+  // Create node and subscribe.
+  nh_.reset(new ros::NodeHandle("~"));
+  pub_marker_.reset(new ros::Publisher(nh_->advertise<visualization_msgs::Marker>("markers", 100)));
+}
 
 void VisualizerRos::drawPoint(
     const std::string& ns,
@@ -73,7 +83,7 @@ void VisualizerRos::drawPoint(
   m.scale.z = marker_scale;
   m.color = utils::getRosColor(color);
   m.pose.position = utils::getRosPoint(point);
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 void VisualizerRos::drawLine(
@@ -98,7 +108,7 @@ void VisualizerRos::drawLine(
   m.points.reserve(2);
   m.points.push_back(utils::getRosPoint(line_from));
   m.points.push_back(utils::getRosPoint(line_to));
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 void VisualizerRos::drawCoordinateFrame(
@@ -133,7 +143,7 @@ void VisualizerRos::drawCoordinateFrame(
   m.points.push_back(utils::getRosPoint(p + Vector3::UnitZ() * length));
   m.colors.push_back(utils::getRosColor(Colors::Blue));
   m.pose = utils::getRosPose(pose);
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 void VisualizerRos::drawPoints(
@@ -160,7 +170,7 @@ void VisualizerRos::drawPoints(
   {
     m.points.push_back(utils::getRosPoint(points.col(i)));
   }
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 void VisualizerRos::drawLines(
@@ -185,7 +195,7 @@ void VisualizerRos::drawLines(
     m.points.push_back(utils::getRosPoint(lines[i].first));
     m.points.push_back(utils::getRosPoint(lines[i].second));
   }
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 void VisualizerRos::drawCoordinateFrames(
@@ -222,7 +232,7 @@ void VisualizerRos::drawCoordinateFrames(
     m.points.push_back(utils::getRosPoint(p + R.col(2) * length));
     m.colors.push_back(utils::getRosColor(Colors::Blue));
   }
-  pub_marker_.publish(m);
+  pub_marker_->publish(m);
 }
 
 } // namespace ze

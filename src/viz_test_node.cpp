@@ -9,13 +9,10 @@ int main(int argc, char** argv)
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  ros::init(argc, argv, "viz_test_node");
-  ros::NodeHandle pnh("~");
+  // Visualizer internally initializes ROS and creates a node handle.
+  ze::VisualizerRos visualizer;
 
-  ze::VisualizerRos visualizer(pnh);
-
-  int i = 0;
-  while(ros::ok())
+  for(int i = 0; i < 100; ++i)
   {
     visualizer.drawPoint(
           "point", i, ze::Vector3(0, 0, i), ze::Colors::DarkBlue);
@@ -47,6 +44,5 @@ int main(int argc, char** argv)
     visualizer.drawCoordinateFrames("poses", 0, poses);
 
     sleep(1);
-    ++i;
   }
 }
