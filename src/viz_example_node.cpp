@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 
-#include <ze/visualization/viz_publisher_ros.h>
+#include <ze/visualization/viz_ros.h>
 
 int main(int argc, char** argv)
 {

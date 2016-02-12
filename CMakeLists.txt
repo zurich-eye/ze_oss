@@ -13,13 +13,14 @@ set(HEADERS
   include/ze/visualization/viz_common.h
   include/ze/visualization/viz_gtsam.h
   include/ze/visualization/viz_interface.h
-  include/ze/visualization/viz_publisher_ros.h
+  include/ze/visualization/viz_ros.h
+  include/ze/visualization/viz_ros_utils.h
   )
 
 set(SOURCES
   src/viz_common.cpp
   src/viz_gtsam.cpp  
-  src/viz_publisher_ros.cpp
+  src/viz_ros.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -27,8 +28,8 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ###############
 # EXECUTABLES #
 ###############
-cs_add_executable(viz_test_node src/viz_test_node.cpp)
-target_link_libraries(viz_test_node ${PROJECT_NAME})
+cs_add_executable(viz_example_node src/viz_example_node.cpp)
+target_link_libraries(viz_example_node ${PROJECT_NAME})
 
 ##########
 # EXPORT #
