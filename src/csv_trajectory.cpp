@@ -21,11 +21,18 @@ Vector3 CSVTrajectory::readTranslation(const std::vector<std::string>& items)
 
 Vector4 CSVTrajectory::readOrientation(const std::vector<std::string>& items)
 {
-  return Vector4(
+  Vector4 q(
         std::stod(items[order_.find("qx")->second]),
         std::stod(items[order_.find("qy")->second]),
         std::stod(items[order_.find("qz")->second]),
         std::stod(items[order_.find("qw")->second]));
+  if(std::abs(q.squaredNorm() - 1.0) > 1e-4)
+  {
+    LOG(WARNING) << "Quaternion norm is = " << q.norm();
+    CHECK_NEAR(q.norm(), 1.0, 0.01);
+    q.normalize(); // This is only good up to some point.
+  }
+  return q;
 }
 
 Vector7 CSVTrajectory::readPose(const std::vector<std::string>& items)
@@ -167,8 +174,8 @@ StampedTransformationVector PoseSeries::getStampedTransformationVector()
 Transformation PoseSeries::getTransformationFromVec7(const Vector7& data)
 {
   Vector3 p = data.head<3>();
-  Quaternion q(data(6), data(3), data(4), data(5));
-  CHECK_DOUBLE_EQ(q.norm(), 1.0);
+  Eigen::Quaterniond q(data(6), data(3), data(4), data(5));
+  CHECK_NEAR(q.squaredNorm(), 1.0, 1e-4);
   return Transformation(q, p);
 }
 
