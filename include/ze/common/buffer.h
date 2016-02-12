@@ -73,10 +73,10 @@ public:
     return buffer_.size();
   }
 
-  inline void empty() const
+  inline bool empty() const
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    buffer_.empty();
+    return buffer_.empty();
   }
 
   inline void removeDataBeforeTimestamp(int64_t stamp)
