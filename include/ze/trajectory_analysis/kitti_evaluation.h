@@ -28,7 +28,7 @@ int32_t lastFrameFromSegmentLength(
 std::vector<RelativeError> calcSequenceErrors(
     const TransformationVector& poses_gt,
     const TransformationVector& poses_es,
-    const std::vector<FloatType>& segment_lengths,
+    const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation);
 
 } // namespace ze

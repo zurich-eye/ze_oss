@@ -27,6 +27,10 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # EXECUTABLES #
 ###############
 cs_add_executable(match_stamps src/match_stamps_node.cpp)
+target_link_libraries(match_stamps ${PROJECT_NAME})
+
+cs_add_executable(kitti_evaluation src/kitti_evaluation_node.cpp)
+target_link_libraries(kitti_evaluation ${PROJECT_NAME})
 
 ##########
 # GTESTS #

@@ -41,7 +41,7 @@ int32_t lastFrameFromSegmentLength(
 std::vector<RelativeError> calcSequenceErrors(
     const TransformationVector& poses_gt,
     const TransformationVector& poses_es,
-    const std::vector<FloatType>& segment_lengths,
+    const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation)
 {
   // error vector
@@ -54,30 +54,28 @@ std::vector<RelativeError> calcSequenceErrors(
   for (size_t first_frame = 0; first_frame < poses_gt.size();
        first_frame += skip_num_frames_between_segment_evaluation)
   {
-    // for all segment lengths do
-    for (const FloatType len : segment_lengths)
+    // compute last frame
+    int32_t last_frame = lastFrameFromSegmentLength(dist, first_frame, segment_length);
+
+    // continue, if sequence not long enough
+    if (last_frame == -1)
     {
-
-      // compute last frame
-      int32_t last_frame = lastFrameFromSegmentLength(dist, first_frame, len);
-
-      // continue, if sequence not long enough
-      if (last_frame == -1)
-      {
-        continue;
-      }
-
-      // compute rotational and translational errors
-      Transformation rel_pose_gt = poses_gt[first_frame].inverse() * poses_gt[last_frame];
-      Transformation rel_pose_es = poses_es[first_frame].inverse() * poses_es[last_frame];
-      Transformation rel_pose_error = rel_pose_es.inverse() * rel_pose_gt;
-      FloatType rot_err = rel_pose_error.getRotation().log().norm();
-      FloatType pos_err = rel_pose_error.getPosition().norm();
-
-      // write to file
-      errors.push_back(RelativeError(first_frame, rot_err/len, pos_err/len, len,
-                                     last_frame - first_frame + 1));
+      continue;
     }
+
+    // compute rotational and translational errors
+    Transformation rel_pose_gt = poses_gt[first_frame].inverse() * poses_gt[last_frame];
+    Transformation rel_pose_es = poses_es[first_frame].inverse() * poses_es[last_frame];
+    Transformation rel_pose_error = rel_pose_es.inverse() * rel_pose_gt;
+    FloatType rot_err = rel_pose_error.getRotation().log().norm();
+    FloatType pos_err = rel_pose_error.getPosition().norm();
+
+    // write to file
+    errors.push_back(RelativeError(first_frame,
+                                   rot_err / segment_length,
+                                   pos_err / segment_length,
+                                   segment_length,
+                                   last_frame - first_frame + 1));
   }
 
   // return error vector
