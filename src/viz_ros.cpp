@@ -9,7 +9,7 @@ namespace ze {
 
 VisualizerRos::VisualizerRos()
 {
-  // Inititialize ROS it was not initialized before.
+  // Inititialize ROS if it was not initialized before.
   if(!ros::isInitialized())
   {
     VLOG(1) << "Initializting ROS";

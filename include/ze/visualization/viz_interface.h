@@ -12,6 +12,7 @@ namespace ze {
 
 using Lines = std::vector<std::pair<Position, Position>, Eigen::aligned_allocator<std::pair<Position, Position>>>;
 
+//! Interface class for all visualizations.
 class Visualizer
 {
 public:
