@@ -23,14 +23,10 @@ set(SOURCES
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-
 ###############
 # EXECUTABLES #
 ###############
-cs_add_executable(
-	match_stamps
-	src/match_stamps.cpp
-)
+cs_add_executable(match_stamps src/match_stamps_node.cpp)
 
 ##########
 # GTESTS #
