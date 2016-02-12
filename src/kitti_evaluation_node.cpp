@@ -25,19 +25,22 @@ ze::PoseSeries::Ptr loadData(const std::string& format,
 {
   if(format == "swe")
   {
-    ze::SWEResultSeries::Ptr series;
+    VLOG(1) << "Loading 'swe' formatted trajectory from: " << datapath;
+    ze::PoseSeries::Ptr series = std::make_shared<ze::SWEResultSeries>();
     series->load(datapath);
     return series;
   }
   else if(format == "euroc")
   {
-    ze::EurocResultSeries::Ptr series;
+    VLOG(1) << "Loading 'euroc' formatted trajectory from: " << datapath;
+    ze::PoseSeries::Ptr series = std::make_shared<ze::EurocResultSeries>();
     series->load(datapath);
     return series;
   }
   else if(format == "pose")
   {
-    ze::PoseSeries::Ptr series;
+    VLOG(1) << "Loading 'pose' formatted trajectory from: " << datapath;
+    ze::PoseSeries::Ptr series = std::make_shared<ze::PoseSeries>();
     series->load(datapath);
     return series;
   }
@@ -50,6 +53,7 @@ int main(int argc, char** argv)
 {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InstallFailureSignalHandler();
 
   // Load groundtruth.
   ze::PoseSeries::Ptr gt_data = loadData(
@@ -98,7 +102,8 @@ int main(int argc, char** argv)
 
   // Write result to file
   std::string filename_result =
-      FLAGS_filename_result_prefix + "_" + std::to_string(FLAGS_segment_length) + ".csv";
+      FLAGS_filename_result_prefix + "_"
+      + std::to_string(static_cast<int>(FLAGS_segment_length)) + ".csv";
   VLOG(1) << "Write result to file: " << ze::joinPath(FLAGS_data_dir, filename_result);
   std::ofstream fs;
   ze::openOutputFileStream(ze::joinPath(FLAGS_data_dir, filename_result), &fs);

@@ -20,6 +20,7 @@ int main(int argc, char** argv)
 {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InstallFailureSignalHandler();
 
   // Load groundtruth.
   ze::Buffer<ze::FloatType,1> gt_stamps;

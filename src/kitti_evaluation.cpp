@@ -18,9 +18,9 @@ std::vector<FloatType> trajectoryDistances(
   std::vector<FloatType> dist;
   dist.reserve(poses.size());
   dist.push_back(0);
-  for (size_t i = 0; i < poses.size(); ++i)
+  for (size_t i = 1; i < poses.size(); ++i)
   {
-    dist.push_back(dist[i-1] + (poses[i].getPosition() - poses[i-1].getPosition()).norm());
+    dist.push_back(dist.at(i-1) + (poses.at(i).getPosition() - poses.at(i-1).getPosition()).norm());
   }
   return dist;
 }
@@ -32,7 +32,7 @@ int32_t lastFrameFromSegmentLength(
 {
   for (size_t i = first_frame; i < dist.size(); i++)
   {
-    if (dist[i] > dist[first_frame] + segment_length)
+    if (dist.at(i) > dist.at(first_frame) + segment_length)
       return i;
   }
   return -1;
