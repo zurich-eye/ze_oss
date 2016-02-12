@@ -63,6 +63,7 @@ public:
   const Buffer<FloatType, 7>& getBuffer() const;
   Buffer<FloatType, 7>& getBuffer();
   StampedTransformationVector getStampedTransformationVector();
+  static Transformation getTransformationFromVec7(const Vector7& data);
 
 protected:
   Buffer<FloatType, 7> pose_buf_;

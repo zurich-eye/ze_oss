@@ -2,14 +2,6 @@
 
 namespace ze {
 
-Transformation getTransformationFromVec7(const Vector7& data)
-{
-  Vector3 p = data.head<3>();
-  Quaternion q(data(6), data(3), data(4), data(5));
-  CHECK_DOUBLE_EQ(q.norm(), 1.0);
-  return Transformation(q, p);
-}
-
 void CSVTrajectory::readHeader(const std::string& in_file_path)
 {
   in_str_.open(in_file_path);
@@ -170,6 +162,14 @@ StampedTransformationVector PoseSeries::getStampedTransformationVector()
   }
   pose_buf_.unlock();
   return vec;
+}
+
+Transformation PoseSeries::getTransformationFromVec7(const Vector7& data)
+{
+  Vector3 p = data.head<3>();
+  Quaternion q(data(6), data(3), data(4), data(5));
+  CHECK_DOUBLE_EQ(q.norm(), 1.0);
+  return Transformation(q, p);
 }
 
 SWEResultSeries::SWEResultSeries()
