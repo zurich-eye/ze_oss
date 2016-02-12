@@ -11,11 +11,40 @@ DEFINE_string(data_dir, ".", "Path to data");
 DEFINE_string(filename_es, "traj_es.csv", "Filename of estimated trajectory.");
 DEFINE_string(filename_gt, "traj_gt.csv", "Filename of groundtruth trajectory.");
 DEFINE_string(filename_result_prefix, "traj_relative_errors", "Filename prefix of result.");
+DEFINE_string(format_es, "pose", "Format of the estimate {pose, euroc, swe}.");
+DEFINE_string(format_gt, "pose", "Format of the groundtruth {pose, euroc, swe}.");
 DEFINE_double(offset_sec, 0.0, "time offset added to the timestamps of the estimate");
 DEFINE_double(max_difference_sec, 0.02, "maximally allowed time difference for matching entries");
 
 DEFINE_double(segment_length, 50, "Segment length of relative error evaluation. [meters]");
 DEFINE_double(skip_frames, 10, "Number of frames to skip between evaluation.");
+
+
+ze::PoseSeries::Ptr loadData(const std::string& format,
+                             const std::string& datapath)
+{
+  if(format == "swe")
+  {
+    ze::SWEResultSeries::Ptr series;
+    series->load(datapath);
+    return series;
+  }
+  else if(format == "euroc")
+  {
+    ze::EurocResultSeries::Ptr series;
+    series->load(datapath);
+    return series;
+  }
+  else if(format == "pose")
+  {
+    ze::PoseSeries::Ptr series;
+    series->load(datapath);
+    return series;
+  }
+  LOG(FATAL) << "Format " << format << " is not supported.";
+  return nullptr;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -23,14 +52,14 @@ int main(int argc, char** argv)
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   // Load groundtruth.
-  ze::PoseSeries gt_data;
-  gt_data.load(ze::joinPath(FLAGS_data_dir, FLAGS_filename_gt));
+  ze::PoseSeries::Ptr gt_data = loadData(
+        FLAGS_format_gt, ze::joinPath(FLAGS_data_dir, FLAGS_filename_gt));
 
   // Load estimate data.
-  ze::SWEResultSeries es_data;
-  es_data.load(ze::joinPath(FLAGS_data_dir, FLAGS_filename_es));
+  ze::PoseSeries::Ptr es_data =
+      loadData(FLAGS_format_es, ze::joinPath(FLAGS_data_dir, FLAGS_filename_es));
   ze::StampedTransformationVector es_stamped_poses =
-      es_data.getStampedTransformationVector();
+      es_data->getStampedTransformationVector();
 
   // Now loop through all estimate stamps and find closest groundtruth-stamp.
   ze::TransformationVector es_poses, gt_poses;
@@ -47,7 +76,7 @@ int main(int argc, char** argv)
       int64_t gt_stamp;
       ze::Vector7 gt_pose_data;
       std::tie(gt_stamp, gt_pose_data, success) =
-          gt_data.getBuffer().getNearestValue(it.first + offset_nsec);
+          gt_data->getBuffer().getNearestValue(it.first + offset_nsec);
       CHECK(success);
       if(std::abs(gt_stamp - it.first + offset_nsec) > max_diff_nsec)
       {
@@ -60,7 +89,6 @@ int main(int argc, char** argv)
     }
     VLOG(1) << "...done. Found " << es_poses.size() << " matches.";
   }
-
 
   // Kitti evaluation
   VLOG(1) << "Computing relative errors...";
