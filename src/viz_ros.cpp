@@ -14,8 +14,7 @@ VisualizerRos::VisualizerRos()
   {
     VLOG(1) << "Initializting ROS";
     int argc = 0;
-    std::string node_name = "ze_visualization";
-    ros::init(argc, nullptr, node_name);
+    ros::init(argc, nullptr, std::string("ze_visualization"));
   }
 
   // Create node and subscribe.

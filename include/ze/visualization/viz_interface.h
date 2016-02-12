@@ -12,13 +12,13 @@ namespace ze {
 
 using Lines = std::vector<std::pair<Position, Position>, Eigen::aligned_allocator<std::pair<Position, Position>>>;
 
-class VisualizerBase
+class Visualizer
 {
 public:
-  ZE_POINTER_TYPEDEFS(VisualizerBase);
+  ZE_POINTER_TYPEDEFS(Visualizer);
 
-  VisualizerBase() = default;
-  virtual ~VisualizerBase() = default;
+  Visualizer() = default;
+  virtual ~Visualizer() = default;
 
   // ---------------------------------------------------------------------------
   // Draw single elements

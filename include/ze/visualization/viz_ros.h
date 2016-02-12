@@ -12,7 +12,7 @@ class NodeHandle;
 namespace ze {
 
 //! @todo(cfo): Deal with multi-threaded publishing.
-class VisualizerRos : public VisualizerBase
+class VisualizerRos : public Visualizer
 {
 public:
 
