@@ -67,10 +67,10 @@ public:
     buffer_.clear();
   }
 
-  inline void size() const
+  inline size_t size() const
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    buffer_.size();
+    return buffer_.size();
   }
 
   inline void empty() const
