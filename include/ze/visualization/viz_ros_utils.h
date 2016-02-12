@@ -6,7 +6,7 @@
 
 namespace ze {
 
-std_msgs::ColorRGBA getRosColor(const Color& color)
+inline std_msgs::ColorRGBA getRosColor(const Color& color)
 {
   std_msgs::ColorRGBA c;
   c.r = color.r;
@@ -16,7 +16,7 @@ std_msgs::ColorRGBA getRosColor(const Color& color)
   return c;
 }
 
-geometry_msgs::Point getRosPoint(const Eigen::Ref<const Position>& point)
+inline geometry_msgs::Point getRosPoint(const Eigen::Ref<const Position>& point)
 {
   geometry_msgs::Point p;
   p.x = point(0);
@@ -25,7 +25,7 @@ geometry_msgs::Point getRosPoint(const Eigen::Ref<const Position>& point)
   return p;
 }
 
-geometry_msgs::Quaternion getRosQuaternion(const Quaternion& rot)
+inline geometry_msgs::Quaternion getRosQuaternion(const Quaternion& rot)
 {
   geometry_msgs::Quaternion q;
   q.x = rot.toImplementation().x();
@@ -35,7 +35,7 @@ geometry_msgs::Quaternion getRosQuaternion(const Quaternion& rot)
   return q;
 }
 
-geometry_msgs::Pose getRosPose(const Transformation& pose)
+inline geometry_msgs::Pose getRosPose(const Transformation& pose)
 {
   geometry_msgs::Pose T;
   T.position = getRosPoint(pose.getPosition());
