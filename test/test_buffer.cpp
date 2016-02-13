@@ -73,17 +73,17 @@ TEST(BufferTest, testIterator)
 TEST(BufferTest, testNearestValue)
 {
   ze::Buffer<double, 2> buffer;
-  EXPECT_FALSE(buffer.getNearestValue(ze::secToNanosec(1)).second);
+  EXPECT_FALSE(std::get<2>(buffer.getNearestValue(ze::secToNanosec(1))));
 
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
   }
 
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(0.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(1.4)).first[0], 1);
-  EXPECT_EQ(buffer.getNearestValue(ze::secToNanosec(11.0)).first[0], 9);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(1)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(0.4)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(1.4)))[0], 1);
+  EXPECT_EQ(std::get<1>(buffer.getNearestValue(ze::secToNanosec(11.0)))[0], 9);
 }
 
 TEST(BufferTest, testOldestNewestValue)
@@ -114,17 +114,20 @@ TEST(BufferTest, testInterpolation)
   Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(1.2), secToNanosec(5.4));
+
+  EXPECT_EQ(stamps.size(), values.cols());
+  EXPECT_EQ(stamps.size(), 6);
   EXPECT_EQ(stamps(0), secToNanosec(1.2));
-  EXPECT_EQ(stamps(stamps.cols()-1), secToNanosec(5.4));
+  EXPECT_EQ(stamps(stamps.size()-1), secToNanosec(5.4));
   EXPECT_DOUBLE_EQ(values(0, 0), 1.2);
-  EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 5.4);
+  EXPECT_DOUBLE_EQ(values(0, stamps.size()-1), 5.4);
 
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(0), secToNanosec(9));
   EXPECT_EQ(stamps(0), secToNanosec(0));
-  EXPECT_EQ(stamps(stamps.cols()-1), secToNanosec(9));
+  EXPECT_EQ(stamps(stamps.size()-1), secToNanosec(9));
   EXPECT_DOUBLE_EQ(values(0, 0), 0);
-  EXPECT_DOUBLE_EQ(values(0, stamps.cols()-1), 9);
+  EXPECT_DOUBLE_EQ(values(0, stamps.size()-1), 9);
 }
 
 ZE_UNITTEST_ENTRYPOINT

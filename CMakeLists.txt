@@ -31,11 +31,13 @@ set(HEADERS
   include/ze/common/transformation.h
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
+  include/ze/common/csv_trajectory.h
   )
 
 set(SOURCES
   src/sample.cpp
   src/test_utils.cpp
+  src/csv_trajectory.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

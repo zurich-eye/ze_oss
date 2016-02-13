@@ -47,6 +47,32 @@ inline std::string ensureLeftSlash(const std::string& s)
   return s_copy;
 }
 
+inline std::string ensureNoLeftSlash(const std::string& s)
+{
+  CHECK_GE(s.size(), 1u);
+  if(s[0] != '/')
+  {
+    return s;
+  }
+  std::string s_copy = s;
+  s_copy.erase(0, 1);
+  CHECK(s_copy[0] != '/');
+  return s_copy;
+}
+
+inline std::string ensureRightSlash(const std::string& s)
+{
+  if(s.size() == 0)
+  {
+    return "/";
+  }
+  if(s[s.size()-1] == '/')
+  {
+    return s;
+  }
+  return s + "/";
+}
+
 inline std::vector<std::string> splitString(const std::string& s, char delim)
 {
   std::stringstream ss(s);

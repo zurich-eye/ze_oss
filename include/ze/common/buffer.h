@@ -41,7 +41,7 @@ public:
   }
 
   //! Get value with timestamp closest to stamp. Boolean in returns if successful.
-  std::pair<Vector, bool> getNearestValue(int64_t stamp);
+  std::tuple<int64_t, Vector, bool> getNearestValue(int64_t stamp);
 
   //! Get oldest value in buffer.
   std::pair<Vector, bool> getOldestValue() const;
@@ -67,16 +67,16 @@ public:
     buffer_.clear();
   }
 
-  inline void size() const
+  inline size_t size() const
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    buffer_.size();
+    return buffer_.size();
   }
 
-  inline void empty() const
+  inline bool empty() const
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    buffer_.empty();
+    return buffer_.empty();
   }
 
   inline void removeDataBeforeTimestamp(int64_t stamp)

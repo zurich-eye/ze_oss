@@ -78,6 +78,4 @@ using KeypointScores = Eigen::Matrix<FloatType, Eigen::Dynamic, 1, Eigen::ColMaj
 using ImuStamps = Eigen::Matrix<int64_t, Eigen::Dynamic, 1>;
 using ImuAccGyr = Eigen::Matrix<FloatType, 6, Eigen::Dynamic, Eigen::ColMajor>;
 
-
-
 } // namespace ze

@@ -18,7 +18,7 @@ namespace internal {
 template<typename Scalar>
 struct ScalarTraits
 {
-  static constexpr int dimension = 1;
+  enum { dimension = 1 }; //! @todo(cfo): static constexpr int fails on GCC 4.8, works for Eigen because no derived class.
   typedef Eigen::Matrix<double, 1, 1> TangentVector;
   typedef Eigen::Matrix<double, 1, 1> Jacobian;
 
@@ -57,7 +57,8 @@ template<> struct traits<float> : public internal::ScalarTraits<float> {};
 template<int M, int N, int Options, int MaxRows, int MaxCols>
 struct traits<Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> >
 {
-  static constexpr int dimension = M * N;
+  //static constexpr int dimension = M * N;
+  enum { dimension = M * N };
   typedef Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> Matrix;
   typedef Eigen::Matrix<double, dimension, 1> TangentVector;
   typedef Eigen::Matrix<double, dimension, dimension> Jacobian;

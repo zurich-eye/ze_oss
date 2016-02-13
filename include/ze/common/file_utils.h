@@ -7,7 +7,7 @@
 
 namespace ze {
 
-void openFileStream(
+inline void openFileStream(
     const std::string& filename,
     std::ifstream* fs)
 {
@@ -19,7 +19,7 @@ void openFileStream(
   CHECK(!fs->eof()) << "File seems to contain no content!";
 }
 
-void openFileStreamAndCheckHeader(
+inline void openFileStreamAndCheckHeader(
     const std::string& filename,
     const std::string& header,
     std::ifstream* fs)
@@ -28,6 +28,16 @@ void openFileStreamAndCheckHeader(
   std::string line;
   std::getline(*fs, line);
   CHECK_EQ(line, header) << "Invalid header.";
+}
+
+inline void openOutputFileStream(
+    const std::string& filename,
+    std::ofstream* fs)
+{
+  CHECK_NOTNULL(fs);
+  fs->open(filename.c_str(), std::ios::out);
+  CHECK(*fs);
+  CHECK(fs->is_open()) << "Failed to open file: " << filename;
 }
 
 } // namespace ze
