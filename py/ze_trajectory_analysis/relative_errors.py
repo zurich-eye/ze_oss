@@ -18,8 +18,8 @@ def load_relative_errors_from_file(data_dir,
     data = np.genfromtxt(os.path.join(data_dir, filename_result_prefix+'_'+str(segment_length)+'.csv'),
                          delimiter=',', dtype=np.float64, skip_header=1)
     assert data[0, 7] == segment_length
-    rel_pos_errors = np.abs(data[:,1:4]) / segment_length
-    rel_rot_errors = np.abs(data[:,4:7]) / segment_length
+    rel_pos_errors = np.abs(data[:,1:4]) # / segment_length
+    rel_rot_errors = np.abs(data[:,4:7]) # / segment_length
 
     rel_pos_errors_norm = np.sqrt(np.sum(rel_pos_errors**2, 1))
     rel_roll_pitch_errors = np.sqrt(np.sum(rel_rot_errors[:,0:2]**2, 1))
@@ -42,7 +42,8 @@ def plot_relative_errors(data_dirs, segment_lengths):
     """    
     
     colors = ['blue', 'black', 'green', 'red', 'mangenta', 'cyan', 'orange']
-     
+
+    # Precompute position of boxplots in plot.     
     n_exp = len(data_dirs)
     n_dist = len(segment_lengths)
     spacing = 1
@@ -54,13 +55,11 @@ def plot_relative_errors(data_dirs, segment_lengths):
        
     # Init axes
     fig = plt.figure(figsize=(8,7))
-    ax_pos = fig.add_subplot(311, xlabel='Distance traveled [m]', ylabel='Translation error [%]')
-    _ax_formatting(ax_pos)
-    
-    ax_yaw = fig.add_subplot(312, xlabel='Distance traveled [m]', ylabel='Yaw error [deg/m]')
+    ax_pos = fig.add_subplot(311, xlabel='Distance traveled [m]', ylabel='Translation error [m]')
+    ax_yaw = fig.add_subplot(312, xlabel='Distance traveled [m]', ylabel='Yaw error [deg]')
+    ax_rap = fig.add_subplot(313, xlabel='Distance traveled [m]', ylabel='Roll and Pitch error [deg]')
     _ax_formatting(ax_yaw)
-    
-    ax_rap = fig.add_subplot(313, xlabel='Distance traveled [m]', ylabel='Roll and Pitch error [deg/m]')
+    _ax_formatting(ax_pos)    
     _ax_formatting(ax_rap)
      
     dummy_plots_pos = []
@@ -82,7 +81,7 @@ def plot_relative_errors(data_dirs, segment_lengths):
 
         for idx_segment_length, segment_length in enumerate(segment_lengths):
             e_pos, e_rap, e_yaw = load_relative_errors_from_file(data_dir, segment_length)
-            pb = ax_pos.boxplot(e_pos * 100.0, False, '',
+            pb = ax_pos.boxplot(e_pos, False, '',
                                 positions=[pos[idx_segment_length] + idx_exp], widths=0.8)                    
             _set_boxplot_colors(pb, colors[idx_exp])
             pb = ax_yaw.boxplot(e_yaw * 360.0 / np.pi, False, '',
@@ -157,10 +156,10 @@ if __name__=='__main__':
     logger = logging.getLogger(__name__)
     
     if options.data_dir:
-        relative_errors = compute_relative_errors(options.data_dir,
-                                                  segment_lengths = [5, 10, 20, 30, 50],
-                                                  skip_frames = 1,
-                                                  format_gt = 'euroc',
-                                                  format_es = 'pose')
+        compute_relative_errors(options.data_dir,
+                                segment_lengths = [5, 10, 20, 30, 50],
+                                skip_frames = 1,
+                                format_gt = 'euroc',
+                                format_es = 'pose')
 
         plot_relative_errors([options.data_dir], segment_lengths = [5, 10, 20, 30, 50])
