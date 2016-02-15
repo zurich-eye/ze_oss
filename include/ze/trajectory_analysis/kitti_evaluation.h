@@ -7,13 +7,13 @@ namespace ze {
 struct RelativeError
 {
   size_t first_frame;
-  FloatType rot_error;
-  FloatType tran_error;
+  Vector3 W_t_gt_es;  //!< Relative translation error represented in world frame.
+  Vector3 W_R_gt_es;  //!< Relative rotation error (Angle-Axis) in world frame.
   FloatType len;
   int num_frames;
 
   RelativeError(
-      size_t first_frame, FloatType r_err, FloatType t_err,
+      size_t first_frame, Vector3 W_t_gt_es, Vector3 W_R_gt_es,
       FloatType segment_length, int num_frames_in_between);
 };
 

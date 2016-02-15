@@ -107,12 +107,16 @@ int main(int argc, char** argv)
   VLOG(1) << "Write result to file: " << ze::joinPath(FLAGS_data_dir, filename_result);
   std::ofstream fs;
   ze::openOutputFileStream(ze::joinPath(FLAGS_data_dir, filename_result), &fs);
-  fs << "# First frame index, rot. err. rel., transl. err. rel., length, num frames\n";
+  fs << "# First frame index, err-tx, err-ty, err-tz, err-ax, err-ay, err-az, length, num frames\n";
   for(const ze::RelativeError& err : errors)
   {
     fs << err.first_frame << ", "
-       << err.rot_error << ", "
-       << err.tran_error << ", "
+       << err.W_t_gt_es.x() << ", "
+       << err.W_t_gt_es.y() << ", "
+       << err.W_t_gt_es.z() << ", "
+       << err.W_R_gt_es.x() << ", "
+       << err.W_R_gt_es.y() << ", "
+       << err.W_R_gt_es.z() << ", "
        << err.len << ", "
        << err.num_frames << "\n";
   }

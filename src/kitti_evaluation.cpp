@@ -3,11 +3,11 @@
 namespace ze {
 
 RelativeError::RelativeError(
-    size_t first_frame, FloatType r_err, FloatType t_err, FloatType segment_length,
-    int num_frames_in_between)
+    size_t first_frame, Vector3 W_t_gt_es, Vector3 W_R_gt_es,
+    FloatType segment_length, int num_frames_in_between)
   : first_frame(first_frame)
-  , rot_error(r_err)
-  , tran_error(t_err)
+  , W_t_gt_es(W_t_gt_es)
+  , W_R_gt_es(W_R_gt_es)
   , len(segment_length)
   , num_frames(num_frames_in_between)
 {}
@@ -39,41 +39,43 @@ int32_t lastFrameFromSegmentLength(
 }
 
 std::vector<RelativeError> calcSequenceErrors(
-    const TransformationVector& poses_gt,
-    const TransformationVector& poses_es,
+    const TransformationVector& T_W_gt,
+    const TransformationVector& T_W_es,
     const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation)
 {
-  // error vector
+  // Pre-compute cumulative distances (from ground truth as reference).
+  std::vector<FloatType> dist = trajectoryDistances(T_W_gt);
+
+  // Compute relative errors for all start positions.
   std::vector<RelativeError> errors;
-
-  // pre-compute distances (from ground truth as reference)
-  std::vector<FloatType> dist = trajectoryDistances(poses_gt);
-
-  // for all start positions do
-  for (size_t first_frame = 0; first_frame < poses_gt.size();
+  for (size_t first_frame = 0; first_frame < T_W_gt.size();
        first_frame += skip_num_frames_between_segment_evaluation)
   {
-    // compute last frame
+    // Find last frame to compare with.
     int32_t last_frame = lastFrameFromSegmentLength(dist, first_frame, segment_length);
-
-    // continue, if sequence not long enough
     if (last_frame == -1)
     {
-      continue;
+      continue; // continue, if segment is longer than trajectory.
     }
 
-    // compute rotational and translational errors
-    Transformation rel_pose_gt = poses_gt[first_frame].inverse() * poses_gt[last_frame];
-    Transformation rel_pose_es = poses_es[first_frame].inverse() * poses_es[last_frame];
-    Transformation rel_pose_error = rel_pose_es.inverse() * rel_pose_gt;
-    FloatType rot_err = rel_pose_error.getRotation().log().norm();
-    FloatType pos_err = rel_pose_error.getPosition().norm();
+    // Compute relative rotational and translational errors.
+    Transformation T_W_gtlast = T_W_gt[last_frame];
+    Transformation T_W_eslast = T_W_es[last_frame];
+    Transformation T_gtfirst_gtlast = T_W_gt[first_frame].inverse() * T_W_gtlast;
+    Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
+    Transformation T_gtlast_eslast = T_gtfirst_gtlast.inverse() * T_esfirst_eslast;
 
-    // write to file
+    // The relative error is represented in the frame of reference of the last
+    // frame in the ground-truth trajectory. We want to express it in the world
+    // frame to make statements about the yaw drift (not observable in Visual-
+    // inertial setting) vs. roll and pitch (observable).
+    Vector3 W_t_gtlast_eslast = T_W_gtlast.getRotation().rotate(T_gtlast_eslast.getPosition());
+    Vector3 W_R_gtlast_eslast = T_W_gtlast.getRotation().rotate(T_gtlast_eslast.getRotation().log());
+
     errors.push_back(RelativeError(first_frame,
-                                   rot_err / segment_length,
-                                   pos_err / segment_length,
+                                   W_t_gtlast_eslast,
+                                   W_R_gtlast_eslast,
                                    segment_length,
                                    last_frame - first_frame + 1));
   }
