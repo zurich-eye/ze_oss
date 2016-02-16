@@ -69,8 +69,8 @@ inline Matrix16 dNorm_dPose(const Transformation& T_A_B,
   Matrix3 R = T_A_B.getRotationMatrix();
   Matrix13 J_norm = dNorm_dPoint(p_A - T_A_B * p_B);
   Matrix16 J;
-  J.head<3>() = - J_norm * R;
-  J.tail<3>() = J_norm * R * skewSymmetric(p_B);
+  J.head<3>() = - J_norm * R; // translation
+  J.tail<3>() = J_norm * R * skewSymmetric(p_B); // orientation
   return J;
 }
 
