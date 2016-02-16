@@ -11,6 +11,7 @@ include(ze_setup)
 #############
 set(HEADERS
   include/ze/geometry/align_points.h
+  include/ze/geometry/align_poses.h
   include/ze/geometry/least_squares_solver.h
   include/ze/geometry/least_squares_solver-inl.h
   include/ze/geometry/pose_optimizer.h
@@ -20,6 +21,7 @@ set(HEADERS
 
 set(SOURCES
 	src/align_points.cpp
+  src/align_poses.cpp
   src/pose_optimizer.cpp
   )
 
