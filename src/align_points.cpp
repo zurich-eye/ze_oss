@@ -27,22 +27,22 @@ double PointAligner::evaluateError(
   double chi2 = 0.0;
 
   // Compute prediction error.
-  Positions dAB = p_A_ - T_A_B.transformVectorized(p_B_);
-  VectorX residual = dAB.colwise().norm();
+  Positions residuals = p_A_ - T_A_B.transformVectorized(p_B_);
+  VectorX residuals_norm = residuals.colwise().norm();
 
   // At the first iteration, compute the scale of the error.
   if(iter_ == 0)
   {
-    measurement_sigma_ = ScaleEstimator::compute(residual);
+    measurement_sigma_ = ScaleEstimator::compute(residuals_norm);
     VLOG(1) << "measurement sigma = " << measurement_sigma_;
   }
 
   // Robust cost function.
   VectorX weights =
-      WeightFunction::weightVectorized(residual / measurement_sigma_);
+      WeightFunction::weightVectorized(residuals_norm / measurement_sigma_);
 
   // Whiten error.
-  residual /= measurement_sigma_;
+  residuals_norm /= measurement_sigma_;
 
   if(H && g)
   {
@@ -56,12 +56,12 @@ double PointAligner::evaluateError(
 
       // Compute Hessian and Gradient Vector.
       H->noalias() += J.transpose() * J * weights(i);
-      g->noalias() -= J.transpose() * residual(i) * weights(i);
+      g->noalias() -= J.transpose() * residuals_norm(i) * weights(i);
     }
   }
 
   // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
-  chi2 += 0.5 * weights.dot(residual.colwise().squaredNorm());
+  chi2 += 0.5 * weights.dot(residuals_norm.colwise().squaredNorm());
 
   return chi2;
 }
