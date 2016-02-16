@@ -7,14 +7,13 @@
 
 #include <ze/common/matrix.h>
 #include <ze/common/stl_utils.h>
-#include <ze/geometry/jacobians.h>
 
 namespace ze {
 
 PoseOptimizer::PoseOptimizer(
     const std::vector<PoseOptimizerFrameData>& data,
     const Transformation& T_B_W_prior,
-    const double prior_weight_pos, const double prior_weight_rot)
+    const FloatType prior_weight_pos, const FloatType prior_weight_rot)
   : data_(data)
   , T_B_W_prior_(T_B_W_prior)
   , prior_weight_pos_(prior_weight_pos)
@@ -28,13 +27,13 @@ double PoseOptimizer::evaluateError(
     const Transformation& T_B_W, HessianMatrix* H, GradientVector* g)
 {
   CHECK_EQ(data_.size(), measurement_sigma_.size());
-  double chi2 = 0.0;
+  FloatType chi2 = 0.0;
 
   // Loop over all cameras in rig.
   for(size_t i = 0; i < data_.size(); ++i)
   {
     const PoseOptimizerFrameData& data = data_[i];
-    double& measurement_sigma = measurement_sigma_[i];
+    FloatType& measurement_sigma = measurement_sigma_[i];
 
     // Transform points from world coordinates to camera coordinates.
     const Transformation T_C_W = data.T_C_B * T_B_W;
@@ -46,7 +45,7 @@ double PoseOptimizer::evaluateError(
 
     // Compute difference between bearing vectors.
     Bearings f_err = f_est - data.f;
-    Eigen::VectorXd f_err_norm = f_err.colwise().norm();
+    VectorX f_err_norm = f_err.colwise().norm();
 
     // At the first iteration, compute the scale of the error.
     if(iter_ == 0)
@@ -56,7 +55,7 @@ double PoseOptimizer::evaluateError(
     }
 
     // Robust cost function.
-    Eigen::VectorXd weights =
+    VectorX weights =
         WeightFunction::weightVectorized(f_err_norm / measurement_sigma);
 
     // Whiten error.
@@ -64,7 +63,7 @@ double PoseOptimizer::evaluateError(
 
     if(H && g)
     {
-      const Eigen::Matrix3d R_C_W = T_C_W.getRotationMatrix();
+      const Matrix3 R_C_W = T_C_W.getRotationMatrix();
       const int n = data.f.cols();
       Matrix36 G;
       G.block<3,3>(0,0) = I_3x3;
@@ -91,7 +90,7 @@ double PoseOptimizer::evaluateError(
   // Rotation prior.
   if(prior_weight_rot_ > 0 && H && g)
   {
-    double H_max_diag = 0;
+    FloatType H_max_diag = 0;
     for(int i = 3; i < 6; ++i)
     {
       H_max_diag = std::max(H_max_diag, std::abs((*H)(i,i)));
@@ -102,7 +101,7 @@ double PoseOptimizer::evaluateError(
 
     // Jacobian w.r.t. prior:
     Matrix3 J = logmapDerivativeSO3(r);
-    double weight = H_max_diag * prior_weight_rot_;
+    FloatType weight = H_max_diag * prior_weight_rot_;
 
     // Add to normal equations:
     H->bottomRightCorner<3,3>().noalias() += J.transpose() * J * weight;
@@ -114,7 +113,7 @@ double PoseOptimizer::evaluateError(
   // Position prior.
   if(prior_weight_pos_ > 0 && H && g)
   {
-    double H_max_diag = 0;
+    FloatType H_max_diag = 0;
     for(int i = 0; i < 3; ++i)
     {
       H_max_diag = std::max(H_max_diag, std::abs((*H)(i,i)));
@@ -125,7 +124,7 @@ double PoseOptimizer::evaluateError(
 
     // Jacobian w.r.t. prior:
     Matrix3 J = T_B_W.getRotationMatrix();
-    double weight = H_max_diag * prior_weight_rot_;
+    FloatType weight = H_max_diag * prior_weight_rot_;
 
     // Add to normal equations:
     H->topLeftCorner<3,3>().noalias() += I_3x3 * weight; // J^T * J = I_3x3

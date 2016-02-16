@@ -10,7 +10,7 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/geometry/jacobians.h
+  include/ze/geometry/align_points.h
   include/ze/geometry/least_squares_solver.h
   include/ze/geometry/least_squares_solver-inl.h
   include/ze/geometry/pose_optimizer.h
@@ -19,6 +19,7 @@ set(HEADERS
   )
 
 set(SOURCES
+	src/align_points.cpp
   src/pose_optimizer.cpp
   )
 
