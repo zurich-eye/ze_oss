@@ -49,19 +49,19 @@ double PointAligner::evaluateError(
     for(int i = 0; i < p_A_.cols(); ++i)
     {
       // Compute Jacobian (if necessary, this can be optimized a lot).
-      Matrix16 J = dNorm_dPose(T_A_B, p_A_.col(i), p_B_.col(i));
+      Matrix36 J = dPointdistance_dRelpose(T_A_B, p_A_.col(i), p_B_.col(i));
 
       // Whiten Jacobian.
       J /= measurement_sigma_;
 
       // Compute Hessian and Gradient Vector.
       H->noalias() += J.transpose() * J * weights(i);
-      g->noalias() -= J.transpose() * residuals_norm(i) * weights(i);
+      g->noalias() -= J.transpose() * residuals.col(i) * weights(i);
     }
   }
 
   // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
-  chi2 += 0.5 * weights.dot(residuals_norm.colwise().squaredNorm());
+  chi2 += 0.5 * weights.dot(residuals.colwise().squaredNorm());
 
   return chi2;
 }
