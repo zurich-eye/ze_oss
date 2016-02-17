@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <ze/visualization/viz_interface.h>
+#include <ros/ros.h>
 
 // fwd
 namespace ros {
