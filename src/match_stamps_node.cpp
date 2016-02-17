@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     std::string line;
     while(std::getline(fs, line))
     {
-      if('%' != line.at(0) && '#' != line.at(0))
+      if('%' != line.at(0) && '#' != line.at(0) && 't' != line.at(0))
       {
         std::vector<std::string> items = ze::splitString(line, ',');
         CHECK_GE(items.size(), FLAGS_stamp_index_groundtruth + 1);
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     int64_t offset_nsec = ze::secToNanosec(FLAGS_offset_sec);
     while(std::getline(fs, line))
     {
-      if('%' != line.at(0) && '#' != line.at(0))
+      if('%' != line.at(0) && '#' != line.at(0) && 't' != line.at(0))
       {
         std::vector<std::string> items = ze::splitString(line, ',');
         CHECK_GE(items.size(), FLAGS_stamp_index_estimate + 1);

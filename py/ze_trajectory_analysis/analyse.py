@@ -392,27 +392,29 @@ def compute_and_save_statistics(data_vec, label, yaml_filename):
     with open(yaml_filename,'w') as outfile:
         outfile.write(yaml.dump(stats, default_flow_style=False))
 
-#if __name__ == '__main__':
-  
-# parse command line
-#    parser = argparse.ArgumentParser(description='''
-#    Analyse trajectory
-#    ''')
-#    parser.add_argument('--trace_dir', help='folder with the results', default='')
-#    parser.add_argument('--evaluation_type', help='', default='rms')
-#    parser.add_argument('--use_hand_eye_calib', help='', default='True')
-#    parser.add_argument('--align_num_frames', help='', default=-1)
-#    parser.add_argument('--align_type', help='', default='sim3') # option: 'sim3', 'se3'
-#    parser.add_argument('--boxplot_distances', help='', default='')
-#    parser.add_argument('--data_format', default='txt') # option: 'csv', 'txt', 'blender'
-#    args = parser.parse_args()
-#    
-#    ta = TrajectoryAnalysis( args.trace_dir,
-#                             data_format = args.data_format,
-#                             align_type = args.align_type,
-#                             align_num_frames = args.align_num_frames,
-#                             use_hand_eye_calib = args.use_hand_eye_calib, 
-#                             evaluation_type = args.evaluation_type,
-#                             boxplot_distances = args.boxplot_distances)
-#    ta.load_data()
-#    ta.analyse_trajectory()
+if __name__=='__main__':
+    
+    # parse command line
+    parser = argparse.ArgumentParser(description='Compute relative errors')
+    parser.add_argument('--data_dir', help='folder with the results',
+                        default='')
+    parser.add_argument('--format_gt', help='format groundtruth {swe,pose,euroc}',
+                        default='pose')
+    parser.add_argument('--format_es', help='format estimate {swe,pose,euroc}',
+                        default='pose')
+    options = parser.parse_args()    
+    
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.info('Compute relative errors')
+
+    if options.data_dir:
+        ta = TrajectoryAnalysis(result_dir = options.data_dir)
+        
+        gt_path = os.path.join(options.data_dir, "traj_gt.csv")
+        ta.load_data(data_dir=options.data_dir,
+                     data_format='csv')
+                     
+        ta.align_trajectory('sim3', 0, -1)
+        ta.plot_aligned_trajectory()
+        ta.compute_rms_errors()
