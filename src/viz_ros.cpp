@@ -1,7 +1,6 @@
 #include <ze/visualization/viz_ros.h>
 #include <ze/visualization/viz_ros_utils.h>
 
-#include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
