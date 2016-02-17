@@ -146,20 +146,21 @@ def compute_relative_errors(data_dir,
 if __name__=='__main__':
     
     # parse command line
-    parser = argparse.ArgumentParser(description='''
-    Analyse trajectory
-    ''')
+    parser = argparse.ArgumentParser(description='Compute relative errors')
     parser.add_argument('--data_dir', help='folder with the results', default='')
+    parser.add_argument('--format_gt', help='format groundtruth {swe,pose,euroc}', default='pose')
+    parser.add_argument('--format_es', help='format estimate {swe,pose,euroc}', default='pose')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
-    
+    logger.info('Compute relative errors')
+
     if options.data_dir:
         compute_relative_errors(options.data_dir,
                                 segment_lengths = [5, 10, 20, 30, 50],
                                 skip_frames = 1,
-                                format_gt = 'euroc',
-                                format_es = 'pose')
+                                format_gt = options.format_gt,
+                                format_es = options.format_es)
 
         plot_relative_errors([options.data_dir], segment_lengths = [5, 10, 20, 30, 50])
