@@ -57,7 +57,7 @@ double PoseAligner::evaluateError(
     for(size_t i = 0; i < T_W_A_.size(); ++i)
     {
       // Compute Jacobian (if necessary, this can be optimized a lot).
-      Matrix66 J = dRelpose_dTransformation(T_A_B, T_W_A_[i], T_W_B_[i]);
+      Matrix6 J = dRelpose_dTransformation(T_A_B, T_W_A_[i], T_W_B_[i]);
 
       // Whiten Jacobian.
       J /= measurement_sigma_;

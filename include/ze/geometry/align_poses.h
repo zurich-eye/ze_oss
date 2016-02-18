@@ -37,7 +37,7 @@ private:
   const TransformationVector& T_W_B_;
 };
 
-inline Matrix66 dRelpose_dTransformation(
+inline Matrix6 dRelpose_dTransformation(
     const Transformation& T_A_B,
     const Transformation& T_W_A,
     const Transformation& T_W_B)
@@ -45,7 +45,7 @@ inline Matrix66 dRelpose_dTransformation(
   Quaternion R_W_B_predicted = T_W_A.getRotation() * T_A_B.getRotation();
   Quaternion R_error = T_W_B.getRotation().inverse() * R_W_B_predicted;
 
-  Matrix66 J = Z_6x6;
+  Matrix6 J = Z_6x6;
   J.block<3,3>(0,0) = R_W_B_predicted.getRotationMatrix(); // drt / dt
   J.block<3,3>(3,3) = logmapDerivativeSO3(R_error.log());  // drR / dR
 
