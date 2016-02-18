@@ -24,7 +24,7 @@ PoseAligner::PoseAligner(
 }
 
 double PoseAligner::evaluateError(
-    const Transformation& T_A_B,
+    const Transformation& T_A0_B0,
     HessianMatrix* H,
     GradientVector* g)
 {
@@ -32,13 +32,14 @@ double PoseAligner::evaluateError(
 
   // Compute prediction error.
   Matrix6X residuals(6, T_W_A_.size());
+
+
   for (size_t i = 0; i < T_W_A_.size(); ++i)
   {
-    residuals.col(i) =
-        (Vector6() << T_W_A_[i] * T_A_B.getPosition() - T_W_B_[i].getPosition(),
-                      Quaternion::log(T_W_B_[i].getRotation().inverse()
-                                      * T_W_A_[i].getRotation()
-                                      * T_A_B.getRotation())).finished();
+    Transformation T_Ai_A0 = T_W_A_[i].inverse() * T_W_A_[0];
+    Transformation T_B0_Bi = T_W_B_[0].inverse() * T_W_B_[i];
+    Transformation T_Ai_Bi = T_Ai_A0 * T_A0_B0 * T_B0_Bi; // Error
+    residuals.col(i) = T_Ai_Bi.log();
   }
 
   // Whiten the error.
@@ -54,7 +55,9 @@ double PoseAligner::evaluateError(
     for (size_t i = 0; i < T_W_A_.size(); ++i)
     {
       // Compute Jacobian (if necessary, this can be optimized a lot).
-      Matrix6 J = dRelpose_dTransformation(T_A_B, T_W_A_[i], T_W_B_[i]);
+      Transformation T_Ai_A0 = T_W_A_[i].inverse() * T_W_A_[0];
+      Transformation T_B0_Bi = T_W_B_[0].inverse() * T_W_B_[i];
+      Matrix6 J = dRelpose_dTransformation(T_A0_B0, T_Ai_A0, T_B0_Bi);
 
       // Compute square-root of inverse covariance:
       Matrix6 R =
