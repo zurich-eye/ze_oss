@@ -32,7 +32,7 @@ double PoseAligner::evaluateError(
 
   // Compute prediction error.
   Matrix6X residuals(6, T_W_A_.size());
-  for(size_t i = 0; i < T_W_A_.size(); ++i)
+  for (size_t i = 0; i < T_W_A_.size(); ++i)
   {
     residuals.col(i) =
         (Vector6() << T_W_A_[i] * T_A_B.getPosition() - T_W_B_[i].getPosition(),
@@ -49,9 +49,9 @@ double PoseAligner::evaluateError(
   VectorX residuals_norm = residuals.colwise().norm();
   VectorX weights = WeightFunction::weightVectorized(residuals_norm);
 
-  if(H && g)
+  if (H && g)
   {
-    for(size_t i = 0; i < T_W_A_.size(); ++i)
+    for (size_t i = 0; i < T_W_A_.size(); ++i)
     {
       // Compute Jacobian (if necessary, this can be optimized a lot).
       Matrix6 J = dRelpose_dTransformation(T_A_B, T_W_A_[i], T_W_B_[i]);
