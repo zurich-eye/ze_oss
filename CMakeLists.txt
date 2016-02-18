@@ -28,6 +28,7 @@ set(HEADERS
   include/ze/common/test_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
+  include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
