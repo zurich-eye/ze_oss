@@ -10,6 +10,7 @@ namespace ze {
 
 using Transformation = kindr::minimal::QuatTransformation;
 using Quaternion = kindr::minimal::RotationQuaternion;
+using AngleAxis = kindr::minimal::AngleAxis;
 
 using TransformationVector = std::vector<Transformation, Eigen::aligned_allocator<Transformation>>;
 using QuaternionVector = std::vector<Transformation, Eigen::aligned_allocator<Quaternion>>;
