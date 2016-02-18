@@ -65,16 +65,22 @@ std::vector<RelativeError> calcSequenceErrors(
     // Perform a least-squares alignment of the first 20% of the trajectories.
     int n_align_poses = 0.2 * (last_frame - first_frame);
     Transformation T_gt_es = T_W_gt[first_frame].inverse() * T_W_es[first_frame];
-    if(use_least_squares_alignment && n_align_poses > 2)
+    if(use_least_squares_alignment && n_align_poses > 1)
     {
       TransformationVector T_W_es_align(
             T_W_es.begin() + first_frame, T_W_es.begin() + first_frame + n_align_poses);
       TransformationVector T_W_gt_align(
             T_W_gt.begin() + first_frame, T_W_gt.begin() + first_frame + n_align_poses);
-      const FloatType sigma_pos = 0.1;
-      const FloatType sigma_rot = 10.0 / 180 * M_PI;
+      VLOG(40) << "T_W_es_align size = " << T_W_es_align.size();
+
+      const FloatType sigma_pos = 0.05;
+      const FloatType sigma_rot = 5.0 / 180 * M_PI;
       PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
+
+      Transformation T_gt_es_optimized = T_gt_es;
       problem.optimize(T_gt_es);
+      Transformation T_diff = T_gt_es * T_gt_es_optimized.inverse();
+      std::cout << T_diff.log().transpose() << std::endl;
     }
 
     // Compute relative rotational and translational errors.
@@ -82,7 +88,8 @@ std::vector<RelativeError> calcSequenceErrors(
     Transformation T_W_eslast = T_W_es[last_frame];
     Transformation T_gtfirst_gtlast = T_W_gt[first_frame].inverse() * T_W_gtlast;
     //Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
-    Transformation T_esfirst_eslast = (T_W_gt[first_frame] * T_gt_es).inverse() * T_W_eslast;
+    //Transformation T_esfirst_eslast = (T_W_es[first_frame] * T_gt_es.inverse()).inverse() * (T_W_eslast * T_gt_es.inverse());
+    Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
     Transformation T_gtlast_eslast = T_gtfirst_gtlast.inverse() * T_esfirst_eslast;
 
     // The relative error is represented in the frame of reference of the last

@@ -125,7 +125,8 @@ def compute_relative_errors(data_dir,
                             filename_es = 'traj_es.csv',
                             filename_result_prefix = 'traj_relative_errors',
                             match_timestamps_offset = 0.0,
-                            match_timestamps_max_difference_sec = 0.02):
+                            match_timestamps_max_difference_sec = 0.02,
+                            use_least_squares_alignment = False):
     logger = logging.getLogger(__name__)
     for segment_length in segment_lengths:
         cmd = "rosrun ze_trajectory_analysis kitti_evaluation" \
@@ -138,8 +139,10 @@ def compute_relative_errors(data_dir,
             + " --offset_sec=" + str(match_timestamps_offset) \
             + " --max_difference_sec=" + str(match_timestamps_max_difference_sec) \
             + " --segment_length=" + str(segment_length) \
-            + " --skip_frames=" + str(skip_frames) \
-            + " --least_squares_align"
+            + " --skip_frames=" + str(skip_frames)
+            
+        if use_least_squares_alignment: 
+            cmd += " --least_squares_align"
                                            
         logger.info("Executing command: "+cmd)
         os.system(cmd)
