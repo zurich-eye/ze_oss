@@ -54,10 +54,18 @@ TEST(AlignPosesTest, testOptimization)
     T_W_B.at(i) = T_W_A.at(i) * T_A_B;
   }
 
-  // Align trajectories.
-  PoseAligner problem(T_W_A, T_W_B);
-  Vector6 perturbation = Vector6::Ones() * 0.1;
-  Transformation T_A_B_estimate = T_A_B * Transformation::exp(perturbation);
+  // Perturb estimated pose.
+  FloatType sigma_pos = 0.2;
+  FloatType sigma_rot = 30.0 / 180 * M_PI;
+  Vector3 pos_pert = Vector3::Random();
+  pos_pert = pos_pert.normalized() * sigma_pos;
+  Vector3 rot_pert = Vector3::Random();
+  rot_pert = rot_pert.normalized() * sigma_rot;
+  Transformation T_pert = Transformation::exp((Vector6() << pos_pert, rot_pert).finished());
+  Transformation T_A_B_estimate = T_A_B * T_pert;
+
+  // Optimize.
+  PoseAligner problem(T_W_A, T_W_B, sigma_pos, sigma_rot);
   problem.optimize(T_A_B_estimate);
 
   // Compute error.

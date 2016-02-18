@@ -12,9 +12,13 @@ namespace ze {
 
 PoseAligner::PoseAligner(
     const TransformationVector& T_W_A,
-    const TransformationVector& T_W_B)
+    const TransformationVector& T_W_B,
+    const FloatType measurement_sigma_pos,
+    const FloatType measurement_sigma_rot)
   : T_W_A_(T_W_A)
   , T_W_B_(T_W_B)
+  , measurement_sigma_pos_(measurement_sigma_pos)
+  , measurement_sigma_rot_(measurement_sigma_rot)
 {
   CHECK_EQ(T_W_A_.size(), T_W_B_.size());
 }
@@ -36,21 +40,14 @@ double PoseAligner::evaluateError(
                                       * T_W_A_[i].getRotation()
                                       * T_A_B.getRotation())).finished();
   }
-  VectorX residuals_norm = residuals.colwise().norm();
 
-  // At the first iteration, compute the scale of the error.
-  if(iter_ == 0)
-  {
-    measurement_sigma_ = ScaleEstimator::compute(residuals_norm);
-    VLOG(1) << "measurement sigma = " << measurement_sigma_;
-  }
+  // Whiten the error.
+  residuals.topRows<3>()    /= measurement_sigma_pos_;
+  residuals.bottomRows<3>() /= measurement_sigma_rot_;
 
   // Robust cost function.
-  VectorX weights =
-      WeightFunction::weightVectorized(residuals_norm / measurement_sigma_);
-
-  // Whiten error.
-  residuals /= measurement_sigma_;
+  VectorX residuals_norm = residuals.colwise().norm();
+  VectorX weights = WeightFunction::weightVectorized(residuals_norm);
 
   if(H && g)
   {
@@ -59,8 +56,13 @@ double PoseAligner::evaluateError(
       // Compute Jacobian (if necessary, this can be optimized a lot).
       Matrix6 J = dRelpose_dTransformation(T_A_B, T_W_A_[i], T_W_B_[i]);
 
+      // Compute square-root of inverse covariance:
+      Matrix6 R =
+          (Vector6() << Vector3::Ones() / measurement_sigma_pos_,
+                        Vector3::Ones() / measurement_sigma_rot_).finished().asDiagonal();
+
       // Whiten Jacobian.
-      J /= measurement_sigma_;
+      J *= R;
 
       // Compute Hessian and Gradient Vector.
       H->noalias() += J.transpose() * J * weights(i);

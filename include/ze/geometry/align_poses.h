@@ -19,7 +19,9 @@ public:
 
   PoseAligner(
       const TransformationVector& T_W_A,
-      const TransformationVector& T_W_B);
+      const TransformationVector& T_W_B,
+      const FloatType measurement_sigma_pos,
+      const FloatType measurement_sigma_rot);
 
   double evaluateError(
       const Transformation& T_A_B,
@@ -32,9 +34,10 @@ public:
       Transformation& T_A_Bnew);
 
 private:
-  FloatType measurement_sigma_;
   const TransformationVector& T_W_A_;
   const TransformationVector& T_W_B_;
+  FloatType measurement_sigma_pos_;
+  FloatType measurement_sigma_rot_;
 };
 
 inline Matrix6 dRelpose_dTransformation(
