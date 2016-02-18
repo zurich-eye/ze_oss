@@ -136,7 +136,7 @@ void PoseSeries::load(const std::string& in_file_path)
   std::string line;
   while(getline(in_str_, line))
   {
-    if('%' != line.at(0) && '#' != line.at(0))
+    if('%' != line.at(0) && '#' != line.at(0) && 't' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
       CHECK_GE(items.size(), 8u);
@@ -176,13 +176,14 @@ Transformation PoseSeries::getTransformationFromVec7(const Vector7& data)
   Vector3 p = data.head<3>();
   Eigen::Quaterniond q(data(6), data(3), data(4), data(5));
   CHECK_NEAR(q.squaredNorm(), 1.0, 1e-4);
+  q.normalize();
   return Transformation(q, p);
 }
 
 SWEResultSeries::SWEResultSeries()
   : PoseSeries()
 {
-  header_ = "# timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz";
+  header_ = "timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz";
 }
 
 EurocResultSeries::EurocResultSeries()
