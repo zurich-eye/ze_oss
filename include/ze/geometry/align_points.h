@@ -14,8 +14,8 @@ class PointAligner :
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = MADScaleEstimator<FloatType>;
-  using WeightFunction = TukeyWeightFunction<FloatType>;
+  using ScaleEstimator = UnitScaleEstimator<FloatType>;
+  using WeightFunction = UnitWeightFunction<FloatType>;
 
   PointAligner(
       const Positions& p_A,

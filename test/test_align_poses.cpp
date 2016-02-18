@@ -30,4 +30,39 @@ TEST(AlignPosesTest, testJacobian)
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(J_numeric, J_analytic));
 }
 
+TEST(AlignPosesTest, testOptimization)
+{
+  using namespace ze;
+
+  const size_t n_poses = 20;
+
+  // Generate random trajectory.
+  TransformationVector T_W_A(n_poses);
+  for (Transformation& T : T_W_A)
+  {
+    T.setRandom(2.0);
+  }
+
+  // Random transformation between trajectories.
+  Transformation T_A_B;
+  T_A_B.setRandom();
+
+  // Compute transformed trajectory.
+  TransformationVector T_W_B(n_poses);
+  for (size_t i = 0; i < n_poses; ++i)
+  {
+    T_W_B.at(i) = T_W_A.at(i) * T_A_B;
+  }
+
+  // Align trajectories.
+  PoseAligner problem(T_W_A, T_W_B);
+  Vector6 perturbation = Vector6::Ones() * 0.1;
+  Transformation T_A_B_estimate = T_A_B * Transformation::exp(perturbation);
+  problem.optimize(T_A_B_estimate);
+
+  // Compute error.
+  Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
+  EXPECT_LT(T_err.log().norm(), 1e-10);
+}
+
 ZE_UNITTEST_ENTRYPOINT

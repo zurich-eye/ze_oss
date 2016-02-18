@@ -14,8 +14,8 @@ class PoseAligner :
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = MADScaleEstimator<FloatType>;
-  using WeightFunction = TukeyWeightFunction<FloatType>;
+  using ScaleEstimator = UnitScaleEstimator<FloatType>;
+  using WeightFunction = UnitWeightFunction<FloatType>;
 
   PoseAligner(
       const TransformationVector& T_W_A,
