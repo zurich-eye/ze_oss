@@ -1,5 +1,7 @@
 #include <ze/trajectory_analysis/kitti_evaluation.h>
 
+#include <ze/geometry/align_poses.h>
+
 namespace ze {
 
 RelativeError::RelativeError(
@@ -42,7 +44,8 @@ std::vector<RelativeError> calcSequenceErrors(
     const TransformationVector& T_W_gt,
     const TransformationVector& T_W_es,
     const FloatType& segment_length,
-    const size_t skip_num_frames_between_segment_evaluation)
+    const size_t skip_num_frames_between_segment_evaluation,
+    const bool use_least_squares_alignment)
 {
   // Pre-compute cumulative distances (from ground truth as reference).
   std::vector<FloatType> dist = trajectoryDistances(T_W_gt);
@@ -59,11 +62,27 @@ std::vector<RelativeError> calcSequenceErrors(
       continue; // continue, if segment is longer than trajectory.
     }
 
+    // Perform a least-squares alignment of the first 20% of the trajectories.
+    int n_align_poses = 0.2 * (last_frame - first_frame);
+    Transformation T_gt_es = T_W_gt[first_frame].inverse() * T_W_es[first_frame];
+    if(use_least_squares_alignment && n_align_poses > 2)
+    {
+      TransformationVector T_W_es_align(
+            T_W_es.begin() + first_frame, T_W_es.begin() + first_frame + n_align_poses);
+      TransformationVector T_W_gt_align(
+            T_W_gt.begin() + first_frame, T_W_gt.begin() + first_frame + n_align_poses);
+      const FloatType sigma_pos = 0.1;
+      const FloatType sigma_rot = 10.0 / 180 * M_PI;
+      PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
+      problem.optimize(T_gt_es);
+    }
+
     // Compute relative rotational and translational errors.
     Transformation T_W_gtlast = T_W_gt[last_frame];
     Transformation T_W_eslast = T_W_es[last_frame];
     Transformation T_gtfirst_gtlast = T_W_gt[first_frame].inverse() * T_W_gtlast;
-    Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
+    //Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
+    Transformation T_esfirst_eslast = (T_W_gt[first_frame] * T_gt_es).inverse() * T_W_eslast;
     Transformation T_gtlast_eslast = T_gtfirst_gtlast.inverse() * T_esfirst_eslast;
 
     // The relative error is represented in the frame of reference of the last

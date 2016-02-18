@@ -138,7 +138,8 @@ def compute_relative_errors(data_dir,
             + " --offset_sec=" + str(match_timestamps_offset) \
             + " --max_difference_sec=" + str(match_timestamps_max_difference_sec) \
             + " --segment_length=" + str(segment_length) \
-            + " --skip_frames=" + str(skip_frames)
+            + " --skip_frames=" + str(skip_frames) \
+            + " --least_squares_align"
                                            
         logger.info("Executing command: "+cmd)
         os.system(cmd)

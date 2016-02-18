@@ -15,10 +15,9 @@ DEFINE_string(format_es, "pose", "Format of the estimate {pose, euroc, swe}.");
 DEFINE_string(format_gt, "pose", "Format of the groundtruth {pose, euroc, swe}.");
 DEFINE_double(offset_sec, 0.0, "time offset added to the timestamps of the estimate");
 DEFINE_double(max_difference_sec, 0.02, "maximally allowed time difference for matching entries");
-
 DEFINE_double(segment_length, 50, "Segment length of relative error evaluation. [meters]");
 DEFINE_double(skip_frames, 10, "Number of frames to skip between evaluation.");
-
+DEFINE_bool(least_squares_align, false, "Use least squares to align 20% of the segment length.");
 
 ze::PoseSeries::Ptr loadData(const std::string& format,
                              const std::string& datapath)
@@ -97,7 +96,8 @@ int main(int argc, char** argv)
   // Kitti evaluation
   VLOG(1) << "Computing relative errors...";
   std::vector<ze::RelativeError> errors =
-      ze::calcSequenceErrors(gt_poses, es_poses, FLAGS_segment_length, FLAGS_skip_frames);
+      ze::calcSequenceErrors(gt_poses, es_poses, FLAGS_segment_length,
+                             FLAGS_skip_frames, FLAGS_least_squares_align);
   VLOG(1) << "...done";
 
   // Write result to file
