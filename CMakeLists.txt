@@ -20,7 +20,7 @@ set(HEADERS
   )
 
 set(SOURCES
-	src/align_points.cpp
+  src/align_points.cpp
   src/align_poses.cpp
   src/pose_optimizer.cpp
   )
@@ -30,6 +30,12 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
+catkin_add_gtest(test_align_points test/test_align_points.cpp)
+target_link_libraries(test_align_points ${PROJECT_NAME})
+
+catkin_add_gtest(test_align_poses test/test_align_poses.cpp)
+target_link_libraries(test_align_poses ${PROJECT_NAME})
+
 catkin_add_gtest(test_pose_optimizer test/test_pose_optimizer.cpp)
 target_link_libraries(test_pose_optimizer ${PROJECT_NAME})
 
