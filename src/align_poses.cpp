@@ -36,10 +36,10 @@ double PoseAligner::evaluateError(
 
   for (size_t i = 0; i < T_W_A_.size(); ++i)
   {
-    Transformation T_Ai_A0 = T_W_A_[i].inverse() * T_W_A_[0];
-    Transformation T_B0_Bi = T_W_B_[0].inverse() * T_W_B_[i];
-    Transformation T_Ai_Bi = T_Ai_A0 * T_A0_B0 * T_B0_Bi; // Error
-    residuals.col(i) = T_Ai_Bi.log();
+    Transformation T_A0_Ai = T_W_A_[0].inverse() * T_W_A_[i];
+    Transformation T_Bi_A0 = T_W_B_[i].inverse() * T_W_A_[0];
+    Transformation T_Bi_Ai = T_Bi_A0 * T_A0_B0 * T_A0_Ai;
+    residuals.col(i) = T_Bi_Ai.log();
   }
 
   // Whiten the error.
@@ -55,9 +55,9 @@ double PoseAligner::evaluateError(
     for (size_t i = 0; i < T_W_A_.size(); ++i)
     {
       // Compute Jacobian (if necessary, this can be optimized a lot).
-      Transformation T_Ai_A0 = T_W_A_[i].inverse() * T_W_A_[0];
-      Transformation T_B0_Bi = T_W_B_[0].inverse() * T_W_B_[i];
-      Matrix6 J = dRelpose_dTransformation(T_A0_B0, T_Ai_A0, T_B0_Bi);
+      Transformation T_A0_Ai = T_W_A_[0].inverse() * T_W_A_[i];
+      Transformation T_Bi_A0 = T_W_B_[i].inverse() * T_W_A_[0];
+      Matrix6 J = dRelpose_dTransformation(T_A0_B0, T_Bi_A0, T_A0_Ai);
 
       // Compute square-root of inverse covariance:
       Matrix6 R =

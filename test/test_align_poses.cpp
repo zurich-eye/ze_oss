@@ -53,8 +53,8 @@ TEST(AlignPosesTest, testOptimization)
   }
 
   // Perturb estimated pose.
-  FloatType sigma_pos = 0.002;
-  FloatType sigma_rot = 0.02 / 180 * M_PI;
+  FloatType sigma_pos = 0.05;
+  FloatType sigma_rot = 5.0 / 180 * M_PI;
   Vector3 pos_pert = Vector3::Random();
   pos_pert = pos_pert.normalized() * sigma_pos;
   Vector3 rot_pert = Vector3::Random();
@@ -68,7 +68,7 @@ TEST(AlignPosesTest, testOptimization)
 
   // Compute error.
   Transformation T_err = T_A0_B0.inverse() * T_A0_B0_estimate;
-  EXPECT_LT(T_err.log().norm(), 1e-10);
+  EXPECT_LT(T_err.log().norm(), 1e-5);
 }
 
 ZE_UNITTEST_ENTRYPOINT
