@@ -37,7 +37,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
     g_.setZero();
 
     // compute initial error
-    double new_chi2 = evaluateError(state, &H_, &g_);
+    FloatType new_chi2 = evaluateError(state, &H_, &g_);
 
     // solve the linear system
     if(!solve(state, H_, g_, dx_))
@@ -64,7 +64,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
     old_state = state;
     state = new_state;
     chi2_ = new_chi2;
-    double x_norm = normMax(dx_);
+    FloatType x_norm = normMax(dx_);
     VLOG(400) << "It. " << iter_
               << "\t Success"
               << "\t new_chi2 = " << new_chi2
@@ -97,8 +97,8 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
   // Compute Initial Lambda
   if(mu_ < 0)
   {
-    double H_max_diag = 0;
-    double tau = 1e-4;
+    FloatType H_max_diag = 0;
+    FloatType tau = 1e-4;
     for(size_t j=0; j<D; ++j)
     {
       H_max_diag = std::max(H_max_diag, std::fabs(H_(j,j)));
@@ -118,9 +118,9 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
     {
       // init variables
       State new_model;
-      double new_chi2 = -1;
+      FloatType new_chi2 = -1;
       H_.setZero();
-      //H_ = mu_ * Matrix<double,D,D>::Identity(D,D);
+      //H_ = mu_ * Matrix<FloatType,D,D>::Identity(D,D);
       g_.setZero();
 
       // linearize

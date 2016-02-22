@@ -22,10 +22,10 @@ struct LeastSquaresSolverOptions
   //! the steepest direction. This is good if the current iterate is far from the
   //! solution. If mu is small, LM approximates gauss newton iteration and we
   //! have (almost) quadratic convergence in the final stages.
-  double mu_init = 0.01f;
+  FloatType mu_init = 0.01f;
 
   //! Increase factor of mu after fail
-  double nu_init = 2.0;
+  FloatType nu_init = 2.0;
 
   //! Max number of iterations
   size_t max_iter = 15;
@@ -40,7 +40,7 @@ struct LeastSquaresSolverOptions
   bool verbose = false;
 
   //! Stop if update norm is smaller than eps
-  double eps = 0.0000000001;
+  FloatType eps = 0.0000000001;
 };
 
 //! Abstract Class for solving nonlinear least-squares (NLLS) problems.
@@ -51,9 +51,9 @@ class LeastSquaresSolver
 {
 public:
   typedef T State;
-  typedef Eigen::Matrix<double, D, D> HessianMatrix;
-  typedef Eigen::Matrix<double, D, 1> GradientVector;
-  typedef Eigen::Matrix<double, D, 1> UpdateVector;
+  typedef Eigen::Matrix<FloatType, D, D> HessianMatrix;
+  typedef Eigen::Matrix<FloatType, D, 1> GradientVector;
+  typedef Eigen::Matrix<FloatType, D, 1> UpdateVector;
 
   LeastSquaresSolverOptions solver_options_;
 
@@ -78,13 +78,13 @@ public:
   void reset();
 
   //! Get the squared error
-  inline double getError() const
+  inline FloatType getError() const
   {
     return chi2_;
   }
 
   //! The the Hessian matrix (Information Matrix).
-  inline const Eigen::Matrix<double, D, D>& getHessian() const
+  inline const HessianMatrix& getHessian() const
   {
     return H_;
   }
@@ -100,7 +100,7 @@ protected:
   //! the Hessian matrix and the gradient vector (Jacobian * residual).
   //! If these parameters are requested, the system is linearized at the current
   //! state.
-  double evaluateError(
+  FloatType evaluateError(
       const State& state,
       HessianMatrix* H,
       GradientVector* g)
@@ -166,10 +166,10 @@ protected:
   HessianMatrix  H_;        //!< Hessian or approximation Jacobian*Jacobian^T.
   GradientVector g_;        //!< Jacobian*residual.
   UpdateVector   dx_;       //!< Update step.
-  double chi2_ = 0.0;       //!< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  double rho_ = 0.0;        //!< Error reduction: chi2-new_chi2.
-  double mu_ = 0.01;        //!< Damping parameter.
-  double nu_ = 2.0;         //!< Factor that specifies how much we increase mu at every trial.
+  FloatType chi2_ = 0.0;    //!< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
+  FloatType rho_ = 0.0;     //!< Error reduction: chi2-new_chi2.
+  FloatType mu_ = 0.01;     //!< Damping parameter.
+  FloatType nu_ = 2.0;      //!< Factor that specifies how much we increase mu at every trial.
   bool stop_ = false;       //!< Stop flag.
   size_t iter_ = 0;         //!< Current Iteration.
   size_t trials_ = 0;       //!< Current number of trials.
