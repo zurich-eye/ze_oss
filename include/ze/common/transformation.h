@@ -8,9 +8,9 @@
 
 namespace ze {
 
-using Transformation = kindr::minimal::QuatTransformation;
-using Quaternion = kindr::minimal::RotationQuaternion;
-using AngleAxis = kindr::minimal::AngleAxis;
+using Transformation = kindr::minimal::QuatTransformationTemplate<FloatType>;
+using Quaternion = kindr::minimal::RotationQuaternionTemplate<FloatType>;
+using AngleAxis = kindr::minimal::AngleAxisTemplate<FloatType>;
 
 using TransformationVector = std::vector<Transformation, Eigen::aligned_allocator<Transformation>>;
 using QuaternionVector = std::vector<Transformation, Eigen::aligned_allocator<Quaternion>>;
