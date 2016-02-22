@@ -51,8 +51,7 @@ public:
   virtual Keypoints projectVectorized(const Bearings& bearing_vec) const;
 
   //! Vectorized computation of projection Jacobian. Column-wise reshaped.
-  virtual Eigen::Matrix<FloatType, 6, Eigen::Dynamic>
-  dProject_dLandmarkVectorized(const Positions& pos_vec) const;
+  virtual Matrix6X dProject_dLandmarkVectorized(const Positions& pos_vec) const;
   //!@}
 
   //! Print camera info.

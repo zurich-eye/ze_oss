@@ -34,15 +34,13 @@ Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
   return px_vec;
 }
 
-Eigen::Matrix<FloatType, 6, Eigen::Dynamic>
-Camera::dProject_dLandmarkVectorized(const Positions& pos_vec) const
+Matrix6X Camera::dProject_dLandmarkVectorized(const Positions& pos_vec) const
 {
-  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> J_vec(6, pos_vec.cols());
+  Matrix6X J_vec(6, pos_vec.cols());
   for(int i = 0; i < pos_vec.cols(); ++i)
   {
     J_vec.col(i) =
-        Eigen::Map<Eigen::Matrix<FloatType, 6, 1>>(
-                this->dProject_dLandmark(pos_vec.col(i)).data());
+        Eigen::Map<Matrix61>(this->dProject_dLandmark(pos_vec.col(i)).data());
   }
   return J_vec;
 }
