@@ -9,8 +9,6 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
-include(ze_macros_cuda)
-find_cuda()
 
 set(HEADERS
   include/imp/bridge/opencv/cv_connector_pixel_types.hpp
@@ -27,7 +25,7 @@ set(SOURCES
 set(IMPL_FILES
   )
 
-cs_cuda_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
+cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
 #target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
 ###
