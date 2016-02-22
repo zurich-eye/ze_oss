@@ -5,12 +5,12 @@
 namespace ze {
 
 //! Skew symmetric matrix.
-inline Matrix3 skewSymmetric(Vector3 w)
+inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
 {
   return (Matrix3() <<
-          0.0f, -w.z(), +w.y(),
-          +w.z(), 0.0f, -w.x(),
-          -w.y(), +w.x(), 0.0f).finished();
+           0.0f, -w(2),  w(1),
+           w(2),  0.0f, -w(0),
+          -w(1),  w(0),  0.0f).finished();
 }
 
 //! Normalize a block of bearing vectors.
