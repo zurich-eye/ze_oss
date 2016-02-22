@@ -23,7 +23,7 @@ PoseOptimizer::PoseOptimizer(
   measurement_sigma_.resize(data.size());
 }
 
-double PoseOptimizer::evaluateError(
+FloatType PoseOptimizer::evaluateError(
     const Transformation& T_B_W, HessianMatrix* H, GradientVector* g)
 {
   CHECK_EQ(data_.size(), measurement_sigma_.size());

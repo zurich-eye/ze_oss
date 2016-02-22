@@ -38,7 +38,7 @@ public:
       const Transformation& T_B_W_prior,
       const FloatType prior_weight_pos, const FloatType prior_weight_rot);
 
-  double evaluateError(
+  FloatType evaluateError(
       const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
 
   void update(
@@ -66,13 +66,13 @@ private:
  */
 inline Matrix3 dBearing_dLandmark(const Position& p_C)
 {
-  double x2 = p_C(0) * p_C(0);
-  double y2 = p_C(1) * p_C(1);
-  double z2 = p_C(2) * p_C(2);
-  double xy = p_C(0) * p_C(1);
-  double xz = p_C(0) * p_C(2);
-  double yz = p_C(1) * p_C(2);
-  double x2_y2_z2 = x2 + y2 + z2;
+  FloatType x2 = p_C(0) * p_C(0);
+  FloatType y2 = p_C(1) * p_C(1);
+  FloatType z2 = p_C(2) * p_C(2);
+  FloatType xy = p_C(0) * p_C(1);
+  FloatType xz = p_C(0) * p_C(2);
+  FloatType yz = p_C(1) * p_C(2);
+  FloatType x2_y2_z2 = x2 + y2 + z2;
   Matrix3 J;
   J << y2 + z2, -xy, -xz,
        -xy, x2 + z2, -yz,
