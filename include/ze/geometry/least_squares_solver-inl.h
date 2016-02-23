@@ -192,6 +192,7 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
 template <int D, typename T, typename Implementation>
 void LeastSquaresSolver<D, T, Implementation>::reset()
 {
+  VLOG(400) << "Reset";
   chi2_ = 1e10;
   mu_ = solver_options_.mu_init;
   nu_ = solver_options_.nu_init;
