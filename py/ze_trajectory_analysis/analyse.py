@@ -411,7 +411,6 @@ if __name__=='__main__':
     if options.data_dir:
         ta = TrajectoryAnalysis(result_dir = options.data_dir)
         
-        gt_path = os.path.join(options.data_dir, "traj_gt.csv")
         ta.load_data(data_dir=options.data_dir,
                      data_format='csv')
                      
