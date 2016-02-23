@@ -1,6 +1,7 @@
 #include <imp/core/image_raw.hpp>
 
 #include <iostream>
+#include <glog/logging.h>
 
 #include <imp/core/exception.hpp>
 
@@ -105,11 +106,8 @@ ImageRaw<Pixel>::ImageRaw(Pixel* data,
 template<typename Pixel>
 Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
 {
-  if (ox > this->width() || oy > this->height())
-  {
-    throw ze::Exception("Request starting offset is outside of the image.", __FILE__, __FUNCTION__, __LINE__);
-  }
-
+  CHECK_LT(ox, this->width());
+  CHECK_LT(oy, this->height());
   return &data_.get()[oy*this->stride() + ox];
 }
 
@@ -117,11 +115,8 @@ Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
 template<typename Pixel>
 const Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy) const
 {
-  if (ox > this->width() || oy > this->height())
-  {
-    throw ze::Exception("Request starting offset is outside of the image.", __FILE__, __FUNCTION__, __LINE__);
-  }
-
+  CHECK_LT(ox, this->width());
+  CHECK_LT(oy, this->height());
   return reinterpret_cast<const Pixel*>(&data_.get()[oy*this->stride() + ox]);
 }
 
