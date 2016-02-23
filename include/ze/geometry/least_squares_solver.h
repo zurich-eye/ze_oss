@@ -1,9 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <cmath>
-#include <Eigen/Core>
-#include <Eigen/StdVector>
+#include <ze/common/types.h>
 
 namespace ze {
 
