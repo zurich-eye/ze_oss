@@ -7,6 +7,7 @@
 
 #include <ze/common/matrix.h>
 #include <ze/common/stl_utils.h>
+#include <ze/geometry/pose_prior.h>
 
 namespace ze {
 
@@ -85,52 +86,12 @@ FloatType PoseOptimizer::evaluateError(
 
     // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
     chi2 += 0.5 * weights.dot(f_err.colwise().squaredNorm());
-  }
 
-  // Rotation prior.
-  if(prior_weight_rot_ > 0 && H && g)
-  {
-    FloatType H_max_diag = 0;
-    for(int i = 3; i < 6; ++i)
+    // Apply prior.
+    if(prior_weight_rot_ > 0.0f || prior_weight_pos_ > 0.0f)
     {
-      H_max_diag = std::max(H_max_diag, std::abs((*H)(i,i)));
+      applyPosePrior(T_B_W, T_B_W_prior_, prior_weight_rot_, prior_weight_pos_, *H, *g);
     }
-
-    // Residual of prior:
-    Vector3 r = (T_B_W_prior_.getRotation().inverse() * T_B_W.getRotation()).log();
-
-    // Jacobian w.r.t. prior:
-    Matrix3 J = logmapDerivativeSO3(r);
-    FloatType weight = H_max_diag * prior_weight_rot_;
-
-    // Add to normal equations:
-    H->bottomRightCorner<3,3>().noalias() += J.transpose() * J * weight;
-    g->tail<3>().noalias() -= J.transpose() * r * weight;
-
-    VLOG(500) << "Rot. prior Hessian = J^T * J = \n" << J.transpose() * J;
-  }
-
-  // Position prior.
-  if(prior_weight_pos_ > 0 && H && g)
-  {
-    FloatType H_max_diag = 0;
-    for(int i = 0; i < 3; ++i)
-    {
-      H_max_diag = std::max(H_max_diag, std::abs((*H)(i,i)));
-    }
-
-    // Residual of prior:
-    Vector3 r = T_B_W.getPosition() - T_B_W_prior_.getPosition();
-
-    // Jacobian w.r.t. prior:
-    Matrix3 J = T_B_W.getRotationMatrix();
-    FloatType weight = H_max_diag * prior_weight_rot_;
-
-    // Add to normal equations:
-    H->topLeftCorner<3,3>().noalias() += I_3x3 * weight; // J^T * J = I_3x3
-    g->head<3>().noalias() -= J.transpose() * r * weight;
-
-    VLOG(500) << "Pos. prior Hessian = J^T * J = \n" << J.transpose() * J;
   }
 
   return chi2;
