@@ -19,6 +19,7 @@ public:
   ZE_POINTER_TYPEDEFS(CSVTrajectory);
 
   virtual void load(const std::string& in_file_path) = 0;
+  virtual int64_t getTimeStamp(const std::string& ts_str) const;
 
 protected:
   CSVTrajectory() = default;
@@ -32,6 +33,7 @@ protected:
   std::map<std::string, int> order_;
   std::string header_;
   const char delimiter_{','};
+  size_t num_tokens_in_line_;
 };
 
 class LLASeries : public CSVTrajectory
@@ -90,6 +92,15 @@ class EurocResultSeries : public PoseSeries
 {
 public:
   EurocResultSeries();
+};
+
+class ApplanixPostProcessedSeries : public LLASeries
+{
+public:
+  ApplanixPostProcessedSeries(int gps_week);
+protected:
+  virtual int64_t getTimeStamp(const std::string& ts_str) const override;
+  int gps_week_;
 };
 
 } // ze namespace

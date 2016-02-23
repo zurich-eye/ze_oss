@@ -1,14 +1,23 @@
 #include <ze/common/csv_trajectory.h>
+#include <ze/common/gps_time.h>
 
 namespace ze {
+
+int64_t CSVTrajectory::getTimeStamp(const std::string& ts_str) const
+{
+  return std::stoll(ts_str);
+}
 
 void CSVTrajectory::readHeader(const std::string& in_file_path)
 {
   in_str_.open(in_file_path);
   CHECK(in_str_.is_open());
-  std::string line;
-  getline(in_str_, line);
-  CHECK_EQ(line, header_);
+  if(!header_.empty())
+  {
+    std::string line;
+    getline(in_str_, line);
+    CHECK_EQ(line, header_);
+  }
 }
 
 Vector3 CSVTrajectory::readTranslation(const std::vector<std::string>& items)
@@ -50,23 +59,37 @@ LLASeries::LLASeries()
   order_["tz"] = 3;
 
   header_ = "# timestamp, latitude, longitude, altitude";
+  num_tokens_in_line_ = 4u;
 }
 
 void LLASeries::load(const std::string& in_file_path)
 {
   readHeader(in_file_path);
   std::string line;
+  size_t ln_cnt{0};
   while(getline(in_str_, line))
   {
     if('%' != line.at(0) && '#' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
-      Vector3 lla = readTranslation(items);
-      lla_buf_.insert(stamp, lla);
+      if(items.size()!=num_tokens_in_line_)
+      {
+        LOG(WARNING) << "Unexpected number of tokens at line "
+                     << ln_cnt << ". Read " << items.size()
+                     << ", expected "
+                     << num_tokens_in_line_
+                     << std::endl;
+      }
+      else
+      {
+        int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
+        Vector3 lla = readTranslation(items);
+        lla_buf_.insert(stamp, lla);
+      }
     }
+    ln_cnt++;
   }
+  LOG(INFO) << "Total number of read lines " << ln_cnt << std::endl;
 }
 
 const Buffer<FloatType, 3>& LLASeries::getBuffer() const
@@ -87,6 +110,7 @@ PositionSeries::PositionSeries()
   order_["tz"] = 3;
 
   header_ = "# timestamp, tx, ty, tz";
+  num_tokens_in_line_ = 4u;
 }
 
 void PositionSeries::load(const std::string& in_file_path)
@@ -98,8 +122,8 @@ void PositionSeries::load(const std::string& in_file_path)
     if('%' != line.at(0) && '#' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+      CHECK_GE(items.size(), num_tokens_in_line_);
+      int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
       Vector3 position = readTranslation(items);
       position_buf_.insert(stamp, position);
     }
@@ -128,6 +152,7 @@ PoseSeries::PoseSeries()
   order_["qw"] = 7;
 
   header_ = "# timestamp, x, y, z, qx, qy, qz, qw";
+  num_tokens_in_line_ = 8u;
 }
 
 void PoseSeries::load(const std::string& in_file_path)
@@ -139,8 +164,8 @@ void PoseSeries::load(const std::string& in_file_path)
     if('%' != line.at(0) && '#' != line.at(0) && 't' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 8u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+      CHECK_GE(items.size(), num_tokens_in_line_);
+      int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
       Vector7 pose = readPose(items);
       pose_buf_.insert(stamp, pose);
     }
@@ -199,6 +224,27 @@ EurocResultSeries::EurocResultSeries()
   order_["qw"] = 4;
 
   header_ = "#timestamp, p_RS_R_x [m], p_RS_R_y [m], p_RS_R_z [m], q_RS_w [], q_RS_x [], q_RS_y [], q_RS_z [], v_RS_R_x [m s^-1], v_RS_R_y [m s^-1], v_RS_R_z [m s^-1], b_w_RS_S_x [rad s^-1], b_w_RS_S_y [rad s^-1], b_w_RS_S_z [rad s^-1], b_a_RS_S_x [m s^-2], b_a_RS_S_y [m s^-2], b_a_RS_S_z [m s^-2]";
+}
+
+ApplanixPostProcessedSeries::ApplanixPostProcessedSeries(int gps_week)
+  : LLASeries()
+{
+  order_["ts"] = 0;
+  order_["tx"] = 4;
+  order_["ty"] = 5;
+  order_["tz"] = 6;
+
+  header_ = "";
+  num_tokens_in_line_ = 31u;
+  gps_week_ = gps_week;
+}
+
+int64_t ApplanixPostProcessedSeries::getTimeStamp(const std::string& ts_str) const
+{
+  const double gps_secs = std::stod(ts_str);
+  const gtime_t unix_time = gpst2time(gps_week_, gps_secs);
+  const double nanosecs = ze::secToNanosec(unix_time.sec + static_cast<double>(unix_time.time));
+  return static_cast<int64_t>(nanosecs);
 }
 
 } // ze namespace
