@@ -28,6 +28,7 @@ set(HEADERS
   include/ze/common/test_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
+  include/ze/common/gps_time.h
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
@@ -70,6 +71,9 @@ target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
 
 catkin_add_gtest(test_statistics test/test_statistics.cpp)
 target_link_libraries(test_statistics ${PROJECT_NAME})
+
+catkin_add_gtest(test_gps_time test/test_gps_time.cpp)
+target_link_libraries(test_gps_time ${PROJECT_NAME})
 
 ##########
 # EXPORT #
