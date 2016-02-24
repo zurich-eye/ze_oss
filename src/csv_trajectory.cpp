@@ -242,9 +242,7 @@ ApplanixPostProcessedSeries::ApplanixPostProcessedSeries(int gps_week)
 int64_t ApplanixPostProcessedSeries::getTimeStamp(const std::string& ts_str) const
 {
   const double gps_secs = std::stod(ts_str);
-  const gtime_t unix_time = gpst2time(gps_week_, gps_secs);
-  const double nanosecs = ze::secToNanosec(unix_time.sec + static_cast<double>(unix_time.time));
-  return static_cast<int64_t>(nanosecs);
+  return ze::gps2UtcNSecs(gps_week_, gps_secs);
 }
 
 } // ze namespace
