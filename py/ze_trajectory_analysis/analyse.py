@@ -33,9 +33,9 @@ class TrajectoryAnalysis:
         self.data_aligned = False
           
     def load_data(self, data_dir, data_format='csv',
-                  filename_gt = 'traj_gt.csv', filename_es = 'traj_es.csv', 
-                  filename_matches = 'traj_es_gt_matches.csv', rematch_timestamps = False, 
-                  match_timestamps_offset = 0.0, rematch_timestamps_max_difference_sec = 0.02):
+                  filename_gt='traj_gt.csv', filename_es='traj_es.csv', 
+                  filename_matches='traj_es_gt_matches.csv', rematch_timestamps=True, 
+                  match_timestamps_offset=0.0, rematch_timestamps_max_difference_sec=0.02):
         """Loads the trajectory data.
         
         The resuls {p_es, q_es, p_gt, q_gt} is synchronized and has the same length.
@@ -395,13 +395,16 @@ def compute_and_save_statistics(data_vec, label, yaml_filename):
 if __name__=='__main__':
     
     # parse command line
-    parser = argparse.ArgumentParser(description='Compute relative errors')
+    parser = argparse.ArgumentParser(description='Compute errors')
     parser.add_argument('--data_dir', help='folder with the results',
                         default='')
     parser.add_argument('--format_gt', help='format groundtruth {swe,pose,euroc}',
                         default='pose')
     parser.add_argument('--format_es', help='format estimate {swe,pose,euroc}',
                         default='pose')
+    parser.add_argument('--match_ts_offset', 
+                        help='offset between experiment and GT timestamps (in seconds)',
+                        default=0.0)
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
@@ -412,7 +415,8 @@ if __name__=='__main__':
         ta = TrajectoryAnalysis(result_dir = options.data_dir)
         
         ta.load_data(data_dir=options.data_dir,
-                     data_format='csv')
+                     data_format='csv', 
+                     match_timestamps_offset=options.match_ts_offset)
                      
         ta.align_trajectory('sim3', 0, -1)
         ta.plot_aligned_trajectory()
