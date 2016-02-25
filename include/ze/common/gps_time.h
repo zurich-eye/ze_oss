@@ -1,4 +1,5 @@
-//! From rtkcmn.c
+//! This file contains C code from rtkcmn.c, part of
+//! RTKLIB: An Open Source Program Package for GNSS Positioning
 
 /*
 The RTKLIB software package is distributed under the following BSD 2-clause license
@@ -63,7 +64,7 @@ constexpr double leaps[][7]={ /* leap seconds {y,m,d,h,m,s,utc-gpst,...} */
                               {1981,7,1,0,0,0, -1}
                             };
 
-typedef struct {        /* time struct */
+typedef struct {      /* time struct */
   time_t time;        /* time (s) expressed by standard time_t */
   double sec;         /* fraction of second under 1 s */
 } gtime_t;
@@ -74,7 +75,7 @@ typedef struct {        /* time struct */
 * return : gtime_t struct
 * notes  : proper in 1970-2037 or 1970-2099 (64bit time_t)
 *-----------------------------------------------------------------------------*/
-extern gtime_t epoch2time(const double *ep)
+gtime_t epoch2time(const double *ep)
 {
   const int doy[]={1,32,60,91,121,152,182,213,244,274,305,335};
   gtime_t time={0};
@@ -96,7 +97,7 @@ extern gtime_t epoch2time(const double *ep)
 *          double sec       I   time to add (s)
 * return : gtime_t struct (t+sec)
 *-----------------------------------------------------------------------------*/
-extern gtime_t timeadd(gtime_t t, double sec)
+gtime_t timeadd(gtime_t t, double sec)
 {
   double tt;
 
@@ -108,7 +109,7 @@ extern gtime_t timeadd(gtime_t t, double sec)
 * args   : gtime_t t1,t2    I   gtime_t structs
 * return : time difference (t1-t2) (s)
 *-----------------------------------------------------------------------------*/
-extern double timediff(gtime_t t1, gtime_t t2)
+double timediff(gtime_t t1, gtime_t t2)
 {
   return difftime(t1.time,t2.time)+t1.sec-t2.sec;
 }
