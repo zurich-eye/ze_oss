@@ -40,6 +40,7 @@ set(SOURCES
   src/sample.cpp
   src/test_utils.cpp
   src/csv_trajectory.cpp
+  src/gps_time.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
