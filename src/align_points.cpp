@@ -22,7 +22,7 @@ PointAligner::PointAligner(
 double PointAligner::evaluateError(
     const Transformation& T_A_B,
     HessianMatrix* H,
-    GradientVector *g)
+    GradientVector* g)
 {
   double chi2 = 0.0;
 
