@@ -80,7 +80,26 @@ def load_estimator_results(filename):
     bias_acc = data[:,13:17]
     return stamp, velocity, bias_gyr, bias_acc
         
+
+def load_relative_errors_from_file(data_dir, segment_length,
+                                   filename_result_prefix = 'traj_relative_errors'):
+                                       
+    data = np.genfromtxt(os.path.join(data_dir, filename_result_prefix+'_'+str(segment_length)+'.csv'),
+                         delimiter=',', dtype=np.float64, skip_header=1)
+    assert data[0, 7] == segment_length
+    rel_pos_errors = np.abs(data[:,1:4]) # / segment_length
+    rel_rot_errors = np.abs(data[:,4:7]) # / segment_length
+
+    rel_pos_errors_norm = np.sqrt(np.sum(rel_pos_errors**2, 1))
+    rel_roll_pitch_errors = np.sqrt(np.sum(rel_rot_errors[:,0:2]**2, 1))
+    rel_yaw_errors = rel_rot_errors[:,2]
     
+    start_indices = data[:,0].astype(int)
+    scale_errors = data[:,9]
+    
+    return rel_pos_errors_norm, rel_roll_pitch_errors, rel_yaw_errors, scale_errors, start_indices
+
+
     
 # -----------------------------------------------------------------------------
 # DEPRECATED

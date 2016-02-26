@@ -187,212 +187,33 @@ class TrajectoryAnalysis:
         traj_plot.plot_scale_error(self.distances, e_scale_rel*100.0, self.result_dir)
         
         # compute error statistics:
-        compute_and_save_statistics(e_trans_euclidean, 'trans', self.statistics_filename)
-        compute_and_save_statistics(e_rot, 'rot', self.statistics_filename)
-        compute_and_save_statistics(e_scale_rel, 'scale', self.statistics_filename)
+        self.compute_and_save_statistics(e_trans_euclidean, 'trans')
+        self.compute_and_save_statistics(e_rot, 'rot')
+        self.compute_and_save_statistics(e_scale_rel, 'scale')
     
     def get_trajectory_length(self):
         assert(self.data_loaded)
         return self.distances[-1]
         
-
-
-
-
-# -----------------------------------------------------------------------------
-# DEPRECATED
-
-
-
-def analyse_synthetic_trajectory(results_dir):
-    
-    data = np.loadtxt(os.path.join(results_dir, 'translation_error.txt'))
-    t_gt, p_es, q_es, t_gt, p_gt, q_gt = load_synthetic_dataset(results_dir)
-
-    distances = utils.get_distance_from_start(p_gt)
-    translation_error = data[:,1:4]
-    plot_translation_error(distances, translation_error, results_dir)
-      
-    # plot orientation error
-    data = np.loadtxt(os.path.join(results_dir, 'orientation_error.txt'))
-    orientation_error = data[:,1:4]
-    plot_rotation_error(distances, orientation_error, results_dir)
-
-    # plot trajectory
-    plot_trajectory(results_dir, p_gt, p_es, -1, q_gt, q_es)
-    
-    # plot mean/variance boxplots for a subset of travelled distances
-    #if boxplot_distances != '':
-    #  plot_boxplots_distances(results_dir, p_es, q_es, p_gt, q_gt, boxplot_distances)
-    
-def compute_relative_errors(results_dir, t_es, p_es, q_es, t_gt, p_gt, q_gt, n_align_frames, estimate_scale, T_cm): 
-
-    
-
-    # align Sim3/SE3
-    if estimate_scale:
-        print('align Sim3 using '+str(n_align_frames)+' first frames.')
-        scale,rot,trans = align_trajectory.align_sim3(p_gt[0:n_align_frames,:], p_es[0:n_align_frames,:])
-    else:
-        scale = 1.0 
-    print('scale = '+str(scale))
-  
-    # get trafo between (v)ision and (o)ptitrack frame
-    print(q_gt[0,:])
-    print(p_gt[0,:])
-    T_om = get_rigid_body_trafo(q_gt[0,:], p_gt[0,:])
-    T_vc = get_rigid_body_trafo(q_es[0,:], scale*p_es[0,:])
-    T_cv = tf.inverse_matrix(T_vc)
-    T_ov = np.dot(T_om, np.dot(T_mc, T_cv))
-    print('T_ov = ' + str(T_ov))
-  
-    # apply transformation to estimated trajectory
-    q_es_aligned = np.zeros(np.shape(q_es))
-    p_es_aligned = np.zeros(np.shape(p_es))
-    for i in range(np.shape(p_es)[0]):
-        T_vc = get_rigid_body_trafo(q_es[i,:],p_es[i,:])
-        T_vc[0:3,3] *= scale
-        T_om = np.dot(T_ov, np.dot(T_vc, T_cm))
-        p_es_aligned[i,:] = T_om[0:3,3]
-        q_es_aligned[i,:] = tf.quaternion_from_matrix(T_om) 
-      
-    traj_plot.plot_trajectory(results_dir, p_gt, p_es_aligned, n_align_frames, q_gt, q_es_aligned)
-    
-    # compute relative rotation errors    (TODO: activate again for TUM datasets)
-    dist = 1.0
-    unit='s'
-    errors, e_trans, e_yaw, e_gravity, e_angle = utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, 0.2*dist, unit, t_gt, scale)
-    e_trans_median = np.median(e_trans)
-    e_angle_median = np.median(e_angle)
-    print('Relative Error ' + str(dist)+'/'+unit+' over ' + str(len(e_trans)) + ' measurements:')
-    print('trans median error = ' + str(e_trans_median) + 'm/s,   mean error = ' + str(np.mean(e_trans)))
-    print('rot   median error = ' + str(e_angle_median) + 'deg/s, mean error = ' + str(np.mean(e_angle)))
-    fig = plt.figure(figsize=(8, 4))
-    ax = fig.add_subplot(211, xlabel='Measurement', ylabel='Relative Error [m/sec]', title='Median error = '+str(e_trans_median*100)+'[cm/s]')
-    ax.plot(e_trans)
-    ax = fig.add_subplot(212, xlabel='Measurement', ylabel='Relative Error [deg/sec]', title='Median error = '+str(e_angle_median)+'[deg/s]')
-    ax.plot(e_angle)
-    fig.tight_layout()
-    fig.savefig(results_dir+'/relative_error'+FORMAT)
-    
-    # write to file
-    file_out = open(os.path.join(results_dir, 'relative_error.csv'), 'w')
-    file_out.write('# Relative errors over 1 meter distance \n')
-    file_out.write('# translation error [m/s], angular error [rad/s], yaw error [rad/s], gravity error [rad/s] \n')
-    for i in range(len(e_trans)):
-        file_out.write(
-            '%.8f, %.8f, %.8f, %.8f\n' %
-            (e_trans[i], e_angle[i], e_yaw[i], e_gravity[i]))
-    file_out.close()
-    
-      
-def analyse_trajectory(results_dir, n_align_frames = 200, use_hand_eye_calib = True,
-                       estimate_scale=True, boxplot_distances='', synthetic_realign_frames = False,
-                       data_format = 'txt'):
-    dataset_params = yaml.load(open(os.path.join(results_dir, 'dataset.yaml'),'r'))
-    print('Analysing trajectory:')
-    print('* use_hand_eye_calib = ' + str(use_hand_eye_calib))
-    print('* estimate_scale = ' + str(estimate_scale))
-    print('* dataset_is_blender = ' + str(dataset_params['dataset_is_blender']))
-    
-    # TODO: refactor!!!
-    if data_format == 'txt':
-        t_es, p_es, q_es, t_gt, p_gt, q_gt = traj_loading.load_dataset(results_dir, dataset_params['cam_delay'])
-    elif data_format == 'csv':
-        t_es, p_es, q_es, t_gt, p_gt, q_gt = traj_loading.load_dataset_csv(results_dir, dataset_params['cam_delay'])
-    elif data_format == 'blender':
-        t_es, p_es, q_es, t_gt, p_gt, q_gt = traj_loading.load_synthetic_dataset(results_dir)
-    
-    if dataset_params['dataset_is_blender']:
-        if synthetic_realign_frames:
-            T_cm = traj_loading.load_hand_eye_calib(dataset_params)
-            compute_relative_errors(results_dir, t_es, p_es, q_es, t_gt, p_gt, q_gt, n_align_frames, estimate_scale, T_cm)
-        else:
-            analyse_synthetic_trajectory(results_dir, boxplot_distances)
-     
-    elif use_hand_eye_calib:
-        T_cm = traj_loading.load_hand_eye_calib(dataset_params)
-        compute_relative_errors(results_dir, t_es, p_es, q_es, t_gt, p_gt, q_gt, n_align_frames, estimate_scale, T_cm)
-    else:
-        compute_rms_errors(results_dir, p_es, q_es, p_gt, q_gt, n_align_frames, True)
+    def compute_and_save_statistics(self, data_vec, label):
+        # Load statistics
+        stats = dict()
+        if os.path.exists(self.statistics_filename):
+            stats = yaml.load(open(self.statistics_filename,'r'))
+         
+        # Compute new statistics
+        stats[label] = dict()
+        stats[label]['rmse']   = float(np.sqrt(np.dot(data_vec,data_vec) / len(data_vec)))
+        stats[label]['mean']   = float(np.mean(data_vec))
+        stats[label]['median'] = float(np.median(data_vec))
+        stats[label]['std']    = float(np.std(data_vec))
+        stats[label]['min']    = float(np.min(data_vec))
+        stats[label]['max']    = float(np.max(data_vec))
+        stats[label]['num_samples'] = int(len(data_vec))
         
-        
-
-    
-def plot_boxplots_distances(results_dir, p_es, q_es, p_gt, q_gt, distances_str):
-    distances = [int(item) for item in distances_str.split(',')]
-    trans_errors_rel = []
-    trans_errors = []
-    ang_yaw_errors = []
-    print ('-----------------------')
-    for dist in distances:
-        print('Distance = '+str(dist))
-        max_error = 0.2*np.double(dist)
-        T_cm = np.array([[1.0, 0.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0]])
-        errors, e_trans, e_yaw, e_gravity, e_angle = utils.compute_relative_error(p_es, q_es, p_gt, q_gt, T_cm, dist, max_error)
-        e_trans_median = np.median(e_trans)
-        print('dist = '+str(dist)+', median error = ' + str(e_trans_median) + ' ('+str(e_trans_median/np.double(dist)*100.0)+'%) ' + str(len(e_trans)) + 'measurements')
-        trans_errors.append(e_trans)
-        trans_errors_rel.append(e_trans/np.double(dist)*100.0)
-        ang_yaw_errors.append(e_yaw)
-        
-    # absolute error
-    fig = plt.figure(figsize=(6,2.5))
-    ax = fig.add_subplot(111, xlabel='Distance traveled [m]', ylabel='Translation error [m]')
-    ax.boxplot(trans_errors, 0, '')
-    ax.set_xticks(np.arange(len(distances))+1)
-    ax.set_xticklabels(distances)
-    ax.legend()
-    fig.tight_layout()
-    fig.savefig(results_dir+'/boxplot_translation_error'+FORMAT, bbox_inches="tight")
-    
-    # relative error
-    fig = plt.figure(figsize=(6,2.5))
-    ax = fig.add_subplot(111, xlabel='Distance traveled [m]', ylabel='Translation error [\%]')
-    ax.boxplot(trans_errors_rel, 0, '')
-    ax.set_xticks(np.arange(len(distances))+1)
-    ax.set_xticklabels(distances)
-    ax.legend()
-    fig.tight_layout()
-    fig.savefig(results_dir+'/boxplot_translation_error_relative'+FORMAT, bbox_inches="tight")
-      
-    ## yaw orientation error
-    fig = plt.figure(figsize=(6,2.5))
-    ax = fig.add_subplot(111, xlabel='Distance traveled [m]', ylabel='Yaw error [deg]')
-    ax.boxplot(ang_yaw_errors, 0, '')
-    ax.set_xticks(np.arange(len(distances))+1)
-    ax.set_xticklabels(distances)
-    ax.legend()
-    fig.tight_layout()
-    ax.set_ylim(-0.1, 15)
-    fig.savefig(results_dir+'/boxplot_yaw_error'+FORMAT, bbox_inches="tight") 
-  
-
-def compute_and_save_statistics(data_vec, label, yaml_filename):
-    
-    # TODO: Move to another file!    
-
-    # Load statistics
-    stats = dict()
-    if os.path.exists(yaml_filename):
-        stats = yaml.load(open(yaml_filename,'r'))
-     
-    # Compute new statistics
-    stats[label] = dict()
-    stats[label]['rmse']   = float(np.sqrt(np.dot(data_vec,data_vec) / len(data_vec)))
-    stats[label]['mean']   = float(np.mean(data_vec))
-    stats[label]['median'] = float(np.median(data_vec))
-    stats[label]['std']    = float(np.std(data_vec))
-    stats[label]['min']    = float(np.min(data_vec))
-    stats[label]['max']    = float(np.max(data_vec))
-    stats[label]['num_samples'] = int(len(data_vec))
-    
-    # Save updated statistics
-    with open(yaml_filename,'w') as outfile:
-        outfile.write(yaml.dump(stats, default_flow_style=False))
+        # Save updated statistics
+        with open(self.statistics_filename,'w') as outfile:
+            outfile.write(yaml.dump(stats, default_flow_style=False))
 
 if __name__=='__main__':
     

@@ -10,28 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from pylab import setp
+import ze_py.plot_utils as plot_utils
+import ze_trajectory_analysis.load as traj_loading
+from ze_trajectory_analysis.analyse import TrajectoryAnalysis
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Cardo']})
 rc('text', usetex=True)
 
-def load_relative_errors_from_file(data_dir, 
-                                   segment_length,
-                                   filename_result_prefix = 'traj_relative_errors'):
-                                       
-    data = np.genfromtxt(os.path.join(data_dir, filename_result_prefix+'_'+str(segment_length)+'.csv'),
-                         delimiter=',', dtype=np.float64, skip_header=1)
-    assert data[0, 7] == segment_length
-    rel_pos_errors = np.abs(data[:,1:4]) # / segment_length
-    rel_rot_errors = np.abs(data[:,4:7]) # / segment_length
 
-    rel_pos_errors_norm = np.sqrt(np.sum(rel_pos_errors**2, 1))
-    rel_roll_pitch_errors = np.sqrt(np.sum(rel_rot_errors[:,0:2]**2, 1))
-    rel_yaw_errors = rel_rot_errors[:,2]
-    
-    scale_errors = data[:,9]
-    
-    return rel_pos_errors_norm, rel_roll_pitch_errors, rel_yaw_errors, scale_errors
-    
 def _set_boxplot_colors(boxplot_object, color):
     setp(boxplot_object['boxes'][0], color=color)
     setp(boxplot_object['caps'][0], color=color)
@@ -61,7 +47,6 @@ def plot_relative_errors(data_dirs, segment_lengths):
     ax_rap = fig.add_subplot(413, ylabel='Roll and Pitch error [deg]')
     ax_scale = fig.add_subplot(414, xlabel='Distance traveled [m]', ylabel=r"Scale error [\%]")
 
-     
     dummy_plots_pos = []
     dummy_plots_yaw = []
     dummy_plots_rap = []
@@ -82,14 +67,15 @@ def plot_relative_errors(data_dirs, segment_lengths):
         labels.append('exp-'+str(idx_exp)) # TODO: Read label from data_dir
         
         for idx_segment_length, segment_length in enumerate(segment_lengths):
-            e_pos, e_rap, e_yaw, e_scale = load_relative_errors_from_file(data_dir, segment_length)
+            e_pos, e_rap, e_yaw, e_scale, e_idx = \
+                traj_loading.load_relative_errors_from_file(data_dir, segment_length)
             pb = ax_pos.boxplot(e_pos, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)                    
             _set_boxplot_colors(pb, colors[idx_exp])
-            pb = ax_yaw.boxplot(e_yaw * 360.0 / np.pi, False, '',
+            pb = ax_yaw.boxplot(e_yaw * 180.0 / np.pi, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
             _set_boxplot_colors(pb, colors[idx_exp])
-            pb = ax_rap.boxplot(e_rap * 360.0 / np.pi, False, '',
+            pb = ax_rap.boxplot(e_rap * 180.0 / np.pi, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
             _set_boxplot_colors(pb, colors[idx_exp])
             pb = ax_scale.boxplot(e_scale * 100.0 - 100.0, False, '',
@@ -115,9 +101,60 @@ def plot_relative_errors(data_dirs, segment_lengths):
     _ax_formatting(ax_scale, dummy_plots_scale)
     
     #fig.tight_layout()
-    fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors.pdf'), bbox_inches="tight")
+    fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors_boxplots.pdf'), bbox_inches="tight")
 
+def plot_relative_errors_along_trajectory(data_dir, segment_length):
+    ta = TrajectoryAnalysis(result_dir = data_dir)
+    ta.load_data(data_dir=data_dir)
+                     
+    e_pos, e_rap, e_yaw, e_scale, e_idx = \
+        traj_loading.load_relative_errors_from_file(data_dir, segment_length)
+       
+    # plot scale drift
+    fig = plt.figure(figsize=(16, 16))
+    ax = fig.add_subplot(221, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Scale drift over '+str(segment_length)+'m Segment Length')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+                             c=np.abs(1.0 - e_scale)*100, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Scale drift [\%]")
 
+    # plot pos drift
+    ax = fig.add_subplot(222, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Position drift over '+str(segment_length)+'m Segment Length')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+                             c=e_pos, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Position drift [m]")
+ 
+    # plot yaw drift
+    ax = fig.add_subplot(223, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Yaw drift over '+str(segment_length)+'m Segment Length')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+                             c=e_yaw * 180.0 / np.pi, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Yaw drift [deg]")
+
+    # roll-pitch drift
+    ax = fig.add_subplot(224, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Roll and pitch drift over '+str(segment_length)+'m Segment Length')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+                             c=e_rap * 180.0 / np.pi, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Roll and pitch drift [deg]")
+    
+    # Save fig
+    fig.savefig(os.path.join(data_dir, 'traj_relative_errors_'+str(segment_length)+'_errors.pdf'))
+    
+    
 def compute_relative_errors(data_dir,
                             segment_lengths = [10, 50, 100, 200],
                             skip_frames = 10,
@@ -168,12 +205,17 @@ if __name__=='__main__':
     logger = logging.getLogger(__name__)
     logger.info('Compute relative errors')
 
+    segment_lengths = [5, 10, 20, 30, 50]
+    
     if options.data_dir:
         compute_relative_errors(options.data_dir,
-                                segment_lengths = [5, 10, 20, 30, 50],
+                                segment_lengths,
                                 skip_frames = 1,
                                 format_gt = options.format_gt,
                                 format_es = options.format_es,
                                 use_least_squares_alignment = (options.least_squares=='True'))
 
-        plot_relative_errors([options.data_dir], segment_lengths = [5, 10, 20, 30, 50])
+        plot_relative_errors([options.data_dir], segment_lengths)
+        
+        for segment_length in segment_lengths:
+            plot_relative_errors_along_trajectory(options.data_dir, segment_length)
