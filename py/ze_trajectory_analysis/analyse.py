@@ -18,7 +18,7 @@ import ze_py.transformations as tf
            
 class TrajectoryAnalysis:
     
-    def __init__(self, result_dir):
+    def __init__(self, result_dir, plot_size = 0.2):
         """Analyse trajectory. 
         
         result_dir: The results of the analysis are saved at this location.
@@ -26,6 +26,7 @@ class TrajectoryAnalysis:
         self.logger = logging.getLogger(__name__)
         self.reset()
         self.result_dir = utils.check_folder_exists(result_dir)
+        self.plot_size = plot_size
         self.statistics_filename = os.path.join(self.result_dir, 'statistics.yaml')
        
     def reset(self):
@@ -51,7 +52,7 @@ class TrajectoryAnalysis:
         # Load trajectory data
         self.logger.info('Loading trajectory data..')
         if data_format == 'csv':
-            self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt =\
+            self.t_es, self.p_es, self.q_es, self.t_gt, self.p_gt, self.q_gt, self.matches_lut =\
                 traj_loading.load_dataset_csv(data_dir, filename_gt, filename_es,
                                               filename_matches, rematch_timestamps,
                                               match_timestamps_offset,
@@ -67,20 +68,28 @@ class TrajectoryAnalysis:
         self.data_dir = data_dir
         self.data_loaded = True
         
-    def plot_estimator_results(self, data_dir, data_format='swe', filename = 'traj_es.csv'):
+    def plot_estimator_results(self, data_dir, data_format='swe',
+                               filename = 'traj_es.csv', skip_frames = 1):
         self.logger.info('Loading estimator data')
         filename = utils.check_file_exists(os.path.join(data_dir, filename))
+        if not self.matches_lut:
+            raise ValueError("You need to first load the data")           
         if data_format == 'swe':
             self.estimator_ts, self.vel_es, self.bias_gyr_es, self.bias_acc_es = \
-                traj_loading.load_estimator_results(filename)
+                traj_loading.load_estimator_results(filename, self.matches_lut)
         else:
             self.logger.error("Estimator results format \""+data_format+"\" not known.")
             return
             
         # Plot estimated biases
         self.logger.info('Plotting estimator data')
-        traj_plot.plot_imu_biases(self.estimator_ts, self.bias_gyr_es,
-                                  self.bias_acc_es, self.result_dir)
+        traj_plot.plot_imu_biases(
+            self.estimator_ts, self.bias_gyr_es, self.bias_acc_es, self.result_dir)
+        traj_plot.plot_imu_state_along_trajectory( 
+            self.result_dir, self.bias_gyr_es[::skip_frames,:],
+            self.bias_acc_es[::skip_frames,:], self.vel_es[::skip_frames,:],
+            self.p_es[::skip_frames,:], self.plot_size)                          
+        
                
     def align_trajectory(self, align_type = 'se3', first_idx = 0, last_idx = -1):
         """Align trajectory segment with ground-truth trajectory.
@@ -114,7 +123,7 @@ class TrajectoryAnalysis:
             self.scale, self.R_gt_es, self.t_gt_es = \
                 align_trajectory.align_sim3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
         elif align_type == 'se3':
-            self.logger.info('Align SE3 - rotation, translation and scale.')
+            self.logger.info('Align SE3 - rotation and translation.')
             self.R_gt_es, self.t_gt_es = \
                 align_trajectory.align_se3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
             self.scale = 1.0 
@@ -226,6 +235,9 @@ if __name__=='__main__':
                         default='pose')
     parser.add_argument('--alignment', help='trajectory alignment {se3, sim3, first_frame}',
                         default='se3')
+    parser.add_argument('--plot_size', default=0.2, help='size of circle')
+    parser.add_argument('--skip_frames', default=1,
+                        help='frames skipped between segment evaluation')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
@@ -233,7 +245,8 @@ if __name__=='__main__':
     logger.info('Compute relative errors')
 
     if options.data_dir:
-        ta = TrajectoryAnalysis(result_dir = options.data_dir)
+        ta = TrajectoryAnalysis(result_dir = options.data_dir,
+                                plot_size = options.plot_size)
         
         ta.load_data(data_dir=options.data_dir,
                      data_format='csv')
@@ -242,5 +255,6 @@ if __name__=='__main__':
         ta.plot_aligned_trajectory()
         ta.compute_rms_errors()
         ta.plot_estimator_results(options.data_dir,
-                                  data_format=options.format_es,
-                                  filename = 'traj_es.csv')
+                                  data_format = options.format_es,
+                                  filename = 'traj_es.csv',
+                                  skip_frames = options.skip_frames)

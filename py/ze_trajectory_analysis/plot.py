@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import FuncFormatter
+import ze_py.plot_utils as plot_utils
 #from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Cardo']})
@@ -207,6 +208,47 @@ def plot_imu_biases(stamps, bias_gyr, bias_acc, results_dir):
     
     ax5.tick_params('x',top='off')
     #fig.tight_layout()
-    fig.savefig(results_dir+'/biases'+FORMAT)
+    fig.savefig(os.path.join(results_dir,'imu_states'+FORMAT))
     
     return 0
+    
+def plot_imu_state_along_trajectory(
+        data_dir, bias_gyr, bias_acc, velocity, pos, circle_size=0.2):
+    
+    # plot bias
+    fig = plt.figure(figsize=(8, 20))
+    ax = fig.add_subplot(311, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Gyroscope Bias')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(pos[:,0], pos[:,1], 'b-', label='Estimate')
+    bias_gyr_norm = np.sqrt(np.sum(bias_gyr**2,1))
+    out = plot_utils.circles(pos[:,0], pos[:,1], circle_size,
+                             c=bias_gyr_norm, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Gyroscope Bias")
+
+    # plot pos drift
+    ax = fig.add_subplot(312, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Accelerometer Bias')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(pos[:,0], pos[:,1], 'b-', label='Estimate')
+    bias_acc_norm = np.sqrt(np.sum(bias_acc**2,1))
+    out = plot_utils.circles(pos[:,0], pos[:,1], circle_size,
+                             c=bias_acc_norm, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Accelerometer Bias")
+ 
+    # plot yaw drift
+    ax = fig.add_subplot(313, aspect='equal', xlabel='x [m]', ylabel='y [m]', 
+                         title='Velocity')
+    ax.grid(ls='--', color='0.7')
+    ax.plot(pos[:,0], pos[:,1], 'b-', label='Estimate')
+    velocity_norm = np.sqrt(np.sum(velocity**2,1))
+    out = plot_utils.circles(pos[:,0], pos[:,1], circle_size,
+                             c=velocity_norm, ax=ax, edgecolor='none', lw=0)
+    cbar = fig.colorbar(out)
+    cbar.set_label(r"Velocity")
+    
+    # Save fig
+    fig.savefig(os.path.join(data_dir,'imu_states_along_trajectory'+FORMAT))
+    

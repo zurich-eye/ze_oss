@@ -69,16 +69,29 @@ def load_dataset_csv(data_dir, filename_gt = 'traj_gt.csv', filename_es = 'traj_
     t_gt = np.array(t_gt)
     t_es = np.array(t_es)
 
-    return t_es, p_es, q_es, t_gt, p_gt, q_gt    
+    return t_es, p_es, q_es, t_gt, p_gt, q_gt, matches_lut 
     
 
-def load_estimator_results(filename):
-    stamp = utils.read_nanosecond_timestamps_from_csv_file(filename, 0, ',')
+def load_estimator_results(filename, matches_lut):
     data = np.genfromtxt(filename, delimiter=',', dtype=np.float64, skip_header=1)[:,1:]
-    velocity = data[:,7:10]    
-    bias_gyr = data[:,10:13]
-    bias_acc = data[:,13:17]
-    return stamp, velocity, bias_gyr, bias_acc
+    keys_es = utils.read_nanosecond_timestamps_from_csv_file(filename, 0, ',')
+    
+    velocity = []
+    bias_gyr = []
+    bias_acc = [] 
+    stamps = []
+    for i in range(len(keys_es)):
+        if keys_es[i] in matches_lut:
+            velocity.append(data[i,7:10])
+            bias_gyr.append(data[i,10:13])
+            bias_acc.append(data[i,13:17])
+            stamps.append(keys_es[i])
+            
+    velocity = np.array(velocity)
+    bias_gyr = np.array(bias_gyr)
+    bias_acc = np.array(bias_acc)
+    stamps = np.array(stamps)
+    return stamps, velocity, bias_gyr, bias_acc
         
 
 def load_relative_errors_from_file(data_dir, segment_length,
