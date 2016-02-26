@@ -67,16 +67,18 @@ class TrajectoryAnalysis:
         self.data_dir = data_dir
         self.data_loaded = True
         
-    def load_estimator_results(self, data_dir, data_format='swe', filename = 'traj_es.csv'):
+    def plot_estimator_results(self, data_dir, data_format='swe', filename = 'traj_es.csv'):
         self.logger.info('Loading estimator data')
         filename = utils.check_file_exists(os.path.join(data_dir, filename))
         if data_format == 'swe':
             self.estimator_ts, self.vel_es, self.bias_gyr_es, self.bias_acc_es = \
                 traj_loading.load_estimator_results(filename)
         else:
-            raise ValueError("estimator results format \""+data_format+"\" not known.")
+            self.logger.error("Estimator results format \""+data_format+"\" not known.")
+            return
             
         # Plot estimated biases
+        self.logger.info('Plotting estimator data')
         traj_plot.plot_imu_biases(self.estimator_ts, self.bias_gyr_es,
                                   self.bias_acc_es, self.result_dir)
                
@@ -417,3 +419,6 @@ if __name__=='__main__':
         ta.align_trajectory('sim3', 0, -1)
         ta.plot_aligned_trajectory()
         ta.compute_rms_errors()
+        ta.plot_estimator_results(options.data_dir,
+                                  data_format=options.format_es,
+                                  filename = 'traj_es.csv')

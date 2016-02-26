@@ -10,6 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from pylab import setp
+from matplotlib import rc
+rc('font',**{'family':'serif','serif':['Cardo']})
+rc('text', usetex=True)
 
 def load_relative_errors_from_file(data_dir, 
                                    segment_length,
@@ -25,7 +28,9 @@ def load_relative_errors_from_file(data_dir,
     rel_roll_pitch_errors = np.sqrt(np.sum(rel_rot_errors[:,0:2]**2, 1))
     rel_yaw_errors = rel_rot_errors[:,2]
     
-    return rel_pos_errors_norm, rel_roll_pitch_errors, rel_yaw_errors
+    scale_errors = data[:,9]
+    
+    return rel_pos_errors_norm, rel_roll_pitch_errors, rel_yaw_errors, scale_errors
     
 def _set_boxplot_colors(boxplot_object, color):
     setp(boxplot_object['boxes'][0], color=color)
@@ -49,22 +54,18 @@ def plot_relative_errors(data_dirs, segment_lengths):
     spacing = 1
     pos = np.arange(0, n_dist*(n_exp+spacing), (n_exp+spacing))
     
-    def _ax_formatting(ax):
-       ax.yaxis.grid(ls='--', color='0.7')
-       ax.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.2f'%y)) 
-       
     # Init axes
-    fig = plt.figure(figsize=(8,7))
-    ax_pos = fig.add_subplot(311, xlabel='Distance traveled [m]', ylabel='Translation error [m]')
-    ax_yaw = fig.add_subplot(312, xlabel='Distance traveled [m]', ylabel='Yaw error [deg]')
-    ax_rap = fig.add_subplot(313, xlabel='Distance traveled [m]', ylabel='Roll and Pitch error [deg]')
-    _ax_formatting(ax_yaw)
-    _ax_formatting(ax_pos)    
-    _ax_formatting(ax_rap)
+    fig = plt.figure(figsize=(8,10))
+    ax_pos = fig.add_subplot(411, ylabel='Translation error [m]')
+    ax_yaw = fig.add_subplot(412, ylabel='Yaw error [deg]')
+    ax_rap = fig.add_subplot(413, ylabel='Roll and Pitch error [deg]')
+    ax_scale = fig.add_subplot(414, xlabel='Distance traveled [m]', ylabel=r"Scale error [\%]")
+
      
     dummy_plots_pos = []
     dummy_plots_yaw = []
     dummy_plots_rap = []
+    dummy_plots_scale = []
     labels = []
     
     for idx_exp, data_dir in enumerate(data_dirs):
@@ -76,13 +77,14 @@ def plot_relative_errors(data_dirs, segment_lengths):
         dummy_plots_yaw.append(dummy_plot_yaw[0])
         dummy_plot_rap = ax_yaw.plot([1,1], '-', color=colors[idx_exp])
         dummy_plots_rap.append(dummy_plot_rap[0])
+        dummy_plot_scale = ax_yaw.plot([1,1], '-', color=colors[idx_exp])
+        dummy_plots_scale.append(dummy_plot_scale[0])
         labels.append('exp-'+str(idx_exp)) # TODO: Read label from data_dir
         
-
         for idx_segment_length, segment_length in enumerate(segment_lengths):
-            e_pos, e_rap, e_yaw = load_relative_errors_from_file(data_dir, segment_length)
+            e_pos, e_rap, e_yaw, e_scale = load_relative_errors_from_file(data_dir, segment_length)
             pb = ax_pos.boxplot(e_pos, False, '',
-                                positions=[pos[idx_segment_length] + idx_exp], widths=0.8)                    
+                                positions=[idx_exp + pos[idx_segment_length]], widths=0.8)                    
             _set_boxplot_colors(pb, colors[idx_exp])
             pb = ax_yaw.boxplot(e_yaw * 360.0 / np.pi, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
@@ -90,30 +92,30 @@ def plot_relative_errors(data_dirs, segment_lengths):
             pb = ax_rap.boxplot(e_rap * 360.0 / np.pi, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
             _set_boxplot_colors(pb, colors[idx_exp])
+            pb = ax_scale.boxplot(e_scale * 100.0 - 100.0, False, '',
+                                positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
+            _set_boxplot_colors(pb, colors[idx_exp])
                    
-    # Set x-labels
-    ax_pos.set_xticks(pos+0.5*n_exp-0.5)
-    ax_pos.set_xticklabels(segment_lengths)
-    ax_pos.set_xlim(xmin=pos[0]-2, xmax=pos[-1]+5)
-    ax_yaw.set_xticks(pos+0.5*n_exp-0.5)
-    ax_yaw.set_xticklabels(segment_lengths)
-    ax_yaw.set_xlim(xmin=pos[0]-2, xmax=pos[-1]+5)    
-    ax_rap.set_xticks(pos+0.5*n_exp-0.5)
-    ax_rap.set_xticklabels(segment_lengths)
-    ax_rap.set_xlim(xmin=pos[0]-2, xmax=pos[-1]+5)
-
     # create legend
-    ax_pos.legend(dummy_plots_yaw, labels, loc='upper right', ncol=2)
-    for p in dummy_plots_pos:
-        p.set_visible(False)
-    for p in dummy_plots_yaw:
-        p.set_visible(False)
-    for p in dummy_plots_rap:
-        p.set_visible(False)
+    ax_pos.legend(dummy_plots_yaw, labels, bbox_to_anchor=(0., 1.02, 1., .102),
+                  loc=3, ncol=3, mode='expand', borderaxespad=0.)
+        
+    def _ax_formatting(ax, dummy_plots):
+       ax.yaxis.grid(ls='--', color='0.7')
+       ax.yaxis.set_major_formatter(FuncFormatter(lambda y, pos: '%.2f'%y))
+       ax.set_xticks(pos + 0.5*n_exp - 0.5)
+       ax.set_xticklabels(segment_lengths)
+       ax.set_xlim(xmin=pos[0] - 1, xmax=pos[-1] + n_exp + 1)
+       for p in dummy_plots:
+           p.set_visible(False)
     
-    fig.tight_layout()
-    fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors.png'), bbox_inches="tight")
-
+    _ax_formatting(ax_pos, dummy_plots_pos)    
+    _ax_formatting(ax_yaw, dummy_plots_yaw)
+    _ax_formatting(ax_rap, dummy_plots_rap)
+    _ax_formatting(ax_scale, dummy_plots_scale)
+    
+    #fig.tight_layout()
+    fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors.pdf'), bbox_inches="tight")
 
 
 def compute_relative_errors(data_dir,

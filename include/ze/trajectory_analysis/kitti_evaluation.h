@@ -10,11 +10,13 @@ struct RelativeError
   Vector3 W_t_gt_es;  //!< Relative translation error represented in world frame.
   Vector3 W_R_gt_es;  //!< Relative rotation error (Angle-Axis) in world frame.
   FloatType len;
+  FloatType scale_error;
   int num_frames;
 
   RelativeError(
       size_t first_frame, Vector3 W_t_gt_es, Vector3 W_R_gt_es,
-      FloatType segment_length, int num_frames_in_between);
+      FloatType segment_length, FloatType scale_error,
+      int num_frames_in_between);
 };
 
 std::vector<FloatType> trajectoryDistances(

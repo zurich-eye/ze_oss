@@ -39,8 +39,8 @@ def plot_pointcloud_3d(results_dir, p_gt, p_es, scale, rot, trans):
     
 def plot_trajectory(results_dir, p_gt, p_es, align_first_idx = 0, align_last_idx = -1):
     
-    # plot trajectory
-    fig = plt.figure(figsize=(6, 5.5))
+    # plot trajectory top
+    fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, aspect='equal', xlabel='x [m]', ylabel='y [m]')
     ax.grid(ls='--', color='0.7')
     p_es_0 = p_es - p_gt[0,:]
@@ -52,19 +52,21 @@ def plot_trajectory(results_dir, p_gt, p_es, align_first_idx = 0, align_last_idx
     for (x1,y1,z1),(x2,y2,z2) in zip(p_es_0[align_first_idx:align_last_idx:10,:],p_gt_0[align_first_idx:align_last_idx:10,:]):
         ax.plot([x1,x2],[y1,y2],'-',color="gray")
     
-    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    ax.legend(bbox_to_anchor=(0., 1.02, 1., .102),
+              loc=3, ncol=3, mode='expand', borderaxespad=0.)
     #ax.set_ylim([-0.5, 5])
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/trajectory_top'+FORMAT)
     
     # plot trajectory side
-    fig = plt.figure(figsize=(6, 2.2))
+    fig = plt.figure(figsize=(8, 5))
     ax = fig.add_subplot(111, aspect='equal', xlabel='x [m]', ylabel='z [m]')
     ax.grid(ls='--', color='0.7')
     ax.plot(p_es[:,0]-p_gt[0,0], p_es[:,2]-p_gt[0,1], 'b-', label='Estimate')
     ax.plot(p_gt[:,0]-p_gt[0,0], p_gt[:,2]-p_gt[0,1], 'r-', label='Groundtruth')
-    ax.legend()
-    fig.tight_layout()
+    ax.legend(bbox_to_anchor=(0., 1.02, 1., .102),
+              loc=3, ncol=3, mode='expand', borderaxespad=0.)
+    #fig.tight_layout()
     fig.savefig(os.path.join(results_dir, 'trajectory_side'+FORMAT))
     
     # write aligned trajectory to file
@@ -86,7 +88,7 @@ def plot_translation_error(translation, translation_error, results_dir):
     ax.plot(translation, translation_error[:,1]*1000, 'g-', label='y')
     ax.plot(translation, translation_error[:,2]*1000, 'b-', label='z')
     ax.legend()
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/translation_error'+FORMAT)
     
     # write to file
@@ -107,7 +109,7 @@ def plot_rotation_error(translation, rotation_error, results_dir):
     ax.plot(translation, rotation_error[:,1]*180.0/np.pi, 'g-', label='pitch')
     ax.plot(translation, rotation_error[:,2]*180.0/np.pi, 'b-', label='roll')
     ax.legend()
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/orientation_error'+FORMAT)
     
     # write to file
@@ -126,7 +128,7 @@ def plot_scale_error(translation, scale_error_perc, results_dir):
     ax = fig.add_subplot(111, xlabel='Distance [m]', ylabel='Scale Drift [\%]', xlim=[0,translation[-1]])
     ax.plot(translation, scale_error_perc, 'b-')
     ax.set_ylim([-100, 100])
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/scale_drift'+FORMAT)
     
     # write to file
@@ -140,7 +142,7 @@ def plot_travelled_distance(distances, results_dir):
     fig = plt.figure(figsize=(8,5))
     ax = fig.add_subplot(111, xlabel='Measurement', ylabel='Distance [m]')
     ax.plot(range(len(distances)), distances)
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/distance'+FORMAT)
     
 def plot_imu_biases(stamps, bias_gyr, bias_acc, results_dir):
@@ -152,7 +154,7 @@ def plot_imu_biases(stamps, bias_gyr, bias_acc, results_dir):
     acc_max = 1.1*np.max(bias_acc)
 
     # Plot Accelerometer Bias.
-    fig = plt.figure(figsize=(6,8))
+    fig = plt.figure(figsize=(8,12))
     gs1 = gridspec.GridSpec(3, 1)
     gs1.update(wspace=0.015) # set the spacing between axes. 
     ax0 = fig.add_subplot(611, ylabel='Acc. Bias x')
@@ -204,7 +206,7 @@ def plot_imu_biases(stamps, bias_gyr, bias_acc, results_dir):
     #ax3.legend(ncol=2, loc='lower left') 
     
     ax5.tick_params('x',top='off')
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(results_dir+'/biases'+FORMAT)
     
     return 0
