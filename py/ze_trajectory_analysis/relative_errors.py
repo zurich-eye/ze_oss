@@ -103,7 +103,7 @@ def plot_relative_errors(data_dirs, segment_lengths):
     #fig.tight_layout()
     fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors_boxplots.pdf'), bbox_inches="tight")
 
-def plot_relative_errors_along_trajectory(data_dir, segment_length):
+def plot_relative_errors_along_trajectory(data_dir, segment_length, circle_size=0.2):
     ta = TrajectoryAnalysis(result_dir = data_dir)
     ta.load_data(data_dir=data_dir)
                      
@@ -116,7 +116,7 @@ def plot_relative_errors_along_trajectory(data_dir, segment_length):
                          title='Scale drift over '+str(segment_length)+'m Segment Length')
     ax.grid(ls='--', color='0.7')
     ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
-    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], circle_size,
                              c=np.abs(1.0 - e_scale)*100, ax=ax, edgecolor='none', lw=0)
     cbar = fig.colorbar(out)
     cbar.set_label(r"Scale drift [\%]")
@@ -126,7 +126,7 @@ def plot_relative_errors_along_trajectory(data_dir, segment_length):
                          title='Position drift over '+str(segment_length)+'m Segment Length')
     ax.grid(ls='--', color='0.7')
     ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
-    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], circle_size,
                              c=e_pos, ax=ax, edgecolor='none', lw=0)
     cbar = fig.colorbar(out)
     cbar.set_label(r"Position drift [m]")
@@ -136,7 +136,7 @@ def plot_relative_errors_along_trajectory(data_dir, segment_length):
                          title='Yaw drift over '+str(segment_length)+'m Segment Length')
     ax.grid(ls='--', color='0.7')
     ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
-    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], circle_size,
                              c=e_yaw * 180.0 / np.pi, ax=ax, edgecolor='none', lw=0)
     cbar = fig.colorbar(out)
     cbar.set_label(r"Yaw drift [deg]")
@@ -146,7 +146,7 @@ def plot_relative_errors_along_trajectory(data_dir, segment_length):
                          title='Roll and pitch drift over '+str(segment_length)+'m Segment Length')
     ax.grid(ls='--', color='0.7')
     ax.plot(ta.p_es[:,0], ta.p_es[:,1], 'b-', label='Estimate')
-    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], 0.2,
+    out = plot_utils.circles(ta.p_es[e_idx,0], ta.p_es[e_idx,1], circle_size,
                              c=e_rap * 180.0 / np.pi, ax=ax, edgecolor='none', lw=0)
     cbar = fig.colorbar(out)
     cbar.set_label(r"Roll and pitch drift [deg]")
@@ -197,8 +197,12 @@ if __name__=='__main__':
                         help='format groundtruth {swe,pose,euroc}')
     parser.add_argument('--format_es', default='pose',
                         help='format estimate {swe,pose,euroc}')
-    parser.add_argument('--least_squares', default='False',
+    parser.add_argument('--segment_align_lsq', default='False',
                         help='use least squares alignment of segment')
+    parser.add_argument('--plot_size', default=0.2,
+                        help='size of circle')
+    parser.add_argument('--skip_frames', default=1,
+                        help='frames skipped between segment evaluation')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
@@ -206,16 +210,16 @@ if __name__=='__main__':
     logger.info('Compute relative errors')
 
     segment_lengths = [5, 10, 20, 30, 50]
-    
+
     if options.data_dir:
         compute_relative_errors(options.data_dir,
                                 segment_lengths,
-                                skip_frames = 1,
+                                skip_frames = int(options.skip_frames),
                                 format_gt = options.format_gt,
                                 format_es = options.format_es,
-                                use_least_squares_alignment = (options.least_squares=='True'))
+                                use_least_squares_alignment = (options.segment_align_lsq=='True'))
 
         plot_relative_errors([options.data_dir], segment_lengths)
         
         for segment_length in segment_lengths:
-            plot_relative_errors_along_trajectory(options.data_dir, segment_length)
+            plot_relative_errors_along_trajectory(options.data_dir, segment_length, float(options.plot_size))
