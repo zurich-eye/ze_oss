@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """
 Zurich Eye
 """
@@ -111,30 +111,29 @@ class TrajectoryAnalysis:
         # Compute alignment parameters
         if align_type == 'sim3':
             self.logger.info('Align Sim3 - rotation, translation and scale.')
-            self.scale, self.rot, self.trans = \
+            self.scale, self.R_gt_es, self.t_gt_es = \
                 align_trajectory.align_sim3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
         elif align_type == 'se3':
             self.logger.info('Align SE3 - rotation, translation and scale.')
-            self.rot, self.trans = \
-                align_trajectory.align_se3(self.p_es[first_idx:last_idx,:], self.p_gt[first_idx:last_idx,:])
-            self.rot = np.transpose(self.rot)
+            self.R_gt_es, self.t_gt_es = \
+                align_trajectory.align_se3(self.p_gt[first_idx:last_idx,:], self.p_es[first_idx:last_idx,:])
             self.scale = 1.0 
         elif align_type == 'first_frame':
-            self.trans = np.zeros((3,))
-            self.rot = np.eye(3)            
+            self.t_gt_es = np.zeros((3,))
+            self.R_gt_es = np.eye(3)            
             self.scale = 1.0
             
-        self.logger.info('Alignment translation: \n' + str(self.trans))
-        self.logger.info('Alignment rotation: \n' + str(self.rot))
+        self.logger.info('Alignment translation: \n' + str(self.t_gt_es))
+        self.logger.info('Alignment R_gt_es: \n' + str(self.R_gt_es))
         self.logger.info('Alignment scale: \n' + str(self.scale))
-        npt.assert_almost_equal(np.linalg.det(self.rot), 1.0)
+        npt.assert_almost_equal(np.linalg.det(self.R_gt_es), 1.0)
             
         self.logger.info('Apply alignment to estimated trajectory to fit groundtruth')
-        q = tf.quaternion_from_matrix(tf.convert_3x3_to_4x4(self.rot))
+        q = tf.quaternion_from_matrix(tf.convert_3x3_to_4x4(self.R_gt_es))
         self.p_es_aligned = np.zeros(np.shape(self.p_es))
         self.q_es_aligned = np.zeros(np.shape(self.q_es))
         for i in range(np.shape(self.p_es)[0]):
-            self.p_es_aligned[i,:] = self.scale*self.rot.dot(self.p_es[i,:]) + self.trans
+            self.p_es_aligned[i,:] = self.scale * np.dot(self.R_gt_es, self.p_es[i,:]) + self.t_gt_es
             self.q_es_aligned[i,:] = tf.quaternion_multiply(q, self.q_es[i,:])
         
         self.align_first_idx = first_idx
@@ -225,6 +224,8 @@ if __name__=='__main__':
                         default='pose')
     parser.add_argument('--format_es', help='format estimate {swe,pose,euroc}',
                         default='pose')
+    parser.add_argument('--alignment', help='trajectory alignment {se3, sim3, first_frame}',
+                        default='se3')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
@@ -237,7 +238,7 @@ if __name__=='__main__':
         ta.load_data(data_dir=options.data_dir,
                      data_format='csv')
                      
-        ta.align_trajectory('sim3', 0, -1)
+        ta.align_trajectory(options.alignment, 0, -1)
         ta.plot_aligned_trajectory()
         ta.compute_rms_errors()
         ta.plot_estimator_results(options.data_dir,

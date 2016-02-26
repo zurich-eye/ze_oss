@@ -5,33 +5,33 @@ Zurich Eye
 
 import numpy as np
 
-def align_sim3(model, data):
+def align_sim3(p_gt, p_es):
     """Implementation of the paper: S. Umeyama, Least-Squares Estimation 
     of Transformation Parameters Between Two Point Patterns,
     IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.
 
     Input:
-    model -- first trajectory (nx3), numpy array type
-    data -- second trajectory (nx3), numpy array type
+    p_gt -- first trajectory (nx3), numpy array type
+    p_es -- second trajectory (nx3), numpy array type
     
     Output:
     s -- scale factor (scalar)
-    R -- rotation matrix (3x3)
-    t -- translation vector (3x1)
-    t_error -- translational error per point (1xn)
-    
+    R_gt_es -- rotation matrix (3x3)
+    gt_t_gt_es -- translation vector (3x1)
+
+    p_es_aligned = s * np.transpose(np.dot(R_gt_es, np.transpose(p_es))) + gt_t_gt_es
     """
 
     # substract mean
-    mu_M = model.mean(0)
-    mu_D = data.mean(0)
-    model_zerocentered = model - mu_M
-    data_zerocentered = data - mu_D
-    n = np.shape(model)[0]
+    mu_M = p_gt.mean(0)
+    mu_D = p_es.mean(0)
+    gt_zerocentered = p_gt - mu_M
+    es_zerocentered = p_es - mu_D
+    n = np.shape(p_gt)[0]
 
     # correlation
-    C = 1.0/n*np.dot(model_zerocentered.transpose(), data_zerocentered)
-    sigma2 = 1.0/n*np.multiply(data_zerocentered,data_zerocentered).sum()
+    C = 1.0/n*np.dot(gt_zerocentered.transpose(), es_zerocentered)
+    sigma2 = 1.0/n*np.multiply(es_zerocentered, es_zerocentered).sum()
     U_svd,D_svd,V_svd = np.linalg.linalg.svd(C)
     D_svd = np.diag(D_svd)
     V_svd = np.transpose(V_svd)
@@ -40,18 +40,14 @@ def align_sim3(model, data):
     if(np.linalg.det(U_svd)*np.linalg.det(V_svd) < 0):
         S[2,2] = -1
 
-    R = np.dot(U_svd, np.dot(S, np.transpose(V_svd)))
-    s = 1.0/sigma2*np.trace(np.dot(D_svd, S))
-    t = mu_M-s*np.dot(R,mu_D)
+    R_gt_es = np.dot(U_svd, np.dot(S, np.transpose(V_svd)))
+    s = 1.0/sigma2 * np.trace(np.dot(D_svd, S))
+    gt_t_gt_es = mu_M - s * np.dot(R_gt_es, mu_D)
+    
+   
+    return s, R_gt_es, gt_t_gt_es
 
-    # TODO:
-    # model_aligned = s * R * model + t
-    # alignment_error = model_aligned - data
-    # t_error = np.sqrt(np.sum(np.multiply(alignment_error,alignment_error),0)).A[0]
-
-    return s, R, t #, t_error
-
-def align_se3(model, data):
+def align_se3(p_gt, p_es):
     """Align two trajectories using the method of Horn (closed-form). 
         
     Input:
@@ -59,28 +55,29 @@ def align_se3(model, data):
     data -- second trajectory (nx3), numpy array type
     
     Output:
-    R -- rotation matrix (3x3)
-    t -- translation vector (3x1)
+    R_gt_es -- rotation matrix (3x3)
+    gt_t_gt_es -- translation vector (3x1)
     """
     np.set_printoptions(precision=3,suppress=True)
-    mu_M = model.mean(0)
-    mu_D = data.mean(0)
-    model_zerocentered = model - mu_M
-    data_zerocentered = data - mu_D
+    mu_M = p_gt.mean(0)
+    mu_D = p_es.mean(0)
+    gt_zerocentered = p_gt - mu_M
+    es_zerocentered = p_es - mu_D
     
     W = np.zeros( (3,3) )
-    for row in range(model.shape[0]):
-        W += np.outer(model_zerocentered[row,:],data_zerocentered[row,:])
+    for row in range(p_gt.shape[0]):
+        W += np.outer(gt_zerocentered[row,:], es_zerocentered[row,:])
     U,d,Vh = np.linalg.linalg.svd(W.transpose())
-    S = np.matrix(np.identity( 3 ))
+    S = np.eye(3)
     if np.linalg.det(U) * np.linalg.det(Vh) < 0:
         S[2,2] = -1
-    R = U*S*Vh
+    R = np.dot(U, np.dot(S, Vh))
     t = mu_D - np.dot(R, mu_M)
     
-    #model_aligned = np.transpose(np.dot(R, np.transpose(model)) + np.transpose(t))
-  
-    return R, t
+    R_gt_es = np.transpose(R)
+    gt_t_gt_es = - np.dot(R_gt_es, t)
+
+    return R_gt_es, gt_t_gt_es
 
 def _matrix_log(A):
     theta = np.arccos((np.trace(A)-1.0)/2.0)
