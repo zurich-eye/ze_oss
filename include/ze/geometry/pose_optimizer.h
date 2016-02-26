@@ -66,13 +66,13 @@ private:
  */
 inline Matrix3 dBearing_dLandmark(const Position& p_C)
 {
-  FloatType x2 = p_C(0) * p_C(0);
-  FloatType y2 = p_C(1) * p_C(1);
-  FloatType z2 = p_C(2) * p_C(2);
-  FloatType xy = p_C(0) * p_C(1);
-  FloatType xz = p_C(0) * p_C(2);
-  FloatType yz = p_C(1) * p_C(2);
-  FloatType x2_y2_z2 = x2 + y2 + z2;
+  const FloatType x2 = p_C(0) * p_C(0);
+  const FloatType y2 = p_C(1) * p_C(1);
+  const FloatType z2 = p_C(2) * p_C(2);
+  const FloatType xy = p_C(0) * p_C(1);
+  const FloatType xz = p_C(0) * p_C(2);
+  const FloatType yz = p_C(1) * p_C(2);
+  const FloatType x2_y2_z2 = x2 + y2 + z2;
   Matrix3 J;
   J << y2 + z2, -xy, -xz,
        -xy, x2 + z2, -yz,
