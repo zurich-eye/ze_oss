@@ -22,16 +22,7 @@ inline void normalizeBearings(Bearings& bearings)
 //! Get element with max norm in a vector.
 inline FloatType normMax(const VectorX& v)
 {
-  FloatType max = -1.0f;
-  for(int i = 0; i < v.size(); ++i)
-  {
-    FloatType abs = std::abs(v[i]);
-    if(abs > max)
-    {
-      max = abs;
-    }
-  }
-  return max;
+  return v.lpNorm<Eigen::Infinity>();
 }
 
 } // namespace ze
