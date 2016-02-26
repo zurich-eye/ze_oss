@@ -246,7 +246,7 @@ if __name__=='__main__':
 
     if options.data_dir:
         ta = TrajectoryAnalysis(result_dir = options.data_dir,
-                                plot_size = options.plot_size)
+                                plot_size = float(options.plot_size))
         
         ta.load_data(data_dir=options.data_dir,
                      data_format='csv')
@@ -257,4 +257,4 @@ if __name__=='__main__':
         ta.plot_estimator_results(options.data_dir,
                                   data_format = options.format_es,
                                   filename = 'traj_es.csv',
-                                  skip_frames = options.skip_frames)
+                                  skip_frames = int(options.skip_frames))
