@@ -30,6 +30,8 @@ using FloatType = double;
   using Matrix7##SUFFIX = Eigen::Matrix<FloatType, 7, SIZE>;   \
   using Matrix8##SUFFIX = Eigen::Matrix<FloatType, 8, SIZE>;   \
   using Matrix9##SUFFIX = Eigen::Matrix<FloatType, 9, SIZE>;   \
+  using Matrix##SUFFIX##X = Eigen::Matrix<FloatType, SIZE, Eigen::Dynamic>; \
+  using MatrixX##SUFFIX = Eigen::Matrix<FloatType, Eigen::Dynamic, SIZE>; \
   static const Eigen::MatrixBase<Matrix##SUFFIX>::IdentityReturnType I_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Identity(); \
   static const Eigen::MatrixBase<Matrix##SUFFIX>::ConstantReturnType Z_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Zero()
 

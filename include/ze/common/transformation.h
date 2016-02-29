@@ -58,10 +58,10 @@ template<> struct traits<Quaternion>
 {
   static constexpr int dimension = 3; // The dimension of the manifold.
 
-  typedef Eigen::Matrix<double, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<double, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
-  static bool Equals(const Quaternion& q1, const Quaternion& q2, double tol = 1e-8)
+  static bool Equals(const Quaternion& q1, const Quaternion& q2, FloatType tol = 1e-8)
   {
     return (q1.getUnique().vector() - q2.getUnique().vector()).array().abs().maxCoeff() < tol;
   }
@@ -80,7 +80,7 @@ template<> struct traits<Quaternion>
     return v;
   }
 
-  static Quaternion Retract(const Quaternion& origin, const Eigen::Vector3d& d,
+  static Quaternion Retract(const Quaternion& origin, const Vector3& d,
                             Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     const Quaternion g = Quaternion::exp(d);
@@ -93,9 +93,43 @@ template<> struct traits<Quaternion>
 
 // -----------------------------------------------------------------------------
 // Manifold traits for SE(3)
+template<> struct traits<Transformation>
+{
+  static constexpr int dimension = 6; // The dimension of the manifold.
 
-//
-// TODO(cfo): SE(3) traits.
-//
+  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+
+  static bool Equals(const Transformation& T1, const Transformation& T2, FloatType tol = 1e-8)
+  {
+    return (T1.getRotation().getUnique().vector()
+            - T2.getRotation().getUnique().vector()).array().abs().maxCoeff() < tol
+        && (T1.getPosition() - T2.getPosition()).array().abs().maxCoeff() < tol;
+  }
+
+  static TangentVector Local(const Transformation& origin, const Transformation& other,
+                             Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    const Transformation h = origin.inverse() * other;
+    const TangentVector v = (Vector6() << h.getPosition(), h.getRotation().log()).finished();
+    if(H1 || H2)
+    {
+      LOG(FATAL) << "Not implemented";
+    }
+    return v;
+  }
+
+  static Transformation Retract(const Transformation& origin, const Vector6& d,
+                                Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    Transformation g(Quaternion::exp(d.tail<3>()), d.head<3>()); // Chart at origin
+    Transformation h  = origin * g;
+    if(H1 || H2)
+    {
+      LOG(FATAL) << "Not implemented";
+    }
+    return h;
+  }
+};
 
 } // namespace ze

@@ -8,9 +8,9 @@ namespace ze {
 inline Matrix3 skewSymmetric(Vector3 w)
 {
   return (Matrix3() <<
-          0.0, -w.z(), +w.y(),
-          +w.z(), 0.0, -w.x(),
-          -w.y(), +w.x(), 0.0).finished();
+          0.0f, -w.z(), +w.y(),
+          +w.z(), 0.0f, -w.x(),
+          -w.y(), +w.x(), 0.0f).finished();
 }
 
 //! Normalize a block of bearing vectors.
@@ -22,16 +22,7 @@ inline void normalizeBearings(Bearings& bearings)
 //! Get element with max norm in a vector.
 inline FloatType normMax(const VectorX& v)
 {
-  FloatType max = -1.0;
-  for(int i = 0; i < v.size(); ++i)
-  {
-    FloatType abs = std::abs(v[i]);
-    if(abs > max)
-    {
-      max = abs;
-    }
-  }
-  return max;
+  return v.lpNorm<Eigen::Infinity>();
 }
 
 } // namespace ze
