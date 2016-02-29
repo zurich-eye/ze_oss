@@ -125,7 +125,8 @@ def compute_relative_errors(data_dir,
                             filename_es = 'traj_es.csv',
                             filename_result_prefix = 'traj_relative_errors',
                             match_timestamps_offset = 0.0,
-                            match_timestamps_max_difference_sec = 0.02):
+                            match_timestamps_max_difference_sec = 0.02,
+                            use_least_squares_alignment = False):
     logger = logging.getLogger(__name__)
     for segment_length in segment_lengths:
         cmd = "rosrun ze_trajectory_analysis kitti_evaluation" \
@@ -139,6 +140,10 @@ def compute_relative_errors(data_dir,
             + " --max_difference_sec=" + str(match_timestamps_max_difference_sec) \
             + " --segment_length=" + str(segment_length) \
             + " --skip_frames=" + str(skip_frames)
+            
+        if use_least_squares_alignment:
+            print("Use least squares alignment")
+            cmd += " --least_squares_align"
                                            
         logger.info("Executing command: "+cmd)
         os.system(cmd)
@@ -147,9 +152,14 @@ if __name__=='__main__':
     
     # parse command line
     parser = argparse.ArgumentParser(description='Compute relative errors')
-    parser.add_argument('--data_dir', help='folder with the results', default='')
-    parser.add_argument('--format_gt', help='format groundtruth {swe,pose,euroc}', default='pose')
-    parser.add_argument('--format_es', help='format estimate {swe,pose,euroc}', default='pose')
+    parser.add_argument('--data_dir', default='',
+                        help='folder with the results')
+    parser.add_argument('--format_gt', default='pose',
+                        help='format groundtruth {swe,pose,euroc}')
+    parser.add_argument('--format_es', default='pose',
+                        help='format estimate {swe,pose,euroc}')
+    parser.add_argument('--least_squares', default='False',
+                        help='use least squares alignment of segment')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
@@ -161,6 +171,7 @@ if __name__=='__main__':
                                 segment_lengths = [5, 10, 20, 30, 50],
                                 skip_frames = 1,
                                 format_gt = options.format_gt,
-                                format_es = options.format_es)
+                                format_es = options.format_es,
+                                use_least_squares_alignment = (options.least_squares=='True'))
 
         plot_relative_errors([options.data_dir], segment_lengths = [5, 10, 20, 30, 50])

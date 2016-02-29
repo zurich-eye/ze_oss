@@ -1,5 +1,7 @@
 #include <ze/trajectory_analysis/kitti_evaluation.h>
 
+#include <ze/geometry/align_poses.h>
+
 namespace ze {
 
 RelativeError::RelativeError(
@@ -39,17 +41,18 @@ int32_t lastFrameFromSegmentLength(
 }
 
 std::vector<RelativeError> calcSequenceErrors(
-    const TransformationVector& T_W_gt,
-    const TransformationVector& T_W_es,
+    const TransformationVector& T_W_A, // groundtruth
+    const TransformationVector& T_W_B,
     const FloatType& segment_length,
-    const size_t skip_num_frames_between_segment_evaluation)
+    const size_t skip_num_frames_between_segment_evaluation,
+    const bool use_least_squares_alignment)
 {
   // Pre-compute cumulative distances (from ground truth as reference).
-  std::vector<FloatType> dist = trajectoryDistances(T_W_gt);
+  std::vector<FloatType> dist = trajectoryDistances(T_W_A);
 
   // Compute relative errors for all start positions.
   std::vector<RelativeError> errors;
-  for (size_t first_frame = 0; first_frame < T_W_gt.size();
+  for (size_t first_frame = 0; first_frame < T_W_A.size();
        first_frame += skip_num_frames_between_segment_evaluation)
   {
     // Find last frame to compare with.
@@ -59,19 +62,36 @@ std::vector<RelativeError> calcSequenceErrors(
       continue; // continue, if segment is longer than trajectory.
     }
 
+    // Perform a least-squares alignment of the first 20% of the trajectories.
+    int n_align_poses = 0.2 * (last_frame - first_frame);
+    Transformation T_A0_B0 = T_W_A[first_frame].inverse() * T_W_B[first_frame];
+    if(use_least_squares_alignment && n_align_poses > 1)
+    {
+      TransformationVector T_W_es_align(
+            T_W_B.begin() + first_frame, T_W_B.begin() + first_frame + n_align_poses);
+      TransformationVector T_W_gt_align(
+            T_W_A.begin() + first_frame, T_W_A.begin() + first_frame + n_align_poses);
+      VLOG(40) << "T_W_es_align size = " << T_W_es_align.size();
+
+      const FloatType sigma_pos = 0.05;
+      const FloatType sigma_rot = 5.0 / 180 * M_PI;
+      PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
+      problem.optimize(T_A0_B0);
+    }
+
     // Compute relative rotational and translational errors.
-    Transformation T_W_gtlast = T_W_gt[last_frame];
-    Transformation T_W_eslast = T_W_es[last_frame];
-    Transformation T_gtfirst_gtlast = T_W_gt[first_frame].inverse() * T_W_gtlast;
-    Transformation T_esfirst_eslast = T_W_es[first_frame].inverse() * T_W_eslast;
-    Transformation T_gtlast_eslast = T_gtfirst_gtlast.inverse() * T_esfirst_eslast;
+    Transformation T_W_Ai = T_W_A[last_frame];
+    Transformation T_A0_Ai = T_W_A[first_frame].inverse() * T_W_Ai;
+    Transformation T_Bi_A0 = T_W_B[last_frame].inverse() * T_W_A[first_frame];
+    Transformation T_Bi_Ai = T_Bi_A0 * T_A0_B0 * T_A0_Ai;
+    Transformation T_Ai_Bi = T_Bi_Ai.inverse();
 
     // The relative error is represented in the frame of reference of the last
     // frame in the ground-truth trajectory. We want to express it in the world
     // frame to make statements about the yaw drift (not observable in Visual-
     // inertial setting) vs. roll and pitch (observable).
-    Vector3 W_t_gtlast_eslast = T_W_gtlast.getRotation().rotate(T_gtlast_eslast.getPosition());
-    Vector3 W_R_gtlast_eslast = T_W_gtlast.getRotation().rotate(T_gtlast_eslast.getRotation().log());
+    Vector3 W_t_gtlast_eslast = T_W_Ai.getRotation().rotate(T_Ai_Bi.getPosition());
+    Vector3 W_R_gtlast_eslast = T_W_Ai.getRotation().rotate(T_Ai_Bi.getRotation().log());
 
     errors.push_back(RelativeError(first_frame,
                                    W_t_gtlast_eslast,
