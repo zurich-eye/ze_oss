@@ -36,20 +36,6 @@ protected:
   size_t num_tokens_in_line_;
 };
 
-class LLASeries : public CSVTrajectory
-{
-public:
-  ZE_POINTER_TYPEDEFS(LLASeries);
-
-  LLASeries();
-  virtual void load(const std::string& in_file_path) override;
-  const Buffer<FloatType, 3>& getBuffer() const;
-  Buffer<FloatType, 3>& getBuffer();
-
-protected:
-  Buffer<FloatType, 3> lla_buf_;
-};
-
 class PositionSeries : public CSVTrajectory
 {
 public:
@@ -92,15 +78,6 @@ class EurocResultSeries : public PoseSeries
 {
 public:
   EurocResultSeries();
-};
-
-class ApplanixPostProcessedSeries : public LLASeries
-{
-public:
-  ApplanixPostProcessedSeries(int gps_week);
-protected:
-  virtual int64_t getTimeStamp(const std::string& ts_str) const override;
-  int gps_week_;
 };
 
 } // ze namespace

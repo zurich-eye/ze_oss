@@ -28,7 +28,6 @@ set(HEADERS
   include/ze/common/test_utils.h
   include/ze/common/time.h
   include/ze/common/timer.h
-  include/ze/common/gps_time.h
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
@@ -40,7 +39,6 @@ set(SOURCES
   src/sample.cpp
   src/test_utils.cpp
   src/csv_trajectory.cpp
-  src/gps_time.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -73,8 +71,6 @@ target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
 catkin_add_gtest(test_statistics test/test_statistics.cpp)
 target_link_libraries(test_statistics ${PROJECT_NAME})
 
-catkin_add_gtest(test_gps_time test/test_gps_time.cpp)
-target_link_libraries(test_gps_time ${PROJECT_NAME})
 
 ##########
 # EXPORT #

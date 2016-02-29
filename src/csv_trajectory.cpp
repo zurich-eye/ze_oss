@@ -1,5 +1,4 @@
 #include <ze/common/csv_trajectory.h>
-#include <ze/common/gps_time.h>
 
 namespace ze {
 
@@ -49,57 +48,6 @@ Vector7 CSVTrajectory::readPose(const std::vector<std::string>& items)
   Vector7 pose;
   pose << readTranslation(items), readOrientation(items);
   return pose;
-}
-
-LLASeries::LLASeries()
-{
-  order_["ts"] = 0;
-  order_["tx"] = 1;
-  order_["ty"] = 2;
-  order_["tz"] = 3;
-
-  header_ = "# timestamp, latitude, longitude, altitude";
-  num_tokens_in_line_ = 4u;
-}
-
-void LLASeries::load(const std::string& in_file_path)
-{
-  readHeader(in_file_path);
-  std::string line;
-  size_t ln_cnt{0};
-  while(getline(in_str_, line))
-  {
-    if('%' != line.at(0) && '#' != line.at(0))
-    {
-      std::vector<std::string> items = ze::splitString(line, delimiter_);
-      if(items.size()!=num_tokens_in_line_)
-      {
-        LOG(WARNING) << "Unexpected number of tokens at line "
-                     << ln_cnt << ". Read " << items.size()
-                     << ", expected "
-                     << num_tokens_in_line_
-                     << std::endl;
-      }
-      else
-      {
-        int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
-        Vector3 lla = readTranslation(items);
-        lla_buf_.insert(stamp, lla);
-      }
-    }
-    ln_cnt++;
-  }
-  LOG(INFO) << "Total number of read lines " << ln_cnt << std::endl;
-}
-
-const Buffer<FloatType, 3>& LLASeries::getBuffer() const
-{
-  return lla_buf_;
-}
-
-Buffer<FloatType, 3>& LLASeries::getBuffer()
-{
-  return lla_buf_;
 }
 
 PositionSeries::PositionSeries()
@@ -224,25 +172,6 @@ EurocResultSeries::EurocResultSeries()
   order_["qw"] = 4;
 
   header_ = "#timestamp, p_RS_R_x [m], p_RS_R_y [m], p_RS_R_z [m], q_RS_w [], q_RS_x [], q_RS_y [], q_RS_z [], v_RS_R_x [m s^-1], v_RS_R_y [m s^-1], v_RS_R_z [m s^-1], b_w_RS_S_x [rad s^-1], b_w_RS_S_y [rad s^-1], b_w_RS_S_z [rad s^-1], b_a_RS_S_x [m s^-2], b_a_RS_S_y [m s^-2], b_a_RS_S_z [m s^-2]";
-}
-
-ApplanixPostProcessedSeries::ApplanixPostProcessedSeries(int gps_week)
-  : LLASeries()
-{
-  order_["ts"] = 0;
-  order_["tx"] = 4;
-  order_["ty"] = 5;
-  order_["tz"] = 6;
-
-  header_ = "";
-  num_tokens_in_line_ = 31u;
-  gps_week_ = gps_week;
-}
-
-int64_t ApplanixPostProcessedSeries::getTimeStamp(const std::string& ts_str) const
-{
-  const double gps_secs = std::stod(ts_str);
-  return ze::gps2UtcNSecs(gps_week_, gps_secs);
 }
 
 } // ze namespace
