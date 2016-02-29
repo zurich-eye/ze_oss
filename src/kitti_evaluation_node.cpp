@@ -18,6 +18,7 @@ DEFINE_double(max_difference_sec, 0.02, "maximally allowed time difference for m
 DEFINE_double(segment_length, 50, "Segment length of relative error evaluation. [meters]");
 DEFINE_double(skip_frames, 10, "Number of frames to skip between evaluation.");
 DEFINE_bool(least_squares_align, false, "Use least squares to align 20% of the segment length.");
+DEFINE_double(least_squares_align_range, 0.2, "Portion of the segment that should be least squares aligned.");
 
 ze::PoseSeries::Ptr loadData(const std::string& format,
                              const std::string& datapath)
@@ -97,7 +98,8 @@ int main(int argc, char** argv)
   VLOG(1) << "Computing relative errors...";
   std::vector<ze::RelativeError> errors =
       ze::calcSequenceErrors(gt_poses, es_poses, FLAGS_segment_length,
-                             FLAGS_skip_frames, FLAGS_least_squares_align);
+                             FLAGS_skip_frames, FLAGS_least_squares_align,
+                             FLAGS_least_squares_align_range);
   VLOG(1) << "...done";
 
   // Write result to file

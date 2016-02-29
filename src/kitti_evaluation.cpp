@@ -46,7 +46,8 @@ std::vector<RelativeError> calcSequenceErrors(
     const TransformationVector& T_W_B,
     const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation,
-    const bool use_least_squares_alignment)
+    const bool use_least_squares_alignment,
+    const double least_squares_align_range)
 {
   // Pre-compute cumulative distances (from ground truth as reference).
   std::vector<FloatType> dist_gt = trajectoryDistances(T_W_A);
@@ -64,8 +65,8 @@ std::vector<RelativeError> calcSequenceErrors(
       continue; // continue, if segment is longer than trajectory.
     }
 
-    // Perform a least-squares alignment of the first 20% of the trajectories.
-    int n_align_poses = 0.2 * (last_frame - first_frame);
+    // Perform a least-squares alignment of the first part of the trajectories.
+    int n_align_poses = least_squares_align_range * (last_frame - first_frame);
     Transformation T_A0_B0 = T_W_A[first_frame].inverse() * T_W_B[first_frame];
     if(use_least_squares_alignment && n_align_poses > 1)
     {
