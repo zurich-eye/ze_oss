@@ -162,14 +162,14 @@ private:
 protected:
   HessianMatrix  H_;        //!< Hessian or approximation Jacobian*Jacobian^T.
   GradientVector g_;        //!< Jacobian*residual.
-  UpdateVector   dx_;       //!< Update step.
-  FloatType chi2_ = 0.0;    //!< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  FloatType rho_ = 0.0;     //!< Error reduction: chi2-new_chi2.
-  FloatType mu_ = 0.01;     //!< Damping parameter.
-  FloatType nu_ = 2.0;      //!< Factor that specifies how much we increase mu at every trial.
+  UpdateVector  dx_;        //!< Update step.
+  FloatType chi2_ = 0.0f;   //!< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
+  FloatType rho_ = 0.0f;    //!< Error reduction: chi2-new_chi2.
+  FloatType mu_ = 0.01f;    //!< Damping parameter.
+  FloatType nu_ = 2.0f;     //!< Factor that specifies how much we increase mu at every trial.
   bool stop_ = false;       //!< Stop flag.
-  size_t iter_ = 0;         //!< Current Iteration.
-  size_t trials_ = 0;       //!< Current number of trials.
+  size_t iter_ = 0u;        //!< Current Iteration.
+  size_t trials_ = 0u;      //!< Current number of trials.
 };
 
 } // namespace ze

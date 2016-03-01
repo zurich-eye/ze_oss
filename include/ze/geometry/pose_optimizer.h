@@ -39,7 +39,7 @@ public:
       const FloatType prior_weight_pos, const FloatType prior_weight_rot);
 
   FloatType evaluateError(
-      const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
+      const Transformation& T_B_W, HessianMatrix* H, GradientVector* g);
 
   void update(
       const Transformation& T_Bold_W, const UpdateVector& dx,
