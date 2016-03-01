@@ -2,13 +2,21 @@
 
 namespace ze {
 
+int64_t CSVTrajectory::getTimeStamp(const std::string& ts_str) const
+{
+  return std::stoll(ts_str);
+}
+
 void CSVTrajectory::readHeader(const std::string& in_file_path)
 {
   in_str_.open(in_file_path);
   CHECK(in_str_.is_open());
-  std::string line;
-  getline(in_str_, line);
-  CHECK_EQ(line, header_);
+  if(!header_.empty())
+  {
+    std::string line;
+    getline(in_str_, line);
+    CHECK_EQ(line, header_);
+  }
 }
 
 Vector3 CSVTrajectory::readTranslation(const std::vector<std::string>& items)
@@ -42,43 +50,6 @@ Vector7 CSVTrajectory::readPose(const std::vector<std::string>& items)
   return pose;
 }
 
-LLASeries::LLASeries()
-{
-  order_["ts"] = 0;
-  order_["tx"] = 1;
-  order_["ty"] = 2;
-  order_["tz"] = 3;
-
-  header_ = "# timestamp, latitude, longitude, altitude";
-}
-
-void LLASeries::load(const std::string& in_file_path)
-{
-  readHeader(in_file_path);
-  std::string line;
-  while(getline(in_str_, line))
-  {
-    if('%' != line.at(0) && '#' != line.at(0))
-    {
-      std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
-      Vector3 lla = readTranslation(items);
-      lla_buf_.insert(stamp, lla);
-    }
-  }
-}
-
-const Buffer<FloatType, 3>& LLASeries::getBuffer() const
-{
-  return lla_buf_;
-}
-
-Buffer<FloatType, 3>& LLASeries::getBuffer()
-{
-  return lla_buf_;
-}
-
 PositionSeries::PositionSeries()
 {
   order_["ts"] = 0;
@@ -87,6 +58,7 @@ PositionSeries::PositionSeries()
   order_["tz"] = 3;
 
   header_ = "# timestamp, tx, ty, tz";
+  num_tokens_in_line_ = 4u;
 }
 
 void PositionSeries::load(const std::string& in_file_path)
@@ -98,8 +70,8 @@ void PositionSeries::load(const std::string& in_file_path)
     if('%' != line.at(0) && '#' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 4u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+      CHECK_GE(items.size(), num_tokens_in_line_);
+      int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
       Vector3 position = readTranslation(items);
       position_buf_.insert(stamp, position);
     }
@@ -128,6 +100,7 @@ PoseSeries::PoseSeries()
   order_["qw"] = 7;
 
   header_ = "# timestamp, x, y, z, qx, qy, qz, qw";
+  num_tokens_in_line_ = 8u;
 }
 
 void PoseSeries::load(const std::string& in_file_path)
@@ -139,8 +112,8 @@ void PoseSeries::load(const std::string& in_file_path)
     if('%' != line.at(0) && '#' != line.at(0) && 't' != line.at(0))
     {
       std::vector<std::string> items = ze::splitString(line, delimiter_);
-      CHECK_GE(items.size(), 8u);
-      int64_t stamp = std::stoll(items[order_.find("ts")->second]);
+      CHECK_GE(items.size(), num_tokens_in_line_);
+      int64_t stamp = getTimeStamp(items[order_.find("ts")->second]);
       Vector7 pose = readPose(items);
       pose_buf_.insert(stamp, pose);
     }
