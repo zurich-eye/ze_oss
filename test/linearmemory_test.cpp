@@ -95,41 +95,41 @@ TYPED_TEST_CASE(LinearMemoryTest, PixelTypes);
 
 TYPED_TEST(LinearMemoryTest, CheckMemforyAlignment)
 {
-  ASSERT_EQ(0, (std::uintptr_t)reinterpret_cast<void*>(this->linmem_.data()) % 32);
+  EXPECT_EQ(0u, (std::uintptr_t)reinterpret_cast<void*>(this->linmem_.data()) % 32);
 }
 
 TYPED_TEST(LinearMemoryTest, CheckLength)
 {
-  ASSERT_EQ(this->numel_, this->linmem_.length());
+  EXPECT_EQ(this->numel_, this->linmem_.length());
 }
 
 TYPED_TEST(LinearMemoryTest, CheckNoRoi)
 {
-  ASSERT_EQ(0, this->linmem_.roi().x());
-  ASSERT_EQ(this->numel_, this->linmem_.roi().length());
+  EXPECT_EQ(0u, this->linmem_.roi().x());
+  EXPECT_EQ(this->numel_, this->linmem_.roi().length());
 }
 
 TYPED_TEST(LinearMemoryTest, CheckRoi)
 {
   this->setRoi();
-  ASSERT_EQ(this->roi_.x(), this->linmem_.roi().x());
-  ASSERT_EQ(this->roi_.length(), this->linmem_.roi().length());
+  EXPECT_EQ(this->roi_.x(), this->linmem_.roi().x());
+  EXPECT_EQ(this->roi_.length(), this->linmem_.roi().length());
 }
 
 TYPED_TEST(LinearMemoryTest, CheckNumBytes)
 {
-  ASSERT_EQ(this->numel_*this->pixel_size_, this->linmem_.bytes());
+  EXPECT_EQ(this->numel_*this->pixel_size_, this->linmem_.bytes());
 }
 
 TYPED_TEST(LinearMemoryTest, CheckNumRoiBytes)
 {
   this->setRoi();
-  ASSERT_EQ(this->roi_.length()*this->pixel_size_, this->linmem_.roiBytes());
+  EXPECT_EQ(this->roi_.length()*this->pixel_size_, this->linmem_.roiBytes());
 }
 
 TYPED_TEST(LinearMemoryTest, CheckPixelBitDepth)
 {
-  ASSERT_EQ(this->pixel_bit_depth_, this->linmem_.bitDepth());
+  EXPECT_EQ(this->pixel_bit_depth_, this->linmem_.bitDepth());
 }
 
 TYPED_TEST(LinearMemoryTest, ReturnsFalseForNonGpuMemory)
@@ -140,9 +140,9 @@ TYPED_TEST(LinearMemoryTest, ReturnsFalseForNonGpuMemory)
 TYPED_TEST(LinearMemoryTest, CheckValues)
 {
   this->setValue();
-  for (std::uint32_t i=0; i<this->numel_; ++i)
+  for (std::uint32_t i=0u; i<this->numel_; ++i)
   {
-    ASSERT_EQ(this->linmem_[i], this->pixel1_);
+    EXPECT_EQ(this->linmem_[i], this->pixel1_);
   }
 }
 
@@ -150,9 +150,9 @@ TYPED_TEST(LinearMemoryTest, CheckValuesInConstLinearMemory)
 {
   this->setValue();
   const ze::LinearMemory<TypeParam> const_linmem(this->linmem_);
-  for (std::uint32_t i=0; i<this->numel_; ++i)
+  for (std::uint32_t i=0u; i<this->numel_; ++i)
   {
-    ASSERT_EQ(const_linmem[i], this->pixel1_);
+    EXPECT_EQ(const_linmem[i], this->pixel1_);
   }
 }
 
@@ -162,15 +162,15 @@ TYPED_TEST(LinearMemoryTest, CheckRoiValues)
   this->setValue();
   this->setValueRoi();
 
-  for (std::uint32_t i=0; i<this->numel_; ++i)
+  for (std::uint32_t i=0u; i<this->numel_; ++i)
   {
     if (i>=this->roi_.x() && i<(this->roi_.x()+this->roi_.length()))
     {
-      ASSERT_EQ(this->pixel2_, this->linmem_[i]);
+      EXPECT_EQ(this->pixel2_, this->linmem_[i]);
     }
     else
     {
-      ASSERT_EQ(this->pixel1_, this->linmem_[i]);
+      EXPECT_EQ(this->pixel1_, this->linmem_[i]);
     }
   }
 }

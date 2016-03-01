@@ -11,7 +11,7 @@ TEST(IMPCoreTestSuite,testSize)
 {
   {
     ze::Size1u sz1u;
-    EXPECT_EQ(0, sz1u.length());
+    EXPECT_EQ(0u, sz1u.length());
     std::uint32_t len=101;
     ze::Size1u sz(len);
     EXPECT_EQ(len, sz.length());
@@ -20,8 +20,8 @@ TEST(IMPCoreTestSuite,testSize)
   }
   {
     ze::Size2u sz2u;
-    EXPECT_EQ(0, sz2u.width());
-    EXPECT_EQ(0, sz2u.height());
+    EXPECT_EQ(0u, sz2u.width());
+    EXPECT_EQ(0u, sz2u.height());
 
     // 2D sizes
     const std::int32_t w=10, h=13;
