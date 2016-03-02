@@ -38,7 +38,7 @@ target_link_libraries(test_align_points ${PROJECT_NAME})
 catkin_add_gtest(test_align_poses test/test_align_poses.cpp)
 target_link_libraries(test_align_poses ${PROJECT_NAME})
 
-cs_add_executable(test_lsq_state test/test_lsq_state.cpp)
+catkin_add_gtest(test_lsq_state test/test_lsq_state.cpp)
 target_link_libraries(test_lsq_state ${PROJECT_NAME})
 
 catkin_add_gtest(test_pose_optimizer test/test_pose_optimizer.cpp)
