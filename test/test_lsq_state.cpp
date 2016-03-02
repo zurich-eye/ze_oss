@@ -6,7 +6,16 @@
 #include <ze/common/transformation.h>
 #include <ze/geometry/lsq_state.h>
 
-TEST(StateTests, testRetract)
+TEST(StateTests, testTupleFixedSize)
+{
+  using namespace ze;
+  using Tuple1 = std::tuple<Transformation, FloatType, Vector3>;
+  using Tuple2 = std::tuple<Transformation, VectorX>;
+  EXPECT_TRUE(internal::TupleIsFixedSize<Tuple1>::is_fixed_size);
+  EXPECT_FALSE(internal::TupleIsFixedSize<Tuple2>::is_fixed_size);
+}
+
+TEST(StateTests, testStateFixedSize)
 {
   using namespace ze;
 
@@ -20,8 +29,26 @@ TEST(StateTests, testRetract)
   state.retract(v);
 
   EXPECT_EQ(State<Transformation>::dimension, 6);
+}
 
-  return 0;
+TEST(StateTests, testStateDynamicSize)
+{
+  using namespace ze;
+
+  using MyState = State<Transformation,VectorX>;
+  std::cout << "Dim = " << MyState::dimension;
+
+  MyState state;
+  state.print();
+
+  VectorX& x = state.at<1>();
+  x.resize(10);
+
+  EXPECT_EQ(state.getDimension(), 16);
+  EXPECT_TRUE(state.isDynamicSize());
+  EXPECT_FALSE(state.isElementDynamicSize<0>());
+  EXPECT_TRUE(state.isElementDynamicSize<1>());
+  MyState::Jacobian J;
 }
 
 ZE_UNITTEST_ENTRYPOINT
