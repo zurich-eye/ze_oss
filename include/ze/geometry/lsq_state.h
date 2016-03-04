@@ -86,23 +86,26 @@ public:
     retractImpl<0,0>(v);
   }
 
-  int getDimension()
+  //! Get actual dimension of the state, also if state is of dynamic size.
+  int getDimension() const
   {
     return getDimensionImpl<0>();
   }
 
+  //! Get reference to element
   template<uint32_t i>
   inline auto at() -> decltype (std::get<i>(state_)) &
   {
     return std::get<i>(state_);
   }
 
-  //! Returns whether the whole state is of dynamic size.
+  //! Returns whether one element of the state is of dynamic size.
   static constexpr bool isDynamicSize()
   {
     return (dimension == -1);
   }
 
+  //! Returns whether element i is of dynamic size.
   template<uint32_t i>
   static constexpr bool isElementDynamicSize()
   {
@@ -111,24 +114,35 @@ public:
 
 private:
 
-  template<unsigned int i, typename std::enable_if<(i<size && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
+  //!@ getDimension recursive implementation.
+  //!{
+  template<unsigned int i, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
   inline int getDimensionImpl() const
   {
     return traits<ElementType<i>>::dimension + getDimensionImpl<i+1>();
   }
 
-  template<unsigned int i, typename std::enable_if<(i<size && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
+  template<unsigned int i, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
   inline int getDimensionImpl() const
   {
-    return traits<ElementType<i>>::getDimension() + getDimensionImpl<i+1>();
+    return traits<ElementType<i>>::getDimension(std::get<i>(state_)) + getDimensionImpl<i+1>();
   }
 
-  template<unsigned int i, typename std::enable_if<(i>=size)>::type* = nullptr>
+  template<unsigned int i, typename std::enable_if<(i==size-1 && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
   inline int getDimensionImpl() const
   {
-    return 0;
+    return traits<ElementType<i>>::dimension;
   }
 
+  template<unsigned int i, typename std::enable_if<(i==size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
+  inline int getDimensionImpl() const
+  {
+    return traits<ElementType<i>>::getDimension(std::get<i>(state_));
+  }
+  //!}
+
+  //!@ print recursive implementation.
+  //!{
   template<unsigned int i, typename std::enable_if<(i<size)>::type* = nullptr>
   inline void printImpl() const
   {
@@ -143,7 +157,10 @@ private:
   template<unsigned int i, typename std::enable_if<(i>=size)>::type* = nullptr>
   inline void printImpl() const
   {}
+  //!}
 
+  //!@ retract recursive implementation.
+  //!{
   template<unsigned int i=0, unsigned int j=0, typename std::enable_if<(i<size)>::type* = nullptr>
   inline void retractImpl(const TangentVector& v)
   {
@@ -157,6 +174,8 @@ private:
   template<unsigned int i=0, unsigned int j=0, typename std::enable_if<(i>=size)>::type* = nullptr>
   inline void retractImpl(const TangentVector& v)
   {}
+  //!}
+
 };
 
 
@@ -168,7 +187,7 @@ template<typename... Elements>
 struct traits<State<Elements...>>
 {
   typedef State<Elements...> StateT;
-  enum { dimension = StateT::dimension() };
+  enum { dimension = StateT::dimension };
 
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
