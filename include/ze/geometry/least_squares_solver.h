@@ -1,6 +1,9 @@
 #pragma once
 
+#include <type_traits>
+
 #include <ze/common/types.h>
+#include <ze/common/manifold.h>
 
 namespace ze {
 
@@ -43,14 +46,15 @@ struct LeastSquaresSolverOptions
 //! Abstract Class for solving nonlinear least-squares (NLLS) problems.
 //! Template Parameters: D  : dimension of the state, T: type of the model
 //! e.g. SE2, SE3
-template <int D, typename T, typename Implementation>
+template <typename T, typename Implementation>
 class LeastSquaresSolver
 {
 public:
-  typedef T State;
-  typedef Eigen::Matrix<FloatType, D, D> HessianMatrix;
-  typedef Eigen::Matrix<FloatType, D, 1> GradientVector;
-  typedef Eigen::Matrix<FloatType, D, 1> UpdateVector;
+  using State = T;
+  enum Dimension : int { dimension = traits<State>::dimension };
+  using HessianMatrix = Eigen::Matrix<FloatType, dimension, dimension>;
+  using GradientVector = Eigen::Matrix<FloatType, dimension, 1>;
+  using UpdateVector = Eigen::Matrix<FloatType, dimension, 1>;
 
   LeastSquaresSolverOptions solver_options_;
 
@@ -125,7 +129,11 @@ protected:
       const UpdateVector& dx,
       State& new_state)
   {
-    impl().update(state, dx, new_state);
+    if(&LeastSquaresSolver::update != &Implementation::update)
+    {
+      return impl().update(state, dx, new_state);
+    }
+    return updateDefaultImpl(state, dx, new_state);
   }
 
   void startIteration()
@@ -158,6 +166,23 @@ private:
       const HessianMatrix& H,
       const GradientVector& g,
       UpdateVector& dx);
+
+  void updateDefaultImpl(
+      const State& state,
+      const UpdateVector& dx,
+      State& new_state);
+
+  template<typename State, typename std::enable_if<(traits<State>::dimension == Eigen::Dynamic)>::type* = nullptr>
+  inline void allocateMemory(State& state)
+  {
+    H_.resize(state.getDimension(state), state.getDimension(state));
+    g_.resize(state.getDimension(state));
+    dx_.resize(state.getDimension(state));
+  }
+
+  template<typename State, typename std::enable_if<(traits<State>::dimension != Eigen::Dynamic)>::type* = nullptr>
+  inline void allocateMemory(State& /*state*/)
+  {}
 
 protected:
   HessianMatrix  H_;        //!< Hessian or approximation Jacobian*Jacobian^T.

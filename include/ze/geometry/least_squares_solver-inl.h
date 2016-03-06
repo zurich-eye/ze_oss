@@ -6,23 +6,30 @@
 
 namespace ze {
 
-template <int D, typename T, typename Implementation>
-LeastSquaresSolver<D, T, Implementation>::LeastSquaresSolver(
+template <typename T, typename Implementation>
+LeastSquaresSolver<T, Implementation>::LeastSquaresSolver(
     const LeastSquaresSolverOptions& options)
   : solver_options_(options)
 {}
 
-template <int D, typename T, typename Implementation>
-void LeastSquaresSolver<D, T, Implementation>::optimize(State& state)
+template <typename T, typename Implementation>
+void LeastSquaresSolver<T, Implementation>::optimize(State& state)
 {
+  // If state is of dynamic size, this resizes Hessian, dx, g.
+  allocateMemory(state);
+
   if(solver_options_.strategy == SolverStrategy::GaussNewton)
+  {
     optimizeGaussNewton(state);
+  }
   else if(solver_options_.strategy == SolverStrategy::LevenbergMarquardt)
+  {
     optimizeLevenbergMarquardt(state);
+  }
 }
 
-template <int D, typename T, typename Implementation>
-void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
+template <typename T, typename Implementation>
+void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
 {
   // Save the old model to rollback in case of unsuccessful update
   State old_state = state;
@@ -80,8 +87,8 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeGaussNewton(State& state)
   }
 }
 
-template <int D, typename T, typename Implementation>
-void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State& state)
+template <typename T, typename Implementation>
+void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& state)
 {
   // init parameters
   mu_ = solver_options_.mu_init;
@@ -97,12 +104,8 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
   // Compute Initial Lambda
   if(mu_ < 0)
   {
-    FloatType H_max_diag = 0;
+    FloatType H_max_diag = maxAbsDiagonalElement(H_);
     FloatType tau = 1e-4;
-    for(size_t j=0; j<D; ++j)
-    {
-      H_max_diag = std::max(H_max_diag, std::fabs(H_(j,j)));
-    }
     mu_ = tau*H_max_diag;
   }
 
@@ -189,8 +192,8 @@ void LeastSquaresSolver<D, T, Implementation>::optimizeLevenbergMarquardt(State&
   }
 }
 
-template <int D, typename T, typename Implementation>
-void LeastSquaresSolver<D, T, Implementation>::reset()
+template <typename T, typename Implementation>
+void LeastSquaresSolver<T, Implementation>::reset()
 {
   VLOG(400) << "Reset";
   chi2_ = 1e10;
@@ -201,8 +204,8 @@ void LeastSquaresSolver<D, T, Implementation>::reset()
   stop_ = false;
 }
 
-template <int D, typename T, typename Implementation>
-bool LeastSquaresSolver<D, T, Implementation>::solveDefaultImpl(
+template <typename T, typename Implementation>
+bool LeastSquaresSolver<T, Implementation>::solveDefaultImpl(
     const HessianMatrix& H,
     const GradientVector& g,
     UpdateVector& dx)
@@ -211,6 +214,15 @@ bool LeastSquaresSolver<D, T, Implementation>::solveDefaultImpl(
   if(std::isnan(dx[0]))
     return false;
   return true;
+}
+
+template <typename T, typename Implementation>
+void LeastSquaresSolver<T, Implementation>::updateDefaultImpl(
+    const State& state,
+    const UpdateVector& dx,
+    State& new_state)
+{
+  new_state = traits<State>::Retract(state, dx);
 }
 
 } // namespace ze
