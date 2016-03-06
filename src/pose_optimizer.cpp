@@ -97,13 +97,6 @@ FloatType PoseOptimizer::evaluateError(
   return chi2;
 }
 
-void PoseOptimizer::update(
-    const Transformation& T_Bold_W, const UpdateVector& dx,
-    Transformation& T_Bnew_W)
-{
-  T_Bnew_W = T_Bold_W * Transformation::exp(dx);
-}
-
 } // namespace ze
 
 

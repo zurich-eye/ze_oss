@@ -66,14 +66,6 @@ double PointAligner::evaluateError(
   return chi2;
 }
 
-void PointAligner::update(
-    const Transformation& T_A_Bold,
-    const UpdateVector& dx,
-    Transformation& T_A_Bnew)
-{
-  T_A_Bnew = T_A_Bold * Transformation::exp(dx);
-}
-
 } // namespace ze
 
 

@@ -25,7 +25,7 @@ struct PoseOptimizerFrameData
 
 //! Optimizes body pose by minimizing difference between bearing vectors.
 class PoseOptimizer :
-    public LeastSquaresSolver<6, Transformation, PoseOptimizer>
+    public LeastSquaresSolver<Transformation, PoseOptimizer>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
@@ -40,10 +40,6 @@ public:
 
   FloatType evaluateError(
       const Transformation& T_B_W, HessianMatrix* H, GradientVector *g);
-
-  void update(
-      const Transformation& T_Bold_W, const UpdateVector& dx,
-      Transformation& T_Bnew_W);
 
 private:
   const std::vector<PoseOptimizerFrameData>& data_;

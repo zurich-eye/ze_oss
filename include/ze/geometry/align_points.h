@@ -8,8 +8,7 @@
 namespace ze {
 
 //! Estimates relative transformation between two sets of associated pints
-class PointAligner :
-    public LeastSquaresSolver<6, Transformation, PointAligner>
+class PointAligner : public LeastSquaresSolver<Transformation, PointAligner>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
@@ -25,11 +24,6 @@ public:
       const Transformation& T_A_B,
       HessianMatrix* H,
       GradientVector* g);
-
-  void update(
-      const Transformation& T_A_Bold,
-      const UpdateVector& dx,
-      Transformation& T_A_Bnew);
 
 private:
   FloatType measurement_sigma_;
