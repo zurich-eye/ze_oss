@@ -18,11 +18,11 @@ void LeastSquaresSolver<T, Implementation>::optimize(State& state)
   // If state is of dynamic size, this resizes Hessian, dx, g.
   allocateMemory(state);
 
-  if(solver_options_.strategy == SolverStrategy::GaussNewton)
+  if (solver_options_.strategy == SolverStrategy::GaussNewton)
   {
     optimizeGaussNewton(state);
   }
-  else if(solver_options_.strategy == SolverStrategy::LevenbergMarquardt)
+  else if (solver_options_.strategy == SolverStrategy::LevenbergMarquardt)
   {
     optimizeLevenbergMarquardt(state);
   }
@@ -47,7 +47,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     FloatType new_chi2 = evaluateError(state, &H_, &g_);
 
     // solve the linear system
-    if(!solve(state, H_, g_, dx_))
+    if (!solve(state, H_, g_, dx_))
     {
       LOG(WARNING) << "Matrix is close to singular! Stop Optimizing."
                    << "H = " << H_ << "g = " << g_;
@@ -55,7 +55,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     }
 
     // check if error increased since last optimization
-    if((iter_ > 0 && new_chi2 > chi2_ && solver_options_.stop_when_error_increases) || stop_)
+    if ((iter_ > 0 && new_chi2 > chi2_ && solver_options_.stop_when_error_increases) || stop_)
     {
       VLOG(400) << "It. " << iter_
                 << "\t Failure"
@@ -79,7 +79,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     finishIteration();
 
     // stop when converged, i.e. update step too small
-    if(x_norm < solver_options_.eps)
+    if (x_norm < solver_options_.eps)
     {
       VLOG(400) << "Converged, x_norm " << x_norm << " < " << solver_options_.eps;
       break;
@@ -102,7 +102,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
   // Hartley and Zisserman: "A typical init value of lambda is 10^-3 times the
   // average of the diagonal elements of J'J"
   // Compute Initial Lambda
-  if(mu_ < 0)
+  if (mu_ < 0)
   {
     FloatType H_max_diag = maxAbsDiagonalElement(H_);
     FloatType tau = 1e-4;
@@ -133,7 +133,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
       H_ += (H_.diagonal()*mu_).asDiagonal();
 
       // solve the linear system to obtain small perturbation in direction of gradient
-      if(solve(state, H_, g_, dx_))
+      if (solve(state, H_, g_, dx_))
       {
         // apply perturbation to the state
         update(state, dx_, new_model);
@@ -149,7 +149,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         rho_ = -1;
       }
 
-      if(rho_>0)
+      if (rho_>0)
       {
         // update decrased the error -> success
         state = new_model;
@@ -211,7 +211,7 @@ bool LeastSquaresSolver<T, Implementation>::solveDefaultImpl(
     UpdateVector& dx)
 {
   dx = H.ldlt().solve(g);
-  if(std::isnan(dx[0]))
+  if (std::isnan(dx[0]))
     return false;
   return true;
 }

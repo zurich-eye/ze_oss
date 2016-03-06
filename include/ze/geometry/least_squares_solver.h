@@ -161,6 +161,7 @@ protected:
   }
 
 private:
+
   //! Default implementation to solve the linear system H*dx = g to obtain optimal perturbation dx.
   bool solveDefaultImpl(
       const HessianMatrix& H,
