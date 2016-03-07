@@ -100,6 +100,13 @@ public:
     return std::get<i>(state_);
   }
 
+  //! Get const reference to element.
+  template<uint32_t i>
+  inline auto at() const -> decltype (std::get<i>(state_)) &
+  {
+    return std::get<i>(state_);
+  }
+
   //! Returns whether one element of the state is of dynamic size.
   static constexpr bool isDynamicSize()
   {

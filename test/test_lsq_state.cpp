@@ -34,21 +34,26 @@ TEST(StateTests, testStateFixedSize)
 TEST(StateTests, testStateDynamicSize)
 {
   using namespace ze;
-
   using MyState = State<Transformation,VectorX>;
-  std::cout << "Dim = " << MyState::dimension;
 
+  // Test constructor of dynamic-sized state.
   MyState state;
+  VectorX& x = state.at<1>();
+  x.resize(5);
+  x.setConstant(0.5);
   state.print();
 
-  VectorX& x = state.at<1>();
-  x.resize(10);
-
-  EXPECT_EQ(state.getDimension(), 16);
+  EXPECT_EQ(state.getDimension(), 11);
   EXPECT_TRUE(state.isDynamicSize());
   EXPECT_FALSE(state.isElementDynamicSize<0>());
   EXPECT_TRUE(state.isElementDynamicSize<1>());
-  MyState::Jacobian J;
+
+  // Test retract.
+  traits<MyState>::TangentVector v;
+  v.resize(state.getDimension());
+  v.setConstant(1.0);
+  state.retract(v);
+  state.print();
 }
 
 ZE_UNITTEST_ENTRYPOINT
