@@ -3,7 +3,7 @@
 #include <ze/common/types.h>
 #include <ze/common/transformation.h>
 #include <ze/geometry/robust_cost.h>
-#include <ze/geometry/least_squares_solver.h>
+#include <ze/geometry/lsq_solver.h>
 
 namespace ze {
 
