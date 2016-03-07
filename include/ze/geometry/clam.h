@@ -70,7 +70,8 @@ private:
   const ClamLandmarks& landmarks_;
   const std::vector<ClamFrameData>& data_;
   const CameraRig& rig_;
-  std::vector<FloatType> measurement_sigma_;
+  std::vector<FloatType> measurement_sigma_localization_;
+  FloatType measurement_sigma_mapping_ = 2.0;
 
   // Prior:
   const Transformation& T_Bc_Br_prior_;

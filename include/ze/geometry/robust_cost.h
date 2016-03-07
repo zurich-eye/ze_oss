@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 #include <Eigen/Core>
 
+#include <ze/common/types.h>
 #include <ze/common/statistics.h>
 
 namespace ze {
@@ -16,7 +17,6 @@ namespace ze {
 template <typename Scalar>
 struct UnitScaleEstimator
 {
-  using VectorX = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
   static constexpr Scalar compute(const VectorX& /*errors*/)
   {
     return 1.0;
@@ -76,6 +76,11 @@ struct WeightFunction
       weights(i) = Implementation::weight(error_vec(i));
     }
     return weights;
+  }
+
+  static FloatType weight(const FloatType error)
+  {
+    return Implementation::weight(error);
   }
 };
 

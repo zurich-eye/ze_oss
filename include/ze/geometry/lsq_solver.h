@@ -176,9 +176,10 @@ private:
   template<typename State, typename std::enable_if<(traits<State>::dimension == Eigen::Dynamic)>::type* = nullptr>
   inline void allocateMemory(State& state)
   {
-    H_.resize(state.getDimension(state), state.getDimension(state));
-    g_.resize(state.getDimension(state));
-    dx_.resize(state.getDimension(state));
+    const int dim = state.getDimension();
+    H_.resize(dim, dim);
+    g_.resize(dim);
+    dx_.resize(dim);
   }
 
   template<typename State, typename std::enable_if<(traits<State>::dimension != Eigen::Dynamic)>::type* = nullptr>

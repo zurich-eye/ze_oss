@@ -17,12 +17,15 @@ Clam::Clam(
   , T_Bc_Br_prior_(T_Bc_Br_prior)
   , prior_weight_pos_(prior_weight_pos)
   , prior_weight_rot_(prior_weight_rot)
-{}
+{
+  measurement_sigma_localization_.resize(data.size());
+  CHECK_EQ(landmarks_.f_Br.cols(), landmarks_.origin_Br.cols());
+}
 
 FloatType Clam::evaluateError(
     const ClamState& state, HessianMatrix* H, GradientVector* g)
 {
-  CHECK_EQ(data_.size(), measurement_sigma_.size());
+  CHECK_EQ(data_.size(), measurement_sigma_localization_.size());
   FloatType chi2 = 0.0;
 
   const Transformation& T_Bc_Br = state.at<0>();
@@ -35,7 +38,14 @@ FloatType Clam::evaluateError(
   for (size_t i = 0; i < data_.size(); ++i)
   {
     const ClamFrameData& data = data_[i];
-    FloatType& measurement_sigma = measurement_sigma_[i];
+    FloatType& measurement_sigma = measurement_sigma_localization_[i];
+
+    // Continue if we have no landmarks to localize with.
+    if(data.p_Br.cols() == 0)
+    {
+      VLOG(300) << "Cam " << i << " has no landmarks to localize.";
+      continue;
+    }
 
     // Transform points from reference coordinates to camera coordinates.
     const Transformation T_C_Br = data.T_C_B * T_Bc_Br; //! @todo(cfo): use inverse-depth coordinates!
@@ -91,27 +101,42 @@ FloatType Clam::evaluateError(
 
   // ---------------------------------------------------------------------------
   // Mapping
+
+  //! @todo(cfo): This can be optimized a lot!
   for (size_t i = 0; i < data_.size(); ++i)
   {
     const ClamFrameData& data = data_[i];
     const Camera& cam = rig_.at(i);
-    const Transformation T_C_Br = data.T_C_B * T_Bc_Br;
     for (const std::pair<uint32_t, Keypoint>& m : data.landmark_measurements)
     {
-      HomPosition p_Br_h;
-      p_Br_h.head<3>() = landmarks_.f_Br.col(m.first)
-          + landmarks_.origin_Br.col(m.first) * inv_depth(m.first);
-      p_Br_h(3) = inv_depth(m.first);
-      const HomPosition p_C_h = T_C_Br.transform4(p_Br_h);
-      const Keypoint px_est = cam.project(p_C_h.head<3>());
-      const Keypoint px_err = px_est - m.second;
+      Matrix26 H1;
+      Matrix21 H2;
+      CHECK_LT(m.first, landmarks_.f_Br.cols());
+      CHECK_LT(m.first, inv_depth.size());
+      Vector2 err = reprojectionResidual(
+            landmarks_.f_Br.col(m.first), landmarks_.origin_Br.col(m.first),
+            cam, data.T_C_B, T_Bc_Br, inv_depth(m.first), m.second, &H1, &H2);
 
-      const Matrix23 J_proj = cam.dProject_dLandmark(p_C_h.head<3>());
+      // Robust cost function.
+      const FloatType weight = 1.0; // WeightFunction::weight(err.norm() / measurement_sigma_mapping_);
 
+      // Whiten error
+      err /= measurement_sigma_mapping_;
 
+      Matrix2X J(2, g->size());
+      J.setZero();
+      J.block<2,6>(0, 0) = H1;
+      J.block<2,1>(0, 6 + m.first) = H2;
 
+      // Whiten Jacobian.
+      J /= measurement_sigma_mapping_;
 
+      // Compute Hessian and Gradient Vector.
+      H->noalias() += J.transpose() * J * weight;
+      g->noalias() -= J.transpose() * err * weight;
 
+      // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
+      chi2 += 0.5 * weight * err.squaredNorm();
     }
   }
 
@@ -122,7 +147,10 @@ FloatType Clam::evaluateError(
     applyPosePrior(
           T_Bc_Br, T_Bc_Br_prior_, prior_weight_rot_, prior_weight_pos_,
           H->block<6,6>(0,0), g->segment<6>(0));
+
+    //! @todo: chi2
   }
+
   return chi2;
 }
 
