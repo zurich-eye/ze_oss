@@ -63,7 +63,6 @@ FloatType Clam::evaluateError(
     if(iter_ == 0)
     {
       measurement_sigma = ScaleEstimator::compute(f_err_norm);
-      VLOG(300) << "Cam " << i << " measurement sigma = " << measurement_sigma;
     }
 
     // Robust cost function.
@@ -118,7 +117,7 @@ FloatType Clam::evaluateError(
             cam, data.T_C_B, T_Bc_Br, inv_depth(m.first), m.second, &H1, &H2);
 
       // Robust cost function.
-      const FloatType weight = 1.0; // WeightFunction::weight(err.norm() / measurement_sigma_mapping_);
+      const FloatType weight = 1.0; //!< @todo(cfo)
 
       // Whiten error
       err /= measurement_sigma_mapping_;
@@ -147,8 +146,6 @@ FloatType Clam::evaluateError(
     applyPosePrior(
           T_Bc_Br, T_Bc_Br_prior_, prior_weight_rot_, prior_weight_pos_,
           H->block<6,6>(0,0), g->segment<6>(0));
-
-    //! @todo: chi2
   }
 
   return chi2;

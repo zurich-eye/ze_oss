@@ -54,8 +54,6 @@ template<typename... Elements>
 class State
 {
 public:
-
-  // typedefs
   using StateT = State<Elements...>;
   using StateTuple = decltype(std::tuple<Elements...>());
 
@@ -210,9 +208,8 @@ private:
 
 };
 
-
 // -----------------------------------------------------------------------------
-// Manifold traits for fixed-size state.
+// Manifold traits for State.
 template<typename T> struct traits;
 
 template<typename... Elements>
@@ -237,31 +234,7 @@ struct traits<State<Elements...>>
     return origin_perturbed;
   }
 
-  /*
-  static bool Equals(const Matrix& v1, const Matrix& v2, double tol = 1e-8)
-  {
-    if (v1.size() != v2.size())
-      return false;
-    return (v1 - v2).array().abs().maxCoeff() < tol;
-    // TODO(cfo): Check for nan entries.
-  }
-
-  static TangentVector Local(Matrix origin, Matrix other,
-                            Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
-  {
-    if (H1) (*H1) = -Jacobian::Identity();
-    if (H2) (*H2) =  Jacobian::Identity();
-    TangentVector result;
-    Eigen::Map<Matrix>(result.data()) = other - origin;
-    return result;
-  }
-  */
+  //! @todo(cfo): Implement Retract, Equals.
 };
-
-
-
-
-
-
 
 } // namespace ze
