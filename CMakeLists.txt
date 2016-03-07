@@ -12,8 +12,9 @@ include(ze_setup)
 set(HEADERS
   include/ze/geometry/align_points.h
   include/ze/geometry/align_poses.h
-  include/ze/geometry/least_squares_solver.h
-  include/ze/geometry/least_squares_solver-inl.h
+  include/ze/geometry/clam.h
+  include/ze/geometry/lsq_solver.h
+  include/ze/geometry/lsq_solver-inl.h
   include/ze/geometry/lsq_state.h
   include/ze/geometry/pose_optimizer.h
   include/ze/geometry/pose_prior.h
@@ -22,6 +23,7 @@ set(HEADERS
   )
 
 set(SOURCES
+  src/clam.cpp
   src/align_points.cpp
   src/align_poses.cpp
   src/pose_optimizer.cpp
