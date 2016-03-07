@@ -123,14 +123,13 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
       State new_model;
       FloatType new_chi2 = -1;
       H_.setZero();
-      //H_ = mu_ * Matrix<FloatType,D,D>::Identity(D,D);
       g_.setZero();
 
       // linearize
       evaluateError(state, &H_, &g_);
 
       // add damping term:
-      H_ += (H_.diagonal()*mu_).asDiagonal();
+      H_ += (H_.diagonal() * mu_).asDiagonal();
 
       // solve the linear system to obtain small perturbation in direction of gradient
       if (solve(state, H_, g_, dx_))
@@ -155,7 +154,9 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         state = new_model;
         chi2_ = new_chi2;
         stop_ = normMax(dx_) < solver_options_.eps;
-        mu_ *= std::max(1./3., std::min(1.-std::pow(2*rho_-1,3), 2./3.));
+        mu_ *= std::max(FloatType{0.333f},
+                        std::min(FloatType{1.0f - 8.0f * rho_ * rho_ * rho_},
+                                 FloatType{0.666f}));
         nu_ = 2.;
         VLOG(400) << "It. " << iter_
                   << "\t Trial " << trials_
@@ -171,7 +172,9 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         nu_ *= 2.;
         ++trials_;
         if (trials_ >= solver_options_.max_trials)
+        {
           stop_ = true;
+        }
 
         VLOG(400) << "It. " << iter_
                   << "\t Trial " << trials_
@@ -183,6 +186,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
       finishTrial();
 
     } while(!(rho_>0 || stop_));
+
     if (stop_)
     {
       break;
