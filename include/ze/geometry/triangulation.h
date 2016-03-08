@@ -5,10 +5,11 @@
 
 namespace ze {
 
+//! Return depth in reference frame.
 inline std::pair<FloatType, bool> depthFromTriangulation(
     const Transformation& T_cur_ref,
-    const Eigen::Vector3d& f_ref,
-    const Eigen::Vector3d& f_cur)
+    const Eigen::Ref<const Bearing>& f_ref,
+    const Eigen::Ref<const Bearing>& f_cur)
 {
   Matrix32 A;
   A << T_cur_ref.getRotation().rotate(f_ref), f_cur;
