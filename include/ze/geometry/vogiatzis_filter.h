@@ -67,7 +67,7 @@ inline bool updateFilterVogiatzis(
     const FloatType z, // Measurement
     const FloatType tau2,
     const FloatType mu_range,
-    Eigen::Ref<SeedState>& mu_sigma2_a_b)
+    Eigen::Ref<SeedState> mu_sigma2_a_b)
 {
   FloatType& mu = mu_sigma2_a_b(0);
   FloatType& sigma2 = mu_sigma2_a_b(1);
@@ -119,7 +119,7 @@ inline bool updateFilterVogiatzis(
 inline bool updateFilterGaussian(
     const FloatType z, // Measurement
     const FloatType tau2,
-    Eigen::Ref<SeedState>& mu_sigma2_a_b)
+    Eigen::Ref<SeedState> mu_sigma2_a_b)
 {
   FloatType& mu = mu_sigma2_a_b(0);
   FloatType& sigma2 = mu_sigma2_a_b(1);
