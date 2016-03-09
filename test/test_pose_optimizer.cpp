@@ -60,7 +60,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 0.0;
     double rot_prior_weight = 0.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
@@ -81,7 +81,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 0.0;
     double rot_prior_weight = 10.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
@@ -102,7 +102,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 10.0;
     double rot_prior_weight = 0.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);

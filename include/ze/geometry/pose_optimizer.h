@@ -17,11 +17,13 @@ struct PoseOptimizerFrameData
   Bearings f;
 
   //! Landmark positions. Each column corresponds to a bearing measurement.
+  //! @todo(cfo): Use inverse depth parametrization or homogeneous points.
   Positions p_W;
 
   //! Extrinsic transformation between camera and body (i.e., imu) frame.
   Transformation T_C_B;
 };
+using PoseOptimizerFrameDataVec = std::vector<PoseOptimizerFrameData>;
 
 //! Optimizes body pose by minimizing difference between bearing vectors.
 class PoseOptimizer :
