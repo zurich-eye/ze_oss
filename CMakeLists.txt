@@ -20,6 +20,7 @@ set(HEADERS
   include/ze/geometry/pose_prior.h
   include/ze/geometry/robust_cost.h
   include/ze/geometry/triangulation.h
+  include/ze/geometry/vogiatzis_filter.h
   )
 
 set(SOURCES
