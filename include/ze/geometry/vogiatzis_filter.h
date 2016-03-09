@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <ze/common/statistics.h>
 #include <ze/common/types.h>
 #include <ze/common/transformation.h>
 
@@ -46,6 +47,11 @@ inline FloatType getInitSigma2FromMuRange(FloatType mu_range)
   return mu_range * mu_range / 36.0;
 }
 
+inline void increaseOutlierProbability(Eigen::Ref<SeedState> mu_sigma2_a_b)
+{
+  mu_sigma2_a_b(3) += 1;
+}
+
 inline bool isConverged(
     const Eigen::Ref<const SeedState>& mu_sigma2_a_b,
     FloatType mu_range, FloatType sigma2_convergence_threshold)
@@ -85,14 +91,14 @@ inline bool updateFilterVogiatzis(
   const FloatType s2 = 1.0/(1.0/sigma2 + 1.0/tau2);
   const FloatType m = s2*(mu/sigma2 + z/tau2);
   const FloatType uniform_x = 1.0/mu_range;
-  FloatType C1 = a/(a+b) * vk::normPdf<FloatType>(z, mu, norm_scale);
-  FloatType C2 = b/(a+b) * uniform_x;
+  FloatType C1 = a / (a + b) * normPdf<FloatType>(z, mu, norm_scale);
+  FloatType C2 = b / (a + b) * uniform_x;
   const FloatType normalization_constant = C1 + C2;
   C1 /= normalization_constant;
   C2 /= normalization_constant;
-  const FloatType f = C1*(a+1.0)/(a+b+1.0) + C2*a/(a+b+1.0);
-  const FloatType e = C1*(a+1.0)*(a+2.0)/((a+b+1.0)*(a+b+2.0))
-                    + C2*a*(a+1.0)/((a+b+1.0)*(a+b+2.0));
+  const FloatType f = C1 * (a+1.0) / (a+b+1.0) + C2 * a/(a+b+1.0);
+  const FloatType e = C1 * (a+1.0)*(a+2.0) / ((a+b+1.0) * (a+b+2.0))
+                    + C2 * a * (a+1.0) / ((a+b+1.0)*(a+b+2.0));
 
   // update parameters
   const FloatType mu_new = C1*m+C2*mu;
@@ -111,6 +117,11 @@ inline bool updateFilterVogiatzis(
   {
     LOG(WARNING) << "Seed diverged! mu is negative!!";
     mu = 1.0;
+    return false;
+  }
+  if(std::isnan(mu))
+  {
+    LOG(WARNING) << "Seed is NaN";
     return false;
   }
   return true;
