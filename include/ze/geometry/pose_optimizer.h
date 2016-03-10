@@ -13,8 +13,14 @@ struct PoseOptimizerFrameData
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  //! Measurements: Bearing vectors.
+  //! Measurements: Bearing vectors corresponding to keypoints.
   Bearings f;
+
+  //! Measurements: Keypoints. (Not used by the actual algorithm).
+  Keypoints px;
+
+  //! Measurements bookkeeping: Corresponding indices. (Not used by the actual algorithm).
+  KeypointIndices kp_idx;
 
   //! Landmark positions. Each column corresponds to a bearing measurement.
   //! @todo(cfo): Use inverse depth parametrization or homogeneous points.
