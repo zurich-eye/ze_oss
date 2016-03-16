@@ -57,7 +57,6 @@ FloatType PoseOptimizer::evaluateError(
     // At the first iteration, compute the scale of the error.
     if (iter_ == 0)
     {
-      VLOG(1) << f_err_norm;
       measurement_sigma = ScaleEstimator::compute(f_err_norm);
       VLOG(300) << "Cam " << i << " measurement sigma = " << measurement_sigma;
     }
