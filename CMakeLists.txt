@@ -54,6 +54,9 @@ target_link_libraries(test_pose_optimizer ${PROJECT_NAME})
 catkin_add_gtest(test_robust_cost test/test_robust_cost.cpp)
 target_link_libraries(test_robust_cost ${PROJECT_NAME})
 
+catkin_add_gtest(test_triangulation test/test_triangulation.cpp)
+target_link_libraries(test_triangulation ${PROJECT_NAME})
+
 ##########
 # EXPORT #
 ##########

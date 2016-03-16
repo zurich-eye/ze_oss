@@ -1,6 +1,8 @@
 #include <ze/geometry/triangulation.h>
 
 #include <algorithm>
+#include <glog/logging.h>
+
 #include <ze/common/matrix.h>
 
 namespace ze {
@@ -10,11 +12,12 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const Bearings& f_C,
     const FloatType rank_tol)
 {
-  // Normalize bearing vectors and select first two components.
-  const Matrix2X uv = f_C.topRows<2>().array().rowwise() / f_C.colwise().norm().array();
-
   // Number of observations.
   size_t m = T_C_W.size();
+  CHECK_GE(m, 2u);
+
+  // Compute unit-plane coorinates (divide by z) from bearing vectors.
+  const Matrix2X uv = f_C.topRows<2>().array().rowwise() / f_C.bottomRows<1>().array();
 
   // Allocate DLT matrix.
   MatrixX4 A(m * 2, 4);
