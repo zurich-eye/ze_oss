@@ -24,14 +24,15 @@ inline std::pair<FloatType, bool> depthFromTriangulation(
   return std::make_pair(std::abs(depths(0)), true);
 }
 
-//! DLT triangulation [Hartley and Zisserman, 2nd edition, p. 312]
-//! @param projection_matrices Projection matrices (K*P^-1)
-//! @param uv_measurements 2D measurements on unit plane
-//! @param rank_tol SVD rank tolerance
-//! @return Triangulated point, in homogeneous coordinates
+//! DLT triangulation [Hartley and Zisserman, 2nd edition, p. 312].
+//! @param T_C_W vector of camera poses (camera in world coordinates).
+//! @param f_C bearing vectors in camera frame.
+//! @param rank_tol SVD rank tolerance.
+//! @return Triangulated point, in homogeneous coordinates.
 //! @return Success.
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
-    const std::vector<Matrix34>& projection_matrices,
-    const Matrix2X& uv_measurements, FloatType rank_tol);
+    const TransformationVector& T_C_W,
+    const Bearings& f_C,
+    const FloatType rank_tol = 1e-9);
 
 } // namespace ze
