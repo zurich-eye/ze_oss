@@ -28,6 +28,7 @@ set(SOURCES
   src/align_points.cpp
   src/align_poses.cpp
   src/pose_optimizer.cpp
+  src/triangulation.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
