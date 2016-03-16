@@ -11,8 +11,7 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const FloatType rank_tol)
 {
   // Normalize bearing vectors and select first two components.
-  const Matrix2X uv_measurements =
-      f_C.topRows<2>().array().rowwise() / f_C.colwise().norm().array();
+  const Matrix2X uv = f_C.topRows<2>().array().rowwise() / f_C.colwise().norm().array();
 
   // Number of observations.
   size_t m = T_C_W.size();
@@ -24,10 +23,11 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
   // Fill DLT matrix.
   for (size_t i = 0; i < m; ++i)
   {
+    //! @todo: Think if this can be optimized, e.g. without computing the Matrix44 and uv.
     size_t row = i * 2;
     Matrix44 projection = T_C_W[i].getTransformationMatrix();
-    A.row(row)     = uv_measurements(0, i) * projection.row(2) - projection.row(0);
-    A.row(row + 1) = uv_measurements(1, i) * projection.row(2) - projection.row(1);
+    A.row(row)     = uv(0, i) * projection.row(2) - projection.row(0);
+    A.row(row + 1) = uv(1, i) * projection.row(2) - projection.row(1);
   }
   int rank;
   FloatType error;
