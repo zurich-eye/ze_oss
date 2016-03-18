@@ -11,6 +11,7 @@
 #include <opengv/triangulation/methods.hpp>
 
 #include <ze/cameras/camera.h>
+#include <ze/common/combinatorics.h>
 
 namespace ze {
 
@@ -90,6 +91,7 @@ bool RansacRelativePose::solveRelativePose(
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
   inliers_ = ransac.inliers_;
+  num_measurements_ = f_ref.size();
   return true;
 }
 
@@ -127,6 +129,7 @@ bool RansacRelativePose::solveTranslationOnly(
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
   inliers_ = ransac.inliers_;
+  num_measurements_ = f_ref.size();
   return true;
 }
 
@@ -164,7 +167,14 @@ bool RansacRelativePose::solveRotationOnly(
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
   inliers_ = ransac.inliers_;
+  num_measurements_ = f_ref.size();
   return true;
+}
+
+// -----------------------------------------------------------------------------
+std::vector<int> RansacRelativePose::getOutliers()
+{
+  return getOutlierIndicesFromInlierIndices<int>(inliers_, num_measurements_);
 }
 
 } // namespace ze

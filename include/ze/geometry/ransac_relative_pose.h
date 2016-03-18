@@ -69,10 +69,11 @@ public:
 
   inline const std::vector<int>& getInliers() const { return inliers_; }
 
-  std::vector<int> getOutliers() const;
+  std::vector<int> getOutliers();
 
 private:
-  uint32_t num_iterations_;
+  uint32_t num_measurements_ = 0u;
+  uint32_t num_iterations_ = 0u;
   FloatType result_probability_;
   std::vector<int> inliers_;
 
