@@ -10,6 +10,14 @@ class Camera;
 
 using BearingsVector = std::vector<Vector3, Eigen::aligned_allocator<Vector3>>;
 
+// utility
+inline BearingsVector bearingsVectorFromBearings(const Bearings& f)
+{
+  const Vector3* data = reinterpret_cast<const Vector3*>(f.data());
+  BearingsVector v(data, data + f.cols());
+  return v;
+}
+
 enum class RelativePoseAlgorithm {
   FivePoint,               //!< Nister 5-point relative pose.
   TwoPointTranslationOnly, //!< 2-point relative pose, assumes known rotation between frames.
@@ -29,6 +37,12 @@ public:
   RansacRelativePose(
       const Camera& cam,
       const FloatType& reprojection_threshold_px);
+
+  bool solve(
+      const Bearings& f_ref,
+      const Bearings& f_cur,
+      const RelativePoseAlgorithm method,
+      Transformation& T_cur_ref);
 
   bool solve(
       const BearingsVector& f_ref,

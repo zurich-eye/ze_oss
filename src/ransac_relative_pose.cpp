@@ -18,8 +18,19 @@ RansacRelativePose::RansacRelativePose(
     const Camera& cam,
     const FloatType& reprojection_threshold_px)
   : opengv_threshold_(
-      1.0 - std::cos(std::atan(reprojection_threshold_px / cam.projectionParameters()(0))))
+      1.0 - std::cos(cam.getApproxAnglePerPixel() * reprojection_threshold_px))
 {}
+
+bool RansacRelativePose::solve(
+      const Bearings& f_ref,
+      const Bearings& f_cur,
+      const RelativePoseAlgorithm method,
+      Transformation& T_cur_ref)
+{
+  BearingsVector f_ref_v = bearingsVectorFromBearings(f_ref);
+  BearingsVector f_cur_v = bearingsVectorFromBearings(f_cur);
+  return solve(f_ref_v, f_cur_v, method, T_cur_ref);
+}
 
 bool RansacRelativePose::solve(
     const BearingsVector& f_ref,
@@ -27,6 +38,7 @@ bool RansacRelativePose::solve(
     const RelativePoseAlgorithm method,
     Transformation& T_cur_ref)
 {
+  CHECK_EQ(f_ref.size(), f_cur.size());
   switch(method)
   {
     case RelativePoseAlgorithm::FivePoint:
@@ -146,7 +158,8 @@ bool RansacRelativePose::solveRotationOnly(
 
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>();
-  T_cur_ref.getRotation() = Quaternion(R);
+  Vector3 t = ransac.model_coefficients_.rightCols<1>();
+  T_cur_ref = Transformation(Quaternion(R), t);
 
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
