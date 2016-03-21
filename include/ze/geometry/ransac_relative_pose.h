@@ -29,7 +29,7 @@ class RansacRelativePose
 public:
   FloatType opengv_threshold_;
   uint32_t max_iterations_ = 100;
-  FloatType init_probability_ = 0.995;
+  FloatType init_probability_ = 0.999;
   uint32_t verbosity_level_ = 0u;
 
   RansacRelativePose() = delete;
