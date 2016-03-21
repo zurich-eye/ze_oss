@@ -18,6 +18,7 @@ class VisualizerRos : public Visualizer
 public:
 
   VisualizerRos();
+  VisualizerRos(const std::string& frame);
 
   virtual ~VisualizerRos() = default;
 

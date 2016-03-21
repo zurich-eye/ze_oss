@@ -21,6 +21,12 @@ VisualizerRos::VisualizerRos()
   pub_marker_.reset(new ros::Publisher(nh_->advertise<visualization_msgs::Marker>("markers", 100)));
 }
 
+VisualizerRos::VisualizerRos(const std::string& frame)
+  : VisualizerRos::VisualizerRos()
+{
+  world_frame = frame;
+}
+
 void VisualizerRos::drawPoint(
     const std::string& ns,
     const size_t id,
