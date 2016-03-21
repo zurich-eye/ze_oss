@@ -20,7 +20,9 @@ RansacRelativePose::RansacRelativePose(
     const FloatType& reprojection_threshold_px)
   : opengv_threshold_(
       1.0 - std::cos(cam.getApproxAnglePerPixel() * reprojection_threshold_px))
-{}
+{
+  VLOG(1) << "RANSAC THRESHOLD = " << cam.getApproxAnglePerPixel() * reprojection_threshold_px;
+}
 
 bool RansacRelativePose::solve(
       const Bearings& f_ref,
