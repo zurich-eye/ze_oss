@@ -124,7 +124,7 @@ imus:
         bandwidth: 200                  # "white noise" bandwidth [Hz]
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
-        type: scale-misalignment
+        type: scale-misalignment-eccentricity
         b:                              # Bias at room temperature (20 degC, ISO) [m/s^2]
           cols: 3
           rows: 1
@@ -137,6 +137,12 @@ imus:
           data: [ 1.0, 0.0, 0.0,
                   0.0, 1.0, 0.0,
                   0.0, 0.0, 1.0 ]
+        R:                              # Column position vectors of the accelerometers [m]
+          cols: 3
+          rows: 3
+          data: [ 0.0, 0.0, 0.0,
+                  0.0, 0.0, 0.0,
+                  0.0, 0.0, 0.0 ]
         delay: 1.00e-3                  # Delay [s]
         range: 150                      # Range [m/s^2]
 
