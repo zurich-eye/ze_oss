@@ -61,13 +61,13 @@ imus:
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
         type: scale-misalignment
-        b0:                             # Bias at room temperature (20 degC, ISO) [m/s^2]
+        b:                              # Bias at room temperature (20 degC, ISO) [m/s^2]
           cols: 3
           rows: 1
           data: [ 0.0,
                   0.0,
                   0.0 ]
-        T0:                             # Scale and misalignment matrix at T0 []
+        M:                              # Scale and misalignment matrix at room temperature []
           cols: 3
           rows: 3
           data: [ 1.0, 0.0, 0.0,
