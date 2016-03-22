@@ -4,6 +4,7 @@
 # Project  : Zurich Eye
 # Author   : Zurich Eye
 # Version  : V01  27JAN2016 Initial version.
+#                 22MAR2016 Additional models.
 # Comment  : TODO() Move to "ze_test_data" after discussion.
 # ------------------------------------------------------------------------------
 
@@ -96,7 +97,7 @@ imus:
         bias_noise_density: 2.66e-5     # Bias driving noise density [rad/s^2/sqrt(Hz)]
       intrinsic_model:
         type: scale-misalignment-gsens
-        b:                              # Bias at room temperature (20 degC, ISO) [m/s^2]
+        b:                              # Bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
           cols: 3
           rows: 1
           data: [ 0.0,
@@ -108,14 +109,14 @@ imus:
           data: [ 1.0, 0.0, 0.0,
                   0.0, 1.0, 0.0,
                   0.0, 0.0, 1.0 ]
-        A:                              # g-sensitivity matrix at room temperature [srad/m ]
+        A:                              # g-sensitivity matrix at room temperature [srad/m]
           cols: 3
           rows: 3
           data: [ 0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0 ]
         delay: 1.00e-3                  # Delay [s]
-        range: 150                      # Range [m/s^2]
+        range: 150            e          # Range [m/s^2]
 
     accelerometers:
       noise_model:
@@ -125,7 +126,7 @@ imus:
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
         type: scale-misalignment-eccentricity
-        b:                              # Bias at room temperature (20 degC, ISO) [m/s^2]
+        b:                              # Bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
           cols: 3
           rows: 1
           data: [ 0.0,
@@ -137,7 +138,7 @@ imus:
           data: [ 1.0, 0.0, 0.0,
                   0.0, 1.0, 0.0,
                   0.0, 0.0, 1.0 ]
-        R:                              # Column position vectors of the accelerometers [m]
+        R:                              # Accel. column position vectors [rx_B, ry_B, rz_B] [m]
           cols: 3
           rows: 3
           data: [ 0.0, 0.0, 0.0,
