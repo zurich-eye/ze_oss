@@ -24,6 +24,23 @@ inline std::pair<FloatType, bool> depthFromTriangulation(
   return std::make_pair(std::abs(depths(0)), true);
 }
 
+//! Compute the position of a 3D point seen from two viewpoints. Fast
+//! non-linear approximation (closed-form), as in Davide's book.
+//! The resulting point is expressed in coordinate frame A.
+Position triangulateNonLinear(
+    const Transformation& T_A_B,
+    const Eigen::Ref<const Bearing>& f_A,
+    const Eigen::Ref<const Bearing>& f_B);
+
+//! Triangulate multiple 3d points using triangulateNonLinear and compute
+//! the corresponding reprojection errors.
+void triangulateManyAndComputeAngularErrors(
+    const Transformation& T_A_B,
+    const Bearings& f_A_vec,
+    const Bearings& f_B_vec,
+    Position& p_A,
+    VectorX& reprojection_erors);
+
 //! DLT triangulation [Hartley and Zisserman, 2nd edition, p. 312].
 //! @param T_C_W vector of camera poses (camera in world coordinates).
 //! @param f_C bearing vectors in camera frame.
@@ -34,5 +51,7 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
     const Bearings& f_C,
     const FloatType rank_tol = 1e-9);
+
+
 
 } // namespace ze

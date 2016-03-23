@@ -7,6 +7,52 @@
 
 namespace ze {
 
+Position triangulateNonLinear(
+    const Transformation& T_A_B,
+    const Eigen::Ref<const Bearing>& f_A,
+    const Eigen::Ref<const Bearing>& f_B)
+{
+  Bearing f_A_hat = T_A_B.getRotation().rotate(f_B);
+  Vector2 b(
+        T_A_B.getPosition().dot(f_A),
+        T_A_B.getPosition().dot(f_A_hat));
+  Matrix2 A;
+  A(0,0) = f_A.dot(f_A);
+  A(1,0) = f_A.dot(f_A_hat);
+  A(0,1) = -A(1,0);
+  A(1,1) = -f_A_hat.dot(f_A_hat);
+  Vector2 lambda = A.inverse() * b;
+  Position xm = lambda(0) * f_A;
+  Position xn = T_A_B.getPosition() + lambda(1) * f_A_hat;
+  Position p_A(0.5 * ( xm + xn ));
+  return p_A;
+}
+
+void triangulateManyAndComputeAngularErrors(
+    const Transformation& T_A_B,
+    const Bearings& f_A_vec,
+    const Bearings& f_B_vec,
+    Position& p_A,
+    VectorX& reprojection_erors)
+{
+  CHECK_EQ(f_A_vec.cols(), f_B_vec.cols());
+  CHECK_EQ(f_A_vec.cols(), p_A.cols());
+  CHECK_EQ(f_A_vec.cols(), reprojection_erors.cols());
+  const Transformation T_B_A = T_A_B.inverse();
+  for (int i = 0; i < f_A_vec.cols(); ++i)
+  {
+    p_A.col(i) = triangulateNonLinear(T_A_B, f_A_vec.col(i), f_B_vec.col(i));
+    Bearing f_A_predicted = p_A.col(i).normalized();
+    Bearing f_B_predicted = (T_B_A * p_A.col(i)).normalized();
+
+    // Bearing-vector based outlier criterium (select threshold accordingly):
+    // 1 - (f1' * f2) = 1 - cos(alpha) as used in OpenGV.
+    FloatType reproj_error_1 = 1.0 - (f_A_vec.col(i).dot(f_A_predicted));
+    FloatType reproj_error_2 = 1.0 - (f_B_vec.col(i).dot(f_B_predicted));
+    reprojection_erors(i) = reproj_error_1 + reproj_error_2;
+  }
+}
+
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
     const Bearings& f_C,
