@@ -38,7 +38,7 @@ void triangulateManyAndComputeAngularErrors(
     const Transformation& T_A_B,
     const Bearings& f_A_vec,
     const Bearings& f_B_vec,
-    Position& p_A,
+    Positions& p_A,
     VectorX& reprojection_erors);
 
 //! DLT triangulation [Hartley and Zisserman, 2nd edition, p. 312].

@@ -32,12 +32,12 @@ void triangulateManyAndComputeAngularErrors(
     const Transformation& T_A_B,
     const Bearings& f_A_vec,
     const Bearings& f_B_vec,
-    Position& p_A,
+    Positions& p_A,
     VectorX& reprojection_erors)
 {
   CHECK_EQ(f_A_vec.cols(), f_B_vec.cols());
   CHECK_EQ(f_A_vec.cols(), p_A.cols());
-  CHECK_EQ(f_A_vec.cols(), reprojection_erors.cols());
+  CHECK_EQ(f_A_vec.cols(), reprojection_erors.size());
   const Transformation T_B_A = T_A_B.inverse();
   for (int i = 0; i < f_A_vec.cols(); ++i)
   {
