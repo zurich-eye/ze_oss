@@ -39,6 +39,7 @@ set(SOURCES
   src/sample.cpp
   src/test_utils.cpp
   src/csv_trajectory.cpp
+  src/matrix.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -64,6 +65,9 @@ target_link_libraries(test_buffer ${PROJECT_NAME})
 
 catkin_add_gtest(test_manifold test/test_manifold.cpp)
 target_link_libraries(test_manifold ${PROJECT_NAME})
+
+catkin_add_gtest(test_matrix test/test_matrix.cpp)
+target_link_libraries(test_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_numerical_derivative test/test_numerical_derivative.cpp)
 target_link_libraries(test_numerical_derivative ${PROJECT_NAME})

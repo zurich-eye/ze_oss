@@ -1,5 +1,9 @@
 #pragma once
 
+#include <algorithm>
+#include <tuple>
+#include <glog/logging.h>
+
 #include <ze/common/types.h>
 
 namespace ze {
@@ -23,6 +27,55 @@ inline void normalizeBearings(Bearings& bearings)
 inline FloatType normMax(const VectorX& v)
 {
   return v.lpNorm<Eigen::Infinity>();
+}
+
+//! Get element with maximum norm on diagonal.
+template<typename Derived>
+FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
+{
+  FloatType max_val = 0.0f;
+  CHECK_EQ(M.cols(), M.rows());
+  for (int i = 0; i < M.cols(); ++i)
+  {
+    max_val = std::max(max_val, std::abs(M(i,i)));
+  }
+  return max_val;
+}
+
+//! Direct linear transform algorithm that calls svd to find a vector v that
+//! minimizes the algebraic error A*v
+//! @param A of size m*n, where m>=n (pad with zero rows if not!)
+//! @return Rank of A, minimum error (singular value), and corresponding
+//! eigenvector (column of V, with A=U*S*V')
+std::tuple<int, FloatType, VectorX> DLT(const MatrixX& A, FloatType rank_tol = 1e-9);
+
+//! Get a slice of vector X by the specified indices.
+template<typename Derived>
+Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> sliceVector(
+    Eigen::MatrixBase<Derived>& X, const std::vector<uint32_t>& indices)
+{
+  EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  const uint32_t n = indices.size();
+  Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> Y(n);
+  for (uint32_t i = 0; i < n; ++i)
+  {
+    Y(i) = X(indices[i]);
+  }
+  return Y;
+}
+
+//! Get a slice of the matrix X by the specified column indices.
+template<typename Derived>
+Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic> sliceColwise(
+    Eigen::MatrixBase<Derived>& X, const std::vector<uint32_t>& column_indices)
+{
+  const uint32_t n_col = column_indices.size();
+  Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic> Y(X.rows(), n_col);
+  for (uint32_t i = 0; i < n_col; ++i)
+  {
+    Y.col(i) = X.col(column_indices[i]);
+  }
+  return Y;
 }
 
 } // namespace ze
