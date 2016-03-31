@@ -2,21 +2,20 @@
 #include <vector>
 #include <chrono>
 
-#include <ze/common/test_entrypoint.h>
 #include <ze/common/thread_pool.h>
 
-TEST(ThreadPoolTests, test)
+int main(int argc, char** argv)
 {
-  ThreadPool pool(4);
+  ze::ThreadPool pool(4);
   std::vector< std::future<int> > results;
 
   for (int i = 0; i < 8; ++i)
   {
     results.emplace_back(
       pool.enqueue([i] {
-        std::cout << "hello " << i << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        std::cout << "world " << i << std::endl;
+        std::cout << "started job " << i << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::cout << "stopped job " << i << std::endl;
         return i*i;
       })
     );
@@ -27,6 +26,6 @@ TEST(ThreadPoolTests, test)
     std::cout << result.get() << ' ';
   }
   std::cout << std::endl;
-}
 
-ZE_UNITTEST_ENTRYPOINT
+  return 1;
+}
