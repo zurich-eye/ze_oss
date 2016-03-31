@@ -41,7 +41,11 @@ namespace ze {
 class ThreadPool
 {
 public:
-  ThreadPool(size_t);
+
+  //! The constructor launches the amount of specified worker threads.
+  ThreadPool(size_t n_threads);
+
+  //! The destructor joins all threads.
   ~ThreadPool();
 
   //! Add task to threadpool. See for example usage in unit-test.
@@ -50,52 +54,18 @@ public:
   -> std::future<typename std::result_of<F(Args...)>::type>;
 
 private:
-  // need to keep track of threads so we can join them
-  std::vector< std::thread > workers_;
+  //! need to keep track of threads so we can join them
+  std::vector<std::thread> workers_;
 
-  // the task queue
-  std::queue< std::function<void()> > tasks_;
+  //! the task queue
+  std::queue<std::function<void()>> tasks_;
 
-  // synchronization
+  //! synchronization
   std::mutex queue_mutex_;
   std::condition_variable condition_;
-  bool stop_;
+  bool stop_ = false;
 };
  
-// the constructor just launches some amount of workers
-inline ThreadPool::ThreadPool(size_t threads)
-  : stop_(false)
-{
-  for(size_t i = 0;i<threads;++i)
-  {
-    workers_.emplace_back(
-      [this] {
-
-        // Thread loop:
-        while(true)
-        {
-          std::function<void()> task;
-
-          // Wait for next task.
-          {
-            std::unique_lock<std::mutex> lock(this->queue_mutex_);
-            this->condition_.wait(lock, [this]{ return this->stop_ || !this->tasks_.empty(); });
-            if (this->stop_ && this->tasks_.empty())
-            {
-              return;
-            }
-            task = std::move(this->tasks_.front());
-            this->tasks_.pop();
-          }
-
-          // Execute task.
-          task();
-        }
-      }
-    );
-  }
-}
-
 // add new work item to the pool
 template<class F, class... Args>
 auto ThreadPool::enqueue(F&& f, Args&&... args)
@@ -121,20 +91,6 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
   }
   condition_.notify_one();
   return res;
-}
-
-// the destructor joins all threads
-inline ThreadPool::~ThreadPool()
-{
-  {
-    std::unique_lock<std::mutex> lock(queue_mutex_);
-    stop_ = true;
-  }
-  condition_.notify_all();
-  for (std::thread& worker : workers_)
-  {
-    worker.join();
-  }
 }
 
 } // namespace ze
