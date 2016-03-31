@@ -16,6 +16,7 @@ class Image : public ImageBase
 {
 public:
   using Ptr = typename std::shared_ptr<Image<Pixel>>;
+  using ConstPtr = typename std::shared_ptr<const Image<Pixel>>;
   using pixel_t = Pixel;
 
 protected:
