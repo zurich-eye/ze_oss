@@ -24,9 +24,9 @@ set(HEADERS
   )
 
 set(SOURCES
-  src/clam.cpp
   src/align_points.cpp
   src/align_poses.cpp
+  src/clam.cpp
   src/pose_optimizer.cpp
   src/ransac_relative_pose.cpp
   src/triangulation.cpp
