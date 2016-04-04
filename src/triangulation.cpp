@@ -81,7 +81,7 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
   int rank;
   FloatType error;
   VectorX v;
-  std::tie(rank, error, v) = DLT(A, rank_tol);
+  std::tie(rank, error, v) = directLinearTransform(A, rank_tol);
 
   // Return homogeneous coordinates and success.
   Vector4 p_W_homogeneous = v;
