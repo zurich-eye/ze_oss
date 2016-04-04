@@ -9,7 +9,7 @@
 #include <glog/logging.h>
 
 #include <ze/common/types.h>
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 
 namespace ze {
 

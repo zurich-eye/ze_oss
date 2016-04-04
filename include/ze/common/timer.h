@@ -1,110 +1,172 @@
 #pragma once
 
 #include <chrono>
+#include <ctime>   // std::localtime
+#include <iomanip> // std::setw
+#include <unordered_map>
 #include <string>
 #include <sstream>
-#include <iomanip> // std::setw
-#include <ctime>   // std::localtime,
+
+#include <ze/common/time_conversions.h>
+#include <ze/common/types.h>
+#include <ze/common/running_statistics.h>
 
 namespace ze {
 
-/*! @brief Simple timing utilty.
- *
- * Usage:
- * Timer t;
- * ... do something
- * std::cout << "took " << t.stop() << " seconds\n";
- */
+//------------------------------------------------------------------------------
+//! Simple timing utilty.
 class Timer
 {
 public:
   using Clock = std::chrono::high_resolution_clock;
   using TimePoint = std::chrono::time_point<Clock>;
-  using Nanoseconds = std::chrono::nanoseconds;
-  using Seconds = std::chrono::seconds;
+  using ns = std::chrono::nanoseconds;
+  using ms = std::chrono::milliseconds;
 
   //! The constructor directly starts the timer.
   Timer()
     : start_time_(Clock::now())
-    , duration_(Nanoseconds::zero())
-    , accumulated_(Nanoseconds::zero())
   {}
 
-  //! Starts the timer
+  //! Starts the timer.
   inline void start()
   {
     start_time_ = Clock::now();
   }
 
-  //! Resumes the timer. Total time can be obtained with getAccumulated().
-  inline void resume()
-  {
-    start_time_ = Clock::now();
-  }
-
-  //! Returns duration in seconds
-  inline double stop()
+  //! Stop timer and get nanoseconds passed.
+  inline int64_t stopAndGetNanoseconds()
   {
     const TimePoint end_time(Clock::now());
-    duration_ = std::chrono::duration_cast<Nanoseconds>(end_time - start_time_);
-    accumulated_ += duration_;
-    return static_cast<double>(duration_.count())*1e-9;
+    ns duration = std::chrono::duration_cast<ns>(end_time - start_time_);
+    return duration.count();
   }
 
-  //! Returns duration of last measurement in seconds
-  inline double getTime() const
+  //! Stops timer and returns duration in milliseconds.
+  inline FloatType stop()
   {
-    return static_cast<double>(duration_.count())*1e-9;
-  }
-
-  //! Returns duration of last measurement in milliseconds
-  inline double getMilliseconds() const
-  {
-    return static_cast<double>(duration_.count())*1e-6;
-  }
-
-  //! Returns duration since the last reset or construction of the timer
-  inline double getAccumulated() const
-  {
-    return static_cast<double>(accumulated_.count())*1e-9;
-  }
-
-  //! Reset the current timer and the accumulated
-  inline void reset()
-  {
-    start_time_ = TimePoint();
-    duration_ = Nanoseconds::zero();
-    accumulated_ = Nanoseconds::zero();
-  }
-
-  //! Get seconds since 1.1.1970
-  static double getCurrentTime()
-  {
-    return static_cast<double>(
-          std::chrono::duration_cast<Nanoseconds>(Clock::now()-TimePoint()).count())*1e-9;
-  }
-
-  //! Get a formated string of the current time, hour, minute and second
-  static std::string getCurrentTimeStr()
-  {
-    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::tm* t = std::localtime(&now);
-    if(t == NULL)
-      return std::string("ERROR");
-    std::ostringstream ss;
-    ss << t->tm_year-100 << "-"
-       << std::setw(2) << std::setfill('0') << t->tm_mon+1 << "-"
-       << std::setw(2) << std::setfill('0') << t->tm_mday << "_"
-       << std::setw(2) << std::setfill('0') << t->tm_hour << "-"
-       << std::setw(2) << std::setfill('0') << t->tm_min << "-"
-       << std::setw(2) << std::setfill('0') << t->tm_sec;
-    return ss.str();
+    return nanosecToMillisecTrunc(stopAndGetNanoseconds());
   }
 
 private:
   TimePoint start_time_;
-  Nanoseconds duration_;
-  Nanoseconds accumulated_;
 };
+
+//------------------------------------------------------------------------------
+//! Collect statistics over multiple timings in milliseconds.
+class TimedScope;
+
+class TimerStatistics
+{
+public:
+  inline void start()
+  {
+    t_.start();
+  }
+
+  //! Using the concept of "Initialization is Resource Acquisition" idiom, this
+  //! function returns a timer object. When this timer object is destructed,
+  //! the timer is stopped.
+  inline TimedScope timeScope();
+
+  inline FloatType stop()
+  {
+    FloatType t = t_.stop();
+    stat_.addSample(t);
+    return t;
+  }
+
+  inline FloatType numTimings() const { return stat_.numSamples(); }
+  inline FloatType accumulated() const { return stat_.sum(); }
+  inline FloatType min() const { return stat_.min(); }
+  inline FloatType max() const { return stat_.max(); }
+  inline FloatType mean() const { return stat_.mean(); }
+  inline FloatType variance() const { return stat_.var(); }
+  inline FloatType standarDeviation() const { return stat_.std(); }
+  inline void reset() { stat_.reset(); }
+  inline const RunningStatistics& statistics() const { return stat_; }
+
+private:
+  Timer t_;
+  RunningStatistics stat_;
+};
+
+//! This object is return from TimerStatistics::timeScope()
+class TimedScope
+{
+public:
+  TimedScope() = delete;
+
+  TimedScope(TimerStatistics* timer)
+    : timer_(timer)
+  {
+    timer_->start();
+  }
+
+  ~TimedScope()
+  {
+    timer_->stop();
+  }
+private:
+  TimerStatistics* timer_;
+};
+
+inline TimedScope TimerStatistics::timeScope()
+{
+  return TimedScope(this);
+}
+
+//------------------------------------------------------------------------------
+//! Collect statistics over multiple timings in milliseconds.
+//! Usage:
+//! ze::TimerCollection timers;
+//! timers["name"].start()
+//! ...
+//! timers["name"].stop()
+class TimerCollection
+{
+public:
+  using Timers = std::unordered_map<std::string, TimerStatistics>;
+
+  TimerCollection() = default;
+  ~TimerCollection() = default;
+
+  inline TimerStatistics& operator[](const std::string& name)
+  {
+    return timers_[name];
+  }
+
+  inline TimerStatistics& operator[](std::string&& name)
+  {
+    return timers_[std::forward<std::string>(name)];
+  }
+
+  inline size_t numTimers() const { return timers_.size(); }
+
+  void saveToFile(const std::string& directory, const std::string& filename);
+
+  //!@{
+  //! Timer iteration:
+  typedef Timers::value_type value_type;
+  typedef Timers::const_iterator const_iterator;
+  Timers::const_iterator begin() const { return timers_.begin(); }
+  Timers::const_iterator end() const { return timers_.end(); }
+  //!@}
+
+private:
+  Timers timers_;
+};
+
+//! Print Timer Collection:
+std::ostream& operator<<(std::ostream& out, const TimerCollection& timers);
+
+//------------------------------------------------------------------------------
+// Utilities:
+
+//! Get nanoseconds since 1.1.1970
+int64_t getCurrentNanosecondTime();
+
+//! Get a formated string of the current time, hour, minute and second
+std::string getCurrentTimeStr();
 
 } // end namespace ze
