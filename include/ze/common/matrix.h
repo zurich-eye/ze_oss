@@ -47,11 +47,12 @@ FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
 //! @param A of size m*n, where m>=n (pad with zero rows if not!)
 //! @return Rank of A, minimum error (singular value), and corresponding
 //! eigenvector (column of V, with A=U*S*V')
-std::tuple<int, FloatType, VectorX> DLT(const MatrixX& A, FloatType rank_tol = 1e-9);
+std::tuple<int, FloatType, VectorX> directLinearTransform(
+    const MatrixX& A, FloatType rank_tol = 1e-9);
 
 //! Get a slice of vector X by the specified indices.
 template<typename Derived>
-Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> sliceVector(
+Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> getVectorElements(
     Eigen::MatrixBase<Derived>& X, const std::vector<uint32_t>& indices)
 {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived);
@@ -66,7 +67,7 @@ Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> sliceVector(
 
 //! Get a slice of the matrix X by the specified column indices.
 template<typename Derived>
-Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic> sliceColwise(
+Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic> getMatrixCols(
     Eigen::MatrixBase<Derived>& X, const std::vector<uint32_t>& column_indices)
 {
   const uint32_t n_col = column_indices.size();

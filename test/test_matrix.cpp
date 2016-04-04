@@ -12,7 +12,7 @@ TEST(MatrixTests, testVectorSlice)
   M << 1, 2, 3, 4, 6;
   std::vector<uint32_t> indices { 0, 2, 3 };
 
-  M = sliceVector(M, indices);
+  M = getVectorElements(M, indices);
 
   VectorX A_expected(3);
   A_expected << 1, 3, 4;
@@ -28,7 +28,7 @@ TEST(MatrixTests, testColumnSlice)
        7, 8, 9, 10, 11;
   std::vector<uint32_t> indices { 0, 2, 3 };
 
-  M = sliceColwise(M, indices);
+  M = getMatrixCols(M, indices);
 
   Matrix2X A_expected(2,3);
   A_expected << 1, 3, 4, 7, 9, 10;

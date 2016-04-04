@@ -5,7 +5,7 @@
 
 namespace ze {
 
-std::tuple<int, FloatType, VectorX> DLT(const MatrixX& A, FloatType rank_tol)
+std::tuple<int, FloatType, VectorX> directLinearTransform(const MatrixX& A, FloatType rank_tol)
 {
   int n = A.rows();
   int p = A.cols();
