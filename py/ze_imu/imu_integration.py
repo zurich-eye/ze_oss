@@ -17,15 +17,13 @@ rc('text', usetex=True)
 
 gravity = 9.81
 g = np.array([0, 0, -gravity])
-dt = 1.0/1000.0
-n = 300
-t_max = n * dt
-    
+
 def renormalize_quaternion_in_state(state):
     state[:4] /= np.linalg.norm(state[:4])
     return state
        
 def integrate_expmap(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B, dt):
+    n = np.shape(B_a_W_B)[0]
     t_W_B = np.zeros((n,3))
     t_W_B[0,:] = t_W_B0
     v_W_B = np.zeros((n,3))
@@ -43,6 +41,7 @@ def integrate_expmap(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B, dt):
     return R_W_B, v_W_B, t_W_B
      
 def integrate_quaternion_zero_order_hold(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B, dt):
+    n = np.shape(B_a_W_B)[0]
     t_W_B = np.zeros((n,3))
     t_W_B[0,:] = t_W_B0
     v_W_B = np.zeros((n,3))
@@ -67,6 +66,7 @@ def integrate_quaternion_zero_order_hold(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_
     return R_W_B, v_W_B, t_W_B
    
 def integrate_quaternion_runge_kutta_4(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B, dt):
+    n = np.shape(B_a_W_B)[0]
     t_W_B = np.zeros((n,3))
     t_W_B[0,:] = t_W_B0
     v_W_B = np.zeros((n,3))
@@ -131,43 +131,114 @@ def integrate_quaternion_runge_kutta_4(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B,
     return R_W_B, v_W_B, t_W_B
     
 def rotation_estimation_error(R_W_Bgt, R_W_Bes):
+    n = np.shape(R_W_Bgt)[0]
     errors = np.zeros(n)
     for i in range(0,n):
         R_gt = np.reshape(R_W_Bgt[i,:], (3,3))
         R_es = np.reshape(R_W_Bes[i,:], (3,3))
         R_err = np.dot(np.transpose(R_gt), R_es)
         errors[i] = np.linalg.norm(tf.logmap_so3(R_err))
+    errors = errors * 180.0 / np.pi
     return errors
     
-# -----------------------------------------------------------------------------
-# Generate measurements and ground-truth data.
-
-t_W_B, v_W_B, R_W_B, B_a_W_B, B_w_W_B = imu_sim.get_simulated_imu_data(t_max, dt)
-
-ax = imu_sim.plot_trajectory(t_W_B, R_W_B)
-
-# -------------------------------------------------------------------------
-# Verification: Repeat integration to see how big the integration error is
-
-R_expm, v_expm, t_expm = integrate_expmap(
-    t_W_B[0,:], v_W_B[0,:], R_W_B[0,:], B_a_W_B, B_w_W_B, dt)
+def translation_estimation_errors(t_W_Bgt, t_W_Bes):
+    errors = np.sqrt(np.sum((t_W_Bgt - t_W_Bes)**2, 1))
+    return errors
     
-R_qrk4, v_qrk4, t_qrk4 = integrate_quaternion_runge_kutta_4(
-    t_W_B[0,:], v_W_B[0,:], R_W_B[0,:], B_a_W_B, B_w_W_B, dt)
+def experiment1():
     
-ax.plot(t_expm[:,0], t_expm[:,1], t_expm[:,2], '-r', label='re-integrated expmap')
-ax.plot(t_qrk4[:,0], t_qrk4[:,1], t_qrk4[:,2], '-g', label='re-integrated runge-kutta')
-ax.legend()
-plot_utils.axis_equal_3d(ax)
+    t_max = 0.25
+    dt = 1.0/800.0
+    n = int(t_max / dt)
+    
+    # -----------------------------------------------------------------------------
+    # Generate measurements and ground-truth data.
+    
+    t_W_B, v_W_B, R_W_B, B_a_W_B, B_w_W_B = imu_sim.get_simulated_imu_data(t_max, dt)
+    
+    ax = imu_sim.plot_trajectory(t_W_B, R_W_B)
+    
+    # -------------------------------------------------------------------------
+    # Verification: Repeat integration to see how big the integration error is
+    
+    R_expm, v_expm, t_expm = integrate_expmap(
+        t_W_B[0,:], v_W_B[0,:], R_W_B[0,:], B_a_W_B, B_w_W_B, dt)
+        
+    R_qrk4, v_qrk4, t_qrk4 = integrate_quaternion_runge_kutta_4(
+        t_W_B[0,:], v_W_B[0,:], R_W_B[0,:], B_a_W_B, B_w_W_B, dt)
+        
+    ax.plot(t_expm[:,0], t_expm[:,1], t_expm[:,2], '-r', label='Proposed')
+    ax.plot(t_qrk4[:,0], t_qrk4[:,1], t_qrk4[:,2], '-g', label='Runge-Kutta 4th order')
+    ax.legend()
+    plot_utils.axis_equal_3d(ax)
+    
+    
+    # Compute rotation error:
+    R_err_expm = rotation_estimation_error(R_W_B, R_expm)
+    R_err_qrk4 = rotation_estimation_error(R_W_B, R_qrk4)
+    t_err_expm = translation_estimation_errors(t_W_B, t_expm)
+    t_err_qrk4 = translation_estimation_errors(t_W_B, t_qrk4)
+    
+    fig = plt.figure(figsize=(8,4))
+    ax = fig.add_subplot(211, title='Rotation Error', ylabel='Rotation error [deg]')
+    times = np.arange(0, n*dt*1000, dt*1000)
+    ax.plot(times, R_err_expm, '-b', label='Proposed', lw=3)
+    ax.plot(times, R_err_qrk4, '-g', label='Runge-Kutta 4th order', lw=3)
+    
+    ax = fig.add_subplot(212, title='Translation Error', ylabel='Translation error [m]', xlabel='Time [ms]')
+    ax.plot(times, t_err_expm, '-b', lw=3)
+    ax.plot(times, t_err_qrk4, '-g', lw=3)
+    ax.legend()
 
+def experiment2():
+    
+    N = 100
+    t_interval = 0.25 
+    t_max = (N+1) * t_interval
+    dt = 1.0 / 800.0
+    n_per_interval = t_interval / dt
+    
+    # -----------------------------------------------------------------------------
+    # Generate measurements and ground-truth data.
+    
+    t_W_B, v_W_B, R_W_B, B_a_W_B, B_w_W_B = imu_sim.get_simulated_imu_data(t_max, dt)
+    
+    #ax, fig = imu_sim.plot_trajectory(t_W_B, R_W_B, interval=10)
+    #fig.savefig('imu_sim_trajectory.png')
+    
+    # -------------------------------------------------------------------------
+    # Verification: Repeat integration to see how big the integration error is
+    R_err_expm = np.zeros(N)
+    R_err_qrk4 = np.zeros(N)
+    t_err_expm = np.zeros(N)
+    t_err_qrk4 = np.zeros(N)
+    for i in np.arange(N):
+        s = i * n_per_interval
+        e = (i+1) * n_per_interval        
 
-# Compute rotation error:
-R_err_expm = rotation_estimation_error(R_W_B, R_expm)
-R_err_qrk4 = rotation_estimation_error(R_W_B, R_qrk4)
-
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.plot(R_err_expm, label='R err so3 exp')
-ax.plot(R_err_qrk4, label='R err quat RK4')
-ax.legend()
-
+        # Integrate Segment        
+        R_expm, v_expm, t_expm = integrate_expmap(
+            t_W_B[s,:], v_W_B[s,:], R_W_B[s,:], B_a_W_B[s:e,:], B_w_W_B[s:e,:], dt)
+            
+        R_qrk4, v_qrk4, t_qrk4 = integrate_quaternion_runge_kutta_4(
+            t_W_B[s,:], v_W_B[s,:], R_W_B[s,:], B_a_W_B[s:e,:], B_w_W_B[s:e,:], dt)
+        
+        
+        # Compute rotation error:
+        R_err_expm[i] = rotation_estimation_error(R_W_B[s:e,:], R_expm)[-1]
+        R_err_qrk4[i] = rotation_estimation_error(R_W_B[s:e,:], R_qrk4)[-1]
+        t_err_expm[i] = translation_estimation_errors(t_W_B[s:e,:], t_expm)[-1]
+        t_err_qrk4[i] = translation_estimation_errors(t_W_B[s:e,:], t_qrk4)[-1]
+    
+    fig = plt.figure(figsize=(8,8))
+    bins = np.linspace(0,np.max(R_err_expm),20)
+    ax = fig.add_subplot(211, xlabel='Rotation error [deg]')
+    ax.hist(R_err_expm, bins=bins, color='b', label='Proposed')
+    ax.hist(R_err_qrk4, bins=bins, color='g', label='Runge-Kutta 4th order')
+    
+    bins = np.linspace(0,np.max(t_err_expm),20)
+    ax = fig.add_subplot(212, xlabel='Translation error [m]')
+    ax.hist(t_err_expm, bins=bins, color='b')
+    ax.hist(t_err_qrk4, bins=bins, color='g')
+    ax.legend()
+    fig.savefig('imu_sim_error_hist.png')

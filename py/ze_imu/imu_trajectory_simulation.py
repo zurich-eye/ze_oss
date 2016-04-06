@@ -126,27 +126,27 @@ def evaluate_symbolic_trajectory(t_W_B, v_W_B, a_W_B, R_W_B, B_w_W_B, t_min, t_m
     
     return t_W_B_val, v_W_B_val, a_W_B_val, R_W_B_val, B_w_W_B_val
     
-def plot_trajectory(t_W_B_val, R_W_B_val):
+def plot_trajectory(t_W_B_val, R_W_B_val, interval = 10):
     n = np.shape(t_W_B_val)[0]
     fig = plt.figure(figsize=(8,5))
     ax = Axes3D(fig, xlabel='x [m]', ylabel='y [m]', zlabel='z [m]')
     ax.plot(t_W_B_val[:,0], t_W_B_val[:,1], t_W_B_val[:,2], 'b-')
-    for i in range(0, n, 10):
+    for i in range(0, n, interval):
         R = np.reshape(R_W_B_val[i,:], (3,3))
         assert(np.abs(np.linalg.det(R) - 1.0) < 1e-5)
         plot_utils.draw_coordinate_frame(ax, t_W_B_val[i,:], R, 1.0)
     ax.legend()
-    return ax
+    return ax, fig
       
 def get_simulated_imu_data(t_max, dt):
     
-    t_W_B, v_W_B, a_W_B = simulate_pos_vel_acc(1.0, 2.0, 1.0,
-                                               1.0, 2.0, 2.0,
-                                               0.0, 1.0, 1.0)
+    t_W_B, v_W_B, a_W_B = simulate_pos_vel_acc(0.7, 1.0, .5,
+                                               2.0, 1.0, 2.0,
+                                               0.7, 1.0, 1.0)
     
-    R_W_B  = simulate_rotation_matrix(0.5, 1, 0.5,
+    R_W_B  = simulate_rotation_matrix(0.5, 0.05, 0.2,
                                       1.0, 2.0, 1.0,
-                                      0.0, 1.0, 0.0)
+                                      0.0, 1.0, 4.0)
     
     B_w_W_B = rotation_rate_from_rotation_matrix(R_W_B)
     
