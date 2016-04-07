@@ -6,7 +6,7 @@
   </description>
   <version>0.1.4</version>
   <license>tbd</license>
-  
+
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -14,6 +14,9 @@
 
   <depend>glog_catkin</depend>
   <depend>ze_cmake</depend>
+  <depend>ze_common</depend>
+  <depend>ze_cameras</depend>
+  <depend>ze_geometry</depend>
   <depend>imp_core</depend>
   <depend>imp_cu_core</depend>
   <depend>imp_3rdparty_cuda_toolkit</depend>

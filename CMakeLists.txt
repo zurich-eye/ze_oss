@@ -66,17 +66,17 @@ set(CU_SRCS
 cs_cuda_add_library(${PROJECT_NAME}
   ${CU_SRCS} ${CU_HDRS} ${SOURCES} ${HEADERS}
   )
-#target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
-###
-### GTESTS
-###
 
-# catkin_add_gtest(${PROJECT_NAME}-test
-#   test/test_main.cpp
-#   test/size_test.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
+##########
+# GTESTS #
+##########
 
+catkin_add_gtest(test_dense_variational_epipolar_stereo test/test_dense_variational_epipolar_stereo.cpp)
+target_link_libraries(test_dense_variational_epipolar_stereo ${PROJECT_NAME})
+
+##########
+# EXPORT #
+##########
 cs_install()
 cs_export()
