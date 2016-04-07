@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import ze_py.plot_utils as plot_utils
 import ze_py.transformations as tf
+from pylab import setp
 import ze_imu.imu_trajectory_simulation as imu_sim
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc
@@ -67,7 +68,7 @@ def integrate_quaternion_zero_order_hold(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_
    
 def integrate_quaternion_runge_kutta_4(t_W_B0, v_W_B0, R_W_B0, B_a_W_B, B_w_W_B, dt):
     n = np.shape(B_a_W_B)[0]
-    t_W_B = np.zeros((n,3))
+    t_W_B = np.zeros((n,3))from pylab import setp
     t_W_B[0,:] = t_W_B0
     v_W_B = np.zeros((n,3))
     v_W_B[0,:] = v_W_B0
@@ -195,7 +196,7 @@ def experiment2():
     N = 100
     t_interval = 0.25 
     t_max = (N+1) * t_interval
-    dt = 1.0 / 800.0
+    dt = 1.0 / 200.0
     n_per_interval = t_interval / dt
     
     # -----------------------------------------------------------------------------
@@ -203,8 +204,8 @@ def experiment2():
     
     t_W_B, v_W_B, R_W_B, B_a_W_B, B_w_W_B = imu_sim.get_simulated_imu_data(t_max, dt)
     
-    #ax, fig = imu_sim.plot_trajectory(t_W_B, R_W_B, interval=10)
-    #fig.savefig('imu_sim_trajectory.png')
+    ax, fig = imu_sim.plot_trajectory(t_W_B, R_W_B, interval=10)
+    fig.savefig('imu_sim_trajectory.pdf')
     
     # -------------------------------------------------------------------------
     # Verification: Repeat integration to see how big the integration error is
@@ -235,10 +236,136 @@ def experiment2():
     ax = fig.add_subplot(211, xlabel='Rotation error [deg]')
     ax.hist(R_err_expm, bins=bins, color='b', label='Proposed')
     ax.hist(R_err_qrk4, bins=bins, color='g', label='Runge-Kutta 4th order')
+    ax.legend()
     
     bins = np.linspace(0,np.max(t_err_expm),20)
     ax = fig.add_subplot(212, xlabel='Translation error [m]')
     ax.hist(t_err_expm, bins=bins, color='b')
     ax.hist(t_err_qrk4, bins=bins, color='g')
-    ax.legend()
     fig.savefig('imu_sim_error_hist.png')
+    
+    
+def experiment3():
+    
+    N = 50
+    t_interval = 0.25 
+    t_max = (N+1) * t_interval
+    hz_range = np.arange(100, 1000, 200) 
+    
+    R_err_expm_all = []
+    R_err_qrk4_all = []
+    t_err_expm_all = []
+    t_err_qrk4_all = []
+    
+    for hz in hz_range:
+        print('Computing errors for hz = ' + str(hz))
+        
+        dt = 1.0 / hz
+        n_per_interval = t_interval / dt
+        
+        # -----------------------------------------------------------------------------
+        # Generate measurements and ground-truth data.
+        
+        t_W_B, v_W_B, R_W_B, B_a_W_B, B_w_W_B = imu_sim.get_simulated_imu_data(t_max, dt)
+        
+        #ax, fig = imu_sim.plot_trajectory(t_W_B, R_W_B, interval=10)
+        #fig.savefig('imu_sim_trajectory.png')
+        
+        # -------------------------------------------------------------------------
+        # Verification: Repeat integration to see how big the integration error is
+        R_err_expm = np.zeros(N)
+        R_err_qrk4 = np.zeros(N)
+        t_err_expm = np.zeros(N)
+        t_err_qrk4 = np.zeros(N)
+        for i in np.arange(N):
+            s = i * n_per_interval
+            e = (i+1) * n_per_interval        
+    
+            # Integrate Segment        
+            R_expm, v_expm, t_expm = integrate_expmap(
+                t_W_B[s,:], v_W_B[s,:], R_W_B[s,:], B_a_W_B[s:e,:], B_w_W_B[s:e,:], dt)
+                
+            R_qrk4, v_qrk4, t_qrk4 = integrate_quaternion_runge_kutta_4(
+                t_W_B[s,:], v_W_B[s,:], R_W_B[s,:], B_a_W_B[s:e,:], B_w_W_B[s:e,:], dt)
+            
+            
+            # Compute rotation error:
+            R_err_expm[i] = rotation_estimation_error(R_W_B[s:e,:], R_expm)[-1]
+            R_err_qrk4[i] = rotation_estimation_error(R_W_B[s:e,:], R_qrk4)[-1]
+            t_err_expm[i] = translation_estimation_errors(t_W_B[s:e,:], t_expm)[-1]
+            t_err_qrk4[i] = translation_estimation_errors(t_W_B[s:e,:], t_qrk4)[-1]
+        
+        R_err_expm_all.append(R_err_expm)
+        R_err_qrk4_all.append(R_err_qrk4)
+        t_err_expm_all.append(t_err_expm)
+        t_err_qrk4_all.append(t_err_qrk4)
+        
+        
+        
+    def set_boxplot_colors(pb, color):
+        setp(pb['boxes'][0], color=color)
+        setp(pb['caps'][0], color=color)
+        setp(pb['caps'][1], color=color)
+        setp(pb['whiskers'][0], color=color)
+        setp(pb['whiskers'][1], color=color)
+        #setp(pb['fliers'][0], color=color)
+        #setp(pb['fliers'][1], color=color)
+        setp(pb['medians'][0], color=color)
+        
+        
+    n_exp = 2
+    n_dist = len(hz_range)
+    spacing = 2
+    pos = np.arange(0, n_dist*(n_exp+spacing), (n_exp+spacing))
+
+    fig = plt.figure(figsize=(6,5))
+    ax_rot = fig.add_subplot(211, ylabel='Rotation error [deg]')
+    ax_pos = fig.add_subplot(212, ylabel='Translation error [m]', xlabel='IMU Rate [Hz]')
+    
+    dummy_plots_rot = []
+    dummy_plot_rot = ax_rot.plot([1,1], '-', color='b', label="Proposed")
+    dummy_plots_rot.append(dummy_plot_rot[0])    
+    dummy_plot_rot = ax_rot.plot([1,1], '-', color='g', label="Runge-Kutta 4th order")
+    dummy_plots_rot.append(dummy_plot_rot[0])
+
+    for idx_hz, hz in enumerate(hz_range):     
+        pb = ax_rot.boxplot(R_err_expm_all[idx_hz], False, '', positions=[pos[idx_hz]+0], widths=0.8)
+        set_boxplot_colors(pb, 'b')
+    
+        pb = ax_pos.boxplot(t_err_expm_all[idx_hz], False, '', positions=[pos[idx_hz]+0], widths=0.8)
+        set_boxplot_colors(pb, 'b')
+        
+        pb = ax_rot.boxplot(R_err_qrk4_all[idx_hz], False, '', positions=[pos[idx_hz]+1], widths=0.8)
+        set_boxplot_colors(pb, 'g')
+    
+        pb = ax_pos.boxplot(t_err_qrk4_all[idx_hz], False, '', positions=[pos[idx_hz]+1], widths=0.8)
+        set_boxplot_colors(pb, 'g')
+           
+    
+        
+    ax_rot.set_xticks(pos+0.5*n_exp-0.5)
+    ax_rot.set_xticklabels(hz_range)
+    ax_rot.set_xlim(xmin=pos[0]-2, xmax=pos[-1]+5)
+    ax_rot.set_ylim([-0.001, np.max(R_err_expm_all[0])])
+    
+    ax_pos.set_xticks(pos+0.5*n_exp-0.5)
+    ax_pos.set_xticklabels(hz_range)
+    ax_pos.set_xlim(xmin=pos[0]-2, xmax=pos[-1]+5)
+    ax_pos.set_ylim([-0.00001, np.max(t_err_expm_all[0])])
+
+    
+    
+    # create legend
+    ax_rot.legend(dummy_plots_rot, ['Proposed','Runge-Kutta 4th order'], loc='upper right')
+    for p in dummy_plots_rot:
+        p.set_visible(False)
+        
+
+    fig.tight_layout()
+    fig.savefig('imu_sim_errors.pdf', bbox_inches="tight")
+    #
+    #fig_yaw.tight_layout()
+    #fig_yaw.savefig('vicon_yaw_error_comparison'+FORMAT, bbox_inches="tight")
+    #
+    #fig_g.tight_layout()
+    #fig_g.savefig('vicon_gravity_error_comparison'+FORMAT, bbox_inches="tight")
