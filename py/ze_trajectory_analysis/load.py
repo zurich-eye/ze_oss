@@ -1,10 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Zurich Eye
 """
 
 import os
 import logging
+import yaml
 import numpy as np
 import ze_trajectory_analysis.utils as utils
 
@@ -112,13 +113,59 @@ def load_relative_errors_from_file(data_dir, segment_length,
     
     return rel_pos_errors_norm, rel_roll_pitch_errors, rel_yaw_errors, scale_errors, start_indices
 
-
+def load_data_svo_gtsam(trace_dir):
+    logger = logging.getLogger(__name__)
+    logger.info("Loading SVO-GTSAM data...")
     
-# -----------------------------------------------------------------------------
-# DEPRECATED
+    # load estimate.
+    if os.path.exists(os.path.join(trace_dir, 'estimate_states.csv')):
+        data = np.loadtxt(os.path.join(trace_dir, 'estimate_states.csv'))
+    else:
+        data = np.loadtxt(os.path.join(trace_dir, 'trace_states.txt'))
 
-def load_hand_eye_calib(params):
-    print('loading hand-eye-calib')
+    last_state = int(data[-1,0])
+    last_data = data[data[:,0]==last_state]
+    frame_ids = [ int(i) for i in last_data[:,1] ]
+    traj_es = dict([ (int(row[1]), row[11:18]) for row in last_data ])
+    
+    # load groundtruth.
+    data = np.loadtxt(os.path.join(trace_dir, 'groundtruth.txt'))
+    groundtruth = dict([ (int(row[0]), row[2:9]) for row in data ])
+    
+    # load matches and create a dictionary.
+    matches = np.loadtxt(os.path.join(trace_dir, 'groundtruth_matches.txt'))
+    matches = dict([(int(m[0]), int(m[1])) for m in matches])
+    
+    logger.info("done.")
+    
+    # remove frame ids that don't have a match.
+    n_removed = 0
+    for i in list(frame_ids):
+       if i not in matches:
+           frame_ids.remove(i)
+           n_removed += 1
+    print('removed '+str(n_removed)+' frames because no groundtruth available')   
+    
+    traj_gt = dict( [ (i, groundtruth[matches[i]]) for i in frame_ids ])
+
+    # generate list of synchronized poses.
+    keys = list(traj_gt.keys())
+    keys.sort()
+    gt = np.array([ traj_gt[i] for i in keys] )
+    es = np.array([ traj_es[i] for i in keys] )
+    t_es = keys
+    p_es = es[:,0:3]
+    q_es = es[:,3:7]
+    p_gt = gt[:,0:3]
+    q_gt = gt[:,3:7]
+    t_gt = keys
+    return t_es, p_es, q_es, t_gt, p_gt, q_gt
+    
+def load_hand_eye_calib_from_file(filename):
+    logger = logging.getLogger(__name__)
+    logger.info("Loading Hand-Eye calib from file: "+filename)
+    params = yaml.load(open(filename,'r'))
+    
     if 'T_sensor_trackable' in params:
         T_cm_quat = np.array([params['T_sensor_trackable']['qx'],
                               params['T_sensor_trackable']['qy'],
@@ -127,10 +174,15 @@ def load_hand_eye_calib(params):
         T_cm_tran = np.array([params['T_sensor_trackable']['tx'],
                               params['T_sensor_trackable']['ty'],
                               params['T_sensor_trackable']['tz']])
-        T_cm = utils.get_rigid_body_trafo(T_cm_quat, T_cm_tran)
+        T_B_V = utils.get_rigid_body_trafo(T_cm_quat, T_cm_tran)
     else:
-        T_cm = np.eye(4)
-    return T_cm
+        raise ValueError('could not load Hand-Eye calib.')
+    return T_B_V # (V)icon-Markers in (B)ody frame.
+    
+# -----------------------------------------------------------------------------
+# DEPRECATED
+
+
     
 def load_dataset(results_dir, cam_delay):
     print('loading dataset in '+results_dir)   
