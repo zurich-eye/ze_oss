@@ -21,7 +21,7 @@ RansacRelativePose::RansacRelativePose(
   : opengv_threshold_(
       1.0 - std::cos(cam.getApproxAnglePerPixel() * reprojection_threshold_px))
 {
-  VLOG(1) << "RANSAC THRESHOLD = " << cam.getApproxAnglePerPixel() * reprojection_threshold_px;
+  VLOG(3) << "RANSAC THRESHOLD = " << cam.getApproxAnglePerPixel() * reprojection_threshold_px;
 }
 
 bool RansacRelativePose::solve(
@@ -82,9 +82,9 @@ bool RansacRelativePose::solveRelativePose(
     LOG(WARNING) << "5Pt RANSAC could not find a solution";
     return false;
   }
-  VLOG(3) << "5Pt RANSAC:"
-          << ", #iter = " << ransac.iterations_
-          << ", #inliers = " << ransac.inliers_.size();
+  VLOG(10) << "5Pt RANSAC:"
+           << ", #iter = " << ransac.iterations_
+           << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>();
@@ -120,9 +120,9 @@ bool RansacRelativePose::solveTranslationOnly(
     LOG(WARNING) << "2Pt RANSAC could not find a solution";
     return false;
   }
-  VLOG(3) << "2pt RANSAC:"
-          << ", #iter = " << ransac.iterations_
-          << ", #inliers = " << ransac.inliers_.size();
+  VLOG(10) << "2pt RANSAC:"
+           << ", #iter = " << ransac.iterations_
+           << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>();
@@ -157,9 +157,9 @@ bool RansacRelativePose::solveRotationOnly(
     LOG(WARNING) << "2Pt RANSAC could not find a solution";
     return false;
   }
-  VLOG(3) << "2pt Rotation-Only RANSAC:"
-          << ", #iter = " << ransac.iterations_
-          << ", #inliers = " << ransac.inliers_.size();
+  VLOG(10) << "2pt Rotation-Only RANSAC:"
+           << ", #iter = " << ransac.iterations_
+           << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>();
