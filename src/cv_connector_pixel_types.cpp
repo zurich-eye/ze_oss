@@ -61,4 +61,4 @@ int pixelTypeToCv(ze::PixelType type)
   }
 }
 
-} // namespace imp
+} // namespace ze

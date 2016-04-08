@@ -21,7 +21,7 @@ ze::PixelType pixelTypeFromCv(int type);
 int pixelTypeToCv(ze::PixelType type);
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CV_CONNECTOR_PIXEL_TYPES
 

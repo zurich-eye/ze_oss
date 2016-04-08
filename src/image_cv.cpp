@@ -197,4 +197,4 @@ template class ImageCv<ze::Pixel32fC3>;
 template class ImageCv<ze::Pixel32fC4>;
 
 
-} // namespace imp
+} // namespace ze

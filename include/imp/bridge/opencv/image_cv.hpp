@@ -115,7 +115,7 @@ template <typename Pixel>
 using ImageCvConstPtr = typename ImageCv<Pixel>::ConstPtr;
 
 
-} // namespace imp
+} // namespace ze
 
 
 #endif // IMP_IMAGE_CV_HPP

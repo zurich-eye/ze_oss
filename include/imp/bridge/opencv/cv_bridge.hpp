@@ -116,6 +116,6 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel>& img,
 //}
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_OPENCV_BRIDGE_HPP

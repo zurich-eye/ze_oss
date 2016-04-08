@@ -40,6 +40,6 @@ void cvBridgeShow(const std::string& winname,
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_OPENCV_BRIDGE_HPP
