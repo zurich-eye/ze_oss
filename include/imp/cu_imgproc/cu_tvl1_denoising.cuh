@@ -44,6 +44,6 @@ typedef TvL1Denoising<ze::Pixel8uC1> TvL1Denoising8uC1;
 typedef TvL1Denoising<ze::Pixel32fC1> TvL1Denoising32fC1;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_ROF_DENOISING_CUH

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <cuda_runtime.h>
+#include <glog/logging.h>
 
 #include <imp/cuda_toolkit/helper_math.h>
 #include <imp/core/pixel.hpp>
@@ -158,10 +159,7 @@ template<typename Pixel>
 void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
                                               const std::shared_ptr<ImageBase>& src)
 {
-  if (params_.verbose)
-  {
-    std::cout << "[Solver @gpu] RofDenoising::denoise:" << std::endl;
-  }
+    VLOG(100) << "[Solver @gpu] RofDenoising::denoise:";
 
   if (src->size() != dst->size())
   {
@@ -190,11 +188,8 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
     else
       theta = 1.0f;
 
-    if (params_.verbose)
-    {
-      std::cout << "(rof solver) iter: " << iter << "; tau: " << tau
-                << "; sigma: " << sigma << "; theta: " << theta << std::endl;
-    }
+    VLOG(101) << "(rof solver) iter: " << iter << "; tau: " << tau
+              << "; sigma: " << sigma << "; theta: " << theta;
 
     if (params_.primal_dual_energy_check_iter > 0
         && iter % params_.primal_dual_energy_check_iter

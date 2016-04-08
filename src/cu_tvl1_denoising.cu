@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <cuda_runtime.h>
+#include <glog/logging.h>
 
 #include <imp/cuda_toolkit/helper_math.h>
 #include <imp/core/pixel.hpp>
@@ -138,10 +139,7 @@ template<typename Pixel>
 void TvL1Denoising<Pixel>::denoise(const ImageBase::Ptr& dst,
                                                const ImageBase::Ptr& src)
 {
-  if (params_.verbose)
-  {
-    std::cout << "[Solver @gpu] TvL1Denoising::denoise:" << std::endl;
-  }
+  VLOG(100) << "[Solver @gpu] TvL1Denoising::denoise:";
 
   if (src->size() != dst->size())
   {
@@ -170,11 +168,8 @@ void TvL1Denoising<Pixel>::denoise(const ImageBase::Ptr& dst,
     else
       theta = 1.0f;
 
-    if (params_.verbose)
-    {
-      std::cout << "(TvL1 solver) iter: " << iter << "; tau: " << tau
-                << "; sigma: " << sigma << "; theta: " << theta << std::endl;
-    }
+    VLOG(101) << "(TvL1 solver) iter: " << iter << "; tau: " << tau
+              << "; sigma: " << sigma << "; theta: " << theta;
 
     k_tvL1DualUpdate
         <<< dimGrid(), dimBlock() >>> (p_->data(), p_->stride(),

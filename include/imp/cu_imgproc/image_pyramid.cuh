@@ -6,6 +6,7 @@
 #include <imp/cu_imgproc/cu_reduce.cuh>
 
 namespace ze {
+namespace cu {
 
 //! Image Pyramid Factory:
 template<typename Pixel>
@@ -33,9 +34,11 @@ createImagePyramidGpu(
     pyr->emplace_back(std::make_shared<ImageGpu>(sz));
     typename ImageGpu::Ptr prev = std::dynamic_pointer_cast<ImageGpu>(pyr->atShared(i-1));
     typename ImageGpu::Ptr img = std::dynamic_pointer_cast<ImageGpu>(pyr->atShared(i));
+    VLOG(300) << "Creating GPU ImagePyramid Level " << i << " of size " << sz;
     ze::cu::reduce(*img, *prev, InterpolationMode::linear, true);
   }
   return pyr;
 }
 
+} // namespace cu
 } // namespace ze

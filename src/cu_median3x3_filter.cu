@@ -304,7 +304,7 @@ template void filterMedian3x3(ImageGpu32fC4& dst, const ImageGpu32fC4& src);
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 

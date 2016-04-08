@@ -24,6 +24,6 @@ void naturalEdges(ImageGpu<Pixel>& dst,
                   ImageGpuPtr<Pixel> tmp_denoised=nullptr);
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IM_CU_EDGE_DETECTORS_CUH

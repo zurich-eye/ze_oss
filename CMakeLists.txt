@@ -13,13 +13,13 @@ include(ze_macros_cuda)
 find_cuda()
 
 set(HEADERS
-  include/imp/cu_imgproc/image_pyramid.hpp
   )
 
 set(SOURCES
   )
 
 set(CU_HDRS
+  include/imp/cu_imgproc/image_pyramid.cuh
   include/imp/cu_imgproc/cu_reduce.cuh
   include/imp/cu_imgproc/cu_resample.cuh
   include/imp/cu_imgproc/cu_image_filter.cuh
@@ -47,15 +47,16 @@ cs_cuda_add_library(${PROJECT_NAME}
    )
 #target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
-###
-### GTESTS
-###
+##########
+# GTESTS #
+##########
+catkin_add_gtest(test_cu_image_pyramid test/test_cu_image_pyramid.cpp)
+target_link_libraries(test_cu_image_pyramid ${PROJECT_NAME})
 
-# catkin_add_gtest(${PROJECT_NAME}-test
-#   test/test_main.cpp
-#   test/size_test.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
+##########
+# EXPORT #
+##########
 cs_install()
 cs_export()
+

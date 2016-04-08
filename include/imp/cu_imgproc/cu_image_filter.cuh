@@ -39,6 +39,6 @@ void filterGauss(ImageGpu<Pixel>& dst,
 //                 cudaStream_t stream);
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_IMAGE_FILTER_CUH

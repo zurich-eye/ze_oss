@@ -50,6 +50,6 @@ typedef RofDenoising<ze::Pixel8uC1> RofDenoising8uC1;
 typedef RofDenoising<ze::Pixel32fC1> RofDenoising32fC1;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_ROF_DENOISING_CUH

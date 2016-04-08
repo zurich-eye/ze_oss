@@ -19,6 +19,6 @@ void resample(ImageGpu<Pixel>& dst,
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_RESAMPLE_CUH
