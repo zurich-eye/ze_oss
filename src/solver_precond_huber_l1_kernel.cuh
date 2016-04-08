@@ -191,7 +191,7 @@ __global__ void k_dualUpdate(DPixel* d_pu, const size_t stride_pu,
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 

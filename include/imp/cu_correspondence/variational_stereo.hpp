@@ -1,5 +1,4 @@
-#ifndef IMP_CU_VARIATIONAL_STEREO_HPP
-#define IMP_CU_VARIATIONAL_STEREO_HPP
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -7,16 +6,11 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_correspondence/variational_stereo_parameters.hpp>
 
-
-// forward declarations
-namespace ze{
-namespace cu{
-class StereoCtFWarping;
-}
-}
-
 namespace ze {
 namespace cu {
+
+// forward declarations
+class StereoCtFWarping;
 
 /**
  * @brief The Stereo class takes a stereo image pair and estimates the disparity map
@@ -48,6 +42,4 @@ protected:
 };
 
 } // namespace cu
-} // namespace imp
-
-#endif // IMP_CU_VARIATIONAL_STEREO_HPP
+} // namespace ze

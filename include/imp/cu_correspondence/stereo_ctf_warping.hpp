@@ -1,17 +1,15 @@
-#ifndef IMP_CU_STEREOCTFWARPING_HPP
-#define IMP_CU_STEREOCTFWARPING_HPP
+#pragma once
 
 #include <memory>
 #include <vector>
 
 #include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/cu_imgproc/image_pyramid.hpp>
+#include <imp/cu_imgproc/image_pyramid.cuh>
 #include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_se3.cuh>
 #include <imp/cu_core/cu_matrix.cuh>
 
 #include <imp/cu_correspondence/variational_stereo_parameters.hpp>
-//#include <imp/cu_correspondence/solver_stereo_abstract.hpp>
 
 
 namespace ze {
@@ -92,6 +90,4 @@ private:
 };
 
 } // namespace cu
-} // namespace imp
-
-#endif // IMP_CU_STEREOCTFWARPING_HPP
+} // namespace ze

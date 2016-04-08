@@ -72,6 +72,9 @@ cs_cuda_add_library(${PROJECT_NAME}
 # GTESTS #
 ##########
 
+catkin_add_gtest(test_dense_variational_stereo test/test_dense_variational_stereo.cpp)
+target_link_libraries(test_dense_variational_stereo ${PROJECT_NAME})
+
 catkin_add_gtest(test_dense_variational_epipolar_stereo test/test_dense_variational_epipolar_stereo.cpp)
 target_link_libraries(test_dense_variational_epipolar_stereo ${PROJECT_NAME})
 

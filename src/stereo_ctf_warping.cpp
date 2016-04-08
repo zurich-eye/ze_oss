@@ -97,22 +97,26 @@ void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 {
   // generate image pyramid
   ImagePyramid32fC1::Ptr pyr =
-      createImagePyramidGpu<Pixel32fC1>(image, params_->ctf.scale_factor, 4);
+      createImagePyramidGpu<Pixel32fC1>(image, params_->ctf.scale_factor);
 
   // update number of levels
   if (params_->ctf.levels > pyr->numLevels())
+  {
     params_->ctf.levels = pyr->numLevels();
+  }
   if (params_->ctf.coarsest_level > params_->ctf.levels - 1)
+  {
     params_->ctf.coarsest_level = params_->ctf.levels - 1;
+  }
 
   images_.push_back(image);
   image_pyramids_.push_back(pyr);
 
-  LOG(INFO) << "we have now " << images_.size() << " images and "
-            <<  image_pyramids_.size() << " pyramids in the CTF instance. "
-             << "params_->ctf.levels: " << params_->ctf.levels
-             << " (" << params_->ctf.coarsest_level
-             << " -> " << params_->ctf.finest_level << ")";
+  VLOG(1) << "we have now " << images_.size() << " images and "
+          <<  image_pyramids_.size() << " pyramids in the CTF instance. "
+          << "params_->ctf.levels: " << params_->ctf.levels
+          << " (" << params_->ctf.coarsest_level
+          << " -> " << params_->ctf.finest_level << ")";
 }
 
 //------------------------------------------------------------------------------
@@ -201,5 +205,5 @@ StereoCtFWarping::ImageGpu32fC1::Ptr StereoCtFWarping::getOcclusion(size_t level
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

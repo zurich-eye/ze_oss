@@ -13,7 +13,7 @@ enum class StereoPDSolver
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // STEREO_SOLVER_ENUM_HPP
 

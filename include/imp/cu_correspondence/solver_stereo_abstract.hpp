@@ -65,6 +65,6 @@ protected:
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_SOLVER_STEREO_ABSTRACT_HPP

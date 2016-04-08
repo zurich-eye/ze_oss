@@ -71,8 +71,8 @@ SolverEpipolarStereoPrecondHuberL1::SolverEpipolarStereoPrecondHuberL1(
 
   if (depth_proposal.size() == size)
   {
-    LOG(INFO) << "Copy depth proposals " << depth_proposal.size() << " to level0 "
-              << depth_proposal_->size();
+    VLOG(10) << "Copy depth proposals " << depth_proposal.size() << " to level0 "
+             << depth_proposal_->size();
     depth_proposal.copyTo(*depth_proposal_);
     depth_proposal_sigma2.copyTo(*depth_proposal_sigma2_);
   }
@@ -81,9 +81,8 @@ SolverEpipolarStereoPrecondHuberL1::SolverEpipolarStereoPrecondHuberL1(
     float downscale_factor = 0.5f*((float)size.width()/(float)depth_proposal.width()+
                                    (float)size.height()/(float)depth_proposal.height());
 
-    if (params_->verbose>2)
-      LOG(INFO) << "depth proposal downscaled to level: " << level << "; size: " << size
-                << "; downscale_factor: " << downscale_factor;
+    VLOG(10) << "depth proposal downscaled to level: " << level << "; size: " << size
+             << "; downscale_factor: " << downscale_factor;
 
     ze::cu::resample(*depth_proposal_, depth_proposal);
     ze::cu::resample(*depth_proposal_sigma2_, depth_proposal_sigma2);
@@ -142,8 +141,7 @@ void SolverEpipolarStereoPrecondHuberL1::init(const SolverStereoAbstract& rhs)
 //------------------------------------------------------------------------------
 void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
 {
-  if (params_->verbose > 0)
-    std::cout << "SolverEpipolarStereoPrecondHuberL1: solving level " << level_ << " with " << images.size() << " images" << std::endl;
+  VLOG(100) << "SolverEpipolarStereoPrecondHuberL1: solving level " << level_ << " with " << images.size() << " images";
 
   // sanity check:
   // TODO
@@ -169,7 +167,9 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
   // a local one to simplify kernel interfaces
   cu::ImageGpu32fC1::Ptr lambda;
   if (params_->lambda_pointwise)
+  {
     lambda = params_->lambda_pointwise;
+  }
   else
   {
     // make it as small as possible to reduce memory overhead. access is then
@@ -187,8 +187,7 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
   // warping
   for (std::uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
   {
-    if (params_->verbose > 5)
-      std::cout << "SOLVING warp iteration of Huber-L1 stereo model." << std::endl;
+    VLOG(100) << "SOLVING warp iteration of Huber-L1 stereo model." << std::endl;
 
     u_->copyTo(*u0_);
 

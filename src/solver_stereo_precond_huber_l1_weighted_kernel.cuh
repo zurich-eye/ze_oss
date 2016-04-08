@@ -192,7 +192,7 @@ __global__ void k_primalEnergy(T* ep, const size_t stride,
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 

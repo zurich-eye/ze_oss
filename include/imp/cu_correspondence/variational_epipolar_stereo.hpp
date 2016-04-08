@@ -40,6 +40,6 @@ private:
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_STEREO_HPP

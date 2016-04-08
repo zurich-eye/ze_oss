@@ -67,6 +67,6 @@ protected:
 };
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_STEREO_CTF_WARPING_LEVEL_PRECOND_HUBER_L1_WEIGHTED_CUH

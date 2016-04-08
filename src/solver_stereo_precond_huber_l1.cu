@@ -1,6 +1,7 @@
 #include <imp/cu_correspondence/solver_stereo_precond_huber_l1.cuh>
 
 #include <cuda_runtime.h>
+#include <glog/logging.h>
 
 #include <imp/cu_correspondence/variational_stereo_parameters.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
@@ -84,8 +85,8 @@ void SolverStereoPrecondHuberL1::init(const SolverStereoAbstract& rhs)
 //------------------------------------------------------------------------------
 void SolverStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
 {
-  if (params_->verbose > 0)
-    std::cout << "StereoCtFWarpingLevelPrecondHuberL1: solving level " << level_ << " with " << images.size() << " images" << std::endl;
+  VLOG(100) << "StereoCtFWarpingLevelPrecondHuberL1: solving level "
+            << level_ << " with " << images.size() << " images";
 
   // sanity check:
   // TODO
@@ -107,8 +108,7 @@ void SolverStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
   // warping
   for (std::uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
   {
-    if (params_->verbose > 5)
-      std::cout << "SOLVING warp iteration of Huber-L1 stereo model." << std::endl;
+    VLOG(101) << "SOLVING warp iteration of Huber-L1 stereo model. warp: " << warp;
 
     u_->copyTo(*u0_);
 

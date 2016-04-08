@@ -43,5 +43,5 @@ void VariationalEpipolarStereo::setDepthProposal(
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 

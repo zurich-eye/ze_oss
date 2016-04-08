@@ -1,7 +1,7 @@
-#ifndef VARIATIONAL_STEREO_PARAMETERS_HPP
-#define VARIATIONAL_STEREO_PARAMETERS_HPP
+#pragma once
 
-#include <cstdint>
+#include <ze/common/types.h>
+#include <ze/common/macros.h>
 #include <imp/core/types.hpp>
 #include <imp/cu_correspondence/stereo_solver_enum.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
@@ -12,11 +12,10 @@ namespace cu {
 // the parameter struct
 struct VariationalStereoParameters
 {
-  using Ptr = typename std::shared_ptr<VariationalStereoParameters>;
+  ZE_POINTER_TYPEDEFS(VariationalStereoParameters);
 
-  int verbose=10; //!< verbosity level (the higher, the more the Stereo algorithm talks to us)
-  StereoPDSolver solver=StereoPDSolver::PrecondHuberL1; //!< selected primal-dual solver / model
-  float lambda = 30.0f; //!< tradeoff between regularization and matching term
+  StereoPDSolver solver=StereoPDSolver::PrecondHuberL1; //!< selected primal-dual solver / model combination
+  float lambda = 30.0f; //!< tradeoff between regularization and matching term (R(u) + \lambda * D(u))
   ImageGpu32fC1::Ptr lambda_pointwise = nullptr; //!< pointwise variant of lambda
   float eps_u = 0.05f; //!< tradeoff between L1 and L2 part of the Huber regularization
 
@@ -24,12 +23,13 @@ struct VariationalStereoParameters
   float edge_alpha = 7.f;
   float edge_q = 0.7f;
 
+  //! @todo (MWE) we might want to define this externally for all ctf approaches?
   // settings for the ctf warping
-  struct CTF // we might want to define this externally for all ctf approaches?
+  struct CTF
   {
     float scale_factor = 0.8f; //!< multiplicative scale factor between coarse-to-fine pyramid levels
-    std::uint32_t iters = 100;
-    std::uint32_t warps =  10;
+    uint32_t iters = 100;
+    uint32_t warps =  10;
     size_t levels = UINT32_MAX;
     size_t coarsest_level = UINT32_MAX;
     size_t finest_level = 0;
@@ -40,9 +40,5 @@ struct VariationalStereoParameters
                                   const VariationalStereoParameters& p);
 };
 
-
 } // namespace cu
-} // namespace imp
-
-#endif // VARIATIONAL_STEREO_PARAMETERS_HPP
-
+} // namespace ze

@@ -48,7 +48,7 @@ TEST(DenseStereoTests, testVariationalEpipolarStereo)
   // Load poses:
   std::map<int64_t, ze::Transformation> T_W_C_vec =
       ze::loadIndexedPosesFromCsv(data_path + "/traj_gt.csv");
-  ze::Transformation T_cur_ref = T_W_C_vec[3].inverse() * T_W_C_vec[1];
+  ze::Transformation T_ref_cur = T_W_C_vec[1].inverse() * T_W_C_vec[3];
 
   // Load camera:
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(data_path + "/calib.yaml");
@@ -59,6 +59,14 @@ TEST(DenseStereoTests, testVariationalEpipolarStereo)
   ze::loadDepthmapFromFile(data_path + "/depth/img0001_0.depth",
                            depth_ref.numel(),
                            reinterpret_cast<float*>(depth_ref.data()));
+
+  // init gpu instances
+//  ze::cu::ImageGpu32fC1::Ptr cuimg_ref = std::make_shared<ze::cu::ImageGpu32fC1>(*img_ref);
+//  ze::cu::ImageGpu32fC1::Ptr cuimg_cur = std::make_shared<ze::cu::ImageGpu32fC1>(*img_cur);
+
+
+
+
 
 
   if (FLAGS_visualize)

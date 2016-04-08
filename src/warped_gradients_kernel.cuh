@@ -180,7 +180,7 @@ __global__ void k_warpedGradientsEpipolarConstraint(
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 
