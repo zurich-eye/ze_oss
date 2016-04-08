@@ -30,6 +30,7 @@ set(HEADERS
   include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
   include/ze/common/time_conversions.h
+  include/ze/common/timer.h
   include/ze/common/timer_collection.h
   include/ze/common/timer_statistics.h
   include/ze/common/ts_match.h
@@ -42,7 +43,7 @@ set(HEADERS
 set(SOURCES
   src/sample.cpp
   src/test_utils.cpp
-  src/timer.cpp
+  src/timer_collection.cpp
   src/csv_trajectory.cpp
   src/matrix.cpp
   src/running_statistics_collection.cpp

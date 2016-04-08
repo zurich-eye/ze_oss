@@ -41,8 +41,8 @@ public:
   //! @{
   typedef Collection::value_type value_type;
   typedef Collection::const_iterator const_iterator;
-  Collection::const_iterator begin() const { return timers_.begin(); }
-  Collection::const_iterator end() const { return timers_.end(); }
+  Collection::const_iterator begin() const { return collection_.begin(); }
+  Collection::const_iterator end() const { return collection_.end(); }
   //! @}
 
 private:

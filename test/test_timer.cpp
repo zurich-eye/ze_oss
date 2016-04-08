@@ -4,6 +4,8 @@
 
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/timer.h>
+#include <ze/common/timer_collection.h>
+#include <ze/common/timer_statistics.h>
 
 TEST(TimerTests, testTimerInterface)
 {
@@ -56,7 +58,7 @@ TEST(TimerTests, testTimerCollection)
   }
   VLOG(1) << timers;
   EXPECT_NO_FATAL_FAILURE(timers.saveToFile("/tmp", "test_timer.yaml"));
-  EXPECT_EQ(timers.numTimers(), 2u);
+  EXPECT_EQ(timers.size(), 2u);
 }
 
 
