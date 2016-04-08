@@ -21,6 +21,7 @@ set(HEADERS
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/running_statistics.h
+  include/ze/common/running_statistics_collection.h
   include/ze/common/sample.h
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
@@ -29,7 +30,8 @@ set(HEADERS
   include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
   include/ze/common/time_conversions.h
-  include/ze/common/timer.h
+  include/ze/common/timer_collection.h
+  include/ze/common/timer_statistics.h
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
@@ -43,6 +45,7 @@ set(SOURCES
   src/timer.cpp
   src/csv_trajectory.cpp
   src/matrix.cpp
+  src/running_statistics_collection.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
