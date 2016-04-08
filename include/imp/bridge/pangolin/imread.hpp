@@ -37,4 +37,4 @@ void pangolinBridgeLoad(ze::ImageRaw8uC1::Ptr& out,
 }
 
 
-} // namespace imp
+} // namespace ze

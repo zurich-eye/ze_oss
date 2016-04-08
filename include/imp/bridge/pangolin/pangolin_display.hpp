@@ -108,6 +108,6 @@ inline void imshow(const ze::Image8uC1& im, const std::string& title="-")
 //  ~PangolinDisplay();
 //};
 
-} // namespace imp
+} // namespace ze
 
 #endif // PANGOLINDISPLAY_HPP
