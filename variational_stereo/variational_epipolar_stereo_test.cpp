@@ -109,7 +109,6 @@ int main(int /*argc*/, char** /*argv*/)
     std::unique_ptr<ze::cu::VariationalEpipolarStereo> stereo(
           new ze::cu::VariationalEpipolarStereo());
 
-    stereo->parameters()->verbose = 1;
     stereo->parameters()->solver = ze::cu::StereoPDSolver::EpipolarPrecondHuberL1;
     stereo->parameters()->ctf.scale_factor = 0.8f;
     stereo->parameters()->ctf.iters = 30;
@@ -129,7 +128,7 @@ int main(int /*argc*/, char** /*argv*/)
     stereo->setIntrinsics({cu_cam, cu_cam});
     stereo->setExtrinsics(T_mov_fix);
     stereo->setDepthProposal(cu_mu, cu_sigma2);
-    
+
     stereo->solve();
 
     std::shared_ptr<ze::cu::ImageGpu32fC1> d_disp = stereo->getDisparities();

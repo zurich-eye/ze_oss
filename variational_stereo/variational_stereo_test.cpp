@@ -45,7 +45,6 @@ int main(int argc, char** argv)
 
 
     StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
-    stereo_params->verbose = 10;
     stereo_params->solver = ze::cu::StereoPDSolver::PrecondHuberL1Weighted;
     stereo_params->ctf.scale_factor = 0.8f;
     stereo_params->ctf.iters = 50;

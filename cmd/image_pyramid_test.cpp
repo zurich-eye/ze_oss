@@ -10,7 +10,7 @@
 #include <imp/core/image_raw.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/cu_imgproc/image_pyramid.hpp>
+#include <imp/cu_imgproc/image_pyramid.cuh>
 
 int main(int /*argc*/, char** /*argv*/)
 {
@@ -24,7 +24,7 @@ int main(int /*argc*/, char** /*argv*/)
       std::shared_ptr<ze::cu::ImageGpu8uC1> d1_lena_8uC1(
             new ze::cu::ImageGpu8uC1(h1_lena_8uC1));
 
-      ze::ImagePyramid8uC1::Ptr pyr = ze::createImagePyramidGpu<ze::Pixel8uC1>(d1_lena_8uC1);
+      ze::ImagePyramid8uC1::Ptr pyr = ze::cu::createImagePyramidGpu<ze::Pixel8uC1>(d1_lena_8uC1);
 
       assert(pyr->numLevels()==7);
       assert(pyr->size(pyr->numLevels()-1).width() == 8);
@@ -48,7 +48,7 @@ int main(int /*argc*/, char** /*argv*/)
       h1_lena_32fC1.cvMat() /= 255.f;
       std::shared_ptr<ze::cu::ImageGpu32fC1> d1_lena_32fC1(
             new ze::cu::ImageGpu32fC1(h1_lena_32fC1));
-      ze::ImagePyramid32fC1::Ptr pyr = ze::createImagePyramidGpu<ze::Pixel32fC1>(d1_lena_32fC1);
+      ze::ImagePyramid32fC1::Ptr pyr = ze::cu::createImagePyramidGpu<ze::Pixel32fC1>(d1_lena_32fC1);
       ze::ImagePyramid32fC1::ImageLevels levels = pyr->levels();
 
       int level_id=0;
