@@ -64,7 +64,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();
@@ -85,7 +85,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();
@@ -106,7 +106,7 @@ TEST(PoseOptimizerTests, testSolver)
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() * 1000 << " ms\n";
 
     // Compute error:
     Transformation T_err = T_B_W * T_B_W_estimate.inverse();

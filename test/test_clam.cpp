@@ -111,7 +111,7 @@ TEST(ClamTests, testExperiment)
     ClamState state;
     state.at<0>() = T_Bc_Br_estimate;
     optimizer.optimize(state);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
 
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
@@ -157,7 +157,7 @@ TEST(ClamTests, testExperiment)
     inv_depths.resize(landmarks.f_Br.cols());
     inv_depths.setConstant(1.0 / 1.5);
     optimizer.optimize(state);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
 
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
@@ -205,7 +205,7 @@ TEST(ClamTests, testExperiment)
     inv_depths.resize(landmarks.f_Br.cols());
     inv_depths.setConstant(1.0 / 1.5);
     optimizer.optimize(state);
-    VLOG(1) << "optimization took " << t.stop() * 1000 << " ms\n";
+    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
 
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
