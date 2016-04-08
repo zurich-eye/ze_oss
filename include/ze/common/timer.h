@@ -21,7 +21,6 @@ public:
     : start_time_(Clock::now())
   {}
 
-  //! Starts the timer.
   inline void start()
   {
     start_time_ = Clock::now();
