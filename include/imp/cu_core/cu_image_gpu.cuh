@@ -189,7 +189,7 @@ template <typename Pixel>
 using ImageGpuPtr = typename std::shared_ptr<ImageGpu<Pixel>>;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 #endif // IMP_CU_IMAGE_GPU_CUH

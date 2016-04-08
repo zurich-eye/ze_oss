@@ -109,6 +109,6 @@ typedef LinearMemory<ze::Pixel32fC3> LinearMemory32fC3;
 typedef LinearMemory<ze::Pixel32fC4> LinearMemory32fC4;
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_LINEARHOSTMEMORY_H

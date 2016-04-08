@@ -78,6 +78,6 @@ __global__ void k_pixelWiseMul(Pixel* d_dst, size_t stride, const T rhs,
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_SETVALUE_CUH

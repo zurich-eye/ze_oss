@@ -145,6 +145,6 @@ std::function< void(Pixel* )> f;
 };
 
               } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_MEMORY_STORAGE_CUH

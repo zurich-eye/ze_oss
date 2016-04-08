@@ -113,7 +113,7 @@ struct Texture2D
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_TEXTURE2D_CUH
 

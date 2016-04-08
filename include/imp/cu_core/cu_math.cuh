@@ -24,7 +24,7 @@ void minMax(const Texture2D& img_tex, Pixel& min, Pixel& max, const ze::Roi2u& r
 //void sum(const Texture2D& img_tex, double& sum, const imp::Roi2u& roi);
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_MATH_CUH
 

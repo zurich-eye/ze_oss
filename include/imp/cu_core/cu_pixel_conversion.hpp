@@ -96,7 +96,7 @@ cudaChannelFormatDesc toCudaChannelFormatDesc(ze::PixelType pixel_type) __attrib
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 
 #endif // IMP_CU_PIXEL_CONVERSION_HPP

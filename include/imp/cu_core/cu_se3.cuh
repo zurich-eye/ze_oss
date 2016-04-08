@@ -219,6 +219,6 @@ inline std::ostream& operator<<(std::ostream &os, const cu::SE3<T>& rhs)
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_SE3_CUH

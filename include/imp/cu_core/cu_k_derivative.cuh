@@ -148,7 +148,7 @@ float dpAdTensor(const ze::cu::Texture2D& tex, const ze::cu::Texture2D& g_tex,
 }
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_K_DERIVATIVE_CUH
 

@@ -137,7 +137,7 @@ T tex2DFetch(
 
 
 } // namespace cu
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_CU_TEXTURE_CUH
 
