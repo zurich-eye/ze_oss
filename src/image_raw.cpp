@@ -148,4 +148,4 @@ template class ImageRaw<ze::Pixel32fC2>;
 template class ImageRaw<ze::Pixel32fC3>;
 template class ImageRaw<ze::Pixel32fC4>;
 
-} // namespace imp
+} // namespace ze

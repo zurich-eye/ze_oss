@@ -138,6 +138,6 @@ using ImageRawPtr = typename ImageRaw<Pixel>::Ptr;
 template <typename Pixel>
 using ImageRawConstPtr = typename ImageRaw<Pixel>::ConstPtr;
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_IMAGE_RAW_HPP

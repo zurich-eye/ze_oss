@@ -233,7 +233,7 @@ using Roi3f = Roi<float, 3>;
 using Roi3d = Roi<float, 3>;
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_ROI_HPP
 

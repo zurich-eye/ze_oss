@@ -69,6 +69,6 @@ protected:
 
 };
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_LINEARMEMORY_HPP

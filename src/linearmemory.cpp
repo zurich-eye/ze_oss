@@ -137,4 +137,4 @@ template class LinearMemory<ze::Pixel32fC2>;
 template class LinearMemory<ze::Pixel32fC3>;
 template class LinearMemory<ze::Pixel32fC4>;
 
-} // namespace imp
+} // namespace ze

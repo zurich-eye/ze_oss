@@ -49,7 +49,7 @@ enum class PixelOrder
 };
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_PIXEL_ENUMS_HPP
 

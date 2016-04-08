@@ -390,7 +390,7 @@ inline CUDA_HOST CUDA_DEVICE Vec32fC4 normalize(Vec4<T> v)
 }
 
 
-} // namespace imp
+} // namespace ze
 
 #undef CUDA_HOST
 #undef CUDA_DEVICE

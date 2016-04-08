@@ -219,6 +219,6 @@ using ImagePtr = typename std::shared_ptr<Image<Pixel>>;
 
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_IMAGE_HPP

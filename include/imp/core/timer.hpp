@@ -71,7 +71,7 @@ private:
 };
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_TIMER_HPP
 

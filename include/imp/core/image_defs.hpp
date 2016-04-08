@@ -17,7 +17,7 @@ using ConstImageCvPtrRef = const std::shared_ptr<ImageCv<Pixel,pixel_type>>&;
 
 
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_IMAGE_DEFS_HPP
 

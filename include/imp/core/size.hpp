@@ -317,6 +317,6 @@ typedef Size<std::int32_t, 3> Size3i;
 typedef Size<float, 3> Size3f;
 typedef Size<double, 3> Size3d;
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_SIZE_HPP

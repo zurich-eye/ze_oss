@@ -197,6 +197,6 @@ inline std::ostream& operator<<(std::ostream &os, const ImageBase& image)
 // convenience typedefs
 using ImageBasePtr = std::shared_ptr<ImageBase>;
 
-} // namespace imp
+} // namespace ze
 
 #endif // IMP_IMAGE_BASE_HPP
