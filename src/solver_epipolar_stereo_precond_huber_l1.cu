@@ -203,7 +203,6 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
 
     // compute preconditioner
 #if USE_EDGES
-    // compute preconditioner
     k_preconditionerWeighted
         <<<
           frag.dimGrid, frag.dimBlock
