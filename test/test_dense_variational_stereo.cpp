@@ -36,13 +36,14 @@
 
 DEFINE_bool(visualize, false, "Show input images and results");
 
-//-------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // parameters: solver, scale_factor, expected error
 class DenseStereoTests
-    : public ::testing::TestWithParam<std::tuple<ze::cu::StereoPDSolver, double, double>>
+    : public ::testing::TestWithParam<std::tuple<
+    ze::cu::StereoPDSolver, double, double>>
 { };
 
-//-------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 TEST_P(DenseStereoTests, StereoAlgorithms)
 {
   using namespace ze::cu;
@@ -121,23 +122,25 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   }
 }
 
-//-------------------------------------------------------------------------------------------------
-std::tuple<ze::cu::StereoPDSolver, double, double> const StereoTestsParametrizationTable[] = {
-  //          solver                                           scale_factor     error
-  std::make_tuple( ze::cu::StereoPDSolver::HuberL1,                 0.5,             0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1,          0.5,             0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1Weighted,  0.5,             0.0),
-  //          solver                                           scale_factor     error
-  std::make_tuple( ze::cu::StereoPDSolver::HuberL1,                 0.8,             0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1,          0.8,             0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1Weighted,  0.8,             0.0),
-  //          solver                                           scale_factor     error
-  std::make_tuple( ze::cu::StereoPDSolver::HuberL1,                 0.95,            0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1,          0.95,            0.0),
-  std::make_tuple( ze::cu::StereoPDSolver::PrecondHuberL1Weighted,  0.95,            0.0),
+//-----------------------------------------------------------------------------
+using Solver = ze::cu::StereoPDSolver;
+std::tuple<ze::cu::StereoPDSolver, double, double> const StereoTestsParametrizationTable[] =
+{
+  //              solver                           scale_factor  error
+  std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1,          0.5,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.5,          0.0),
+  //              solver                           scale_factor  error
+  std::make_tuple(Solver::HuberL1,                 0.8,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1,          0.8,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.8,          0.0),
+  //              solver                           scale_factor  error
+  std::make_tuple(Solver::HuberL1,                 0.95,         0.0),
+  std::make_tuple(Solver::PrecondHuberL1,          0.95,         0.0),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.95,         0.0),
 };
 
-//-------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 INSTANTIATE_TEST_CASE_P(
   DenseStereoSolverTests, DenseStereoTests, ::testing::ValuesIn(StereoTestsParametrizationTable));
 
