@@ -67,6 +67,8 @@ cs_cuda_add_library(${PROJECT_NAME}
   ${CU_SRCS} ${CU_HDRS} ${SOURCES} ${HEADERS}
   )
 
+cs_add_executable(main_node test/main_node.cpp)
+target_link_libraries(main_node ${PROJECT_NAME})
 
 ##########
 # GTESTS #
