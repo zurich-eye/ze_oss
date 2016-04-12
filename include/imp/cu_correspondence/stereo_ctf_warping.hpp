@@ -44,6 +44,7 @@ public:
   StereoCtFWarping(Parameters::Ptr params);
 
   void addImage(const ImageGpu32fC1::Ptr& image);
+  void reset();
   void solve();
   ImageGpu32fC1::Ptr computePrimalEnergy(size_t level=0);
   ImageGpu32fC1::Ptr getDisparities(size_t level=0);

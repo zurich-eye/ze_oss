@@ -34,11 +34,18 @@
 
 DEFINE_string(calibration_file, "", "Path to input calibration YAML file");
 DEFINE_string(bag_filename, "dataset.bag", "Name of bagfile in data_dir.");
+DEFINE_int32(stereo_num_iterations, 50, "number of iterations per warp");
+DEFINE_int32(stereo_num_warps, 5, "number of warping iterations");
+DEFINE_double(stereo_lambda, 20, "tradeoff between smoothing and dataterm");
+DEFINE_double(stereo_scale_factor, 0.8, "image pyramid scale factor (reduction; value in interval (0.5,1.0]");
+DEFINE_string(stereo_dump_disparities_folder, "", "Path to dump disparities.");
+DEFINE_bool(stereo_visualize, false, "");
+DEFINE_double(stereo_viz_min_disp, -20, "");
+DEFINE_double(stereo_viz_max_disp,  20, "");
+namespace ze {
 
 using Stereo = ze::cu::VariationalEpipolarStereo;
 using StereoParameters = Stereo::Parameters;
-
-namespace ze {
 
 //-----------------------------------------------------------------------------
 class StereoNode {
@@ -98,16 +105,36 @@ void StereoNode::callback(const StampedImages& stamped_images,
   CHECK_NOTNULL(cu_im0_32fC1.get());
   CHECK_NOTNULL(cu_im1_32fC1.get());
 
+  stereo_->reset(); //!< @todo MWE this is a temporary hack. make sure to just have the right amount of images in your internal data structures
   stereo_->addImage(cu_im0_32fC1);
   stereo_->addImage(cu_im1_32fC1);
   stereo_->solve();
   ze::cu::ImageGpu32fC1::Ptr cu_disp = stereo_->getDisparities();
   CHECK_NOTNULL(cu_disp.get());
 
-  ze::cu::cvBridgeShow("im0", *cu_im0_32fC1);
-  ze::cu::cvBridgeShow("im1", *cu_im1_32fC1);
-  ze::cu::cvBridgeShow("disparities", *cu_disp, true);
-  cv::waitKey(1);
+
+  {
+    ze::Pixel32fC1 min_val,max_val;
+    ze::cu::minMax(*cu_disp, min_val, max_val);
+    VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
+  }
+
+  if (FLAGS_stereo_visualize)
+  {
+    ze::cu::cvBridgeShow("im0", *cu_im0_32fC1);
+    ze::cu::cvBridgeShow("im1", *cu_im1_32fC1);
+    ze::cu::cvBridgeShow("disparities", *cu_disp, FLAGS_stereo_viz_min_disp, FLAGS_stereo_viz_max_disp);
+    cv::waitKey(1);
+  }
+  std::string dump_path = FLAGS_stereo_dump_disparities_folder;
+  if (!dump_path.empty())
+  {
+    int64_t timestamp = stamped_images.at(0).first;
+    std::stringstream ss;
+    ss << timestamp << "_disp.png";
+    VLOG(2) << "TODO save disparity map to " << ss.str();
+//    ze::cvBridgeSave(ss.str(), )
+  }
 }
 
 } // ze namespace
@@ -190,15 +217,20 @@ int main(int argc, char **argv)
   VLOG(300) << "(gpu) T_cur_ref: " << cu_T_cur_ref;
 
   // compute dense stereo
-  StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
+  ze::StereoParameters::Ptr stereo_params = std::make_shared<ze::StereoParameters>();
   stereo_params->solver = ze::cu::StereoPDSolver::EpipolarPrecondHuberL1;
-  stereo_params->ctf.scale_factor = 0.8;
-  stereo_params->ctf.iters = 20;
-  stereo_params->ctf.warps  = 5;
   stereo_params->ctf.apply_median_filter = true;
-  //stereo->parameters()->lambda = 20;
 
-  std::unique_ptr<Stereo> stereo(new Stereo(stereo_params));
+  stereo_params->ctf.scale_factor = FLAGS_stereo_scale_factor;
+  stereo_params->ctf.iters = FLAGS_stereo_num_iterations;
+  stereo_params->ctf.warps  = FLAGS_stereo_num_warps;
+  stereo_params->lambda = FLAGS_stereo_lambda;
+  //  stereo_params->ctf.scale_factor = 0.8;
+//  stereo_params->ctf.iters = 30;
+//  stereo_params->ctf.warps  = 3;
+//  stereo->parameters()->lambda = 20;
+
+  std::unique_ptr<ze::Stereo> stereo(new ze::Stereo(stereo_params));
   stereo->setFundamentalMatrix(F_cur_ref);
   stereo->setIntrinsics({cu_cam0, cu_cam1});
   stereo->setExtrinsics(cu_T_cur_ref);

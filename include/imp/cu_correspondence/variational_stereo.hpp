@@ -27,6 +27,7 @@ public:
   virtual ~VariationalStereo(); //= default;
 
   virtual void addImage(const ImageGpu32fC1::Ptr& image);
+  virtual void reset();
   virtual void solve();
 
   virtual ImageGpu32fC1::Ptr computePrimalEnergy(size_t level=0);

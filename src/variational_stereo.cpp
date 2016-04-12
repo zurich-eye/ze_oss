@@ -32,6 +32,11 @@ void VariationalStereo::addImage(const ImageGpu32fC1::Ptr& image)
   ctf_->addImage(image);
 }
 
+//------------------------------------------------------------------------------
+void VariationalStereo::reset()
+{
+  ctf_->reset();
+}
 
 //------------------------------------------------------------------------------
 void VariationalStereo::solve()

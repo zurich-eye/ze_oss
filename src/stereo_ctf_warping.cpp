@@ -120,6 +120,13 @@ void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 }
 
 //------------------------------------------------------------------------------
+void StereoCtFWarping::reset()
+{
+  images_.clear();
+  image_pyramids_.clear();
+}
+
+//------------------------------------------------------------------------------
 void StereoCtFWarping::solve()
 {
   if (levels_.empty())
