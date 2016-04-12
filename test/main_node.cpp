@@ -27,15 +27,20 @@
 
 #include <ze/cameras/camera.h>
 #include <ze/cameras/camera_rig.h>
+#include <ze/data_provider/data_provider_rosbag.h>
+#include <ze/data_provider/camera_imu_synchronizer.h>
 
 //#include <ze/common/file_utils.h>
 
 DEFINE_string(calibration_file, "", "Path to input calibration YAML file");
+DEFINE_string(bag_filename, "dataset.bag", "Name of bagfile in data_dir.");
 
 using Stereo = ze::cu::VariationalEpipolarStereo;
 using StereoParameters = Stereo::Parameters;
 
 namespace ze {
+
+//-----------------------------------------------------------------------------
 class StereoNode {
 
 public:
@@ -45,44 +50,10 @@ public:
     : stereo_(stereo)
   { }
 
-  void callback(const sensor_msgs::ImageConstPtr& img0,
-                const sensor_msgs::ImageConstPtr& img1)
-  {
-    VLOG(1) << "received stereo pair";
-    cv::Mat mat0_8uc1, mat1_8uc1;
-    try
-    {
-      mat0_8uc1 = cv_bridge::toCvShare(img0, sensor_msgs::image_encodings::MONO8)->image;
-      mat1_8uc1 = cv_bridge::toCvShare(img1, sensor_msgs::image_encodings::MONO8)->image;
-    }
-    catch (cv_bridge::Exception& e)
-    {
-      ROS_ERROR("cv_bridge exception: %s", e.what());
-    }
-    cv::Mat mat0_32fc1, mat1_32fc1;
-    mat0_8uc1.convertTo(mat0_32fc1, CV_32F, 1.0f/255.0f);
-    mat1_8uc1.convertTo(mat1_32fc1, CV_32F, 1.0f/255.0f);
+  void callback(const StampedImages& stamped_images,
+                const ImuStamps& imu_timestamps,
+                const ImuAccGyr& imu_measurements);
 
-    ze::Size2u im_size((std::uint32_t)mat0_32fc1.cols, (std::uint32_t)mat0_32fc1.rows);
-    if (!cv_img0_ || !cv_img1_ || !cu_img0_ || !cu_img1_ || im_size != cv_img0_->size())
-    {
-      cv_img0_.reset(new ze::ImageCv32fC1(im_size));
-      cv_img1_.reset(new ze::ImageCv32fC1(im_size));
-      cu_img0_.reset(new ze::cu::ImageGpu32fC1(im_size));
-      cu_img1_.reset(new ze::cu::ImageGpu32fC1(im_size));
-    }
-    cv_img0_->cvMat() = mat0_32fc1;
-    cv_img1_->cvMat() = mat1_32fc1;
-    cu_img0_->copyFrom(*cv_img0_);
-    cu_img1_->copyFrom(*cv_img1_);
-
-    stereo_->addImage(cu_img0_);
-    stereo_->addImage(cu_img1_);
-    stereo_->solve();
-
-    //cv::imshow("cv_img0", cv_img0_->cvMat());
-    //cv::waitKey(1);
-  }
 private:
   ze::ImageCv32fC1::Ptr cv_img0_;
   ze::ImageCv32fC1::Ptr cv_img1_;
@@ -90,19 +61,70 @@ private:
   ze::cu::ImageGpu32fC1::Ptr cu_img1_;
   std::unique_ptr<Stereo>& stereo_;
 };
+
+//-----------------------------------------------------------------------------
+void StereoNode::callback(const StampedImages& stamped_images,
+                          const ImuStamps& imu_timestamps,
+                          const ImuAccGyr& imu_measurements)
+{
+  VLOG(1) << "received stamped image length: " << stamped_images.size();
+
+  VLOG(1) << "received stereo pair";
+
+  Image8uC1::Ptr im0 = std::dynamic_pointer_cast<Image8uC1>(stamped_images.at(0).second);
+  Image8uC1::Ptr im1 = std::dynamic_pointer_cast<Image8uC1>(stamped_images.at(1).second);
+
+  CHECK_NOTNULL(im0.get());
+  CHECK_NOTNULL(im1.get());
+
+  //! @todo (MWE) hack - make proper conversion function 8bit -> 32bit
+  ImageCv8uC1 cv_im0(*im0);
+  ImageCv8uC1 cv_im1(*im1);
+
+  ImageCv32fC1 cv_im0_32f(cv_im0.size());
+  cv_im0.cvMat().convertTo(cv_im0_32f.cvMat(), CV_32F);
+  cv_im0_32f.cvMat() /= 255.0f;
+
+  ImageCv32fC1 cv_im1_32f(cv_im1.size());
+  cv_im1.cvMat().convertTo(cv_im1_32f.cvMat(), CV_32F);
+  cv_im1_32f.cvMat() /= 255.0f;
+
+  // copy host->device
+  std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im0_32fC1(
+        new ze::cu::ImageGpu32fC1(cv_im0_32f));
+  std::shared_ptr<ze::cu::ImageGpu32fC1> cu_im1_32fC1(
+        new ze::cu::ImageGpu32fC1(cv_im1_32f));
+
+  CHECK_NOTNULL(cu_im0_32fC1.get());
+  CHECK_NOTNULL(cu_im1_32fC1.get());
+
+  stereo_->addImage(cu_im0_32fC1);
+  stereo_->addImage(cu_im1_32fC1);
+  stereo_->solve();
+  ze::cu::ImageGpu32fC1::Ptr cu_disp = stereo_->getDisparities();
+  CHECK_NOTNULL(cu_disp.get());
+
+  ze::cu::cvBridgeShow("im0", *cu_im0_32fC1);
+  ze::cu::cvBridgeShow("im1", *cu_im1_32fC1);
+  ze::cu::cvBridgeShow("disparities", *cu_disp, true);
+  cv::waitKey(1);
+}
+
 } // ze namespace
 
+//-----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-
+  google::InstallFailureSignalHandler();
   FLAGS_alsologtostderr = true;
   FLAGS_colorlogtostderr = true;
 
-  ros::init(argc, argv, "ze_stereo_node");
-  ros::NodeHandle nh;
+//  ros::init(argc, argv, "ze_stereo_node");
+//  ros::NodeHandle nh;
 
+  VLOG(1) << "load camera rig";
   ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(FLAGS_calibration_file);
   ze::Camera::Ptr cam0 = rig->atShared(0);
   ze::Camera::Ptr cam1 = rig->atShared(1);
@@ -116,6 +138,7 @@ int main(int argc, char **argv)
 
   ze::Transformation T_ref_cur = rig->get_T_C_B(0) * rig->get_T_C_B(1).inverse();
 
+  VLOG(1) << "compute fundamental matrix";
   ze::cu::Matrix3f F_ref_cur;
   ze::cu::Matrix3f F_cur_ref;
   Eigen::Matrix3d F_fm, F_mf;
@@ -170,37 +193,53 @@ int main(int argc, char **argv)
   StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
   stereo_params->solver = ze::cu::StereoPDSolver::EpipolarPrecondHuberL1;
   stereo_params->ctf.scale_factor = 0.8;
-  stereo_params->ctf.iters = 100;
-  stereo_params->ctf.warps  = 10;
+  stereo_params->ctf.iters = 20;
+  stereo_params->ctf.warps  = 5;
   stereo_params->ctf.apply_median_filter = true;
   //stereo->parameters()->lambda = 20;
 
   std::unique_ptr<Stereo> stereo(new Stereo(stereo_params));
-
   stereo->setFundamentalMatrix(F_cur_ref);
   stereo->setIntrinsics({cu_cam0, cu_cam1});
   stereo->setExtrinsics(cu_T_cur_ref);
 
-  /*
-  ImageGpu32fC1::Ptr cudisp = stereo->getDisparities();
-  CHECK_NOTNULL(cudisp.get());
-  ImageGpu32fC1::Ptr cuocc = stereo->getOcclusion();
+//  ImageGpu32fC1::Ptr cudisp = stereo->getDisparities();
+//  CHECK_NOTNULL(cudisp.get());
+//  ImageGpu32fC1::Ptr cuocc = stereo->getOcclusion();
 
-  {
-    ze::Pixel32fC1 min_val,max_val;
-    minMax(*cudisp, min_val, max_val);
-    VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
-  }
-  */
+//  {
+//    ze::Pixel32fC1 min_val,max_val;
+//    minMax(*cudisp, min_val, max_val);
+//    VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
+//  }
 
+  VLOG(1) << "Create Stereo Node.";
   ze::StereoNode stereo_node(stereo);
 
-  message_filters::Subscriber<sensor_msgs::Image> img0_sub(nh, "/cam0/image_raw", 1);
-  message_filters::Subscriber<sensor_msgs::Image> img1_sub(nh, "/cam1/image_raw", 1);
-  message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> sync(img0_sub, img1_sub, 1);
-  sync.registerCallback(boost::bind(&ze::StereoNode::callback, &stereo_node, _1, _2));
+  VLOG(1) << "Create Data Provider and Synchronizer.";
+  ze::DataProviderRosbag data_provider(
+        FLAGS_bag_filename, "/imu0", { {"/cam0/image_raw", 0},
+                                       {"/cam1/image_raw", 1} });
 
-  ros::spin();
+  ze::CameraImuSynchronizer sync(2, 1.0);
+  sync.subscribeDataProvider(data_provider);
+  sync.registerCameraImuCallback(
+        std::bind(&ze::StereoNode::callback,
+                  &stereo_node,
+                  std::placeholders::_1,
+                  std::placeholders::_2,
+                  std::placeholders::_3));
+
+
+//  message_filters::Subscriber<sensor_msgs::Image> img0_sub(nh, "/cam0/image_raw", 1);
+//  message_filters::Subscriber<sensor_msgs::Image> img1_sub(nh, "/cam1/image_raw", 1);
+//  message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> sync(img0_sub, img1_sub, 1);
+//  sync.registerCallback(boost::bind(&ze::StereoNode::callback, &stereo_node, _1, _2));
+
+  VLOG(1) << "Start Processing.";
+  data_provider.spin();
+  VLOG(1) << "Finish Processing.";
+//  vio_node.shutdown();
 
   return EXIT_SUCCESS;
 }
