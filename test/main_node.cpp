@@ -40,8 +40,8 @@ DEFINE_double(stereo_lambda, 20, "tradeoff between smoothing and dataterm");
 DEFINE_double(stereo_scale_factor, 0.8, "image pyramid scale factor (reduction; value in interval (0.5,1.0]");
 DEFINE_string(stereo_dump_disparities_folder, "", "Path to dump disparities.");
 DEFINE_bool(stereo_visualize, false, "");
-DEFINE_double(stereo_viz_min_disp, -20, "");
-DEFINE_double(stereo_viz_max_disp,  20, "");
+DEFINE_double(stereo_viz_min_disp, 0, "");
+DEFINE_double(stereo_viz_max_disp, 0, "");
 namespace ze {
 
 using Stereo = ze::cu::VariationalEpipolarStereo;
@@ -123,7 +123,14 @@ void StereoNode::callback(const StampedImages& stamped_images,
   {
     ze::cu::cvBridgeShow("im0", *cu_im0_32fC1);
     ze::cu::cvBridgeShow("im1", *cu_im1_32fC1);
-    ze::cu::cvBridgeShow("disparities", *cu_disp, FLAGS_stereo_viz_min_disp, FLAGS_stereo_viz_max_disp);
+    if (FLAGS_stereo_viz_min_disp != FLAGS_stereo_viz_max_disp)
+    {
+      ze::cu::cvBridgeShow("disparities", *cu_disp, FLAGS_stereo_viz_min_disp, FLAGS_stereo_viz_max_disp);
+    }
+    else
+    {
+      ze::cu::cvBridgeShow("disparities", *cu_disp, true);
+    }
     cv::waitKey(1);
   }
   std::string dump_path = FLAGS_stereo_dump_disparities_folder;
