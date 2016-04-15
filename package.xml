@@ -12,6 +12,8 @@
   <buildtool_depend>catkin_simple</buildtool_depend>
 
   <depend>glog_catkin</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
 

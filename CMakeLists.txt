@@ -11,10 +11,12 @@ include(ze_setup)
 #############
 set(HEADERS
   include/ze/ros/tf_bridge.h
+  include/ze/ros/pose_msg_bridge.h
   )
 
 set(SOURCES
   src/tf_bridge.cpp
+  src/pose_msg_bridge.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
