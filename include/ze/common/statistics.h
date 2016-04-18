@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <Eigen/Dense>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <ze/common/stl_utils.h>
 

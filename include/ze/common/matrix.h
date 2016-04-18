@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <tuple>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <ze/common/types.h>
 

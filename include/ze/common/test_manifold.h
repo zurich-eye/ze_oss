@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <ze/common/manifold.h>
 #include <ze/common/numerical_derivative.h>

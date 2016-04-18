@@ -27,7 +27,7 @@
 
 #include <gtest/gtest.h>
 #include <gflags/gflags.h>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <eigen-checks/gtest.h>
 
 // Let the Eclipse parser see the macro.

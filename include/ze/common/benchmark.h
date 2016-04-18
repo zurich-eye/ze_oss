@@ -4,7 +4,7 @@
 #include <functional>
 #include <limits>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <ze/common/types.h>
 #include <ze/common/time.h>
 

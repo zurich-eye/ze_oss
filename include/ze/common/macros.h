@@ -7,6 +7,6 @@
   typedef std::shared_ptr<TypeName> Ptr;            \
   typedef std::shared_ptr<const TypeName> ConstPtr
 
-#define ZE_DISALLOW_COPY_AND_ASSIGN(TypeName) \
+#define ZE_DELETE_COPY_ASSIGN(TypeName) \
   TypeName(const TypeName&) = delete;         \
   void operator=(const TypeName&) = delete

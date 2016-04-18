@@ -13,7 +13,7 @@
 
 #include <Eigen/Core>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {

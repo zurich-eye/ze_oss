@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 namespace ze {
 
