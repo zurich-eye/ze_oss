@@ -5,7 +5,7 @@
 
 namespace ze {
 
-ze::Transformation poseMsgTotransformation(
+Transformation poseMsgTotransformation(
     const geometry_msgs::PoseStamped& pose_msg);
 
 } // ze namespace
