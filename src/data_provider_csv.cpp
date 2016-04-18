@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <ze/common/time.h>
 #include <ze/common/string_utils.h>

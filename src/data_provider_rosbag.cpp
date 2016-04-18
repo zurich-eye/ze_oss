@@ -1,6 +1,6 @@
 #include <ze/data_provider/data_provider_rosbag.h>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <rosbag/query.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
