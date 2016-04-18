@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <Eigen/Core>
 
 #include <ze/common/statistics.h>
