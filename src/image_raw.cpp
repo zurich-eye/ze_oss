@@ -1,7 +1,7 @@
 #include <imp/core/image_raw.hpp>
 
 #include <iostream>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <imp/core/exception.hpp>
 

@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include <ze/common/types.h>
-#include <imp/core/macros.hpp>
+#include <ze/common/macros.h>
 #include <imp/core/image_base.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
@@ -15,8 +15,7 @@ template<typename Pixel>
 class Image : public ImageBase
 {
 public:
-  using Ptr = typename std::shared_ptr<Image<Pixel>>;
-  using ConstPtr = typename std::shared_ptr<const Image<Pixel>>;
+  ZE_POINTER_TYPEDEFS(Image);
   using pixel_t = Pixel;
 
 protected:
