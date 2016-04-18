@@ -1,7 +1,7 @@
 #include <ze/geometry/lsq_solver.h>
 
 #include <stdexcept>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <ze/common/matrix.h>
 
 namespace ze {

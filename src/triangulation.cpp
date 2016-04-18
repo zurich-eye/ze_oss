@@ -1,7 +1,7 @@
 #include <ze/geometry/triangulation.h>
 
 #include <algorithm>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 #include <ze/common/matrix.h>
 
