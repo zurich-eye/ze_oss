@@ -1,7 +1,7 @@
 #include <ze/cameras/camera_utils.h>
 
 #include <random>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
 namespace ze {
 

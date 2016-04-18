@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace ze {
