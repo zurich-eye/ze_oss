@@ -21,6 +21,7 @@ set(HEADERS
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
+  include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
@@ -32,12 +33,14 @@ set(HEADERS
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
+  include/ze/common/utility.hpp
   include/ze/common/yaml_serialization.h
   include/ze/common/csv_trajectory.h
   )
 
 set(SOURCES
   src/sample.cpp
+  src/signal_handler.cpp
   src/test_utils.cpp
   src/csv_trajectory.cpp
   src/matrix.cpp
