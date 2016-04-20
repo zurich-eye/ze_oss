@@ -14,8 +14,9 @@ namespace {
 
 volatile bool* s_simple_flag = nullptr;
 
-void handleSignalSimple(int /*signal*/)
+void handleSignalSimple(int signal)
 {
+  LOG(WARNING) << "Signal handler was called with signal " << signal;
   *s_simple_flag = false;
 }
 
