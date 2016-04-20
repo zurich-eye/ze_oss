@@ -49,7 +49,7 @@ void clearSignalHandlerSimple(int sig)
 
 SimpleSigtermHandler::SimpleSigtermHandler(volatile bool &flag)
 {
-  CHECK(s_simple_flag != nullptr) << "Signal handler already installed";
+  CHECK(s_simple_flag == nullptr) << "Signal handler already installed";
   s_simple_flag = &flag;
 
   // note: if one the functions below throws,
