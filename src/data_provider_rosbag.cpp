@@ -124,7 +124,17 @@ bool DataProviderRosbag::spinOnce()
 
 bool DataProviderRosbag::ok() const
 {
-  return bag_view_it_ != bag_view_->end() && running_;
+  if (!running_)
+  {
+    LOG(WARNING) << "Data Provider was terminated.";
+    return false;
+  }
+  if (bag_view_it_ == bag_view_->end())
+  {
+    LOG(WARNING) << "All data processed.";
+    return false;
+  }
+  return true;
 }
 
 size_t DataProviderRosbag::size() const

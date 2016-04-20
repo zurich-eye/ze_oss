@@ -99,7 +99,17 @@ bool DataProviderCsv::spinOnce()
 
 bool DataProviderCsv::ok() const
 {
-  return buffer_it_ != buffer_.cend() && running_;
+  if (!running_)
+  {
+    LOG(WARNING) << "Data Provider was terminated.";
+    return false;
+  }
+  if (buffer_it_ == buffer_.cend())
+  {
+    LOG(WARNING) << "All data processed.";
+    return false;
+  }
+  return true;
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)
