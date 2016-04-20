@@ -124,7 +124,7 @@ bool DataProviderRosbag::spinOnce()
 
 bool DataProviderRosbag::ok() const
 {
-  return bag_view_it_ != bag_view_->end() && !shutdown_;
+  return bag_view_it_ != bag_view_->end() && running_;
 }
 
 size_t DataProviderRosbag::size() const
