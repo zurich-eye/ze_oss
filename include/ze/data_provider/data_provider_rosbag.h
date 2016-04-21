@@ -37,7 +37,6 @@ private:
   std::unique_ptr<rosbag::View> bag_view_;
   rosbag::View::iterator bag_view_it_;
   int n_processed_images_ = 0;
-  bool quit_ = false;
 
   // subscribed topics:
   std::map<std::string, size_t> img_topic_camidx_map_; // camera_topic --> camera_id

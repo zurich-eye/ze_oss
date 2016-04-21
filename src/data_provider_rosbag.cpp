@@ -56,7 +56,7 @@ DataProviderRosbag::DataProviderRosbag(
 
 void DataProviderRosbag::spin()
 {
-  while(ok() && !quit_)
+  while (ok())
   {
     spinOnce();
   }
@@ -79,7 +79,7 @@ bool DataProviderRosbag::spinOnce()
             && n_processed_images_ > FLAGS_data_source_stop_after_n_frames)
         {
           LOG(WARNING) << "Data source has reached max number of desired frames.";
-          quit_ = true;
+          running_ = false;
           return false;
         }
 
