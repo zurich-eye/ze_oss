@@ -11,12 +11,24 @@
 
 namespace ze {
 
-//! Collect statistics over multiple timings in milliseconds.
-//! Usage:
-//! ze::TimerCollection timers;
-//! timers["name"].start()
-//! ...
-//! timers["name"].stop()
+/*! Collect statistics over multiple timings in milliseconds.
+ *
+ * Usage with explicit start and stop:
+\code{.cpp}
+  ze::TimerCollection timers;
+  timers["name"].start();
+  ...
+  timers["name"].stop();
+\endcode
+ * Or RAII-style, use a TimedScope object that stops the timer when it
+ * goes out of scope.
+\code{.cpp}
+  {
+    auto t = timers["name"].timeScope();
+    ...
+  }
+\endcode
+*/
 class TimerCollection
 {
 public:

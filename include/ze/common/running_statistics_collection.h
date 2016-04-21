@@ -9,11 +9,16 @@
 
 namespace ze {
 
-//! Collect statistics over multiple timings in milliseconds.
-//! Usage:
-//! ze::StatisticsCollection stats;
-//! stats["name"].addSample(12);
-//! FloatType variance = stats["name"].var();
+/*! Collect statistics over multiple timings in milliseconds.
+ *
+ * Usage:
+\code{.cpp}
+  ze::StatisticsCollection stats;
+  stats["name"].addSample(12);
+  stats["name"].addSample(10);
+  FloatType variance = stats["name"].var();
+\endcode
+*/
 class StatisticsCollection
 {
 public:
