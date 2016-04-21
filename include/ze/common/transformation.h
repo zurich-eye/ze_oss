@@ -56,7 +56,7 @@ template<typename T> struct traits;
 // Manifold traits for SO(3)
 template<> struct traits<Quaternion>
 {
-  static constexpr int dimension = 3; // The dimension of the manifold.
+  enum { dimension = 3 }; // The dimension of the manifold.
 
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
@@ -95,7 +95,7 @@ template<> struct traits<Quaternion>
 // Manifold traits for SE(3)
 template<> struct traits<Transformation>
 {
-  static constexpr int dimension = 6; // The dimension of the manifold.
+  enum { dimension = 6 }; // The dimension of the manifold.
 
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;

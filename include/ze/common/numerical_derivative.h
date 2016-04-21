@@ -1,36 +1,31 @@
 #pragma once
 
+#include <iostream>
 #include <functional>
-#include <Eigen/Dense>
+#include <ze/common/types.h>
 #include <ze/common/manifold.h>
 
 namespace ze {
 
 // The traits used for this functions are defined in common/manifold.h
 template<class Y, class X>
-typename Eigen::Matrix<double, traits<Y>::dimension, traits<X>::dimension>
-numericalDerivative(std::function<Y(const X&)> h, const X& x, double delta = 1e-5)
+typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension>
+numericalDerivative(std::function<Y(const X&)> h, const X& x, FloatType delta = 1e-5)
 {
   static constexpr int N = traits<X>::dimension;
-  typedef typename Eigen::Matrix<double, traits<Y>::dimension, traits<X>::dimension> Jacobian;
+  typedef typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension> Jacobian;
   typedef typename traits<Y>::TangentVector TangentY;
   typedef typename traits<X>::TangentVector TangentX;
 
   // Get value at x.
   Y hx = h(x);
 
-  // Bit of a hack for now to find number of rows.
-  TangentY zeroY = traits<Y>::Local(hx, hx);
-  size_t m = zeroY.size();
-
   // Prepare a tangent vector to perturb x.
-  TangentX dx;
-  dx.setZero();
+  TangentX dx = TangentX::Zero();
 
   // Compute numerical Jacobian column by column.
-  Jacobian H;
-  H.setZero();
-  double factor = 1.0 / (2.0 * delta);
+  Jacobian H = Jacobian::Zero();
+  FloatType factor = 1.0 / (2.0 * delta);
   for(int i = 0; i < N; ++i)
   {
     dx(i) = delta;

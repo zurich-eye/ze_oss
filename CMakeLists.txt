@@ -14,6 +14,8 @@ set(HEADERS
   include/ze/common/benchmark.h
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
+  include/ze/common/combinatorics.h
+  include/ze/common/csv_trajectory.h
   include/ze/common/file_utils.h
   include/ze/common/logging.hpp
   include/ze/common/macros.h
@@ -39,19 +41,20 @@ set(HEADERS
   include/ze/common/timer_statistics.h
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
+  include/ze/common/thread_pool.hpp
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
-  include/ze/common/csv_trajectory.h
   )
 
 set(SOURCES
-  src/sample.cpp
-  src/signal_handler.cpp
-  src/test_utils.cpp
-  src/timer_collection.cpp
   src/csv_trajectory.cpp
   src/matrix.cpp
   src/running_statistics_collection.cpp
+  src/sample.cpp
+  src/signal_handler.cpp
+  src/test_utils.cpp
+  src/thread_pool.cpp
+  src/timer_collection.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -92,6 +95,9 @@ target_link_libraries(test_timer ${PROJECT_NAME})
 
 catkin_add_gtest(test_transformation test/test_transformation.cpp)
 target_link_libraries(test_transformation ${PROJECT_NAME})
+
+catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
+target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
 ##########
 # EXPORT #

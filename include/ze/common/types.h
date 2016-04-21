@@ -51,7 +51,7 @@ ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(9,9);
 // Typedef arbitary length vector and arbitrary sized matrix.
 using VectorX = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
 using MatrixX = Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic>;
-using VectorXi = Eigen::VectorXi;
+using VectorXi  = Eigen::VectorXi;
 
 // Commonly used fixed size vectors.
 using Vector1 = Eigen::Matrix<FloatType, 1, 1>;

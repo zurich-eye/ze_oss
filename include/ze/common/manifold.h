@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <Eigen/Dense>
+#include <ze/common/types.h>
 
 namespace ze {
 
@@ -27,7 +28,7 @@ struct ScalarTraits
     return std::abs(v1 - v2) < tol;
   }
 
-  static TangentVector Local(Scalar origin, Scalar other,
+  static TangentVector Local(const Scalar origin, Scalar other,
                              Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     if (H1) (*H1)[0] = -1.0;
@@ -37,7 +38,7 @@ struct ScalarTraits
     return result;
   }
 
-  static Scalar Retract(Scalar origin, const TangentVector& v,
+  static Scalar Retract(const Scalar origin, const TangentVector& v,
                         Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     if (H1) (*H1)[0] = 1.0;
@@ -55,13 +56,13 @@ template<> struct traits<float> : public internal::ScalarTraits<float> {};
 // -----------------------------------------------------------------------------
 // Manifold traits for fixed-size Eigen matrices and vectors with double precision.
 template<int M, int N, int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> >
+struct traits<Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> >
 {
   //static constexpr int dimension = M * N;
   enum { dimension = M * N };
-  typedef Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> Matrix;
-  typedef Eigen::Matrix<double, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<double, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> Matrix;
+  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
   static bool Equals(const Matrix& v1, const Matrix& v2, double tol = 1e-8)
   {
@@ -71,7 +72,7 @@ struct traits<Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> >
     // TODO(cfo): Check for nan entries.
   }
 
-  static TangentVector Local(Matrix origin, Matrix other,
+  static TangentVector Local(const Matrix& origin, Matrix other,
                              Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     if (H1) (*H1) = -Jacobian::Identity();
@@ -81,13 +82,77 @@ struct traits<Eigen::Matrix<double, M, N, Options, MaxRows, MaxCols> >
     return result;
   }
 
-  static Matrix Retract(Matrix origin, const TangentVector& v,
+  static Matrix Retract(const Matrix& origin, const TangentVector& v,
                         Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     if (H1) (*H1) = Jacobian::Identity();
     if (H2) (*H2) = Jacobian::Identity();
     return origin + Eigen::Map<const Matrix>(v.data());
   }
+};
+
+// -----------------------------------------------------------------------------
+// Manifold traits for dynamic-size Eigen matrices and vectors with double precision.
+namespace internal {
+
+// traits for dynamic Eigen matrices
+template<int M, int N, int Options, int MaxRows, int MaxCols>
+struct DynamicTraits {
+
+  typedef Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> Dynamic;
+
+  enum Dimension : int { dimension = Eigen::Dynamic };
+
+  typedef VectorX TangentVector;
+  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Dynamic ManifoldType;
+
+  static int getDimension(const Dynamic& m) {
+    return m.rows() * m.cols();
+  }
+
+  static Jacobian eye(const Dynamic& m) {
+    int dim = getDimension(m);
+    return Eigen::Matrix<FloatType, dimension, dimension>::Identity(dim, dim);
+  }
+
+  static TangentVector Local(const Dynamic& m, const Dynamic& other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    if (H1) *H1 = -eye(m);
+    if (H2) *H2 =  eye(m);
+    TangentVector v(getDimension(m));
+    Eigen::Map<Dynamic>(v.data(), m.rows(), m.cols()) = other - m;
+    return v;
+  }
+
+  static Dynamic Retract(const Dynamic& m, const TangentVector& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    if (H1) *H1 = eye(m);
+    if (H2) *H2 = eye(m);
+    return m + Eigen::Map<const Dynamic>(v.data(), m.rows(), m.cols());
+  }
+};
+
+} // namespace internal
+
+// traits for fully dynamic matrix
+template<int Options, int MaxRows, int MaxCols>
+struct traits<Eigen::Matrix<FloatType, -1, -1, Options, MaxRows, MaxCols> > :
+    public internal::DynamicTraits<-1, -1, Options, MaxRows, MaxCols> {
+};
+
+// traits for dynamic column vector
+template<int Options, int MaxRows, int MaxCols>
+struct traits<Eigen::Matrix<FloatType, -1, 1, Options, MaxRows, MaxCols> > :
+    public internal::DynamicTraits<-1, 1, Options, MaxRows, MaxCols> {
+};
+
+// traits for dynamic row vector
+template<int Options, int MaxRows, int MaxCols>
+struct traits<Eigen::Matrix<FloatType, 1, -1, Options, MaxRows, MaxCols> > :
+    public internal::DynamicTraits<1, -1, Options, MaxRows, MaxCols> {
 };
 
 } // namespace ze
