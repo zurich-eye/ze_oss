@@ -1,4 +1,4 @@
-#include <ze/common/thread_pool.h>
+#include <ze/common/thread_pool.hpp>
 
 namespace ze {
 

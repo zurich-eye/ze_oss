@@ -39,7 +39,7 @@ set(HEADERS
   include/ze/common/timer_statistics.h
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
-  include/ze/common/thread_pool.h
+  include/ze/common/thread_pool.hpp
   include/ze/common/types.h
   include/ze/common/yaml_serialization.h
   include/ze/common/csv_trajectory.h
@@ -95,7 +95,7 @@ target_link_libraries(test_timer ${PROJECT_NAME})
 catkin_add_gtest(test_transformation test/test_transformation.cpp)
 target_link_libraries(test_transformation ${PROJECT_NAME})
 
-cs_add_executable(test_thread_pool test/test_thread_pool.cpp)
+catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
 target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
 ##########
