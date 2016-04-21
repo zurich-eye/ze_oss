@@ -6,6 +6,7 @@
 #include <Eigen/Core>
 
 #include <imp/core/image.hpp>
+#include <imp/core/size.hpp>
 #include <ze/common/macros.h> 
 #include <ze/common/types.h>
 
@@ -25,7 +26,7 @@ public:
 
 public:
 
-  Camera(const int width, const int height, const CameraType type,
+  Camera(const uint32_t width, const uint32_t height, const CameraType type,
          const VectorX& projection_params, const VectorX& distortion_params);
 
   virtual ~Camera() = default;
@@ -42,30 +43,25 @@ public:
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
 
-  //! @name Block operations
-  //! Always prefer these functions to avoid cache misses.
+  //! @name Block operations. Always prefer these to avoid cache misses.
   //!@{
-  //! Back projects a block of keypoints.
   virtual Bearings backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const;
-
-  //! Projects a block of bearing vectors.
   virtual Keypoints projectVectorized(const Eigen::Ref<const Bearings>& bearing_vec) const;
-
-  //! Vectorized computation of projection Jacobian. Column-wise reshaped.
   virtual Matrix6X dProject_dLandmarkVectorized(const Positions& pos_vec) const;
   //!@}
 
-  //! Image width in pixels.
-  inline int width() const { return width_; }
-
-  //! Image height in pixels.
-  inline int height() const { return height_; }
+  //! @name Image dimension.
+  //! @{
+  inline uint32_t width() const { return size_.width(); }
+  inline uint32_t height() const { return size_.height(); }
+  inline Size2u size() const { return size_; }
+  //! @}
 
   //! CameraType value representing the camera model used by the derived class.
   inline CameraType type() const { return type_; }
 
   //! CameraType as descriptive string.
-  std::string typeString() const;
+  std::string typeAsString() const;
 
   //! Camera projection parameters.
   inline const VectorX& projectionParameters() const { return projection_params_; }
@@ -74,7 +70,7 @@ public:
   inline const VectorX& distortionParameters() const { return distortion_params_; }
 
   //! Name of the camera.
-  inline const std::string& getLabel() const { return label_; }
+  inline const std::string& label() const { return label_; }
 
   //! Set user-specific camera label.
   inline void setLabel(const std::string& label) { label_ = label; }
@@ -87,12 +83,11 @@ public:
   void setMask(const Image8uC1::Ptr& mask);
 
   //! Get mask.
-  inline Image8uC1::ConstPtr getMask() const { return mask_; }
+  inline Image8uC1::ConstPtr mask() const { return mask_; }
 
 protected:
 
-  int width_;
-  int height_;
+  Size2u size_;
 
   //! Camera projection parameters, e.g., (fx, fy, cx, cy).
   VectorX projection_params_;

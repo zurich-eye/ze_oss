@@ -18,7 +18,7 @@ namespace ze {
 
 void cameraTest(const Camera& cam)
 {
-  Keypoints px1 = generateRandomKeypoints(cam.width(), cam.height(), 10, 500);
+  Keypoints px1 = generateRandomKeypoints(cam.width(), cam.height(), 10u, 500);
   Bearings f1 = cam.backProjectVectorized(px1);
   Keypoints px2 = cam.projectVectorized(f1);
   Keypoints px_error = px1 - px2;

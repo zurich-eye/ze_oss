@@ -8,10 +8,10 @@
 namespace ze {
 
 Keypoints generateRandomKeypoints(
-    const int image_width, const int image_height, const int margin, const size_t count)
+    const uint32_t image_width, const uint32_t image_height, const uint32_t margin, const size_t count)
 {
-  CHECK_GE(image_width, 0);
-  CHECK_GE(image_height, 0);
+  CHECK_GT(image_width, margin);
+  CHECK_GT(image_height, margin);
 
   std::ranlux24 gen;
   std::uniform_real_distribution<FloatType> dist_x(margin, image_width - 1 - margin);

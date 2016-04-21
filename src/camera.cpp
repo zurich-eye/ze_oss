@@ -5,10 +5,9 @@
 
 namespace ze {
 
-Camera::Camera(const int width, const int height, const CameraType type,
+Camera::Camera(const uint32_t width, const uint32_t height, const CameraType type,
                const VectorX& projection_params, const VectorX& distortion_params)
-  : width_(width)
-  , height_(height)
+  : size_(width, height)
   , projection_params_(projection_params)
   , distortion_params_(distortion_params)
   , type_(type)
@@ -60,7 +59,7 @@ Camera::Ptr Camera::loadFromYaml(const std::string& path)
   return Camera::Ptr();
 }
 
-std::string Camera::typeString() const
+std::string Camera::typeAsString() const
 {
   switch (type_)
   {
@@ -77,19 +76,18 @@ std::string Camera::typeString() const
 void Camera::setMask(const Image8uC1::Ptr& mask)
 {
   CHECK_NOTNULL(mask.get());
-  CHECK_EQ(mask->width(), static_cast<uint32_t>(width_));
-  CHECK_EQ(mask->height(), static_cast<uint32_t>(height_));
+  CHECK_EQ(mask->size(), size_);
   mask_ = mask;
 }
 
 std::ostream& operator<<(std::ostream& out, const Camera& cam)
 {
-  out << "    Label = " << cam.getLabel() << "\n"
-      << "    Model = " << cam.typeString() << "\n"
+  out << "    Label = " << cam.label() << "\n"
+      << "    Model = " << cam.typeAsString() << "\n"
       << "    Dimensions = " << cam.width() << "x" << cam.height() << "\n"
       << "    Proj. parameters = " << cam.projectionParameters().transpose() << "\n"
       << "    Dist. parameters = " << cam.distortionParameters().transpose() << "\n"
-      << "    Masked = " << (cam.getMask() ? "True" : "False");
+      << "    Masked = " << (cam.mask() ? "True" : "False");
   return out;
 }
 
