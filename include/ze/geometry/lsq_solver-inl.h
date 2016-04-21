@@ -148,7 +148,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         rho_ = -1;
       }
 
-      if (rho_>0)
+      if (rho_ > 0.0)
       {
         // update decrased the error -> success
         state = new_model;
@@ -226,7 +226,7 @@ void LeastSquaresSolver<T, Implementation>::updateDefaultImpl(
     const UpdateVector& dx,
     State& new_state)
 {
-  new_state = traits<State>::Retract(state, dx);
+  new_state = traits<State>::retract(state, dx);
 }
 
 } // namespace ze

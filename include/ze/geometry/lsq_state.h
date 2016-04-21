@@ -171,7 +171,7 @@ private:
   inline void retractImpl(const TangentVector& v, uint32_t j)
   {
     using T = ElementType<i>;
-    std::get<i>(state_) = traits<T>::Retract(
+    std::get<i>(state_) = traits<T>::retract(
            std::get<i>(state_),
            v.template segment<traits<T>::dimension>(j));
     retractImpl<i+1>(v, j + traits<T>::dimension);
@@ -182,7 +182,7 @@ private:
   {
     using T = ElementType<i>;
     const int element_dim = traits<T>::getDimension(std::get<i>(state_));
-    std::get<i>(state_) = traits<T>::Retract(
+    std::get<i>(state_) = traits<T>::retract(
            std::get<i>(state_), v.segment(j, element_dim));
     retractImpl<i+1>(v, j + element_dim);
   }
@@ -191,7 +191,7 @@ private:
   inline void retractImpl(const TangentVector& v, uint32_t j)
   {
     using T = ElementType<i>;
-    std::get<i>(state_) = traits<T>::Retract(
+    std::get<i>(state_) = traits<T>::retract(
            std::get<i>(state_),
            v.template segment<traits<T>::dimension>(j));
   }
@@ -201,7 +201,7 @@ private:
   {
     using T = ElementType<i>;
     const int element_dim = traits<T>::getDimension(std::get<i>(state_));
-    std::get<i>(state_) = traits<T>::Retract(
+    std::get<i>(state_) = traits<T>::retract(
            std::get<i>(state_), v.segment(j, element_dim));
   }
   //!}
@@ -221,7 +221,7 @@ struct traits<State<Elements...>>
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
-  static StateT Retract(
+  static StateT retract(
            const StateT& origin, const TangentVector& v,
            Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
