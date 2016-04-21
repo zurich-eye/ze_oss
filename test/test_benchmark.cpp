@@ -3,7 +3,6 @@
 
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/benchmark.h>
-#include <ze/common/time.h>
 
 int foo(int x, int y)
 {
