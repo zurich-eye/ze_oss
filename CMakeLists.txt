@@ -6,6 +6,15 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
+# quick fix to gcc bug / boost defining literals
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  #  gcc < 4.9 only
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")      
+  endif()
+endif()
+
+
 #############
 # LIBRARIES #
 #############
