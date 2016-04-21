@@ -5,7 +5,7 @@
 #include <ze/common/buffer.h>
 #include <ze/common/file_utils.h>
 #include <ze/common/transformation.h>
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 
 DEFINE_string(data_dir, ".", "Path to data");
 DEFINE_string(filename_es, "traj_es.csv", "Filename of estimated trajectory.");

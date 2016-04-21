@@ -272,6 +272,8 @@ if __name__=='__main__':
 
     parser.add_argument('--alignment', help='trajectory alignment {se3, sim3, first_frame}',
                         default='se3')
+    parser.add_argument('--alignment_first_frame', help='first frame to align', default=0)
+    parser.add_argument('--alignment_last_frame', help='las frame to align', default=-1)
     parser.add_argument('--plot_size', default=0.2, help='size of circle')
     parser.add_argument('--skip_frames', default=1,
                         help='frames skipped between segment evaluation')
@@ -294,7 +296,8 @@ if __name__=='__main__':
                      data_format='csv', 
                      match_timestamps_offset=options.match_ts_offset)
                      
-        ta.align_trajectory(options.alignment, 0, -1)
+        ta.align_trajectory(options.alignment, int(options.alignment_first_frame),
+                            int(options.alignment_last_frame))
         ta.plot_aligned_trajectory()
         ta.compute_rms_errors()
         ta.plot_estimator_results(options.data_dir,
