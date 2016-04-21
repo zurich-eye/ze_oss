@@ -4,13 +4,14 @@ Zurich Eye
 """
 
 import os
-import yaml
+import logging
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import FuncFormatter
 import ze_py.plot_utils as plot_utils
+import ze_trajectory_analysis.utils as utils
 #from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Cardo']})
@@ -252,3 +253,33 @@ def plot_imu_state_along_trajectory(
     # Save fig
     fig.savefig(os.path.join(data_dir,'imu_states_along_trajectory'+FORMAT))
     
+    
+# -----------------------------------------------------------------------------
+if __name__=='__main__':
+    
+    # parse command line
+    parser = argparse.ArgumentParser(description='Simple plotting of trajectory')
+    
+    parser.add_argument('--data_dir', help='folder with the results',
+                        default='')
+                        
+    options = parser.parse_args()    
+    
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.info('Plot trajectory')
+    
+    pos = np.genfromtxt(
+        os.path.join(options.data_dir, "traj_es.csv"), delimiter=',',
+        dtype=np.float64, skip_header=1)[:,1:4]
+    length = utils.get_distance_from_start(pos)[-1]
+    
+    fig = plt.figure(figsize=(5, 8))
+    ax = fig.add_subplot(211, aspect='equal', title="Trajectory length = {:.1f}m".format(length),
+                         xlabel="x [m]", ylabel="y [m]")    
+    ax.plot(pos[:,0], pos[:,1], 'b-', lw=2)
+    ax = fig.add_subplot(212, aspect='equal', xlabel="x [m]", ylabel="z [m]")    
+    ax.plot(pos[:,0], pos[:,2], 'b-', lw=2)
+    fig.patch.set_visible(False)
+    fig.tight_layout()
+    fig.savefig(os.path.join(options.data_dir, "imu_states_along_trajectory"+FORMAT))
