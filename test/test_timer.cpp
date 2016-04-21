@@ -11,7 +11,7 @@ TEST(TimerTests, testTimerInterface)
 {
   ze::Timer t;
   std::this_thread::sleep_for(ze::Timer::ms(10));
-  EXPECT_NEAR(t.stop(), 10.0, 0.5);
+  EXPECT_NEAR(t.stopAndGetMilliseconds(), 10.0, 0.5);
 }
 
 TEST(TimerTests, testTimerStatistics)
@@ -24,7 +24,7 @@ TEST(TimerTests, testTimerStatistics)
     timer.stop();
   }
   EXPECT_EQ(timer.numTimings(), 10u);
-  EXPECT_NEAR(timer.mean(), 10.0, 0.1);
+  EXPECT_NEAR(timer.mean(), 10.0, 0.5);
   EXPECT_NEAR(timer.accumulated(), 100.0, 1.0);
   EXPECT_GT(timer.max(), timer.min());
 }
