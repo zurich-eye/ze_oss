@@ -72,7 +72,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
   if(max_stamp - min_stamp > img_bundle_max_dt_nsec_)
   {
     LOG(WARNING) << "Images in bundle have too large varying timestamps: "
-                 << nanosecToMillisec(max_stamp - min_stamp) << " milliseconds";
+                 << nanosecToMillisecTrunc(max_stamp - min_stamp) << " milliseconds";
   }
 
   // Check if we have received some IMU measurements.

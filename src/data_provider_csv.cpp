@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ze/common/logging.hpp>
 
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/file_utils.h>
 #include <imp/bridge/opencv/cv_bridge.hpp>

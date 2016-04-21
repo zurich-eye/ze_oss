@@ -7,7 +7,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/path_utils.h>
 #include <imp/bridge/opencv/image_cv.hpp>
