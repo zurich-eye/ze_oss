@@ -282,4 +282,4 @@ if __name__=='__main__':
     ax.plot(pos[:,0], pos[:,2], 'b-', lw=2)
     fig.patch.set_visible(False)
     fig.tight_layout()
-    fig.savefig(os.path.join(options.data_dir, "imu_states_along_trajectory"+FORMAT))
+    fig.savefig(os.path.join(options.data_dir, "traj_es"+FORMAT))
