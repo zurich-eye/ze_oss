@@ -19,11 +19,14 @@ set(HEADERS
   include/ze/common/macros.h
   include/ze/common/manifold.h
   include/ze/common/matrix.h
+  include/ze/common/nonassignable.hpp
+  include/ze/common/noncopyable.hpp
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
   include/ze/common/sample.h
+  include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
@@ -46,6 +49,7 @@ set(SOURCES
   src/csv_trajectory.cpp
   src/matrix.cpp
   src/sample.cpp
+  src/signal_handler.cpp
   src/test_utils.cpp
   src/thread_pool.cpp
   src/timer_collection.cpp
