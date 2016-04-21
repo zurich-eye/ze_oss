@@ -1,11 +1,12 @@
-#ifndef IMP_OPENCV_BRIDGE_HPP
-#define IMP_OPENCV_BRIDGE_HPP
+#pragma once
 
 #include <memory>
+#include <glog/logging.h>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
+#include <ze/common/file_utils.h>
 
 namespace ze {
 
@@ -14,15 +15,18 @@ template<typename Pixel>
 void cvBridgeLoad(ImageCvPtr<Pixel>& out,
                   const std::string& filename, ze::PixelOrder pixel_order)
 {
+  CHECK(fileExists(filename)) << "File does not exist: " << filename;
   cv::Mat mat;
   if (pixel_order == PixelOrder::gray)
   {
     mat = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+    CHECK(!mat.empty());
   }
   else
   {
     // everything else needs color information :)
     mat = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
+    CHECK(!mat.empty());
   }
 
   switch(pixel_type<Pixel>::type)
@@ -116,6 +120,4 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel>& img,
 //}
 
 
-} // namespace imp
-
-#endif // IMP_OPENCV_BRIDGE_HPP
+} // namespace ze
