@@ -2,6 +2,7 @@
 
 #include <ze/common/types.h>
 #include <ze/common/buffer.h>
+#include <ze/common/time_conversions.h>
 #include <imp/core/image_raw.hpp>
 
 namespace ze {
