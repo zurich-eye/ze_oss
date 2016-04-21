@@ -29,9 +29,9 @@ numericalDerivative(std::function<Y(const X&)> h, const X& x, FloatType delta = 
   for(int i = 0; i < N; ++i)
   {
     dx(i) = delta;
-    TangentY dy1 = traits<Y>::Local(hx, h(traits<X>::Retract(x, dx)));
+    TangentY dy1 = traits<Y>::local(hx, h(traits<X>::retract(x, dx)));
     dx(i) = -delta;
-    TangentY dy2 = traits<Y>::Local(hx, h(traits<X>::Retract(x, dx)));
+    TangentY dy2 = traits<Y>::local(hx, h(traits<X>::retract(x, dx)));
     dx(i) = 0;
     H.col(i) << (dy1 - dy2) * factor;
   }

@@ -9,9 +9,9 @@ namespace ze {
 //------------------------------------------------------------------------------
 // Scalars and fp precision.
 using size_t    = std::size_t;
-using int8_t   = std::int8_t;
+using int8_t    = std::int8_t;
 using int16_t   = std::int16_t;
-using int64_t   = std::int64_t;   
+using int64_t   = std::int64_t;
 using uint8_t   = std::uint8_t;
 using uint16_t  = std::uint16_t;
 using uint32_t  = std::uint32_t;
@@ -22,7 +22,7 @@ using FloatType = double;
 // Typedefs of commonly used Eigen matrices and vectors.
 
 // MatrixMN, MatrixN = MatrixNN, I_NxN, and Z_NxN, for M,N=1..9.
-#define ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(SIZE, SUFFIX)         \
+#define ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(SIZE, SUFFIX)            \
   using Matrix##SUFFIX = Eigen::Matrix<FloatType, SIZE, SIZE>; \
   using Matrix1##SUFFIX = Eigen::Matrix<FloatType, 1, SIZE>;   \
   using Matrix2##SUFFIX = Eigen::Matrix<FloatType, 2, SIZE>;   \
@@ -34,7 +34,7 @@ using FloatType = double;
   using Matrix8##SUFFIX = Eigen::Matrix<FloatType, 8, SIZE>;   \
   using Matrix9##SUFFIX = Eigen::Matrix<FloatType, 9, SIZE>;   \
   using Matrix##SUFFIX##X = Eigen::Matrix<FloatType, SIZE, Eigen::Dynamic>; \
-  using MatrixX##SUFFIX = Eigen::Matrix<FloatType, Eigen::Dynamic, SIZE>; \
+  using MatrixX##SUFFIX = Eigen::Matrix<FloatType, Eigen::Dynamic, SIZE>;   \
   static const Eigen::MatrixBase<Matrix##SUFFIX>::IdentityReturnType I_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Identity(); \
   static const Eigen::MatrixBase<Matrix##SUFFIX>::ConstantReturnType Z_##SUFFIX##x##SUFFIX = Matrix##SUFFIX::Zero()
 
@@ -51,7 +51,7 @@ ZE_MAKE_EIGEN_MATRIX_TYPEDEFS(9,9);
 // Typedef arbitary length vector and arbitrary sized matrix.
 using VectorX = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
 using MatrixX = Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic>;
-using VectorXi  = Eigen::VectorXi;
+using VectorXi = Eigen::VectorXi;
 
 // Commonly used fixed size vectors.
 using Vector1 = Eigen::Matrix<FloatType, 1, 1>;
