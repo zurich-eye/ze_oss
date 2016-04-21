@@ -1,8 +1,10 @@
 #include <ze/visualization/viz_ros.h>
-#include <ze/visualization/viz_ros_utils.h>
 
+#include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+
+#include <ze/visualization/viz_ros_utils.h>
 
 namespace ze {
 
@@ -34,6 +36,9 @@ void VisualizerRos::drawPoint(
     const Color& color,
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
   m.header.stamp = ros::Time::now();
@@ -58,6 +63,9 @@ void VisualizerRos::drawLine(
     const Color& color,
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
   m.header.stamp = ros::Time::now();
@@ -81,6 +89,9 @@ void VisualizerRos::drawCoordinateFrame(
     const Transformation& pose, // T_W_B
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   const Vector3& p = pose.getPosition();
 
   visualization_msgs::Marker m;
@@ -94,17 +105,17 @@ void VisualizerRos::drawCoordinateFrame(
   m.colors.reserve(6);
   m.points.reserve(6);
   FloatType length = size * viz_scale_;
-  m.points.push_back(getRosPoint(p));
+  m.points.push_back(getRosPoint(Vector3::Zero()));
   m.colors.push_back(getRosColor(Colors::Red));
-  m.points.push_back(getRosPoint(p + Vector3::UnitX() * length));
+  m.points.push_back(getRosPoint(Vector3::UnitX() * length));
   m.colors.push_back(getRosColor(Colors::Red));
-  m.points.push_back(getRosPoint(p));
+  m.points.push_back(getRosPoint(Vector3::Zero()));
   m.colors.push_back(getRosColor(Colors::Green));
-  m.points.push_back(getRosPoint(p + Vector3::UnitY() * length));
+  m.points.push_back(getRosPoint(Vector3::UnitY() * length));
   m.colors.push_back(getRosColor(Colors::Green));
-  m.points.push_back(getRosPoint(p));
+  m.points.push_back(getRosPoint(Vector3::Zero()));
   m.colors.push_back(getRosColor(Colors::Blue));
-  m.points.push_back(getRosPoint(p + Vector3::UnitZ() * length));
+  m.points.push_back(getRosPoint(Vector3::UnitZ() * length));
   m.colors.push_back(getRosColor(Colors::Blue));
   m.pose = getRosPose(pose);
   pub_marker_->publish(m);
@@ -117,6 +128,9 @@ void VisualizerRos::drawPoints(
     const Color& color,
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
   m.header.stamp = ros::Time::now();
@@ -132,6 +146,10 @@ void VisualizerRos::drawPoints(
   m.points.reserve(points.cols());
   for(int i = 0; i < points.cols(); ++i)
   {
+    if(points.col(i).norm() > 1e4)
+    {
+      continue;
+    }
     m.points.push_back(getRosPoint(points.col(i)));
   }
   pub_marker_->publish(m);
@@ -144,6 +162,9 @@ void VisualizerRos::drawLines(
     const Color& color,
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
   m.header.stamp = ros::Time::now();
@@ -168,6 +189,9 @@ void VisualizerRos::drawCoordinateFrames(
     const TransformationVector& poses,
     const FloatType size)
 {
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
   visualization_msgs::Marker m;
   m.header.frame_id = world_frame;
   m.header.stamp = ros::Time::now();

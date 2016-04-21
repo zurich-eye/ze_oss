@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <gflags/gflags.h>
 
 #include <ze/visualization/viz_ros.h>

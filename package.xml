@@ -21,7 +21,6 @@
   <depend>visualization_msgs</depend>
   <depend>image_transport</depend>
   <depend>cv_bridge</depend>
-  <depend>pcl_ros</depend>
 
   <!-- gtsam -->
   <depend>gtsam_catkin</depend>

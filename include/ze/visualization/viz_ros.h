@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <ze/visualization/viz_interface.h>
-#include <ros/ros.h>
 
 // fwd
 namespace ros {
@@ -70,10 +69,9 @@ public:
       const FloatType size = 0.2) override;
 
 private:
-
-  std::unique_ptr<ros::NodeHandle> nh_;
-  std::unique_ptr<ros::Publisher> pub_marker_;
-  std::string world_frame = "world";  //!< World-frame
+  std::shared_ptr<ros::NodeHandle> nh_;
+  std::shared_ptr<ros::Publisher> pub_marker_;
+  std::string world_frame = "map";    //!< World-frame
   double viz_scale_ = 1.0;            //!< Scale marker size
 };
 

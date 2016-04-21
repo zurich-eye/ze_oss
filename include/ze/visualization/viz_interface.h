@@ -29,7 +29,7 @@ public:
       const size_t id,
       const Position& point,
       const Color& color,
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
   virtual void drawLine(
       const std::string& topic,
@@ -37,13 +37,13 @@ public:
       const Position& line_from,
       const Position& line_to,
       const Color& color,
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
   virtual void drawCoordinateFrame(
       const std::string& topic,
       const size_t id,
       const Transformation& pose, // T_W_B
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
   // ---------------------------------------------------------------------------
   // Draw multiple elements
@@ -53,20 +53,20 @@ public:
       const size_t id,
       const Positions& points,
       const Color& color,
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
   virtual void drawLines(
       const std::string& topic,
       const size_t id,
       const Lines& lines,
       const Color& color,
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
   virtual void drawCoordinateFrames(
       const std::string& topic,
       const size_t id,
       const TransformationVector& poses,
-      const FloatType size) = 0;
+      const FloatType size = 0.02) = 0;
 
 };
 
