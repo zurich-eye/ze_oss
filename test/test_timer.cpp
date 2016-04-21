@@ -25,7 +25,7 @@ TEST(TimerTests, testTimerStatistics)
   }
   EXPECT_EQ(timer.numTimings(), 10u);
   EXPECT_NEAR(timer.mean(), 10.0, 0.5);
-  EXPECT_NEAR(timer.accumulated(), 100.0, 1.0);
+  EXPECT_NEAR(timer.accumulated(), 100.0, 10.0);
   EXPECT_GT(timer.max(), timer.min());
 }
 
@@ -38,8 +38,8 @@ TEST(TimerTests, testTimerScope)
     std::this_thread::sleep_for(ze::Timer::ms(10));
   }
   EXPECT_EQ(timer.numTimings(), 10u);
-  EXPECT_NEAR(timer.mean(), 10.0, 0.1);
-  EXPECT_NEAR(timer.accumulated(), 100.0, 1.0);
+  EXPECT_NEAR(timer.mean(), 10.0, 0.5);
+  EXPECT_NEAR(timer.accumulated(), 100.0, 10.0);
   EXPECT_GT(timer.max(), timer.min());
 }
 
