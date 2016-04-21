@@ -35,14 +35,15 @@ set(HEADERS
   include/ze/common/test_entrypoint.h
   include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
+  include/ze/common/thread_pool.hpp
   include/ze/common/time_conversions.h
   include/ze/common/timer.h
   include/ze/common/timer_collection.h
   include/ze/common/timer_statistics.h
-  include/ze/common/ts_match.h
   include/ze/common/transformation.h
-  include/ze/common/thread_pool.hpp
+  include/ze/common/ts_match.h
   include/ze/common/types.h
+  include/ze/common/versioned_slot_handle.h
   include/ze/common/yaml_serialization.h
   )
 
@@ -98,6 +99,9 @@ target_link_libraries(test_transformation ${PROJECT_NAME})
 
 catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
 target_link_libraries(test_thread_pool ${PROJECT_NAME})
+
+catkin_add_gtest(test_versioned_slot_handle test/test_versioned_slot_handle.cpp)
+target_link_libraries(test_versioned_slot_handle ${PROJECT_NAME})
 
 ##########
 # EXPORT #
