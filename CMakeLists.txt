@@ -18,6 +18,8 @@ set(HEADERS
   include/ze/common/macros.h
   include/ze/common/manifold.h
   include/ze/common/matrix.h
+  include/ze/common/nonassignable.hpp
+  include/ze/common/noncopyable.hpp
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
   include/ze/common/sample.h
@@ -33,7 +35,6 @@ set(HEADERS
   include/ze/common/ts_match.h
   include/ze/common/transformation.h
   include/ze/common/types.h
-  include/ze/common/utility.hpp
   include/ze/common/yaml_serialization.h
   include/ze/common/csv_trajectory.h
   )

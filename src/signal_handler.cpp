@@ -1,10 +1,12 @@
 #include <ze/common/signal_handler.hpp>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <cstring>
+
 #include <cstdint>
+#include <cstring>
 #include <iostream>
+#include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include <ze/common/logging.hpp>
 
 namespace ze {
@@ -53,7 +55,7 @@ SimpleSigtermHandler::SimpleSigtermHandler(volatile bool &flag)
   CHECK(s_simple_flag == nullptr) << "Signal handler already installed";
   s_simple_flag = &flag;
 
-  // note: if one the functions below throws,
+  // note: if one of the functions below throws,
   // s_simple_flag will remain set since the destructor will not be called
   // however, an error here will lead to process termination anyway
   installSignalHandlerSimple(SIGHUP);

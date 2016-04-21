@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ze/common/utility.hpp>
+#include <ze/common/noncopyable.hpp>
 
 namespace ze {
 
