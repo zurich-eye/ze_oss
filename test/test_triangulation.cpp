@@ -35,7 +35,7 @@ TEST(TriangulationTests, testSolver)
 
     Position p_C = T_C_W_perturbed * p_W_true;
     Keypoint px = cam.project(p_C);
-    if(isVisible(cam.width(), cam.height(), px))
+    if(isVisible(cam.size(), px))
     {
       T_C_W_vec.push_back(T_C_W_perturbed);
       f_C.col(n++) = p_C.normalized();
