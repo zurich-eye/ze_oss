@@ -14,6 +14,7 @@ set(HEADERS
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
   include/ze/common/file_utils.h
+  include/ze/common/logging.hpp
   include/ze/common/macros.h
   include/ze/common/manifold.h
   include/ze/common/matrix.h
@@ -37,9 +38,10 @@ set(HEADERS
   )
 
 set(SOURCES
+  src/csv_trajectory.cpp
+  src/matrix.cpp
   src/sample.cpp
   src/test_utils.cpp
-  src/csv_trajectory.cpp
   src/thread_pool.cpp
   )
 
@@ -66,6 +68,9 @@ target_link_libraries(test_buffer ${PROJECT_NAME})
 
 catkin_add_gtest(test_manifold test/test_manifold.cpp)
 target_link_libraries(test_manifold ${PROJECT_NAME})
+
+catkin_add_gtest(test_matrix test/test_matrix.cpp)
+target_link_libraries(test_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_numerical_derivative test/test_numerical_derivative.cpp)
 target_link_libraries(test_numerical_derivative ${PROJECT_NAME})

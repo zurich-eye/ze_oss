@@ -27,7 +27,7 @@
 
 #include <gtest/gtest.h>
 #include <gflags/gflags.h>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <eigen-checks/gtest.h>
 
 // Let the Eclipse parser see the macro.
@@ -60,5 +60,6 @@
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";\
   FLAGS_alsologtostderr = true; \
   FLAGS_colorlogtostderr = true; \
+  FLAGS_v = 1; \
   return RUN_ALL_TESTS();\
 }

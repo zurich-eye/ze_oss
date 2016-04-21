@@ -1,7 +1,7 @@
 #include <ze/common/test_utils.h>
 
 #include <cstdlib>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 #include <ze/common/types.h>
 #include <ze/common/path_utils.h>
 #include <ze/common/string_utils.h>
