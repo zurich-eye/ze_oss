@@ -7,10 +7,13 @@
 #include <sensor_msgs/image_encodings.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/path_utils.h>
 #include <imp/bridge/opencv/image_cv.hpp>
+
+DEFINE_int32(data_source_stop_after_n_frames, -1,
+             "How many frames should be processed?");
 
 namespace ze {
 
@@ -53,8 +56,10 @@ DataProviderRosbag::DataProviderRosbag(
 
 void DataProviderRosbag::spin()
 {
-  while(ok())
+  while(ok() && !quit_)
+  {
     spinOnce();
+  }
 }
 
 bool DataProviderRosbag::spinOnce()
@@ -69,10 +74,19 @@ bool DataProviderRosbag::spinOnce()
       auto it = img_topic_camidx_map_.find(m.getTopic());
       if(it != img_topic_camidx_map_.end())
       {
+        ++n_processed_images_;
+        if (FLAGS_data_source_stop_after_n_frames > 0
+            && n_processed_images_ > FLAGS_data_source_stop_after_n_frames)
+        {
+          LOG(WARNING) << "Data source has reached max number of desired frames.";
+          quit_ = true;
+          return false;
+        }
+
         cv::Mat img;
         try
         {
-          img = cv_bridge::toCvCopy(m_img)->image;
+          img = cv_bridge::toCvCopy(m_img, "mono8")->image;
         }
         catch (cv_bridge::Exception& e)
         {
@@ -104,7 +118,10 @@ bool DataProviderRosbag::spinOnce()
               m_imu->linear_acceleration.x,
               m_imu->linear_acceleration.y,
               m_imu->linear_acceleration.z);
-        imu_callback_(m_imu->header.stamp.toNSec(), acc, gyr);
+        int64_t stamp = m_imu->header.stamp.toNSec();
+        CHECK_GT(stamp, last_imu_stamp_);
+        imu_callback_(stamp, acc, gyr);
+        last_imu_stamp_ = stamp;
       }
       else
       {

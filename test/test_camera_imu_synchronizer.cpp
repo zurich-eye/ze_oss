@@ -30,7 +30,7 @@ TEST(CameraImuSynchronizerTest, testCsv)
             << "IMU-max = " << imu_timestamps(imu_timestamps.size()-1) << "\n";
     EXPECT_EQ(last_img_stamp,  imu_timestamps(0));
     EXPECT_EQ(images[0].first, imu_timestamps(imu_timestamps.size()-1));
-    EXPECT_EQ(imu_timestamps.size(), imu_measurements.cols());
+    EXPECT_EQ(static_cast<int>(imu_timestamps.size()), imu_measurements.cols());
     last_img_stamp = images[0].first;
   });
 

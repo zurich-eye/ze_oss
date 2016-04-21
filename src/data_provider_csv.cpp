@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ze/common/logging.hpp>
 
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/file_utils.h>
 #include <imp/bridge/opencv/cv_bridge.hpp>
@@ -13,7 +13,7 @@ namespace ze {
 
 namespace dataset {
 
-ImageBase::Ptr CameraMeasurement::loadImage() const
+Image8uC1::Ptr CameraMeasurement::loadImage() const
 {
   ImageCv8uC1::Ptr img;
   cvBridgeLoad<Pixel8uC1>(img, image_path_filename, PixelOrder::gray);
@@ -64,7 +64,7 @@ bool DataProviderCsv::spinOnce()
           dataset::CameraMeasurement::ConstPtr cam_data =
               std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
 
-          ImageBase::Ptr img = cam_data->loadImage();
+          Image8uC1::Ptr img = cam_data->loadImage();
           camera_callback_(cam_data->stamp_ns, img, cam_data->camera_index);
         }
         else

@@ -2,15 +2,14 @@
 
 #include <ze/common/types.h>
 #include <ze/common/buffer.h>
-#include <ze/common/time.h>
-#include <imp/core/image_base.hpp>
+#include <imp/core/image_raw.hpp>
 
 namespace ze {
 
 // fwd
 class DataProviderBase;
 
-using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
+using StampedImage = std::pair<int64_t, Image8uC1::Ptr>;
 using StampedImages = std::vector<StampedImage>;
 using SynchronizedCameraImuCallback =
   std::function<void (const StampedImages& /*images*/,
@@ -25,7 +24,7 @@ public:
 
 
   //! Add Image to the frame synchronizer.
-  void addImgData(int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx);
+  void addImgData(int64_t stamp, const Image8uC1::Ptr& img, uint32_t camera_idx);
 
   //! Add IMU measurement to the frame synchronizer.
   void addImuData(int64_t stamp, const Vector3& acc, const Vector3& gyr);
@@ -47,6 +46,9 @@ private:
 
   //! Stamp of previous synchronized image bundle.
   int64_t last_img_bundle_min_stamp_ = -1;
+
+  //! Count number of synchronized frames.
+  int sync_frame_count_ = 0;
 
   //! Image buffer has fixed size of num_frames.
   StampedImages img_buffer_;

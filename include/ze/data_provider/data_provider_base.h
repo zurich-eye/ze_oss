@@ -4,11 +4,11 @@
 #include <memory>
 #include <functional>
 
+#include <imp/core/image.hpp>
 #include <ze/common/macros.h>
 #include <ze/common/signal_handler.hpp>
 #include <ze/common/types.h>
 #include <ze/common/noncopyable.hpp>
-#include <imp/core/image_base.hpp>
 
 // fwd
 namespace cv {
@@ -23,7 +23,7 @@ using ImuCallback =
                       const Vector3& /*gyr*/)>;
 using CameraCallback =
   std::function<void (int64_t /*stamp*/,
-                      const ImageBase::Ptr& /*img*/,
+                      const Image8uC1::Ptr& /*img*/,
                       uint32_t /*camera-idx*/)>;
 
 enum class DataProviderType {
