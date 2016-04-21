@@ -34,16 +34,17 @@ CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
   return nullptr;
 }
 
-void CameraRig::print(std::ostream& out, const std::string& s) const
+std::ostream& operator<<(std::ostream& out, const CameraRig& rig)
 {
-  out << s << "\n";
-  out << " Label = " << label_ << "\n";
-  for(size_t i = 0; i < size(); ++i)
+  out << "Camera Rig: \n"
+      << "  Label = " << rig.getLabel() << "\n";
+  for (size_t i = 0; i < rig.size(); ++i)
   {
-    out << " Camera " << i << ":";
-    cameras_[i]->print(out, "");
-    out << "  T_C_B = " << T_C_B_[i] << std::endl;
+    out << "- Camera " << i << "\n"
+        << rig.at(i) << "\n"
+        << "    T_B_C = \n" << rig.get_T_C_B(i).inverse() << "\n";
   }
+  return out;
 }
 
 } // namespace ze

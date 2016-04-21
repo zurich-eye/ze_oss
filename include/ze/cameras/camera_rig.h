@@ -76,8 +76,18 @@ public:
   //! Get label of rig.
   inline const std::string& getLabel() const { return label_; }
 
-  //! Print rig infos.
-  void print(std::ostream& out, const std::string& s = "CameraRig:") const;
+  //!@{
+  //! Camera iteration:
+  typedef CameraVector::value_type value_type;
+  typedef CameraVector::iterator iterator;
+  typedef CameraVector::const_iterator const_iterator;
+  CameraVector::iterator begin() { return cameras_.begin(); }
+  CameraVector::iterator end() { return cameras_.end(); }
+  CameraVector::const_iterator begin() const { return cameras_.begin(); }
+  CameraVector::const_iterator end() const { return cameras_.end(); }
+  CameraVector::const_iterator cbegin() const { return cameras_.cbegin(); }
+  CameraVector::const_iterator cend() const { return cameras_.cend(); }
+  //!@}
 
 private:
 
@@ -90,6 +100,8 @@ private:
   //! A label for this camera rig, a name.
   std::string label_;
 };
+
+std::ostream& operator<<(std::ostream& out, const CameraRig& rig);
 
 } // namespace ze
 

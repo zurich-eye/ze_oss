@@ -9,8 +9,24 @@
 #include <ze/common/matrix.h>
 #include <ze/common/manifold.h>
 #include <ze/common/numerical_derivative.h>
+#include <ze/cameras/camera_rig.h>
+#include <ze/cameras/camera.h>
 #include <ze/cameras/camera_impl.h>
 #include <ze/cameras/camera_utils.h>
+
+namespace ze {
+
+void cameraTest(const Camera& cam)
+{
+  Keypoints px1 = generateRandomKeypoints(cam.width(), cam.height(), 10, 500);
+  Bearings f1 = cam.backProjectVectorized(px1);
+  Keypoints px2 = cam.projectVectorized(f1);
+  Keypoints px_error = px1 - px2;
+  FloatType max_error = px_error.colwise().norm().array().maxCoeff();
+  EXPECT_LT(max_error, 1e-4);
+}
+
+} // namespace ze
 
 TEST(CameraImplTests, testPinholeJacobian)
 {
@@ -70,13 +86,21 @@ TEST(CameraImplTests, testEquidistantJacobian)
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
 }
 
+TEST(CameraImplTests, testEquidistantCameraRig)
+{
+  using namespace ze;
+  std::string dir = getTestDataDir("camera_models");
+  CameraRig::Ptr rig = CameraRig::loadFromYaml(dir + "/camera_pinhole_equidistant_rig.yaml");
+  cameraTest(rig->at(0));
+  cameraTest(rig->at(1));
+}
+
 TEST(CameraImplTests, testYamlParsingPinhole)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
   ASSERT_TRUE(ze::fileExists(yaml_file));
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  cam->print(std::cout);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(1), 310.0);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(2), 376.5);
@@ -88,7 +112,6 @@ TEST(CameraImplTests, testYamlParsingFoV)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_fov.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  cam->print(std::cout);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), 0.940454);
 }
@@ -98,7 +121,6 @@ TEST(CameraImplTests, testYamlParsingRadTan)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_radtan.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  cam->print(std::cout);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.28340811217029355);
 }
@@ -108,7 +130,6 @@ TEST(CameraImplTests, testYamlParsingEquidistant)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_equidistant.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  cam->print(std::cout);
   EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.0027973061697674074);
 }

@@ -10,7 +10,8 @@ TEST(CameraRigTests, testYamlLoading)
   std::string yaml_file = data_dir + "/camera_rig_1.yaml";
   ASSERT_TRUE(ze::fileExists(yaml_file));
   ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(yaml_file);
-  rig->print(std::cout);
+  FLAGS_v = 1;
+  VLOG(1) << *rig;
 }
 
 ZE_UNITTEST_ENTRYPOINT

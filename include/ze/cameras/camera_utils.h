@@ -1,12 +1,22 @@
 #pragma once
 
+#include <tuple>
+
 #include <ze/common/types.h>
 
 namespace ze {
 
+// fwd
+class Camera;
+
 //! Generate count random visible keypoints.
 Keypoints generateRandomKeypoints(
     const int image_width, const int image_height, const int margin, const size_t count);
+
+//! Generate random visible 3d points.
+std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(
+    const Camera& cam, const size_t count,
+    const int margin = 10, const FloatType min_depth = 1.0, const FloatType max_depth = 3.0);
 
 //! Return if pixel u is within image boundaries.
 template<typename DerivedKeyPoint>

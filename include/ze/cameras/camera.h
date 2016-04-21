@@ -5,6 +5,7 @@
 #include <ze/common/logging.hpp>
 #include <Eigen/Core>
 
+#include <imp/core/image.hpp>
 #include <ze/common/macros.h> 
 #include <ze/common/types.h>
 
@@ -35,27 +36,24 @@ public:
   //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
   virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
-  //! Computes pixel coordinates from bearing vector.
-  virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const = 0;
+  //! Computes pixel coordinates from 3D-point.
+  virtual Keypoint project(const Eigen::Ref<const Position>& pos) const = 0;
 
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
 
+  //! @name Block operations
+  //! Always prefer these functions to avoid cache misses.
   //!@{
-  //! Block operations: Always prefer these functions to avoid cache misses.
-
   //! Back projects a block of keypoints.
-  virtual Bearings backProjectVectorized(const Keypoints& px_vec) const;
+  virtual Bearings backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const;
 
   //! Projects a block of bearing vectors.
-  virtual Keypoints projectVectorized(const Bearings& bearing_vec) const;
+  virtual Keypoints projectVectorized(const Eigen::Ref<const Bearings>& bearing_vec) const;
 
   //! Vectorized computation of projection Jacobian. Column-wise reshaped.
   virtual Matrix6X dProject_dLandmarkVectorized(const Positions& pos_vec) const;
   //!@}
-
-  //! Print camera info.
-  void print(std::ostream& out, const std::string& s = "Camera: ") const;
 
   //! Image width in pixels.
   inline int width() const { return width_; }
@@ -82,7 +80,14 @@ public:
   inline void setLabel(const std::string& label) { label_ = label; }
 
   //! Get angle corresponding to one pixel in image plane.
+  //! @todo: make static cache.
   virtual FloatType getApproxAnglePerPixel() const = 0;
+
+  //! Set mask: 0 = masked, >0 = unmasked.
+  void setMask(const Image8uC1::Ptr& mask);
+
+  //! Get mask.
+  inline Image8uC1::ConstPtr getMask() const { return mask_; }
 
 protected:
 
@@ -98,6 +103,12 @@ protected:
   //! Camera distortion parameters
   std::string label_;
   CameraType type_;
+
+  //! Mask
+  Image8uC1::Ptr mask_ = nullptr;
 };
+
+//! Print camera:
+std::ostream& operator<<(std::ostream& out, const Camera& cam);
 
 } // namespace ze

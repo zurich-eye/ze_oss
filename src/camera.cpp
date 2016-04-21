@@ -14,7 +14,7 @@ Camera::Camera(const int width, const int height, const CameraType type,
   , type_(type)
 {}
 
-Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
+Bearings Camera::backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const
 {
   Bearings bearings(3, px_vec.cols());
   for(int i = 0; i < px_vec.cols(); ++i)
@@ -24,7 +24,7 @@ Bearings Camera::backProjectVectorized(const Keypoints& px_vec) const
   return bearings;
 }
 
-Keypoints Camera::projectVectorized(const Bearings& bearing_vec) const
+Keypoints Camera::projectVectorized(const Eigen::Ref<const Bearings>& bearing_vec) const
 {
   Keypoints px_vec(2, bearing_vec.cols());
   for(int i = 0; i < bearing_vec.cols(); ++i)
@@ -60,16 +60,6 @@ Camera::Ptr Camera::loadFromYaml(const std::string& path)
   return Camera::Ptr();
 }
 
-void Camera::print(std::ostream& out, const std::string& s) const
-{
-  out << s << std::endl
-      << "  Label = " << label_ << "\n"
-      << "  Model = " << typeString() << "\n"
-      << "  Dimensions = " << width_ << "x" << height_ << "\n"
-      << "  Proj. parameters = " << projection_params_.transpose() << "\n"
-      << "  Dist. parameters = " << distortion_params_.transpose() << std::endl;
-}
-
 std::string Camera::typeString() const
 {
   switch (type_)
@@ -82,6 +72,25 @@ std::string Camera::typeString() const
       LOG(FATAL) << "Unknown parameter type";
   }
   return "";
+}
+
+void Camera::setMask(const Image8uC1::Ptr& mask)
+{
+  CHECK_NOTNULL(mask.get());
+  CHECK_EQ(mask->width(), static_cast<uint32_t>(width_));
+  CHECK_EQ(mask->height(), static_cast<uint32_t>(height_));
+  mask_ = mask;
+}
+
+std::ostream& operator<<(std::ostream& out, const Camera& cam)
+{
+  out << "    Label = " << cam.getLabel() << "\n"
+      << "    Model = " << cam.typeString() << "\n"
+      << "    Dimensions = " << cam.width() << "x" << cam.height() << "\n"
+      << "    Proj. parameters = " << cam.projectionParameters().transpose() << "\n"
+      << "    Dist. parameters = " << cam.distortionParameters().transpose() << "\n"
+      << "    Masked = " << (cam.getMask() ? "True" : "False");
+  return out;
 }
 
 } // namespace ze
