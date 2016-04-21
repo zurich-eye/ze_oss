@@ -4,7 +4,7 @@
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_impl.h>
 #include <ze/geometry/robust_cost.h>
-#include <ze/geometry/least_squares_solver.h>
+#include <ze/geometry/lsq_solver.h>
 
 namespace ze {
 
@@ -13,19 +13,27 @@ struct PoseOptimizerFrameData
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  //! Measurements: Bearing vectors.
+  //! Measurements: Bearing vectors corresponding to keypoints.
   Bearings f;
 
+  //! Measurements: Keypoints. (Not used by the actual algorithm).
+  Keypoints px;
+
+  //! Measurements bookkeeping: Corresponding indices. (Not used by the actual algorithm).
+  KeypointIndices kp_idx;
+
   //! Landmark positions. Each column corresponds to a bearing measurement.
+  //! @todo(cfo): Use inverse depth parametrization or homogeneous points.
   Positions p_W;
 
   //! Extrinsic transformation between camera and body (i.e., imu) frame.
   Transformation T_C_B;
 };
+using PoseOptimizerFrameDataVec = std::vector<PoseOptimizerFrameData>;
 
 //! Optimizes body pose by minimizing difference between bearing vectors.
 class PoseOptimizer :
-    public LeastSquaresSolver<6, Transformation, PoseOptimizer>
+    public LeastSquaresSolver<Transformation, PoseOptimizer>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
@@ -39,11 +47,9 @@ public:
       const FloatType prior_weight_pos, const FloatType prior_weight_rot);
 
   FloatType evaluateError(
-      const Transformation& T_B_W, HessianMatrix* H, GradientVector* g);
-
-  void update(
-      const Transformation& T_Bold_W, const UpdateVector& dx,
-      Transformation& T_Bnew_W);
+      const Transformation& T_B_W,
+      HessianMatrix* H,
+      GradientVector* g);
 
 private:
   const std::vector<PoseOptimizerFrameData>& data_;

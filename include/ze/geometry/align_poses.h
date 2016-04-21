@@ -3,13 +3,13 @@
 #include <ze/common/types.h>
 #include <ze/common/transformation.h>
 #include <ze/geometry/robust_cost.h>
-#include <ze/geometry/least_squares_solver.h>
+#include <ze/geometry/lsq_solver.h>
 
 namespace ze {
 
 //! Estimates relative transformation between two sets of associated pints
 class PoseAligner :
-    public LeastSquaresSolver<6, Transformation, PoseAligner>
+    public LeastSquaresSolver<Transformation, PoseAligner>
 {
 public:
   using LeastSquaresSolver::HessianMatrix;
@@ -27,11 +27,6 @@ public:
       const Transformation& T_A_B,
       HessianMatrix* H,
       GradientVector *g);
-
-  void update(
-      const Transformation& T_A_Bold,
-      const UpdateVector& dx,
-      Transformation& T_A_Bnew);
 
 private:
   const TransformationVector& T_W_A_;

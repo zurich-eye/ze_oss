@@ -19,9 +19,9 @@ TEST(PoseOptimizerTests, testSolver)
 
   const size_t n = 120;
   PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
-  Keypoints pix_true = generateRandomKeypoints(640, 480, 10, n);
+  Keypoints px_true = generateRandomKeypoints(640, 480, 10, n);
 
-  Positions pos_C = cam.backProjectVectorized(pix_true);
+  Positions pos_C = cam.backProjectVectorized(px_true);
 
   // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
   std::ranlux24 gen;
@@ -35,15 +35,15 @@ TEST(PoseOptimizerTests, testSolver)
   Positions pos_W = (T_B_W.inverse() * T_C_B.inverse()).transformVectorized(pos_C);
 
   // Apply some noise to the keypoints to simulate measurements.
-  Keypoints pix_noisy = pix_true;
+  Keypoints px_noisy = px_true;
   const double stddev = 1.0;
   std::normal_distribution<double> px_noise(0.0, stddev);
   for(size_t i = 0; i < n; ++i)
   {
-    pix_noisy(0,i) += px_noise(gen);
-    pix_noisy(1,i) += px_noise(gen);
+    px_noisy(0,i) += px_noise(gen);
+    px_noisy(1,i) += px_noise(gen);
   }
-  Bearings bearings_noisy = cam.backProjectVectorized(pix_noisy);
+  Bearings bearings_noisy = cam.backProjectVectorized(px_noisy);
 
   // Perturb pose:
   Transformation T_B_W_perturbed =
@@ -60,7 +60,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 0.0;
     double rot_prior_weight = 0.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
@@ -81,7 +81,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 0.0;
     double rot_prior_weight = 10.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
@@ -102,7 +102,7 @@ TEST(PoseOptimizerTests, testSolver)
     double pos_prior_weight = 10.0;
     double rot_prior_weight = 0.0;
     ze::Timer t;
-    std::vector<PoseOptimizerFrameData> data_vec = { data };
+    PoseOptimizerFrameDataVec data_vec = { data };
     PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     Transformation T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);

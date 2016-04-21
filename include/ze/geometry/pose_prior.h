@@ -11,7 +11,8 @@ inline void applyPosePrior(
     const Transformation& T_prior,
     const FloatType prior_weight_rot,
     const FloatType prior_weight_pos,
-    Matrix6& H, Matrix61& g)
+    Eigen::Ref<Matrix6> H,
+    Eigen::Ref<Vector6> g)
 {
   if (prior_weight_rot > 0)
   {

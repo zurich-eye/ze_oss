@@ -31,10 +31,16 @@ FloatType PoseOptimizer::evaluateError(
   FloatType chi2 = 0.0;
 
   // Loop over all cameras in rig.
-  for(size_t i = 0; i < data_.size(); ++i)
+  for (size_t i = 0; i < data_.size(); ++i)
   {
     const PoseOptimizerFrameData& data = data_[i];
     FloatType& measurement_sigma = measurement_sigma_[i];
+
+    if(data.f.cols() == 0)
+    {
+      LOG(WARNING) << "Have no measurements in camera " << i;
+      continue;
+    }
 
     // Transform points from world coordinates to camera coordinates.
     const Transformation T_C_W = data.T_C_B * T_B_W;
@@ -49,7 +55,7 @@ FloatType PoseOptimizer::evaluateError(
     VectorX f_err_norm = f_err.colwise().norm();
 
     // At the first iteration, compute the scale of the error.
-    if(iter_ == 0)
+    if (iter_ == 0)
     {
       measurement_sigma = ScaleEstimator::compute(f_err_norm);
       VLOG(300) << "Cam " << i << " measurement sigma = " << measurement_sigma;
@@ -62,7 +68,7 @@ FloatType PoseOptimizer::evaluateError(
     // Whiten error.
     f_err /= measurement_sigma;
 
-    if(H && g)
+    if (H && g)
     {
       const Matrix3 R_C_W = T_C_W.getRotationMatrix();
       const int n = data.f.cols();
@@ -86,22 +92,15 @@ FloatType PoseOptimizer::evaluateError(
 
     // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
     chi2 += 0.5 * weights.dot(f_err.colwise().squaredNorm());
+  }
 
-    // Apply prior.
-    if(prior_weight_rot_ > 0.0f || prior_weight_pos_ > 0.0f)
-    {
-      applyPosePrior(T_B_W, T_B_W_prior_, prior_weight_rot_, prior_weight_pos_, *H, *g);
-    }
+  // Apply prior.
+  if (prior_weight_rot_ > 0.0f || prior_weight_pos_ > 0.0f)
+  {
+    applyPosePrior(T_B_W, T_B_W_prior_, prior_weight_rot_, prior_weight_pos_, *H, *g);
   }
 
   return chi2;
-}
-
-void PoseOptimizer::update(
-    const Transformation& T_Bold_W, const UpdateVector& dx,
-    Transformation& T_Bnew_W)
-{
-  T_Bnew_W = T_Bold_W * Transformation::exp(dx);
 }
 
 } // namespace ze
