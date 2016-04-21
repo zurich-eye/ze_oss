@@ -9,7 +9,7 @@
 TEST(ThreadPoolTests, testThreadPool)
 {
   ze::ThreadPool pool(4);
-  std::vector< std::future<size_t> > results;
+  std::vector<std::future<size_t>> results;
 
   for (size_t i = 0; i < 8; ++i)
   {
