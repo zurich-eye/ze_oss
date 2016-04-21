@@ -126,12 +126,12 @@ bool DataProviderRosbag::ok() const
 {
   if (!running_)
   {
-    LOG(WARNING) << "Data Provider was terminated.";
+    VLOG(1) << "Data Provider was terminated.";
     return false;
   }
   if (bag_view_it_ == bag_view_->end())
   {
-    LOG(WARNING) << "All data processed.";
+    VLOG(1) << "All data processed.";
     return false;
   }
   return true;

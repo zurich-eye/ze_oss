@@ -101,12 +101,12 @@ bool DataProviderCsv::ok() const
 {
   if (!running_)
   {
-    LOG(WARNING) << "Data Provider was terminated.";
+    VLOG(1) << "Data Provider was terminated.";
     return false;
   }
   if (buffer_it_ == buffer_.cend())
   {
-    LOG(WARNING) << "All data processed.";
+    VLOG(1) << "All data processed.";
     return false;
   }
   return true;

@@ -7,7 +7,7 @@
 #include <ze/common/macros.h>
 #include <ze/common/signal_handler.hpp>
 #include <ze/common/types.h>
-#include <ze/common/utility.hpp>
+#include <ze/common/noncopyable.hpp>
 #include <imp/core/image_base.hpp>
 
 // fwd
