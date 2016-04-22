@@ -31,8 +31,14 @@ struct ScalarTraits
   static TangentVector local(const Scalar origin, Scalar other,
                              Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) (*H1)[0] = -1.0;
-    if (H2) (*H2)[0] =  1.0;
+    if (H1)
+    {
+      (*H1)[0] = -1.0; // dlocal(origin, other) / dorigin
+    }
+    if (H2)
+    {
+      (*H2)[0] =  1.0; // dlocal(origin, other) / dother
+    }
     TangentVector result;
     result(0) = other - origin;
     return result;
@@ -41,8 +47,14 @@ struct ScalarTraits
   static Scalar retract(const Scalar origin, const TangentVector& v,
                         Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) (*H1)[0] = 1.0;
-    if (H2) (*H2)[0] = 1.0;
+    if (H1)
+    {
+      (*H1)[0] = 1.0; // dretract(origin, v) / dorigin
+    }
+    if (H2)
+    {
+      (*H2)[0] = 1.0; // dretract(origin, v) / dv
+    }
     return origin + v[0];
   }
 };
@@ -67,26 +79,42 @@ struct traits<Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> >
   static bool equals(const Matrix& v1, const Matrix& v2, double tol = 1e-8)
   {
     if (v1.size() != v2.size())
+    {
       return false;
+    }
     return (v1 - v2).array().abs().maxCoeff() < tol;
     // TODO(cfo): Check for nan entries.
   }
 
-  static TangentVector local(const Matrix& origin, Matrix other,
-                             Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static TangentVector local(
+      const Matrix& origin, Matrix other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) (*H1) = -Jacobian::Identity();
-    if (H2) (*H2) =  Jacobian::Identity();
+    if (H1)
+    {
+      *H1 = -Jacobian::Identity(); // dLocal(origin, other)/dOrigin
+    }
+    if (H2)
+    {
+      *H2 =  Jacobian::Identity(); // dLocal(origin, other)/dOther
+    }
     TangentVector result;
     Eigen::Map<Matrix>(result.data()) = other - origin;
     return result;
   }
 
-  static Matrix retract(const Matrix& origin, const TangentVector& v,
-                        Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static Matrix retract(
+      const Matrix& origin, const TangentVector& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) (*H1) = Jacobian::Identity();
-    if (H2) (*H2) = Jacobian::Identity();
+    if (H1)
+    {
+      *H1 = Jacobian::Identity(); // dretract(origin, v) / dorigin
+    }
+    if (H2)
+    {
+      *H2 = Jacobian::Identity(); // dretract(origin, v) / dv
+    }
     return origin + Eigen::Map<const Matrix>(v.data());
   }
 };
@@ -107,31 +135,47 @@ struct DynamicMatrixTraits {
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
   typedef DynamicMatrix ManifoldType;
 
-  static int getDimension(const DynamicMatrix& m) {
+  static int getDimension(const DynamicMatrix& m)
+  {
     return m.rows() * m.cols();
   }
 
-  static Jacobian eye(const DynamicMatrix& m) {
+  static Jacobian eye(const DynamicMatrix& m)
+  {
     int dim = getDimension(m);
     return Eigen::Matrix<FloatType, dimension, dimension>::Identity(dim, dim);
   }
 
-  static TangentVector local(const DynamicMatrix& m, const DynamicMatrix& other,
+  static TangentVector local(
+      const DynamicMatrix& origin, const DynamicMatrix& other,
       Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) *H1 = -eye(m);
-    if (H2) *H2 =  eye(m);
-    TangentVector v(getDimension(m));
-    Eigen::Map<DynamicMatrix>(v.data(), m.rows(), m.cols()) = other - m;
+    if (H1)
+    {
+      *H1 = -eye(origin); // dlocal(origin, other) / dorigin
+    }
+    if (H2)
+    {
+      *H2 =  eye(origin); // dlocal(origin, other) / dother
+    }
+    TangentVector v(getDimension(origin));
+    Eigen::Map<DynamicMatrix>(v.data(), origin.rows(), origin.cols()) = other - origin;
     return v;
   }
 
-  static DynamicMatrix retract(const DynamicMatrix& m, const TangentVector& v,
+  static DynamicMatrix retract(
+      const DynamicMatrix& origin, const TangentVector& v,
       Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    if (H1) *H1 = eye(m);
-    if (H2) *H2 = eye(m);
-    return m + Eigen::Map<const DynamicMatrix>(v.data(), m.rows(), m.cols());
+    if (H1)
+    {
+      *H1 = eye(origin); // dretract(origin, v) / dorigin
+    }
+    if (H2)
+    {
+      *H2 = eye(origin); // dretract(origin, v) / dv
+    }
+    return origin + Eigen::Map<const DynamicMatrix>(v.data(), origin.rows(), origin.cols());
   }
 };
 
@@ -139,20 +183,20 @@ struct DynamicMatrixTraits {
 
 // traits for fully dynamic matrix
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, -1, -1, Options, MaxRows, MaxCols> > :
-    public internal::DynamicMatrixTraits<-1, -1, Options, MaxRows, MaxCols> {
+struct traits<Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
+    public internal::DynamicMatrixTraits<Eigen::Dynamic, Eigen::Dynamic, Options, MaxRows, MaxCols> {
 };
 
 // traits for dynamic column vector
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, -1, 1, Options, MaxRows, MaxCols> > :
-    public internal::DynamicMatrixTraits<-1, 1, Options, MaxRows, MaxCols> {
+struct traits<Eigen::Matrix<FloatType, Eigen::Dynamic, 1, Options, MaxRows, MaxCols> > :
+    public internal::DynamicMatrixTraits<Eigen::Dynamic, 1, Options, MaxRows, MaxCols> {
 };
 
 // traits for dynamic row vector
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, 1, -1, Options, MaxRows, MaxCols> > :
-    public internal::DynamicMatrixTraits<1, -1, Options, MaxRows, MaxCols> {
+struct traits<Eigen::Matrix<FloatType, 1, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
+    public internal::DynamicMatrixTraits<1, Eigen::Dynamic, Options, MaxRows, MaxCols> {
 };
 
 } // namespace ze

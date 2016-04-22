@@ -61,32 +61,52 @@ template<> struct traits<Quaternion>
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
-  static bool equals(const Quaternion& q1, const Quaternion& q2, FloatType tol = 1e-8)
+  static bool equals(
+      const Quaternion& q1, const Quaternion& q2, FloatType tol = 1e-8)
   {
-    return (q1.getUnique().vector() - q2.getUnique().vector()).array().abs().maxCoeff() < tol;
+    return (q1.getUnique().vector()
+            - q2.getUnique().vector()).array().abs().maxCoeff() < tol;
   }
 
-  static TangentVector local(const Quaternion& origin, const Quaternion& other,
-                             Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static TangentVector local(
+      const Quaternion& origin, const Quaternion& other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     const Quaternion h = origin.inverse() * other;
     const TangentVector v = h.log();
     if(H1 || H2)
     {
       Jacobian D_v_h = logmapDerivativeSO3(v);
-      if(H1) *H1 = - D_v_h * h.inverse().getRotationMatrix(); // Adjoint(h.inverse()) = h.inverse()
-      if(H2) *H2 = D_v_h;
+      if(H1)
+      {
+        // dlocal(origin, other) / dorigin, using that Adjoint(h.inverse()) = h.inverse()
+        *H1 = - D_v_h * h.inverse().getRotationMatrix();
+      }
+      if(H2)
+      {
+        // dlocal(origin, other) / dother
+        *H2 = D_v_h;
+      }
     }
     return v;
   }
 
-  static Quaternion retract(const Quaternion& origin, const Vector3& d,
-                            Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static Quaternion retract(
+      const Quaternion& origin, const Vector3& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    const Quaternion g = Quaternion::exp(d);
+    const Quaternion g = Quaternion::exp(v);
     const Quaternion h = origin * g;
-    if (H1) *H1 = g.inverse().getRotationMatrix(); // Adjoint(g.inverse()) = g.inverse()
-    if (H2) *H2 = expmapDerivativeSO3(d);
+    if (H1)
+    {
+      // dretract(origin, v) / dorigin
+      *H1 = g.inverse().getRotationMatrix(); // Adjoint(g.inverse()) = g.inverse()
+    }
+    if (H2)
+    {
+      // dretract(origin, v) / dv
+      *H2 = expmapDerivativeSO3(v);
+    }
     return h;
   }
 };
@@ -100,15 +120,17 @@ template<> struct traits<Transformation>
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
-  static bool equals(const Transformation& T1, const Transformation& T2, FloatType tol = 1e-8)
+  static bool equals(
+      const Transformation& T1, const Transformation& T2, FloatType tol = 1e-8)
   {
     return (T1.getRotation().getUnique().vector()
             - T2.getRotation().getUnique().vector()).array().abs().maxCoeff() < tol
         && (T1.getPosition() - T2.getPosition()).array().abs().maxCoeff() < tol;
   }
 
-  static TangentVector local(const Transformation& origin, const Transformation& other,
-                             Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static TangentVector local(
+      const Transformation& origin, const Transformation& other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
     const Transformation h = origin.inverse() * other;
     const TangentVector v = (Vector6() << h.getPosition(), h.getRotation().log()).finished();
@@ -119,10 +141,11 @@ template<> struct traits<Transformation>
     return v;
   }
 
-  static Transformation retract(const Transformation& origin, const Vector6& d,
-                                Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  static Transformation retract(
+      const Transformation& origin, const Vector6& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
   {
-    Transformation g(Quaternion::exp(d.tail<3>()), d.head<3>()); // Chart at origin
+    Transformation g(Quaternion::exp(v.tail<3>()), v.head<3>()); // Chart at origin
     Transformation h  = origin * g;
     if(H1 || H2)
     {

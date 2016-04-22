@@ -12,12 +12,12 @@ TEST(VersionedSlotHandle, test)
 
   v1.slot = 1;
   v1.version = 1;
-  std::cout << std::bitset<32>(v1.handle) << std::endl;
+  VLOG(1) << std::bitset<32>(v1.handle);
   EXPECT_EQ(v1.handle, 1 + (1<<8));
 
   v1.slot = VIdx::maxSlot();
   v1.version = VIdx::maxVersion();
-  std::cout << std::bitset<32>(v1.handle) << std::endl;
+  VLOG(1) << std::bitset<32>(v1.handle);
   EXPECT_EQ(v1.handle, std::numeric_limits<uint32_t>::max());
 
   VIdx v2;
