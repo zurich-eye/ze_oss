@@ -37,12 +37,12 @@ CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
 std::ostream& operator<<(std::ostream& out, const CameraRig& rig)
 {
   out << "Camera Rig: \n"
-      << "  Label = " << rig.getLabel() << "\n";
+      << "  Label = " << rig.label() << "\n";
   for (size_t i = 0; i < rig.size(); ++i)
   {
     out << "- Camera " << i << "\n"
         << rig.at(i) << "\n"
-        << "    T_B_C = \n" << rig.get_T_C_B(i).inverse() << "\n";
+        << "    T_B_C = \n" << rig.T_C_B(i).inverse() << "\n";
   }
   return out;
 }

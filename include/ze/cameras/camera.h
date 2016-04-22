@@ -25,6 +25,7 @@ public:
   ZE_POINTER_TYPEDEFS(Camera);
 
 public:
+  Camera() = delete;
 
   Camera(const uint32_t width, const uint32_t height, const CameraType type,
          const VectorX& projection_params, const VectorX& distortion_params);
@@ -34,6 +35,8 @@ public:
   //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
   static Ptr loadFromYaml(const std::string& path);
 
+  //! @name: Projection and back-projection operations. The main use of the camera.
+  //! @{
   //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
   virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
@@ -42,13 +45,14 @@ public:
 
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
+  //! @}
 
-  //! @name Block operations. Always prefer these to avoid cache misses.
-  //!@{
+  //! @name Block projection and back-projection. Always prefer to avoid cache misses.
+  //! @{
   virtual Bearings backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const;
   virtual Keypoints projectVectorized(const Eigen::Ref<const Bearings>& bearing_vec) const;
   virtual Matrix6X dProject_dLandmarkVectorized(const Positions& pos_vec) const;
-  //!@}
+  //! @}
 
   //! @name Image dimension.
   //! @{
@@ -86,7 +90,6 @@ public:
   inline Image8uC1::ConstPtr mask() const { return mask_; }
 
 protected:
-
   Size2u size_;
 
   //! Camera projection parameters, e.g., (fx, fy, cx, cy).
@@ -95,11 +98,8 @@ protected:
   //! Camera distortion parameters, e.g., (k1, k2, r1, r2).
   VectorX distortion_params_;
 
-  //! Camera distortion parameters
   std::string label_;
   CameraType type_;
-
-  //! Mask
   Image8uC1::Ptr mask_ = nullptr;
 };
 
