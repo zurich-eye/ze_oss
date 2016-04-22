@@ -18,7 +18,7 @@ namespace ze {
 RansacRelativePose::RansacRelativePose(
     const Camera& cam,
     const FloatType& reprojection_threshold_px)
-  : opengv_threshold_(
+  : ogv_threshold_(
       1.0 - std::cos(cam.getApproxAnglePerPixel() * reprojection_threshold_px))
 {
   VLOG(3) << "RANSAC THRESHOLD = " << cam.getApproxAnglePerPixel() * reprojection_threshold_px;
@@ -55,6 +55,7 @@ bool RansacRelativePose::solve(
       break;
     default:
       LOG(FATAL) << "Algorithm not implemented";
+      break;
   }
   return false;
 }
@@ -66,18 +67,19 @@ bool RansacRelativePose::solveRelativePose(
     Transformation& T_cur_ref)
 {
   // Setup problem.
+  //! @todo: Unify all the repetitive code.
   using Problem = opengv::sac_problems::relative_pose::CentralRelativePoseSacProblem;
   using Adapter = opengv::relative_pose::CentralRelativeAdapter;
   Adapter adapter(f_cur, f_ref);
   boost::shared_ptr<Problem> problem(new Problem(adapter, Problem::STEWENIUS));
   opengv::sac::Ransac<Problem> ransac;
   ransac.sac_model_ = problem;
-  ransac.threshold_ = opengv_threshold_;
-  ransac.max_iterations_ = max_iterations_;
-  ransac.probability_ = init_probability_;
+  ransac.threshold_ = ogv_threshold_;
+  ransac.max_iterations_ = ogv_max_iterations_;
+  ransac.probability_ = ogv_init_probability_;
 
   // Solve.
-  if(!ransac.computeModel(verbosity_level_))
+  if(!ransac.computeModel(ogv_verbosity_level_))
   {
     LOG(WARNING) << "5Pt RANSAC could not find a solution";
     return false;
@@ -104,18 +106,19 @@ bool RansacRelativePose::solveTranslationOnly(
     Transformation& T_cur_ref)
 {
   // Setup Problem.
+  //! @todo: Unify all the repetitive code.
   using Problem = opengv::sac_problems::relative_pose::TranslationOnlySacProblem;
   using Adapter = opengv::relative_pose::CentralRelativeAdapter;
   Adapter adapter(f_cur, f_ref, T_cur_ref.getRotationMatrix());
   boost::shared_ptr<Problem> problem(new Problem(adapter));
   opengv::sac::Ransac<Problem> ransac;
   ransac.sac_model_ = problem;
-  ransac.threshold_ = opengv_threshold_;
-  ransac.max_iterations_ = max_iterations_;
-  ransac.probability_ = init_probability_;
+  ransac.threshold_ = ogv_threshold_;
+  ransac.max_iterations_ = ogv_max_iterations_;
+  ransac.probability_ = ogv_init_probability_;
 
   // Solve.
-  if(!ransac.computeModel(verbosity_level_))
+  if(!ransac.computeModel(ogv_verbosity_level_))
   {
     LOG(WARNING) << "2Pt RANSAC could not find a solution";
     return false;
@@ -142,17 +145,18 @@ bool RansacRelativePose::solveRotationOnly(
     Transformation& T_cur_ref)
 {
   // Setup Problem.
+  //! @todo: Unify all the repetitive code.
   using Problem = opengv::sac_problems::relative_pose::RotationOnlySacProblem;
   opengv::relative_pose::CentralRelativeAdapter adapter(f_cur, f_ref);
   boost::shared_ptr<Problem> problem(new Problem(adapter));
   opengv::sac::Ransac<Problem> ransac;
   ransac.sac_model_ = problem;
-  ransac.threshold_ = opengv_threshold_;
-  ransac.max_iterations_ = max_iterations_;
-  ransac.probability_ = init_probability_;
+  ransac.threshold_ = ogv_threshold_;
+  ransac.max_iterations_ = ogv_max_iterations_;
+  ransac.probability_ = ogv_init_probability_;
 
   // Solve.
-  if(!ransac.computeModel(verbosity_level_))
+  if(!ransac.computeModel(ogv_verbosity_level_))
   {
     LOG(WARNING) << "2Pt RANSAC could not find a solution";
     return false;
@@ -174,7 +178,7 @@ bool RansacRelativePose::solveRotationOnly(
 }
 
 // -----------------------------------------------------------------------------
-std::vector<int> RansacRelativePose::getOutliers()
+std::vector<int> RansacRelativePose::outliers()
 {
   return getOutlierIndicesFromInlierIndices<int>(inliers_, num_measurements_);
 }

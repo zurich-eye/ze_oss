@@ -14,7 +14,9 @@ using ClamState = State<Transformation, VectorX>;
 
 struct ClamLandmarks
 {
-  Positions origin_Br;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  Positions origin_Br; //! Br is body-frame of the reverence view.
   Bearings f_Br;
 };
 
@@ -23,24 +25,23 @@ struct ClamFrameData
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  //!@ Localization data
-  //!{
+  //! @name Localization data
+  //! @{
   //! Measurements: Bearing vectors.
   Bearings f_C;
 
-  //! Landmark positions expressed in body of reference frame.
+  //! Landmark positions expressed in body frame of reference view.
   //! Each column corresponds to a bearing measurement.
   Positions p_Br;
+  //! @}
 
-  //!}
-
-  //!@ Mapping data
-  //!{
+  //! @name Mapping data
+  //! @{
   //! Landmark measurements {ClamLandmarks-Index, Keypoint}.
   std::vector<std::pair<uint32_t, Keypoint>> landmark_measurements;
-  //!}
+  //! @}
 
-  //! Extrinsic transformation between camera and body (i.e., imu) frame.
+  //! Extrinsic transformation between camera and body (i.e., IMU) frame.
   Transformation T_C_B;
 };
 
@@ -74,7 +75,7 @@ private:
   FloatType measurement_sigma_mapping_ = 2.0;
 
   // Prior:
-  const Transformation& T_Bc_Br_prior_;
+  const Transformation& T_Bc_Br_prior_; //!< Body-frame of (c)urrent and (r)eference view.
   FloatType prior_weight_pos_;
   FloatType prior_weight_rot_;
 };
@@ -87,7 +88,9 @@ inline Vector2 reprojectionResidual(
     const Transformation& T_Bc_Br,
     const FloatType inv_depth,
     const Eigen::Ref<const Keypoint>& px_measured,
-    Matrix26* H1 = nullptr, Matrix21* H2 = nullptr)
+    Matrix26* H1 = nullptr, //!< Jacobian dreprojectionResidual() / dT_Bc_Br
+    Matrix21* H2 = nullptr  //!< Jacobian dreprojectionResidual() / dinv_depth
+    )
 {
   HomPosition p_Br_h;
   p_Br_h.head<3>() = f_Br + p_Br * inv_depth;
@@ -97,17 +100,17 @@ inline Vector2 reprojectionResidual(
   const Keypoint px_est = cam.project(p_C_h.head<3>());
   const Vector2 px_err = px_est - px_measured;
 
-  if(H1 || H2)
+  if (H1 || H2)
   {
     // H1 = dPx / dT_Bc_Br
     Matrix23 J_proj = cam.dProject_dLandmark(p_C_h.head<3>());
-    if(inv_depth < 0.0)
+    if (inv_depth < 0.0)
     {
       J_proj *= -1.0;
     }
     Matrix36 G;
     G.block<3,3>(0,0) = I_3x3 * inv_depth; // translation
-    G.block<3,3>(0,3) = - skewSymmetric(p_Br_h.head<3>()); // rotation
+    G.block<3,3>(0,3) = -skewSymmetric(p_Br_h.head<3>()); // rotation
     *H1 = J_proj * T_C_Br.getRotationMatrix() * G;
 
     // H2 = dPx / dinv_depth

@@ -27,11 +27,6 @@ enum class RelativePoseAlgorithm {
 class RansacRelativePose
 {
 public:
-  FloatType opengv_threshold_;
-  uint32_t max_iterations_ = 100;
-  FloatType init_probability_ = 0.999;
-  uint32_t verbosity_level_ = 0u;
-
   RansacRelativePose() = delete;
 
   RansacRelativePose(
@@ -67,16 +62,23 @@ public:
 
   inline uint32_t numIterations() const { return num_iterations_; }
 
-  inline const std::vector<int>& getInliers() const { return inliers_; }
+  inline const std::vector<int>& inliers() const { return inliers_; }
 
-  std::vector<int> getOutliers();
+  std::vector<int> outliers();
+
+  //! @name: OpenGV settings.
+  //! @{
+  FloatType ogv_threshold_;
+  uint32_t ogv_max_iterations_ = 100;
+  FloatType ogv_init_probability_ = 0.999;
+  uint32_t ogv_verbosity_level_ = 0u;
+  //! @}
 
 private:
   uint32_t num_measurements_ = 0u;
   uint32_t num_iterations_ = 0u;
   FloatType result_probability_;
   std::vector<int> inliers_;
-
 };
 
 } // namespace ze

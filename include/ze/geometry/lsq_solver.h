@@ -40,11 +40,11 @@ struct LeastSquaresSolverOptions
   bool verbose = false;
 
   //! Stop if update norm is smaller than eps
-  FloatType eps = 0.0000000001;
+  FloatType eps = 1.0e-10;
 };
 
 //! Abstract Class for solving nonlinear least-squares (NLLS) problems.
-//! Template Parameters: D  : dimension of the state, T: type of the model
+//! Template Parameters: D: dimension of the state, T: type of the model
 //! e.g. SE2, SE3
 template <typename T, typename Implementation>
 class LeastSquaresSolver
@@ -79,13 +79,13 @@ public:
   void reset();
 
   //! Get the squared error
-  inline FloatType getError() const
+  inline FloatType error() const
   {
     return chi2_;
   }
 
   //! The the Hessian matrix (Information Matrix).
-  inline const HessianMatrix& getHessian() const
+  inline const HessianMatrix& hessian() const
   {
     return H_;
   }
@@ -161,7 +161,6 @@ protected:
   }
 
 private:
-
   //! Default implementation to solve the linear system H*dx = g to obtain optimal perturbation dx.
   bool solveDefaultImpl(
       const HessianMatrix& H,
@@ -187,16 +186,35 @@ private:
   {}
 
 protected:
-  HessianMatrix  H_;        //!< Hessian or approximation Jacobian*Jacobian^T.
-  GradientVector g_;        //!< Jacobian*residual.
-  UpdateVector  dx_;        //!< Update step.
-  FloatType chi2_ = 0.0f;   //!< Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  FloatType rho_ = 0.0f;    //!< Error reduction: chi2-new_chi2.
-  FloatType mu_ = 0.01f;    //!< Damping parameter.
-  FloatType nu_ = 2.0f;     //!< Factor that specifies how much we increase mu at every trial.
-  bool stop_ = false;       //!< Stop flag.
-  size_t iter_ = 0u;        //!< Current Iteration.
-  size_t trials_ = 0u;      //!< Current number of trials.
+  //! Hessian or approximation Jacobian*Jacobian^T.
+  HessianMatrix H_;
+
+  //! Jacobian*residual.
+  GradientVector g_;
+
+  //! Update step.
+  UpdateVector dx_;
+
+  //! Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
+  FloatType chi2_ = std::numeric_limits<FloatType>::max();
+
+  //! Error reduction: chi2 - new_chi2.
+  FloatType rho_ = 0.0f;
+
+  //! Damping parameter.
+  FloatType mu_ = 0.01f;
+
+  //! Factor that specifies how much we increase mu at every trial.
+  FloatType nu_ = 2.0f;
+
+  //! Stop flag.
+  bool stop_ = false;
+
+  //! Current Iteration.
+  size_t iter_ = 0u;
+
+  //! Current number of trials.
+  size_t trials_ = 0u;
 };
 
 } // namespace ze
