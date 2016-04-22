@@ -49,17 +49,17 @@ TEST(RansacRelativePoseTests, testFivePointAndTranslationOnly)
   // Some outliers, Five-Point
   Transformation T;
   RansacRelativePose ransac(cam, 1.0);
-  ransac.verbosity_level_ = 2;
+  ransac.ogv_verbosity_level_ = 2;
   bool success = ransac.solve(f_ref, f_cur, RelativePoseAlgorithm::FivePoint, T);
   EXPECT_TRUE(success);
-  EXPECT_EQ(ransac.getInliers().size(), n_points - n_outliers);
+  EXPECT_EQ(ransac.inliers().size(), n_points - n_outliers);
   std::cout << "Error = " << (T.inverse() * T_cur_ref).log().transpose() << std::endl;
 
   // Some outliers, Estimate relative translation.
   T.getRotation() = T_cur_ref.getRotation();
   success = ransac.solve(f_ref, f_cur, RelativePoseAlgorithm::TwoPointTranslationOnly, T);
   EXPECT_TRUE(success);
-  EXPECT_EQ(ransac.getInliers().size(), n_points - n_outliers);
+  EXPECT_EQ(ransac.inliers().size(), n_points - n_outliers);
   std::cout << "Error = " << (T.inverse() * T_cur_ref).log().transpose() << std::endl;
 }
 
@@ -91,10 +91,10 @@ TEST(RansacRelativePoseTests, testRotationOnly)
   // Some outliers, Five-Point
   Transformation T;
   RansacRelativePose ransac(cam, 1.0);
-  ransac.verbosity_level_ = 2;
+  ransac.ogv_verbosity_level_ = 2;
   bool success = ransac.solve(f_ref, f_cur, RelativePoseAlgorithm::TwoPointRotationOnly, T);
   EXPECT_TRUE(success);
-  EXPECT_EQ(ransac.getInliers().size(), n_points - n_outliers);
+  EXPECT_EQ(ransac.inliers().size(), n_points - n_outliers);
   std::cout << "Error = " << (T.inverse() * T_cur_ref).log().transpose() << std::endl;
 }
 

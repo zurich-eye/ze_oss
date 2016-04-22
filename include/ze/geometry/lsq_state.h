@@ -57,8 +57,13 @@ public:
   using StateT = State<Elements...>;
   using StateTuple = decltype(std::tuple<Elements...>());
 
-  enum StateSize : int { size = std::tuple_size<StateTuple>::value };
-  enum StateDimension : int {
+  enum StateSize : int
+  {
+    size = std::tuple_size<StateTuple>::value
+  };
+
+  enum StateDimension : int
+  {
     // Dimension is -1 if State is not of fixed size (e.g. contains VectorX).
     dimension = (internal::TupleIsFixedSize<StateTuple>::is_fixed_size)
       ? internal::TupleGetDimension<StateTuple>::dimension : Eigen::Dynamic
@@ -76,7 +81,7 @@ public:
   void print() const
   {
     printImpl<0>();
-    std::cout << "--\n";
+    VLOG(1) << "--\n";
   }
 
   void retract(const TangentVector& v)
@@ -88,7 +93,7 @@ public:
   //! Get actual dimension of the state, also if state is of dynamic size.
   int getDimension() const
   {
-    return getDimensionImpl<0>();
+    return dimensionImpl<0>();
   }
 
   //! Get reference to element.
@@ -119,54 +124,55 @@ public:
   }
 
 private:
-
-  //!@ getDimension recursive implementation.
-  //!{
+  //! @name dimension recursive implementation.
+  //! @{
   template<uint32_t i, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
-  inline int getDimensionImpl() const
+  inline int dimensionImpl() const
   {
-    return traits<ElementType<i>>::dimension + getDimensionImpl<i+1>();
+    return traits<ElementType<i>>::dimension + dimensionImpl<i+1>();
   }
 
   template<uint32_t i, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
-  inline int getDimensionImpl() const
+  inline int dimensionImpl() const
   {
-    return traits<ElementType<i>>::getDimension(std::get<i>(state_)) + getDimensionImpl<i+1>();
+    // Element is of dynamic size.
+    return traits<ElementType<i>>::getDimension(std::get<i>(state_)) + dimensionImpl<i+1>();
   }
 
   template<uint32_t i,typename std::enable_if<(i==size-1 && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
-  inline int getDimensionImpl() const
+  inline int dimensionImpl() const
   {
     return traits<ElementType<i>>::dimension;
   }
 
   template<uint32_t i, typename std::enable_if<(i==size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
-  inline int getDimensionImpl() const
+  inline int dimensionImpl() const
   {
+    // Element is of dynamic size.
     return traits<ElementType<i>>::getDimension(std::get<i>(state_));
   }
-  //!}
+  //! @}
 
-  //!@ print recursive implementation.
-  //!{
+  //! @name print recursive implementation.
+  //! @{
   template<uint32_t i, typename std::enable_if<(i<size)>::type* = nullptr>
   inline void printImpl() const
   {
     using T = ElementType<i>;
-    std::cout << "--\nState-Index: " << i << "\n"
-              << "Type = " << typeid(T).name() << "\n"
-              << "Dimension = " << traits<T>::dimension << "\n"
-              << "Value = \n" << std::get<i>(state_) << "\n";
+    VLOG(1) << "--\nState-Index: " << i << "\n"
+            << "Type = " << typeid(T).name() << "\n"
+            << "Dimension = " << traits<T>::dimension << "\n"
+            << "Value = \n" << std::get<i>(state_) << "\n";
     printImpl<i+1>();
   }
 
   template<uint32_t i, typename std::enable_if<(i>=size)>::type* = nullptr>
   inline void printImpl() const
   {}
-  //!}
+  //! @}
 
-  //!@ retract recursive implementation.
-  //!{
+  //! @name retract recursive implementation.
+  //! @{
   template<uint32_t i=0, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension != -1)>::type* = nullptr>
   inline void retractImpl(const TangentVector& v, uint32_t j)
   {
@@ -180,6 +186,7 @@ private:
   template<uint32_t i=0, typename std::enable_if<(i<size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
   inline void retractImpl(const TangentVector& v, uint32_t j)
   {
+    // Element is of dynamic size.
     using T = ElementType<i>;
     const int element_dim = traits<T>::getDimension(std::get<i>(state_));
     std::get<i>(state_) = traits<T>::retract(
@@ -199,12 +206,13 @@ private:
   template<uint32_t i=0, typename std::enable_if<(i==size-1 && traits<ElementType<i>>::dimension == -1)>::type* = nullptr>
   inline void retractImpl(const TangentVector& v, uint32_t j)
   {
+    // Element is of dynamic size.
     using T = ElementType<i>;
     const int element_dim = traits<T>::getDimension(std::get<i>(state_));
     std::get<i>(state_) = traits<T>::retract(
            std::get<i>(state_), v.segment(j, element_dim));
   }
-  //!}
+  //! @}
 
 };
 

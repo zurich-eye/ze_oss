@@ -36,7 +36,7 @@ FloatType PoseOptimizer::evaluateError(
     const PoseOptimizerFrameData& data = data_[i];
     FloatType& measurement_sigma = measurement_sigma_[i];
 
-    if(data.f.cols() == 0)
+    if (data.f.cols() == 0)
     {
       LOG(WARNING) << "Have no measurements in camera " << i;
       continue;

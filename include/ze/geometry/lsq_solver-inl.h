@@ -185,7 +185,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
       }
       finishTrial();
 
-    } while(!(rho_>0 || stop_));
+    } while (!(rho_>0 || stop_));
 
     if (stop_)
     {
@@ -200,7 +200,7 @@ template <typename T, typename Implementation>
 void LeastSquaresSolver<T, Implementation>::reset()
 {
   VLOG(400) << "Reset";
-  chi2_ = 1e10;
+  chi2_ = std::numeric_limits<FloatType>::max();
   mu_ = solver_options_.mu_init;
   nu_ = solver_options_.nu_init;
   iter_ = 0;
@@ -216,7 +216,9 @@ bool LeastSquaresSolver<T, Implementation>::solveDefaultImpl(
 {
   dx = H.ldlt().solve(g);
   if (std::isnan(dx[0]))
+  {
     return false;
+  }
   return true;
 }
 
