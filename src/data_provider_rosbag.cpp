@@ -26,8 +26,8 @@ DataProviderRosbag::DataProviderRosbag(
   , imu_topic_(imu_topic)
 {
 
-  // TODO(cfo): Check if topics exists.
-  // TODO(cfo): Display number of messages per topic in the beginning.
+  //! @todo: Check if topics exists.
+  //! @todo: Display number of messages per topic in the beginning.
 
   CHECK(fileExists(bag_filename));
   bag_.reset(new rosbag::Bag);
@@ -35,17 +35,17 @@ DataProviderRosbag::DataProviderRosbag(
   {
     bag_->open(bag_filename, rosbag::bagmode::Read);
   }
-  catch(const std::exception e)
+  catch (const std::exception e)
   {
     LOG(FATAL) << "Could not open rosbag " << bag_filename << ": " << e.what();
   }
 
   std::vector<std::string> topics;
-  for(auto it : img_topic_camidx_map_)
+  for (auto it : img_topic_camidx_map_)
   {
     topics.push_back(it.first);
   }
-  if(!imu_topic.empty())
+  if (!imu_topic.empty())
   {
     topics.push_back(imu_topic);
   }
@@ -64,15 +64,15 @@ void DataProviderRosbag::spin()
 
 bool DataProviderRosbag::spinOnce()
 {
-  if(bag_view_it_ != bag_view_->end())
+  if (bag_view_it_ != bag_view_->end())
   {
     const rosbag::MessageInstance m = *bag_view_it_;
 
     sensor_msgs::ImageConstPtr m_img = m.instantiate<sensor_msgs::Image>();
-    if(m_img && camera_callback_)
+    if (m_img && camera_callback_)
     {
       auto it = img_topic_camidx_map_.find(m.getTopic());
-      if(it != img_topic_camidx_map_.end())
+      if (it != img_topic_camidx_map_.end())
       {
         ++n_processed_images_;
         if (FLAGS_data_source_stop_after_n_frames > 0
@@ -100,15 +100,15 @@ bool DataProviderRosbag::spinOnce()
         LOG_FIRST_N(WARNING, 1) << "Topic in bag that is not subscribed: " << m.getTopic();
       }
     }
-    else if(m_img && !camera_callback_)
+    else if (m_img && !camera_callback_)
     {
       LOG_FIRST_N(WARNING, 1) << "No camera callback registered but measurements available";
     }
 
     const sensor_msgs::ImuConstPtr m_imu = m.instantiate<sensor_msgs::Imu>();
-    if(m_imu && imu_callback_)
+    if (m_imu && imu_callback_)
     {
-      if(m.getTopic() == imu_topic_)
+      if (m.getTopic() == imu_topic_)
       {
         const Eigen::Vector3d gyr(
               m_imu->angular_velocity.x,
@@ -128,7 +128,7 @@ bool DataProviderRosbag::spinOnce()
         LOG_FIRST_N(WARNING, 1) << "Topic in bag that is not subscribed: " << m.getTopic();
       }
     }
-    else if(m_imu && !imu_callback_)
+    else if (m_imu && !imu_callback_)
     {
       LOG_FIRST_N(WARNING, 1) << "No IMU callback registered but measurements available";
     }

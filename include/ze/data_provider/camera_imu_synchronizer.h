@@ -10,7 +10,7 @@ namespace ze {
 // fwd
 class DataProviderBase;
 
-using StampedImage = std::pair<int64_t, Image8uC1::Ptr>;
+using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
 using StampedImages = std::vector<StampedImage>;
 using SynchronizedCameraImuCallback =
   std::function<void (const StampedImages& /*images*/,
@@ -25,7 +25,7 @@ public:
 
 
   //! Add Image to the frame synchronizer.
-  void addImgData(int64_t stamp, const Image8uC1::Ptr& img, uint32_t camera_idx);
+  void addImgData(int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx);
 
   //! Add IMU measurement to the frame synchronizer.
   void addImuData(int64_t stamp, const Vector3& acc, const Vector3& gyr);

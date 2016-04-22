@@ -23,7 +23,7 @@ using ImuCallback =
                       const Vector3& /*gyr*/)>;
 using CameraCallback =
   std::function<void (int64_t /*stamp*/,
-                      const Image8uC1::Ptr& /*img*/,
+                      const ImageBase::Ptr& /*img*/,
                       uint32_t /*camera-idx*/)>;
 
 enum class DataProviderType {

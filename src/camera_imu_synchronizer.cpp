@@ -22,7 +22,7 @@ CameraImuSynchronizer::CameraImuSynchronizer(
 {}
 
 void CameraImuSynchronizer::addImgData(
-    int64_t stamp, const Image8uC1::Ptr& img, uint32_t camera_idx)
+    int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx)
 {
   CHECK_LT(camera_idx, camera_rig_size_);
   if(img_buffer_.at(camera_idx).first != -1)

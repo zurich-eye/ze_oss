@@ -69,7 +69,7 @@ TEST(DataProviderTests, testRosbag)
 
   size_t num_cam0_measurements = 0u, num_cam1_measurements = 0u;
   dp.registerCameraCallback(
-        [&](int64_t /*stamp*/, const Image8uC1::Ptr& /*img*/, uint32_t cam_idx)
+        [&](int64_t /*stamp*/, const ImageBase::Ptr& /*img*/, uint32_t cam_idx)
   {
     if(cam_idx == 0)
     {
