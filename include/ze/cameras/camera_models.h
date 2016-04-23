@@ -97,8 +97,9 @@ struct FovDistortion
   static void distort(const T* params, T* px)
   {
     const T s = params[0];
+    const T tan_s_half_x2 = params[1];
     const T rad = std::sqrt(px[0] * px[0] + px[1] * px[1]);
-    const T factor = (rad < 0.001) ? 1.0 : std::atan(rad * 2.0 * std::tan(s / 2.0)) / (s * rad);
+    const T factor = (rad < 0.001) ? 1.0 : std::atan(rad * tan_s_half_x2) / (s * rad);
     px[0] *= factor;
     px[1] *= factor;
   }
@@ -107,8 +108,9 @@ struct FovDistortion
   static void undistort(const T* params, T* px)
   {
     const T s = params[0];
+    const T tan_s_half_x2 = params[1];
     const T rad = std::sqrt(px[0] * px[0] + px[1] * px[1]);
-    const T factor = (rad < 0.001) ? 1.0 : (std::tan(rad * s) / (2.0 * std::tan(s / 2.0))) / rad;
+    const T factor = (rad < 0.001) ? 1.0 : (std::tan(rad * s) / tan_s_half_x2) / rad;
     px[0] *= factor;
     px[1] *= factor;
   }
@@ -119,6 +121,7 @@ struct FovDistortion
     const T x = px_unitplane[0];
     const T y = px_unitplane[1];
     const T s = params[0];
+    const T tan_s_half_x2 = params[1];
     const T xx = x * x;
     const T yy = y * y;
     const T rad_sq = xx + yy;
@@ -145,7 +148,6 @@ struct FovDistortion
       // Standard case
       const T xy = x * y;
       const T rad = std::sqrt(rad_sq);
-      const T tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
       const T nominator = std::atan(tan_s_half_x2 * rad);
       const T offset = nominator / (s * rad);
       const T scale =
