@@ -15,7 +15,6 @@ namespace ze {
 class DataProviderRosbag : public DataProviderBase
 {
 public:
-
   DataProviderRosbag(
       const std::string& bag_filename,
       const std::string& imu_topic,
@@ -32,7 +31,6 @@ public:
   size_t size() const;
 
 private:
-
   std::unique_ptr<rosbag::Bag> bag_;
   std::unique_ptr<rosbag::View> bag_view_;
   rosbag::View::iterator bag_view_it_;
