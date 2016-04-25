@@ -45,6 +45,10 @@ public:
 
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Computes pixel coordinates from 3D point and corresponding Jacobian.
+  virtual std::pair<Keypoint, Matrix23> projectWithJacobian(
+      const Eigen::Ref<const Position>& pos) const = 0;
   //! @}
 
   //! @name Block projection and back-projection. Always prefer to avoid cache misses.

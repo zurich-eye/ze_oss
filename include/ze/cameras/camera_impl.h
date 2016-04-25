@@ -17,7 +17,8 @@ public:
 
   virtual ~PinholeProjection() = default;
 
-  virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const override
+  virtual Keypoint project(
+      const Eigen::Ref<const Bearing>& bearing) const override
   {
     // Unit coordinates -> distortion -> pinhole, offset and scale.
     Keypoint px = bearing.head<2>() / bearing(2);
@@ -26,7 +27,8 @@ public:
     return px;
   }
 
-  virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const override
+  virtual Bearing backProject(
+      const Eigen::Ref<const Keypoint>& px) const override
   {
     Bearing bearing;
     bearing << px(0), px(1), 1.0;
@@ -35,7 +37,8 @@ public:
     return bearing.normalized();
   }
 
-  virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const override
+  virtual Matrix23 dProject_dLandmark(
+      const Eigen::Ref<const Position>& pos) const override
   {
     Matrix22 J_dist;
     FloatType z_inv = 1.0 / pos.z();
@@ -53,6 +56,15 @@ public:
     J(1, 1) = fy * J_dist(1, 1) * z_inv;
     J(1, 2) = -fy * (pos.x() * J_dist(1, 0) + pos.y() * J_dist(1, 1)) * z_inv_sq;
     return J;
+  }
+
+  std::pair<Keypoint, Matrix23> projectWithJacobian(
+        const Eigen::Ref<const Position>& pos) const
+  {
+    //! @todo: project and jacobian computation do many duplicate things.
+    Keypoint px = project(pos);
+    Matrix23 J = dProject_dLandmark(pos);
+    return std::make_pair(px, J);
   }
 
   virtual FloatType getApproxAnglePerPixel() const override
