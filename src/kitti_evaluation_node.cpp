@@ -54,12 +54,16 @@ int main(int argc, char** argv)
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InstallFailureSignalHandler();
+  FLAGS_alsologtostderr = true;
+  FLAGS_colorlogtostderr = true;
 
   // Load groundtruth.
+  VLOG(1) << "Load groundtruth: " << FLAGS_filename_gt;
   ze::PoseSeries::Ptr gt_data = loadData(
         FLAGS_format_gt, ze::joinPath(FLAGS_data_dir, FLAGS_filename_gt));
 
   // Load estimate data.
+  VLOG(1) << "Load estimate: " << FLAGS_filename_es;
   ze::PoseSeries::Ptr es_data =
       loadData(FLAGS_format_es, ze::joinPath(FLAGS_data_dir, FLAGS_filename_es));
   ze::StampedTransformationVector es_stamped_poses =
