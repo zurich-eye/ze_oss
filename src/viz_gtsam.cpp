@@ -19,8 +19,8 @@ void drawGtsamPoint3(
     const FloatType size)
 {
   auto gtsam_points = values.filter<gtsam::Point3>(gtsam::Symbol::ChrTest(key_prefix));
-  const size_t n_points = gtsam_points.size();
-  Positions points(3, n_points);
+  const size_t num_points = gtsam_points.size();
+  Positions points(3, num_points);
   size_t i = 0;
   for(const auto& it : gtsam_points)
   {
@@ -38,9 +38,9 @@ void drawGtsamPose3(
     const FloatType size)
 {
   auto gtsam_poses = values.filter<gtsam::Pose3>(gtsam::Symbol::ChrTest(key_prefix));
-  const size_t n_poses = gtsam_poses.size();
+  const size_t num_poses = gtsam_poses.size();
   TransformationVector poses;
-  poses.reserve(n_poses);
+  poses.reserve(num_poses);
   for(const auto& it : gtsam_poses)
   {
     poses.push_back(Transformation(Quaternion(it.value.rotation().matrix()),
