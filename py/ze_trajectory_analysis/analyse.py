@@ -154,10 +154,12 @@ class TrajectoryAnalysis:
                                            self.p_es[first_idx:last_idx,:])
             self.scale = 1.0 
         elif align_type == 'identity':
+            self.logger.info('Align Identity.')
             self.t_Wgt_Wes = np.zeros((3,))
             self.R_Wgt_Wes = np.eye(3)            
             self.scale = 1.0
         elif align_type == 'first_frame':
+            self.logger.info('Align first frame.')
             T_Wgt_B = tf.matrix_from_quaternion(self.q_gt[0,:])
             T_Wgt_B[:3,3] = self.p_gt[0,:]
             T_Wes_B = tf.matrix_from_quaternion(self.q_es[0,:])
