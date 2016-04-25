@@ -17,7 +17,7 @@ ImageBase::Ptr CameraMeasurement::loadImage() const
 {
   //! @todo: Make an option which pixel-type to load.
   ImageCv8uC1::Ptr img;
-  cvBridgeLoad<Pixel8uC1>(img, image_path_filename, PixelOrder::gray);
+  cvBridgeLoad<Pixel8uC1>(img, image_filename, PixelOrder::gray);
   CHECK_NOTNULL(img.get());
   CHECK(img->numel() > 0);
   return img;

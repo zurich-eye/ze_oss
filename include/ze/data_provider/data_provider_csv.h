@@ -66,14 +66,14 @@ struct CameraMeasurement : public MeasurementBase
   CameraMeasurement(int64_t stamp_ns, size_t cam_idx, const std::string& img_path)
     : MeasurementBase(stamp_ns, MeasurementType::Camera)
     , camera_index(cam_idx)
-    , image_path_filename(img_path)
+    , image_filename(img_path)
   {}
   virtual ~CameraMeasurement() = default;
 
   ImageBase::Ptr loadImage() const;
 
   const size_t camera_index;
-  const std::string image_path_filename;
+  const std::string image_filename;
 };
 
 struct FeatureTrackMeasurement : public MeasurementBase
