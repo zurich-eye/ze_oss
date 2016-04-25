@@ -217,8 +217,6 @@ typedef Image<ze::Pixel32fC4> Image32fC4;
 template<typename Pixel>
 using ImagePtr = typename std::shared_ptr<Image<Pixel>>;
 
-
-
 } // namespace imp
 
 #endif // IMP_IMAGE_HPP
