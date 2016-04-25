@@ -28,4 +28,16 @@ inline std::string joinPath(const std::string& s1, const std::string& s2)
   return std::string(ensureRightSlash(s1) + ensureNoLeftSlash(s2));
 }
 
+inline std::string joinPath(const std::string& s1, const std::string& s2,
+                            const std::string& s3)
+{
+  return joinPath(joinPath(s1, s2), s3);
+}
+
+inline std::string joinPath(const std::string& s1, const std::string& s2,
+                            const std::string& s3, const std::string& s4)
+{
+  return joinPath(joinPath(s1, s2), joinPath(s3, s4));
+}
+
 } // namespace ze
