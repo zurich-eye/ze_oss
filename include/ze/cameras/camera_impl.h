@@ -74,6 +74,14 @@ public:
     return std::atan(1.0 / (2.0 * std::abs(this->projection_params_[0])))
          + std::atan(1.0 / (2.0 * std::abs(this->projection_params_[1])));
   }
+
+  virtual FloatType getApproxBearingAngleFromPixelDifference(FloatType px_diff) const override
+  {
+    //! @todo: Is this correct? And if yes, this is costlty to compute often!
+    // abs() because ICL-NUIM has negative focal length.
+    return std::atan(px_diff / (2.0 * std::abs(this->projection_params_[0])))
+         + std::atan(px_diff / (2.0 * std::abs(this->projection_params_[1])));
+  }
 };
 
 //-----------------------------------------------------------------------------

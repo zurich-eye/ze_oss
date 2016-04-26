@@ -19,12 +19,16 @@ enum class CameraType {
   PinholeRadialTangential = 3
 };
 
+inline bool isPinholeType(CameraType /*type*/)
+{
+  return true; // For now, we only have pinhole cameras.
+}
+
 class Camera
 {
 public:
   ZE_POINTER_TYPEDEFS(Camera);
 
-public:
   Camera() = delete;
 
   Camera(const uint32_t width, const uint32_t height, const CameraType type,
@@ -86,6 +90,8 @@ public:
   //! Get angle corresponding to one pixel in image plane.
   //! @todo: make static cache.
   virtual FloatType getApproxAnglePerPixel() const = 0;
+
+  virtual FloatType getApproxBearingAngleFromPixelDifference(FloatType px_diff) const = 0;
 
   //! Set mask: 0 = masked, >0 = unmasked.
   void setMask(const Image8uC1::Ptr& mask);

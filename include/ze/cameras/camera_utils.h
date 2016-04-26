@@ -60,6 +60,19 @@ bool isVisibleWithMargin(
 }
 
 //! Return if pixel px is within image boundaries with margin.
+template<typename DerivedKeyPoint>
+bool isVisibleWithMargin(
+    const Size2u image_size,
+    const Eigen::MatrixBase<DerivedKeyPoint>& px,
+    const typename DerivedKeyPoint::Scalar margin)
+{
+  return px[0] >= margin
+      && px[1] >= margin
+      && px[0] < (static_cast<typename DerivedKeyPoint::Scalar>(image_size.width()) - margin)
+      && px[1] < (static_cast<typename DerivedKeyPoint::Scalar>(image_size.height()) - margin);
+}
+
+//! Return if pixel px is within image boundaries with margin.
 inline bool isVisibleWithMargin(
     const int image_width, const int image_height, const int x, const int y, const int margin)
 {
