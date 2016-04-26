@@ -33,7 +33,10 @@ DataProviderCsv::DataProviderCsv(
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
-  loadImuData(csv_directory + ensureLeftSlash(imu_topic), 0u);
+  if (!imu_topic.empty())
+  {
+    loadImuData(csv_directory + ensureLeftSlash(imu_topic), 0u);
+  }
 
   for (auto it : camera_topics)
   {
