@@ -75,6 +75,7 @@ using Gradient  = Vector2;
 using Keypoints = Matrix2X;
 using Bearings  = Matrix3X;
 using Positions = Matrix3X;
+using Gradients = Matrix2X;
 using KeypointLevel = int8_t;
 using KeypointType  = int8_t;
 using KeypointIndex = uint16_t;

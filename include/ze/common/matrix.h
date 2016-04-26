@@ -23,6 +23,24 @@ inline void normalizeBearings(Bearings& bearings)
   bearings = bearings.array().rowwise() / bearings.colwise().norm().array();
 }
 
+template<typename Derived>
+Eigen::Matrix<typename Derived::Scalar, 2, 1> project2(const Eigen::MatrixBase<Derived>& v)
+{
+  EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 1);
+  return v.template head<2>() / v(2);
+}
+
+inline Matrix2X project2Vectorized(const Matrix3X& v)
+{
+  Matrix2X m(2, v.cols());
+  for (int i = 0; i < v.cols(); ++i)
+  {
+    m.col(i) = v.block<2,1>(0,i) / v(2,i);
+  }
+  return m;
+}
+
+
 //! Get element with max norm in a vector.
 inline FloatType normMax(const VectorX& v)
 {
