@@ -13,12 +13,6 @@
 
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
-//#include <ze/common/benchmark.h>
-//#include <ze/common/matrix.h>
-//#include <ze/common/timer.h>
-//#include <ze/cameras/camera.h>
-//#include <ze/cameras/camera_rig.h>
-//#include <ze/cameras/camera_utils.h>
 
 #include <imp/core/roi.hpp>
 #include <imp/core/image_raw.hpp>
@@ -27,10 +21,6 @@
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/bridge/opencv/cu_cv_bridge.hpp>
-
-//#include <imp/cu_core/cu_se3.cuh>
-//#include <imp/cu_core/cu_matrix.cuh>
-//#include <imp/cu_core/cu_pinhole_camera.cuh>
 
 #include <imp/cu_correspondence/variational_stereo.hpp>
 
@@ -55,8 +45,6 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   ImageGpu32fC1::Ptr cuimg_ref, cuimg_cur;
   cvBridgeLoad(cuimg_ref, data_path + "/cones/im2.png", ze::PixelOrder::gray);
   cvBridgeLoad(cuimg_cur, data_path + "/cones/im6.png", ze::PixelOrder::gray);
-//  ze::cvBridgeLoad(gt_disp_ref, data_path + "/cones/disp2.png", ze::PixelOrder::gray);
-//  ze::cvBridgeLoad(gt_disp_cur, data_path + "/cones/disp6.png", ze::PixelOrder::gray);
 
   {
     ze::Pixel32fC1 min_val,max_val;
@@ -123,8 +111,10 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
 }
 
 //-----------------------------------------------------------------------------
+//! @todo (MWE) add desired error to make tests more useful.
 using Solver = ze::cu::StereoPDSolver;
-std::tuple<ze::cu::StereoPDSolver, double, double> const StereoTestsParametrizationTable[] =
+std::tuple<ze::cu::StereoPDSolver, double, double> const
+StereoTestsParametrizationTable[] =
 {
   //              solver                           scale_factor  error
   std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
@@ -142,7 +132,8 @@ std::tuple<ze::cu::StereoPDSolver, double, double> const StereoTestsParametrizat
 
 //-----------------------------------------------------------------------------
 INSTANTIATE_TEST_CASE_P(
-  DenseStereoSolverTests, DenseStereoTests, ::testing::ValuesIn(StereoTestsParametrizationTable));
+  DenseStereoSolverTests, DenseStereoTests,
+    ::testing::ValuesIn(StereoTestsParametrizationTable));
 
 
 ZE_UNITTEST_ENTRYPOINT

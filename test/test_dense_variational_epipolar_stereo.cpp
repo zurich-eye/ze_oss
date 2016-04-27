@@ -13,12 +13,7 @@
 
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
-//#include <ze/common/benchmark.h>
-//#include <ze/common/matrix.h>
-//#include <ze/common/timer.h>
 #include <ze/cameras/camera.h>
-//#include <ze/cameras/camera_rig.h>
-//#include <ze/cameras/camera_utils.h>
 
 #include <imp/core/roi.hpp>
 #include <imp/core/image_raw.hpp>
@@ -181,6 +176,7 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 }
 
 //-----------------------------------------------------------------------------
+//! @todo (MWE) add desired error to make tests more useful.
 using Solver = ze::cu::StereoPDSolver;
 std::tuple<ze::cu::StereoPDSolver, double, double>
 const EpipolarStereoTestsParametrizationTable[] = {

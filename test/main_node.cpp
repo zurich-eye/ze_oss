@@ -30,14 +30,13 @@
 #include <ze/data_provider/data_provider_rosbag.h>
 #include <ze/data_provider/camera_imu_synchronizer.h>
 
-//#include <ze/common/file_utils.h>
 
 DEFINE_string(calibration_file, "", "Path to input calibration YAML file");
 DEFINE_string(bag_filename, "dataset.bag", "Name of bagfile in data_dir.");
-DEFINE_int32(stereo_num_iterations, 50, "number of iterations per warp");
-DEFINE_int32(stereo_num_warps, 5, "number of warping iterations");
-DEFINE_double(stereo_lambda, 20, "tradeoff between smoothing and dataterm");
-DEFINE_double(stereo_scale_factor, 0.8, "image pyramid scale factor (reduction; value in interval (0.5,1.0]");
+DEFINE_int32(stereo_num_iterations, 30, "number of iterations per warp");
+DEFINE_int32(stereo_num_warps, 3, "number of warping iterations");
+DEFINE_double(stereo_lambda, 10, "tradeoff between smoothing and dataterm");
+DEFINE_double(stereo_scale_factor, 0.5, "image pyramid scale factor (reduction; value in interval (0.5,1.0]");
 DEFINE_string(stereo_dump_disparities_folder, "", "Path to dump disparities.");
 DEFINE_bool(stereo_visualize, false, "");
 DEFINE_double(stereo_viz_min_disp, 0, "");
@@ -112,7 +111,6 @@ void StereoNode::callback(const StampedImages& stamped_images,
   ze::cu::ImageGpu32fC1::Ptr cu_disp = stereo_->getDisparities();
   CHECK_NOTNULL(cu_disp.get());
 
-
   {
     ze::Pixel32fC1 min_val,max_val;
     ze::cu::minMax(*cu_disp, min_val, max_val);
@@ -136,6 +134,7 @@ void StereoNode::callback(const StampedImages& stamped_images,
   std::string dump_path = FLAGS_stereo_dump_disparities_folder;
   if (!dump_path.empty())
   {
+    CHECK(false) << "dumping stereo images not yet supported";
     int64_t timestamp = stamped_images.at(0).first;
     std::stringstream ss;
     ss << timestamp << "_disp.png";
@@ -211,7 +210,6 @@ int main(int argc, char **argv)
   } // end .. compute fundamental matrix
 
   //! @todo (mwe) this also needs to get simpler from cpu transformation to gpu transformation...
-  //  Eigen::Quaterniond q_ref_cur = T_ref_cur.getEigenQuaternion();
   Eigen::Quaterniond q_cur_ref = T_ref_cur.inverse().getEigenQuaternion();
   Eigen::Vector3d t_cur_ref = T_ref_cur.inverse().getPosition();
 
@@ -232,25 +230,11 @@ int main(int argc, char **argv)
   stereo_params->ctf.iters = FLAGS_stereo_num_iterations;
   stereo_params->ctf.warps  = FLAGS_stereo_num_warps;
   stereo_params->lambda = FLAGS_stereo_lambda;
-  //  stereo_params->ctf.scale_factor = 0.8;
-//  stereo_params->ctf.iters = 30;
-//  stereo_params->ctf.warps  = 3;
-//  stereo->parameters()->lambda = 20;
 
   std::unique_ptr<ze::Stereo> stereo(new ze::Stereo(stereo_params));
   stereo->setFundamentalMatrix(F_cur_ref);
   stereo->setIntrinsics({cu_cam0, cu_cam1});
   stereo->setExtrinsics(cu_T_cur_ref);
-
-//  ImageGpu32fC1::Ptr cudisp = stereo->getDisparities();
-//  CHECK_NOTNULL(cudisp.get());
-//  ImageGpu32fC1::Ptr cuocc = stereo->getOcclusion();
-
-//  {
-//    ze::Pixel32fC1 min_val,max_val;
-//    minMax(*cudisp, min_val, max_val);
-//    VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
-//  }
 
   VLOG(1) << "Create Stereo Node.";
   ze::StereoNode stereo_node(stereo);
@@ -270,15 +254,9 @@ int main(int argc, char **argv)
                   std::placeholders::_3));
 
 
-//  message_filters::Subscriber<sensor_msgs::Image> img0_sub(nh, "/cam0/image_raw", 1);
-//  message_filters::Subscriber<sensor_msgs::Image> img1_sub(nh, "/cam1/image_raw", 1);
-//  message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> sync(img0_sub, img1_sub, 1);
-//  sync.registerCallback(boost::bind(&ze::StereoNode::callback, &stereo_node, _1, _2));
-
   VLOG(1) << "Start Processing.";
   data_provider.spin();
   VLOG(1) << "Finish Processing.";
-//  vio_node.shutdown();
 
   return EXIT_SUCCESS;
 }
