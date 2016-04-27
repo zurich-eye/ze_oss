@@ -1,5 +1,4 @@
-#ifndef PANGOLINDISPLAY_HPP
-#define PANGOLINDISPLAY_HPP
+#pragma once
 
 #include <imp/core/size.hpp>
 #include <imp/core/image.hpp>
@@ -109,5 +108,3 @@ inline void imshow(const ze::Image8uC1& im, const std::string& title="-")
 //};
 
 } // namespace ze
-
-#endif // PANGOLINDISPLAY_HPP
