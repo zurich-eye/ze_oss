@@ -1,5 +1,4 @@
-#ifndef IMP_ROS_BRIDGE_HPP
-#define IMP_ROS_BRIDGE_HPP
+#pragma once
 
 #include <memory>
 #include <cstdint>
@@ -208,4 +207,3 @@ ze::cu::ImageGpu<Pixel,pixel_type>::Ptr toImageGpu(
 
 } // namespace imp
 
-#endif // IMP_ROS_BRIDGE_HPP
