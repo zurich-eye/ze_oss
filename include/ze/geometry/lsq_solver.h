@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <vector>
 
 #include <ze/common/types.h>
 #include <ze/common/manifold.h>
@@ -22,25 +23,25 @@ struct LeastSquaresSolverOptions
   //! the steepest direction. This is good if the current iterate is far from the
   //! solution. If mu is small, LM approximates gauss newton iteration and we
   //! have (almost) quadratic convergence in the final stages.
-  FloatType mu_init = 0.01f;
+  FloatType mu_init{0.01};
 
   //! Increase factor of mu after fail
-  FloatType nu_init = 2.0;
+  FloatType nu_init{2.0};
 
   //! Max number of iterations
-  size_t max_iter = 15;
+  uint32_t max_iter{15u};
 
   //! Max number of trials (used in LevenbergMarquardt)
-  size_t max_trials = 5;
+  uint32_t max_trials{5u};
 
   //! Stop when error increases.
-  bool stop_when_error_increases = false;
+  bool stop_when_error_increases{false};
 
   //! Output Statistics
-  bool verbose = false;
+  bool verbose{false};
 
   //! Stop if update norm is smaller than eps
-  FloatType eps = 1.0e-10;
+  FloatType eps{1.0e-10};
 };
 
 //! Abstract Class for solving nonlinear least-squares (NLLS) problems.
@@ -66,22 +67,28 @@ protected:
   virtual ~LeastSquaresSolver() = default;
 
 public:
-  //! Calls the GaussNewton or LevenbergMarquardt optimization strategy
+  //! Calls the GaussNewton or LevenbergMarquardt optimization strategy.
   void optimize(State& state);
 
-  //! Gauss Newton optimization strategy
+  //! Gauss Newton optimization strategy.
   void optimizeGaussNewton(State& state);
 
-  //! Levenberg Marquardt optimization strategy
+  //! Levenberg Marquardt optimization strategy.
   void optimizeLevenbergMarquardt(State& state);
 
-  //! Reset all parameters to restart the optimization
+  //! Reset all parameters to restart the optimization.
   void reset();
 
-  //! Get the squared error
+  //! Get the squared error.
   inline FloatType error() const
   {
     return chi2_;
+  }
+
+  //! Get error at every iteration.
+  inline const std::vector<FloatType>& errors() const
+  {
+    return chi2_per_iter_;
   }
 
   //! The the Hessian matrix (Information Matrix).
@@ -196,25 +203,28 @@ protected:
   UpdateVector dx_;
 
   //! Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  FloatType chi2_ = std::numeric_limits<FloatType>::max();
+  FloatType chi2_{std::numeric_limits<FloatType>::max()};
 
   //! Error reduction: chi2 - new_chi2.
-  FloatType rho_ = 0.0f;
+  FloatType rho_{0.0};
 
   //! Damping parameter.
-  FloatType mu_ = 0.01f;
+  FloatType mu_{0.01};
 
   //! Factor that specifies how much we increase mu at every trial.
-  FloatType nu_ = 2.0f;
+  FloatType nu_{2.0};
 
   //! Stop flag.
-  bool stop_ = false;
+  bool stop_{false};
 
   //! Current Iteration.
-  size_t iter_ = 0u;
+  size_t iter_{0u};
 
   //! Current number of trials.
-  size_t trials_ = 0u;
+  size_t trials_{0u};
+
+  // Statistics:
+  std::vector<FloatType> chi2_per_iter_;
 };
 
 } // namespace ze

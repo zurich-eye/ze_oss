@@ -20,13 +20,18 @@ struct PoseOptimizerFrameData
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  PoseOptimizerResidualType type;
+  PoseOptimizerResidualType type = PoseOptimizerResidualType::UnitPlane;
+
+  uint32_t camera_idx = 0u;
 
   //! Measurements: Bearing vectors corresponding to keypoints.
   Bearings f;
 
   //! Gradients: Used only for edgelets.
   Gradients grad;
+
+  //! At which level was the keypoint extracted.
+  VectorX scale;
 
   //! Measurements bookkeeping: Corresponding indices. (Not used by the actual algorithm).
   KeypointIndices kp_idx;
@@ -58,10 +63,18 @@ public:
   using ScaleEstimator = MADScaleEstimator<FloatType>;
   using WeightFunction = TukeyWeightFunction<FloatType>;
 
+  PoseOptimizer(std::vector<PoseOptimizerFrameData>& data);
+
   PoseOptimizer(
       std::vector<PoseOptimizerFrameData>& data,
       const Transformation& T_B_W_prior,
-      const FloatType prior_weight_pos, const FloatType prior_weight_rot);
+      const FloatType prior_weight_pos,
+      const FloatType prior_weight_rot);
+
+  void setPrior(
+      const Transformation& T_B_W_prior,
+      const FloatType prior_weight_pos,
+      const FloatType prior_weight_rot);
 
   FloatType evaluateError(
       const Transformation& T_B_W,
@@ -71,25 +84,37 @@ public:
 private:
   std::vector<PoseOptimizerFrameData>& data_;
 
-  // Prior:
-  const Transformation& T_B_W_prior_;
-  FloatType prior_weight_pos_;
-  FloatType prior_weight_rot_;
+  //! @name Prior
+  //! @{
+  Transformation T_B_W_prior_;
+  FloatType prior_weight_pos_ {0.0};
+  FloatType prior_weight_rot_ {0.0};
+  //! @}
 };
 
-FloatType evaluateBearingErrors(
+//! Returns sum of chi2 errors (weighted and whitened errors) and
+//! a vector of withened errors for each error term (used for outlier removal).
+std::pair<FloatType, VectorX> evaluateBearingErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
     PoseOptimizer::HessianMatrix* H,
     PoseOptimizer::GradientVector* g);
 
-FloatType evaluateUnitPlaneErrors(
+//! Returns sum of chi2 errors (weighted and whitened errors) and
+//! a vector of withened errors for each error term (used for outlier removal).
+std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
     PoseOptimizer::HessianMatrix* H,
     PoseOptimizer::GradientVector* g);
+
+std::vector<KeypointIndex> getOutlierIndices(
+    PoseOptimizerFrameData& data,
+    const Camera& cam,
+    const Transformation& T_B_W,
+    const FloatType pixel_threshold);
 
 /*!
  * @brief Jacobian of bearing vector w.r.t. landmark in camera coordinates.

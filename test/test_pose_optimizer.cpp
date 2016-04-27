@@ -1,4 +1,5 @@
 #include <random>
+#include <ze/common/benchmark.h>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/matrix.h>
 #include <ze/common/timer.h>
@@ -8,6 +9,38 @@
 #include <ze/cameras/camera_impl.h>
 #include <ze/geometry/pose_optimizer.h>
 #include <ze/geometry/robust_cost.h>
+
+namespace ze {
+
+void testPoseOptimizer(
+    const FloatType pos_prior_weight,
+    const FloatType rot_prior_weight,
+    const Transformation& T_B_W,
+    const Transformation& T_B_W_perturbed,
+    const PoseOptimizerFrameData& data,
+    const std::string& description)
+{
+  PoseOptimizerFrameDataVec data_vec = { data };
+  Transformation T_B_W_estimate;
+  auto fun = [&]()
+  {
+    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
+    T_B_W_estimate = T_B_W_perturbed;
+    optimizer.optimize(T_B_W_estimate);
+  };
+  runTimingBenchmark(fun, 1, 10, description, true);
+
+  // Compute error:
+  Transformation T_err = T_B_W * T_B_W_estimate.inverse();
+  FloatType pos_error = T_err.getPosition().norm();
+  FloatType ang_error = T_err.getRotation().log().norm();
+  CHECK_LT(pos_error, 0.005);
+  CHECK_LT(ang_error, 0.005);
+  VLOG(1) << "ang error = " << ang_error;
+  VLOG(1) << "pos error = " << pos_error;
+}
+
+} // namespace ze
 
 TEST(PoseOptimizerTests, testSolver)
 {
@@ -36,12 +69,16 @@ TEST(PoseOptimizerTests, testSolver)
 
   // Apply some noise to the keypoints to simulate measurements.
   Keypoints px_noisy = px_true;
+  VectorX pyr_scale(n);
   const double stddev = 1.0;
   std::normal_distribution<double> px_noise(0.0, stddev);
   for(size_t i = 0; i < n; ++i)
   {
-    px_noisy(0,i) += px_noise(gen);
-    px_noisy(1,i) += px_noise(gen);
+    // Features distribute among all levels. features on higher levels have more
+    // uncertainty.
+    pyr_scale(i) = (1 << (i % 4));
+    px_noisy(0,i) += pyr_scale(i) * px_noise(gen);
+    px_noisy(1,i) += pyr_scale(i) * px_noise(gen);
   }
   Bearings bearings_noisy = cam.backProjectVectorized(px_noisy);
 
@@ -54,69 +91,24 @@ TEST(PoseOptimizerTests, testSolver)
   data.f = bearings_noisy;
   data.p_W = pos_W;
   data.T_C_B = T_C_B;
+  data.scale = pyr_scale;
+  data.type = PoseOptimizerResidualType::UnitPlane;
 
-  // Without prior:
-  {
-    double pos_prior_weight = 0.0;
-    double rot_prior_weight = 0.0;
-    ze::Timer t;
-    PoseOptimizerFrameDataVec data_vec = { data };
-    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
-    Transformation T_B_W_estimate = T_B_W_perturbed;
-    optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
+  testPoseOptimizer(
+        0.0, 0.0, T_B_W, T_B_W_perturbed, data, "UnitPlane, No Prior");
+  testPoseOptimizer(
+        10.0, 0.0, T_B_W, T_B_W_perturbed, data, "UnitPlane, Rotation Prior");
+  testPoseOptimizer(
+        10.0, 10.0, T_B_W, T_B_W_perturbed, data, "UnitPlane, Rotation and Position Prior");
 
-    // Compute error:
-    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
-    double pos_error = T_err.getPosition().norm();
-    double ang_error = T_err.getRotation().log().norm();
-    CHECK_LT(pos_error, 0.005);
-    CHECK_LT(ang_error, 0.005);
-    VLOG(1) << "ang error = " << ang_error;
-    VLOG(1) << "pos error = " << pos_error;
-  }
+  data.type = PoseOptimizerResidualType::Bearing;
 
-  // With rotation prior:
-  {
-    double pos_prior_weight = 0.0;
-    double rot_prior_weight = 10.0;
-    ze::Timer t;
-    PoseOptimizerFrameDataVec data_vec = { data };
-    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
-    Transformation T_B_W_estimate = T_B_W_perturbed;
-    optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() << " ms\n";
-
-    // Compute error:
-    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
-    double pos_error = T_err.getPosition().norm();
-    double ang_error = T_err.getRotation().log().norm();
-    CHECK_LT(pos_error, 0.005);
-    CHECK_LT(ang_error, 0.005);
-    VLOG(1) << "ang error = " << ang_error;
-    VLOG(1) << "pos error = " << pos_error;
-  }
-
-  // With position prior:
-  {
-    double pos_prior_weight = 10.0;
-    double rot_prior_weight = 0.0;
-    ze::Timer t;
-    PoseOptimizerFrameDataVec data_vec = { data };
-    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
-    Transformation T_B_W_estimate = T_B_W_perturbed;
-    optimizer.optimize(T_B_W_estimate);
-    VLOG(1) << "optimization took " << t.stopAndGetMilliseconds() * 1000 << " ms\n";
-
-    // Compute error:
-    Transformation T_err = T_B_W * T_B_W_estimate.inverse();
-    double pos_error = T_err.getPosition().norm();
-    double ang_error = T_err.getRotation().log().norm();
-    CHECK_LT(pos_error, 0.005);
-    CHECK_LT(ang_error, 0.005);
-    VLOG(1) << "ang error = " << ang_error;
-    VLOG(1) << "pos error = " << pos_error;
-  }
+  testPoseOptimizer(
+        0.0, 0.0, T_B_W, T_B_W_perturbed, data, "Bearing, No Prior");
+  testPoseOptimizer(
+        10.0, 0.0, T_B_W, T_B_W_perturbed, data, "Bearing, Rotation Prior");
+  testPoseOptimizer(
+        10.0, 10.0, T_B_W, T_B_W_perturbed, data, "Bearing, Rotation and Position Prior");
 }
 
 

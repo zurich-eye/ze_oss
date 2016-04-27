@@ -10,7 +10,9 @@ template <typename T, typename Implementation>
 LeastSquaresSolver<T, Implementation>::LeastSquaresSolver(
     const LeastSquaresSolverOptions& options)
   : solver_options_(options)
-{}
+{
+  chi2_per_iter_.reserve(std::min(options.max_iter, 100u));
+}
 
 template <typename T, typename Implementation>
 void LeastSquaresSolver<T, Implementation>::optimize(State& state)
@@ -71,6 +73,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     old_state = state;
     state = new_state;
     chi2_ = new_chi2;
+    chi2_per_iter_.push_back(chi2_);
     FloatType x_norm = normMax(dx_);
     VLOG(400) << "It. " << iter_
               << "\t Success"
@@ -153,6 +156,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         // update decrased the error -> success
         state = new_model;
         chi2_ = new_chi2;
+        chi2_per_iter_.push_back(chi2_);
         stop_ = normMax(dx_) < solver_options_.eps;
         mu_ *= std::max(FloatType{0.333f},
                         std::min(FloatType{1.0f - 8.0f * rho_ * rho_ * rho_},

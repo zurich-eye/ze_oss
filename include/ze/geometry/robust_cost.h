@@ -19,7 +19,7 @@ struct UnitScaleEstimator
 {
   static constexpr Scalar compute(const VectorX& /*errors*/)
   {
-    return 1.0;
+    return Scalar{1.0};
   }
 };
 
@@ -34,7 +34,7 @@ struct MADScaleEstimator
     absolute_error = errors.array().abs();
     std::pair<Scalar, bool> res = median(absolute_error);
     CHECK(res.second);
-    return 1.48f * res.first; // 1.48f / 0.6745
+    return Scalar{1.48} * res.first; // 1.48f / 0.6745
   }
 };
 
@@ -49,7 +49,7 @@ struct NormalDistributionScaleEstimator
     const int n = errors.size();
     CHECK(n > 1);
     const Scalar mean = errors.sum() / n;
-    Scalar sum2 = 0.0;
+    Scalar sum2 = Scalar{0.0};
     for(int i = 0; i < errors.size(); ++i)
     {
       sum2 += (errors(i) - mean) * (errors(i) - mean);
@@ -89,7 +89,7 @@ struct UnitWeightFunction : public WeightFunction<Scalar, UnitWeightFunction<Sca
 {
   static constexpr Scalar weight(const Scalar& /*normed_error*/)
   {
-    return 1.0;
+    return Scalar{1.0};
   }
 };
 
@@ -102,12 +102,12 @@ struct TukeyWeightFunction : public WeightFunction<Scalar, TukeyWeightFunction<S
     const Scalar x_square = error * error;
     if(x_square <= b_square)
     {
-      const Scalar tmp = 1.0f - x_square / b_square;
+      const Scalar tmp = Scalar{1.0} - x_square / b_square;
       return tmp * tmp;
     }
     else
     {
-      return 0.0f;
+      return Scalar{0.0};
     }
   }
 };
@@ -119,7 +119,7 @@ struct HuberWeightFunction : public WeightFunction<Scalar, HuberWeightFunction<S
   static Scalar weight(const Scalar& normed_error)
   {
     const Scalar abs_error = std::abs(normed_error);
-    return (abs_error < k) ? 1.0f : k / abs_error;
+    return (abs_error < k) ? Scalar{1.0} : k / abs_error;
   }
 };
 
