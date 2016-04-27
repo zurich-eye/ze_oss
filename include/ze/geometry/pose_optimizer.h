@@ -63,13 +63,18 @@ public:
   using ScaleEstimator = MADScaleEstimator<FloatType>;
   using WeightFunction = TukeyWeightFunction<FloatType>;
 
-  PoseOptimizer(std::vector<PoseOptimizerFrameData>& data);
+  PoseOptimizer(
+      const LeastSquaresSolverOptions& options,
+      std::vector<PoseOptimizerFrameData>& data);
 
   PoseOptimizer(
+      const LeastSquaresSolverOptions& options,
       std::vector<PoseOptimizerFrameData>& data,
       const Transformation& T_B_W_prior,
       const FloatType prior_weight_pos,
       const FloatType prior_weight_rot);
+
+  static LeastSquaresSolverOptions getDefaultSolverOptions();
 
   void setPrior(
       const Transformation& T_B_W_prior,

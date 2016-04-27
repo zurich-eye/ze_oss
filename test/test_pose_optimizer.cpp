@@ -24,7 +24,9 @@ void testPoseOptimizer(
   Transformation T_B_W_estimate;
   auto fun = [&]()
   {
-    PoseOptimizer optimizer(data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
+    PoseOptimizer optimizer(
+          PoseOptimizer::getDefaultSolverOptions(),
+          data_vec, T_B_W, pos_prior_weight, rot_prior_weight);
     T_B_W_estimate = T_B_W_perturbed;
     optimizer.optimize(T_B_W_estimate);
   };

@@ -14,20 +14,35 @@ namespace ze {
 
 //------------------------------------------------------------------------------
 PoseOptimizer::PoseOptimizer(
+    const LeastSquaresSolverOptions& options,
     std::vector<PoseOptimizerFrameData>& data)
-  : data_(data)
+  : LeastSquaresSolver<Transformation, PoseOptimizer>(options)
+  , data_(data)
 {}
 
 //------------------------------------------------------------------------------
 PoseOptimizer::PoseOptimizer(
+    const LeastSquaresSolverOptions& options,
     std::vector<PoseOptimizerFrameData>& data,
     const Transformation& T_B_W_prior,
-    const FloatType prior_weight_pos, const FloatType prior_weight_rot)
-  : data_(data)
+    const FloatType prior_weight_pos,
+    const FloatType prior_weight_rot)
+  : LeastSquaresSolver<Transformation, PoseOptimizer>(options)
+  , data_(data)
   , T_B_W_prior_(T_B_W_prior)
   , prior_weight_pos_(prior_weight_pos)
   , prior_weight_rot_(prior_weight_rot)
 {}
+
+//------------------------------------------------------------------------------
+LeastSquaresSolverOptions PoseOptimizer::getDefaultSolverOptions()
+{
+  LeastSquaresSolverOptions options;
+  options.strategy = SolverStrategy::GaussNewton;
+  options.max_iter = 10;
+  options.eps = 0.000001;
+  return options;
+}
 
 //------------------------------------------------------------------------------
 void PoseOptimizer::setPrior(
@@ -47,8 +62,10 @@ FloatType PoseOptimizer::evaluateError(
   FloatType chi2 = FloatType{0.0};
 
   // Loop over all cameras in rig.
+  VLOG(400) << "Num residual blocks = " << data_.size();
   for (auto& residual_block : data_)
   {
+    VLOG(400) << "Process residual block " << residual_block.camera_idx;
     switch (residual_block.type)
     {
       case PoseOptimizerResidualType::Bearing:
@@ -92,23 +109,21 @@ std::pair<FloatType, VectorX> evaluateBearingErrors(
   Bearings f_err = f_est - data.f;
   VectorX f_err_norm = f_err.colwise().norm();
 
+  // Account that features at higher levels have higher uncertainty.
+  f_err_norm.array() /= data.scale.array();
+
   // At the first iteration, compute the scale of the error.
   if (first_iteration)
   {
-    // Account for level of feature. Higher level features have more uncertainty.
-    data.measurement_sigma = PoseOptimizer::ScaleEstimator::compute(
-                               f_err_norm.array().colwise() / data.scale.array());
+    data.measurement_sigma = PoseOptimizer::ScaleEstimator::compute(f_err_norm);
   }
 
-  // Compute measurement uncertainties.
-  VectorX sigmas2 = data.scale.array() * data.measurement_sigma * data.measurement_sigma;
-
   // Robust cost function.
-  f_err_norm.array() /= sigmas2.array();
-  VectorX weights = PoseOptimizer::WeightFunction::weightVectorized(f_err_norm);
+  VectorX weights = PoseOptimizer::WeightFunction::weightVectorized(
+                      f_err_norm.array() / data.measurement_sigma);
 
   // Instead of whitening the error and the Jacobian, we apply sigma to the weights:
-  weights.array() /= sigmas2.array();
+  weights.array() /= (data.scale.array() * data.measurement_sigma * data.measurement_sigma);
 
   if (H && g)
   {
@@ -158,23 +173,22 @@ std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
   Keypoints uv_err = uv_est - data.uv;
   VectorX uv_err_norm = uv_err.colwise().norm();
 
+  // Account that features at higher levels have higher uncertainty.
+  uv_err_norm.array() /= data.scale.array();
+
   // At the first iteration, compute the scale of the error.
   if (first_iteration)
   {
-    // Account for level of feature. Higher level features have more uncertainty.
-    data.measurement_sigma = PoseOptimizer::ScaleEstimator::compute(
-                               uv_err_norm.array() / data.scale.array());
+    data.measurement_sigma =
+        PoseOptimizer::ScaleEstimator::compute(uv_err_norm);
   }
 
-  // Compute measurement uncertainties.
-  VectorX sigmas2 = data.scale * data.measurement_sigma * data.measurement_sigma;
-
   // Robust cost function.
-  uv_err_norm.array() /= sigmas2.array();
-  VectorX weights = PoseOptimizer::WeightFunction::weightVectorized(uv_err_norm);
+  VectorX weights = PoseOptimizer::WeightFunction::weightVectorized(
+                      uv_err_norm.array() / data.measurement_sigma);
 
   // Instead of whitening the error and the Jacobian, we apply sigma to the weights:
-  weights.array() /= sigmas2.array();
+  weights.array() /= (data.scale.array() * data.measurement_sigma * data.measurement_sigma);
 
   if (H && g)
   {
