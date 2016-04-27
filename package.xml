@@ -17,17 +17,10 @@
   <depend>ze_common</depend>
   <depend>ze_cameras</depend>
   <depend>ze_geometry</depend>
-  <depend>ze_ros</depend>
   <depend>imp_core</depend>
   <depend>imp_cu_core</depend>
   <depend>imp_3rdparty_cuda_toolkit</depend>
   <depend>imp_cu_imgproc</depend>
-  <depend>roscpp</depend>
-  <depend>std_msgs</depend>
-  <depend>message_filters</depend>
-  <depend>ze_data_provider</depend>
-
-<!--  <depend>imp_bridge_opencv</depend>-->
 
   <test_depend>gtest</test_depend>
 </package>
