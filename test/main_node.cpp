@@ -170,7 +170,7 @@ int main(int argc, char **argv)
   ze::cu::PinholeCamera cu_cam1(projection_parameteres1(0), projection_parameteres1(1),
                                 projection_parameteres1(2), projection_parameteres1(3));
 
-  ze::Transformation T_ref_cur = rig->get_T_C_B(0) * rig->get_T_C_B(1).inverse();
+  ze::Transformation T_ref_cur = rig->T_C_B(0) * rig->T_C_B(1).inverse();
 
   VLOG(1) << "compute fundamental matrix";
   ze::cu::Matrix3f F_ref_cur;
