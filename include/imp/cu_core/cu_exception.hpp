@@ -1,5 +1,4 @@
-#ifndef CUCORE_CU_EXCEPTION_HPP
-#define CUCORE_CU_EXCEPTION_HPP
+#pragma once
 
 #include <sstream>
 #include <cuda_runtime_api.h>
@@ -60,6 +59,4 @@ public:
 
 #define IMP_CU_THROW_EXCEPTION(msg, err) \
   throw ze::cu::Exception(msg, err, __FILE__, __FUNCTION__, __LINE__)
-
-#endif // CUCORE_CU_EXCEPTION_HPP
 

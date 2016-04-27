@@ -1,5 +1,4 @@
-#ifndef IMP_CU_PIXEL_CONVERSION_HPP
-#define IMP_CU_PIXEL_CONVERSION_HPP
+#pragma once
 
 #include <cuda_runtime_api.h>
 #include <imp/core/pixel.hpp>
@@ -98,6 +97,4 @@ cudaChannelFormatDesc toCudaChannelFormatDesc(ze::PixelType pixel_type) __attrib
 } // namespace cu
 } // namespace ze
 
-
-#endif // IMP_CU_PIXEL_CONVERSION_HPP
 

@@ -1,5 +1,4 @@
-#ifndef IMP_CU_UTILS_CUH
-#define IMP_CU_UTILS_CUH
+#pragma once
 
 #include <cuda_runtime_api.h>
 #include <cstdint>
@@ -306,6 +305,3 @@ static inline void printGPUMemoryUsage()
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_UTILS_CUH
-
