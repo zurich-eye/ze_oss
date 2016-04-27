@@ -1,5 +1,4 @@
-#ifndef IMP_ROI_HPP
-#define IMP_ROI_HPP
+#pragma once
 
 #include <cstdint>
 #include <array>
@@ -234,6 +233,4 @@ using Roi3d = Roi<float, 3>;
 
 
 } // namespace ze
-
-#endif // IMP_ROI_HPP
 

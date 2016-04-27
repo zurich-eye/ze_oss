@@ -1,5 +1,4 @@
-#ifndef IMP_IMAGE_HPP
-#define IMP_IMAGE_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -219,4 +218,3 @@ using ImagePtr = typename std::shared_ptr<Image<Pixel>>;
 
 } // namespace ze
 
-#endif // IMP_IMAGE_HPP

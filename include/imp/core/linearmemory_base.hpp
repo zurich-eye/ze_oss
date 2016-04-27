@@ -1,5 +1,4 @@
-#ifndef IMP_LINEARMEMORY_HPP
-#define IMP_LINEARMEMORY_HPP
+#pragma once
 
 #include <cstdint>
 #include <imp/core/size.hpp>
@@ -71,4 +70,3 @@ protected:
 
 } // namespace ze
 
-#endif // IMP_LINEARMEMORY_HPP

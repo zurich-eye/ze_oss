@@ -1,5 +1,4 @@
-#ifndef IMP_IMAGE_BASE_HPP
-#define IMP_IMAGE_BASE_HPP
+#pragma once
 
 #include <memory>
 
@@ -199,4 +198,3 @@ using ImageBasePtr = std::shared_ptr<ImageBase>;
 
 } // namespace ze
 
-#endif // IMP_IMAGE_BASE_HPP

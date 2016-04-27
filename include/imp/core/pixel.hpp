@@ -1,5 +1,4 @@
-#ifndef IMP_PIXEL_HPP
-#define IMP_PIXEL_HPP
+#pragma once
 
 #include <cstdint>
 #include <cmath>
@@ -394,7 +393,4 @@ inline CUDA_HOST CUDA_DEVICE Vec32fC4 normalize(Vec4<T> v)
 
 #undef CUDA_HOST
 #undef CUDA_DEVICE
-
-
-#endif // IMP_PIXEL_HPP
 

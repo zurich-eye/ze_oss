@@ -1,5 +1,4 @@
-#ifndef IMP_SIZE_HPP
-#define IMP_SIZE_HPP
+#pragma once
 
 #include <cstdint>
 #include <array>
@@ -319,4 +318,3 @@ typedef Size<double, 3> Size3d;
 
 } // namespace ze
 
-#endif // IMP_SIZE_HPP

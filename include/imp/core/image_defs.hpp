@@ -1,5 +1,4 @@
-#ifndef IMP_IMAGE_DEFS_HPP
-#define IMP_IMAGE_DEFS_HPP
+#pragma once
 
 #include <memory>
 #include <imp/core/pixel_enums.hpp>
@@ -18,6 +17,4 @@ using ConstImageCvPtrRef = const std::shared_ptr<ImageCv<Pixel,pixel_type>>&;
 
 
 } // namespace ze
-
-#endif // IMP_IMAGE_DEFS_HPP
 

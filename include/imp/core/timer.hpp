@@ -1,5 +1,4 @@
-#ifndef IMP_TIMER_HPP
-#define IMP_TIMER_HPP
+#pragma once
 
 #include <iostream>
 #include <chrono>
@@ -72,6 +71,4 @@ private:
 
 
 } // namespace ze
-
-#endif // IMP_TIMER_HPP
 

@@ -1,5 +1,4 @@
-#ifndef CORE_MACROS_HPP
-#define CORE_MACROS_HPP
+#pragma once
 
 // from Simon's multi-agent mapping framework
 #define IMP_USING_INTERNAL_SMART_POINTERS(TypeName) \
@@ -14,6 +13,4 @@
   using UniquePtr = std::unique_ptr<TypeName>;        \
   void defineUsingInternalSharedPointers##__FILE__##__LINE__(void)
 
-
-#endif // CORE_MACROS_HPP
 

@@ -1,5 +1,4 @@
-#ifndef IMP_TYPES_HPP
-#define IMP_TYPES_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -15,6 +14,4 @@ enum class InterpolationMode
 
 
 }
-
-#endif // IMP_TYPES_HPP
 

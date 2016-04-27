@@ -1,5 +1,4 @@
-#ifndef CORE_EXCEPTION_HPP
-#define CORE_EXCEPTION_HPP
+#pragma once
 
 #include <sstream>
 
@@ -44,6 +43,4 @@ public:
 #define IMP_THROW_EXCEPTION(msg) throw ze::Exception(msg, __FILE__, __FUNCTION__, __LINE__)
 
 }
-
-#endif // CORE_EXCEPTION_HPP
 

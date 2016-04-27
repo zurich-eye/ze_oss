@@ -1,5 +1,4 @@
-#ifndef IMP_IMAGE_RAW_HPP
-#define IMP_IMAGE_RAW_HPP
+#pragma once
 
 #include <memory>
 #include <algorithm>
@@ -140,4 +139,3 @@ using ImageRawConstPtr = typename ImageRaw<Pixel>::ConstPtr;
 
 } // namespace ze
 
-#endif // IMP_IMAGE_RAW_HPP

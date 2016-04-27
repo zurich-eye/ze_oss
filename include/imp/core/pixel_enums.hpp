@@ -1,5 +1,4 @@
-#ifndef IMP_PIXEL_ENUMS_HPP
-#define IMP_PIXEL_ENUMS_HPP
+#pragma once
 
 namespace ze {
 
@@ -50,6 +49,4 @@ enum class PixelOrder
 
 
 } // namespace ze
-
-#endif // IMP_PIXEL_ENUMS_HPP
 

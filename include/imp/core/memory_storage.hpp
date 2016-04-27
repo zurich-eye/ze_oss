@@ -1,5 +1,4 @@
-#ifndef IMP_MEMORY_STORAGE_HPP
-#define IMP_MEMORY_STORAGE_HPP
+#pragma once
 
 #include <stdlib.h>
 #include <assert.h>
@@ -159,4 +158,3 @@ private:
 
 } // imp
 
-#endif // IMAGE_ALLOCATOR_HPP

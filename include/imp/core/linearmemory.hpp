@@ -1,5 +1,4 @@
-#ifndef IMP_LINEARHOSTMEMORY_H
-#define IMP_LINEARHOSTMEMORY_H
+#pragma once
 
 #include <stdio.h>
 #include <assert.h>
@@ -108,4 +107,3 @@ typedef LinearMemory<ze::Pixel32fC4> LinearMemory32fC4;
 
 } // namespace ze
 
-#endif // IMP_LINEARHOSTMEMORY_H
