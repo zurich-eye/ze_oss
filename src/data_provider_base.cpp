@@ -4,13 +4,12 @@ namespace ze {
 
 DataProviderBase::DataProviderBase(DataProviderType type)
   : type_(type)
-  , shutdown_(false)
+  , signal_handler_(running_)
 {}
 
 void DataProviderBase::shutdown()
 {
-  // TODO(cfo): Catch SIGINT signal.
-  shutdown_ = true;
+  running_ = false;
 }
 
 void DataProviderBase::registerImuCallback(const ImuCallback& imu_callback)

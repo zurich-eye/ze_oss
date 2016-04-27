@@ -3,7 +3,14 @@
 
 #include <functional>
 
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
+#include <gflags/gflags.h>
+
+DEFINE_int32(data_sync_init_skip_n_frames, 0,
+             "How many frames should be skipped at the beginning.");
+
+DEFINE_int32(data_sync_stop_after_n_frames, -1,
+             "How many frames should be processed?");
 
 namespace ze {
 
@@ -23,6 +30,16 @@ void CameraImuSynchronizer::addImgData(
     LOG(WARNING) << "Received new camera image before the previous set was complete."
                  << " Unordered camera images are arriving!";
   }
+
+  if (camera_idx == 0)
+  {
+    ++sync_frame_count_;
+    if (sync_frame_count_ < FLAGS_data_sync_init_skip_n_frames)
+    {
+      return;
+    }
+  }
+
   img_buffer_[camera_idx] = std::make_pair(stamp, img);
   checkDataAndCallback();
 }
@@ -72,7 +89,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
   if(max_stamp - min_stamp > img_bundle_max_dt_nsec_)
   {
     LOG(WARNING) << "Images in bundle have too large varying timestamps: "
-                 << nanosecToMillisec(max_stamp - min_stamp) << " milliseconds";
+                 << nanosecToMillisecTrunc(max_stamp - min_stamp) << " milliseconds";
   }
 
   // Check if we have received some IMU measurements.
@@ -117,7 +134,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
         imu_buffer_.getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
   }
 
-  // Awesome, we have all data that we need, let's process the callback.
+  // Let's process the callback.
   cam_imu_callback_(img_buffer_, imu_timestamps, imu_measurements);
 
   last_img_bundle_min_stamp_ = min_stamp;

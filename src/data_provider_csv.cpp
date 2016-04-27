@@ -2,9 +2,9 @@
 
 #include <fstream>
 #include <iostream>
-#include <glog/logging.h>
+#include <ze/common/logging.hpp>
 
-#include <ze/common/time.h>
+#include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/file_utils.h>
 #include <imp/bridge/opencv/cv_bridge.hpp>
@@ -15,8 +15,9 @@ namespace dataset {
 
 ImageBase::Ptr CameraMeasurement::loadImage() const
 {
+  //! @todo: Make an option which pixel-type to load.
   ImageCv8uC1::Ptr img;
-  cvBridgeLoad<Pixel8uC1>(img, image_path_filename, PixelOrder::gray);
+  cvBridgeLoad<Pixel8uC1>(img, image_filename, PixelOrder::gray);
   CHECK_NOTNULL(img.get());
   CHECK(img->numel() > 0);
   return img;
@@ -34,7 +35,7 @@ DataProviderCsv::DataProviderCsv(
 
   loadImuData(csv_directory + ensureLeftSlash(imu_topic), 0u);
 
-  for(auto it : camera_topics)
+  for (auto it : camera_topics)
   {
     std::string dir = csv_directory + ensureLeftSlash(it.first);
     loadCameraData(dir, it.second, millisecToNanosec(100));
@@ -46,20 +47,22 @@ DataProviderCsv::DataProviderCsv(
 
 void DataProviderCsv::spin()
 {
-  while(ok())
+  while (ok())
+  {
     spinOnce();
+  }
 }
 
 bool DataProviderCsv::spinOnce()
 {
-  if(buffer_it_ != buffer_.cend())
+  if (buffer_it_ != buffer_.cend())
   {
     const dataset::MeasurementBase::Ptr& data = buffer_it_->second;
     switch (data->type)
     {
       case dataset::MeasurementType::Camera:
       {
-        if(camera_callback_)
+        if (camera_callback_)
         {
           dataset::CameraMeasurement::ConstPtr cam_data =
               std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
@@ -75,7 +78,7 @@ bool DataProviderCsv::spinOnce()
       }
       case dataset::MeasurementType::Imu:
       {
-        if(imu_callback_)
+        if (imu_callback_)
         {
           dataset::ImuMeasurement::ConstPtr imu_data =
                 std::dynamic_pointer_cast<const dataset::ImuMeasurement>(data);
@@ -88,8 +91,10 @@ bool DataProviderCsv::spinOnce()
         break;
       }
       default:
+      {
         LOG(FATAL) << "Unhandled message type: " << static_cast<int>(data->type);
         break;
+      }
     }
     ++buffer_it_;
     return true;
@@ -99,7 +104,17 @@ bool DataProviderCsv::spinOnce()
 
 bool DataProviderCsv::ok() const
 {
-  return buffer_it_ != buffer_.cend() && !shutdown_;
+  if (!running_)
+  {
+    VLOG(1) << "Data Provider was terminated.";
+    return false;
+  }
+  if (buffer_it_ == buffer_.cend())
+  {
+    VLOG(1) << "All data processed.";
+    return false;
+  }
+  return true;
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)
@@ -109,15 +124,15 @@ void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t play
   openFileStreamAndCheckHeader(data_dir+"/data.csv", kHeader, &fs);
   std::string line;
   size_t i = 0;
-  while(std::getline(fs, line))
+  while (std::getline(fs, line))
   {
     std::vector<std::string> items = splitString(line, ',');
     CHECK_EQ(items.size(), 7u);
     Eigen::Vector3d acc, gyr;
     acc << std::stod(items[4]), std::stod(items[5]), std::stod(items[6]);
     gyr << std::stod(items[1]), std::stod(items[2]), std::stod(items[3]);
-    dataset::ImuMeasurement::Ptr imu_measurement(
-        new dataset::ImuMeasurement(std::stoll(items[0]), acc, gyr));
+    auto imu_measurement =
+        std::make_shared<dataset::ImuMeasurement>(std::stoll(items[0]), acc, gyr);
 
     buffer_.insert(std::make_pair(
                      imu_measurement->stamp_ns + playback_delay,
@@ -138,13 +153,13 @@ void DataProviderCsv::loadCameraData(
   openFileStreamAndCheckHeader(data_dir+"/data.csv", kHeader, &fs);
   std::string line;
   size_t i = 0;
-  while(std::getline(fs, line))
+  while (std::getline(fs, line))
   {
-      std::vector<std::string> items = splitString(line, ',');
-      CHECK_EQ(items.size(), 2u);
-    dataset::CameraMeasurement::Ptr camera_measurement(
-        new dataset::CameraMeasurement(
-            std::stoll(items[0]), camera_index, data_dir + "/data/" + items[1]));
+    std::vector<std::string> items = splitString(line, ',');
+    CHECK_EQ(items.size(), 2u);
+    auto camera_measurement =
+        std::make_shared<dataset::CameraMeasurement>(
+          std::stoll(items[0]), camera_index, data_dir + "/data/" + items[1]);
 
     buffer_.insert(std::make_pair(
                      camera_measurement->stamp_ns + playback_delay,

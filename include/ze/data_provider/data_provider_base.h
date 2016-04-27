@@ -4,9 +4,11 @@
 #include <memory>
 #include <functional>
 
+#include <imp/core/image.hpp>
 #include <ze/common/macros.h>
+#include <ze/common/signal_handler.hpp>
 #include <ze/common/types.h>
-#include <imp/core/image_base.hpp>
+#include <ze/common/noncopyable.hpp>
 
 // fwd
 namespace cv {
@@ -29,7 +31,7 @@ enum class DataProviderType {
   Rosbag
 };
 
-class DataProviderBase
+class DataProviderBase : Noncopyable
 {
 public:
   ZE_POINTER_TYPEDEFS(DataProviderBase);
@@ -57,7 +59,8 @@ protected:
   DataProviderType type_;
   ImuCallback imu_callback_;
   CameraCallback camera_callback_;
-  std::atomic_bool shutdown_;
+  volatile bool running_ = true;
+  SimpleSigtermHandler signal_handler_; //!< Sets running_ to false when Ctrl-C is pressed.
 };
 
 } // namespace ze

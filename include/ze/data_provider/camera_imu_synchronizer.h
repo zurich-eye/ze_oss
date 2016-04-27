@@ -2,8 +2,8 @@
 
 #include <ze/common/types.h>
 #include <ze/common/buffer.h>
-#include <ze/common/time.h>
-#include <imp/core/image_base.hpp>
+#include <ze/common/time_conversions.h>
+#include <imp/core/image_raw.hpp>
 
 namespace ze {
 
@@ -47,6 +47,9 @@ private:
 
   //! Stamp of previous synchronized image bundle.
   int64_t last_img_bundle_min_stamp_ = -1;
+
+  //! Count number of synchronized frames.
+  int sync_frame_count_ = 0;
 
   //! Image buffer has fixed size of num_frames.
   StampedImages img_buffer_;

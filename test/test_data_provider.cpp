@@ -17,7 +17,7 @@ TEST(DataProviderTests, testCsv)
 
   DataProviderCsv dp(data_dir+"/data", "imu0", { {"cam0", 0} });
 
-  size_t num_imu_measurements = 0;
+  size_t num_imu_measurements = 0u;
   int64_t expect_imu_stamp = 1403636579758555392;
   dp.registerImuCallback(
         [&](int64_t stamp, const Vector3& /*acc*/, const Vector3& /*gyr*/)
@@ -29,7 +29,7 @@ TEST(DataProviderTests, testCsv)
     }
   });
 
-  size_t num_cam_measurements = 0;
+  size_t num_cam_measurements = 0u;
   int64_t expect_cam_stamp = 1403636579763555584;
   dp.registerCameraCallback(
         [&](int64_t stamp, const ImageBase::Ptr& /*img*/, uint32_t /*cam_idx*/)
@@ -45,8 +45,8 @@ TEST(DataProviderTests, testCsv)
 
   EXPECT_EQ(expect_imu_stamp, 0);
   EXPECT_EQ(expect_cam_stamp, 0);
-  EXPECT_EQ(num_cam_measurements, 5);
-  EXPECT_EQ(num_imu_measurements, 69);
+  EXPECT_EQ(num_cam_measurements, 5u);
+  EXPECT_EQ(num_imu_measurements, 69u);
 }
 
 TEST(DataProviderTests, testRosbag)
@@ -60,14 +60,14 @@ TEST(DataProviderTests, testRosbag)
   DataProviderRosbag dp(bag_filename, "/imu0", { {"/cam0/image_raw", 0},
                                                  {"/cam1/image_raw", 1} });
 
-  size_t num_imu_measurements = 0;
+  size_t num_imu_measurements = 0u;
   dp.registerImuCallback(
         [&](int64_t /*stamp*/, const Vector3& /*acc*/, const Vector3& /*gyr*/)
   {
     ++num_imu_measurements;
   });
 
-  size_t num_cam0_measurements = 0, num_cam1_measurements = 0;
+  size_t num_cam0_measurements = 0u, num_cam1_measurements = 0u;
   dp.registerCameraCallback(
         [&](int64_t /*stamp*/, const ImageBase::Ptr& /*img*/, uint32_t cam_idx)
   {
@@ -83,9 +83,9 @@ TEST(DataProviderTests, testRosbag)
 
   dp.spin();
 
-  EXPECT_EQ(num_cam0_measurements, 21);
-  EXPECT_EQ(num_cam1_measurements, 20);
-  EXPECT_EQ(num_imu_measurements, 210);
+  EXPECT_EQ(num_cam0_measurements, 21u);
+  EXPECT_EQ(num_cam1_measurements, 20u);
+  EXPECT_EQ(num_imu_measurements, 210u);
 }
 
 
