@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include <ze/common/types.h>
-#include <imp/core/macros.hpp>
+#include <ze/common/macros.h>
 #include <imp/core/image_base.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
@@ -15,7 +15,7 @@ template<typename Pixel>
 class Image : public ImageBase
 {
 public:
-  using Ptr = typename std::shared_ptr<Image<Pixel>>;
+  ZE_POINTER_TYPEDEFS(Image);
   using pixel_t = Pixel;
 
 protected:
@@ -216,8 +216,6 @@ typedef Image<ze::Pixel32fC4> Image32fC4;
 // convenience typedefs
 template<typename Pixel>
 using ImagePtr = typename std::shared_ptr<Image<Pixel>>;
-
-
 
 } // namespace ze
 
