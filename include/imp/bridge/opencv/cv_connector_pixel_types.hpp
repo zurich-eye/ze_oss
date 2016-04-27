@@ -1,5 +1,4 @@
-#ifndef IMP_CV_CONNECTOR_PIXEL_TYPES
-#define IMP_CV_CONNECTOR_PIXEL_TYPES
+#pragma once
 
 #include <imp/core/pixel_enums.hpp>
 
@@ -22,6 +21,3 @@ int pixelTypeToCv(ze::PixelType type);
 
 
 } // namespace ze
-
-#endif // IMP_CV_CONNECTOR_PIXEL_TYPES
-

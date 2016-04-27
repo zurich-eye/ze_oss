@@ -1,5 +1,4 @@
-#ifndef IMP_CU_OPENCV_BRIDGE_HPP
-#define IMP_CU_OPENCV_BRIDGE_HPP
+#pragma once
 
 #include <memory>
 
@@ -41,5 +40,3 @@ void cvBridgeShow(const std::string& winname,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_OPENCV_BRIDGE_HPP

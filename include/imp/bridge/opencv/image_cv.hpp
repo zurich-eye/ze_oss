@@ -1,5 +1,4 @@
-#ifndef IMP_IMAGE_CV_HPP
-#define IMP_IMAGE_CV_HPP
+#pragma once
 
 #include <memory>
 #include <opencv2/core/core.hpp>
@@ -117,5 +116,3 @@ using ImageCvConstPtr = typename ImageCv<Pixel>::ConstPtr;
 
 } // namespace ze
 
-
-#endif // IMP_IMAGE_CV_HPP
