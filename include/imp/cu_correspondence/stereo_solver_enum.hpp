@@ -1,5 +1,4 @@
-#ifndef STEREO_SOLVER_ENUM_HPP
-#define STEREO_SOLVER_ENUM_HPP
+#pragma once
 
 namespace ze {
 namespace cu {
@@ -14,6 +13,4 @@ enum class StereoPDSolver
 
 } // namespace cu
 } // namespace ze
-
-#endif // STEREO_SOLVER_ENUM_HPP
 

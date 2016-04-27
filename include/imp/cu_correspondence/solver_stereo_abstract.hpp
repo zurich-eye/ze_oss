@@ -1,5 +1,4 @@
-#ifndef IMP_CU_SOLVER_STEREO_ABSTRACT_HPP
-#define IMP_CU_SOLVER_STEREO_ABSTRACT_HPP
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -67,4 +66,3 @@ protected:
 } // namespace cu
 } // namespace ze
 
-#endif // IMP_CU_SOLVER_STEREO_ABSTRACT_HPP

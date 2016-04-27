@@ -1,5 +1,4 @@
-#ifndef IMP_CU_VARIATIONAL_EPIPOLAR_STEREO_HPP
-#define IMP_CU_VARIATIONAL_EPIPOLAR_STEREO_HPP
+#pragma once
 
 
 #include <cstdint>
@@ -42,4 +41,3 @@ private:
 } // namespace cu
 } // namespace ze
 
-#endif // IMP_CU_STEREO_HPP
