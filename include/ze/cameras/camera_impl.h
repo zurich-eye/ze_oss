@@ -41,7 +41,7 @@ public:
     FloatType z_inv = 1.0 / pos.z();
     FloatType z_inv_sq = z_inv * z_inv;
     Keypoint px_unitplane = pos.head<2>() * z_inv;
-    Distortion::dDistort_dPx(
+    Distortion::distort(
           this->distortion_params_.data(), px_unitplane.data(), J_dist.data());
     const FloatType fx = this->projection_params_[0];
     const FloatType fy = this->projection_params_[1];
