@@ -1,14 +1,16 @@
 #ifndef IMP_CU_MATRIX_CUH
 #define IMP_CU_MATRIX_CUH
 
-#include <memory>
-#include <ostream>
 #include <cuda_runtime.h>
-#include <imp/core/pixel.hpp>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 # include <Eigen/Dense>
 #pragma GCC diagnostic pop
+#include <memory>
+#include <ostream>
+
+#include <imp/core/pixel.hpp>
+#include <ze/common/matrix.h>
 
 namespace ze{
 namespace cu{
@@ -29,56 +31,17 @@ public:
   ~Matrix() = default;
 
   __host__
-  Matrix(Eigen::Matrix<Type,_rows,_cols,Eigen::RowMajor> from)
+  Matrix(const ze::Matrix3& from)
   {
-    // check if memory is unpadded
-    if(from.innerStride() == 1)
+    // copy element by element
+    for(int row = 0; row < _rows; ++row)
     {
-      if(from.outerStride() == _cols)
+      for(int col = 0; col < _cols; ++col)
       {
-        // copy whole memory block
-        memcpy(data_,from.data(),_rows*_cols*sizeof(Type));
-      }
-      else
-      {
-        // copy line by line
-        for(int row = 0; row < _rows; ++row)
-        {
-          memcpy(&data_[row*_cols],&(from.data()[row*from.outerStride()]),_cols*sizeof(Type));
-        }
-      }
-    }
-    else
-    {
-      // copy element by element
-      for(int row = 0; row < _rows; ++row)
-      {
-        for(int col = 0; col < _cols; ++col)
-        {
-          data_[row*cols_ + col] = from(row,col);
-        }
+        data_[row*cols_ + col] = from(row, col);
       }
     }
   }
-
-  //  // copy and asignment operator
-  //  __host__ __device__
-  //  Matrix(const Matrix& other)
-  //    : f_(other.f())
-  //    , c_(other.c())
-  //  {
-  //  }
-  //  __host__ __device__
-  //  Matrix& operator=(const Matrix& other)
-  //  {
-  //    if  (this != &other)
-  //    {
-  //      f_ = other.f();
-  //      c_ = other.c();
-  //    }
-  //    return *this;
-  //  }
-
 
   __host__ __device__ __forceinline__
   size_t rows() const { return rows_; }
