@@ -4,30 +4,27 @@
 #include <memory>
 #include <tuple>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/cameras/camera.h>
-
-#include <imp/core/roi.hpp>
-#include <imp/core/image_raw.hpp>
-#include <imp/bridge/opencv/image_cv.hpp>
-#include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/cu_core/cu_math.cuh>
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/bridge/opencv/cu_cv_bridge.hpp>
-
-#include <imp/cu_core/cu_se3.cuh>
+#include <imp/bridge/opencv/image_cv.hpp>
+#include <imp/core/image_raw.hpp>
+#include <imp/core/roi.hpp>
+#include <imp/cu_core/cu_image_gpu.cuh>
+#include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_matrix.cuh>
 #include <imp/cu_core/cu_pinhole_camera.cuh>
-
+#include <imp/cu_core/cu_se3.cuh>
 #include <imp/cu_correspondence/variational_epipolar_stereo.hpp>
+#include <ze/cameras/camera.h>
+#include <ze/cameras/camera_rig.h>
+#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_utils.h>
+#include <ze/common/logging.hpp>
+#include <ze/geometry/epipolar_geometry.hpp>
 
 DEFINE_bool(visualize, false, "Show input images and results");
 
@@ -55,60 +52,33 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
       ze::loadIndexedPosesFromCsv(data_path + "/traj_gt.csv");
   ze::Transformation T_ref_cur = T_W_C_vec[1].inverse() * T_W_C_vec[3];
 
-  // Load camera:
+  VLOG(10) << "load camera";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(data_path + "/calib.yaml");
 
-  //! @todo (MWE) we need a proper ze::cu::Camera constructable from a ze::Camera
-  VLOG(100) << "cam type: " << (int)cam->type();
   const ze::VectorX projection_parameteres = cam->projectionParameters();
   ze::cu::PinholeCamera cu_cam(projection_parameteres(0), projection_parameteres(1),
                                projection_parameteres(2), projection_parameteres(3));
 
-  // Load depthmap from reference image:
   ze::ImageRaw32fC1 depth_ref(cam->width(), cam->height());
   CHECK_EQ(depth_ref.width(), depth_ref.stride());
   ze::loadDepthmapFromFile(data_path + "/depth/img0001_0.depth",
                            depth_ref.numel(),
                            reinterpret_cast<float*>(depth_ref.data()));
 
-  ze::cu::Matrix3f F_ref_cur;
-  ze::cu::Matrix3f F_cur_ref;
-  Eigen::Matrix3d F_fm, F_mf;
-  { // compute fundamental matrix
-    Eigen::Matrix3d R_ref_cur = T_ref_cur.getRotationMatrix();
-
-    // in ref coordinates
-    Eigen::Vector3d t_ref_cur = T_ref_cur.getPosition();
-
-    Eigen::Matrix3d tx_ref_cur;
-    tx_ref_cur << 0, -t_ref_cur[2], t_ref_cur[1],
-        t_ref_cur[2], 0, -t_ref_cur[0],
-        -t_ref_cur[1], t_ref_cur[0], 0;
-    Eigen::Matrix3d E_ref_cur = tx_ref_cur * R_ref_cur;
-    Eigen::Matrix3d K;
-    K << cu_cam.fx(), 0, cu_cam.cx(),
-        0, cu_cam.fy(), cu_cam.cy(),
-        0, 0, 1;
-
-    Eigen::Matrix3d Kinv = K.inverse();
-    F_fm = Kinv.transpose() * E_ref_cur * Kinv;
-    F_mf = F_fm.transpose();
-
-    // convert the Eigen-thingy to something that we can use in CUDA
-    for(size_t row=0; row<F_ref_cur.rows(); ++row)
-    {
-      for(size_t col=0; col<F_ref_cur.cols(); ++col)
-      {
-        F_ref_cur(row,col) = (float)F_fm(row,col);
-        F_cur_ref(row,col) = (float)F_mf(row,col);
-      }
-    }
-  } // end .. compute fundamental matrix
+  VLOG(10) << "compute fundamental matrix";
+  ze::TransformationVector transformations;
+  ze::CameraVector cameras;
+  transformations.push_back(ze::Transformation());
+  transformations.push_back(T_ref_cur);
+  cameras.push_back(cam);
+  cameras.push_back(cam);
+  ze::CameraRig rig(transformations, cameras, "dummy rig");
+  ze::Matrix3 F_ref_cur = fundamentalMatrix(T_ref_cur, rig);
+  ze::cu::Matrix3f F_cur_ref(F_ref_cur.transpose());
 
   //! @todo (mwe) this also needs to get simpler from cpu transformation to gpu transformation...
-//  Eigen::Quaterniond q_ref_cur = T_ref_cur.getEigenQuaternion();
-  Eigen::Quaterniond q_cur_ref = T_ref_cur.inverse().getEigenQuaternion();
-  Eigen::Vector3d t_cur_ref = T_ref_cur.inverse().getPosition();
+  ze::Quaternion q_cur_ref = T_ref_cur.inverse().getRotation();
+  ze::Vector3 t_cur_ref = T_ref_cur.inverse().getPosition();
 
   ze::cu::SE3<float> cu_T_cur_ref(
         static_cast<float>(q_cur_ref.w()), static_cast<float>(q_cur_ref.x()),
@@ -180,12 +150,12 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 using Solver = ze::cu::StereoPDSolver;
 std::tuple<ze::cu::StereoPDSolver, double, double>
 const EpipolarStereoTestsParametrizationTable[] = {
-  //              solver                           scale_factor  error
-  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
+//  //              solver                           scale_factor  error
+//  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
   //              solver                           scale_factor  error
   std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.8,          0.0),
-  //              solver                           scale_factor  error
-  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.95,         0.0),
+//  //              solver                           scale_factor  error
+//  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.95,         0.0),
 };
 
 //-----------------------------------------------------------------------------
