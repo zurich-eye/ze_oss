@@ -198,28 +198,6 @@ struct RadialTangentialDistortion
   }
 
   template <typename T>
-  static void undistort_fast(const T* params, T* px)
-  {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-    T x0 = px[0], y0 = px[1];
-    for(int i = 0; i < 30; ++i)
-    {
-      const T xx = px[0] * px[0];
-      const T yy = px[1] * px[1];
-      const T xy2 = 2.0 * px[0] * px[1];
-      const T r2 = xx + yy;
-      const T icdist = 1.0 / (1.0 + (k1 + k2 * r2) * r2);
-      const T dx = p1 * xy2 + p2 * (r2 + 2.0 * xx);
-      const T dy = p2 * xy2 + p1 * (r2 + 2.0 * yy);
-      px[0] = (x0 - dx) * icdist;
-      px[1] = (y0 - dy) * icdist;
-    }
-  }
-
-  template <typename T>
   static void undistort(const T* params, T* px)
   {
     const T k1 = params[0];
