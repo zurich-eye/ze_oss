@@ -25,8 +25,8 @@ public:
   CameraBenchmark(const Camera& cam, size_t sample_size, const std::string& test_name)
     : cam_(cam)
     , sample_size_(sample_size)
+    , test_name_(test_name)
   {
-    test_name_ = test_name;
     px_ = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
     f_ = cam.backProjectVectorized(px_);
   }
@@ -100,8 +100,8 @@ public:
   }
 private:
   const Camera& cam_;
-  std::string test_name_;
   size_t sample_size_;
+  std::string test_name_;
   Keypoints px_;
   Bearings f_;
 };
