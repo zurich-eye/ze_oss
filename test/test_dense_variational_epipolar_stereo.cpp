@@ -67,7 +67,8 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 
   VLOG(10) << "compute fundamental matrix";
 
-  ze::Matrix3 F_ref_cur = fundamentalMatrix(T_ref_cur, *cam);
+  ze::Matrix3 F_ref_cur = ze::fundamentalMatrix(T_ref_cur, projection_parameteres,
+                                                projection_parameteres);
   ze::cu::Matrix3f cu_F_cur_ref(F_ref_cur.transpose());
 
   //! @todo (mwe) this also needs to get simpler from cpu transformation to gpu transformation...
@@ -144,8 +145,8 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 using Solver = ze::cu::StereoPDSolver;
 std::tuple<ze::cu::StereoPDSolver, double, double>
 const EpipolarStereoTestsParametrizationTable[] = {
-  //              solver                           scale_factor  error
-  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
+//  //              solver                           scale_factor  error
+//  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
   //              solver                           scale_factor  error
   std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.8,          0.0),
   //              solver                           scale_factor  error
