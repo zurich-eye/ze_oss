@@ -66,55 +66,9 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
                            reinterpret_cast<float*>(depth_ref.data()));
 
   VLOG(10) << "compute fundamental matrix";
-#if 1
+
   ze::Matrix3 F_ref_cur = fundamentalMatrix(T_ref_cur, *cam);
-  ze::Matrix3 F_cur_ref = F_ref_cur.inverse();
-  ze::cu::Matrix3f cu_F_cur_ref;
-  // convert the Eigen-thingy to something that we can use in CUDA
-  for(int row=0; row<F_ref_cur.rows(); ++row)
-  {
-    for(int col=0; col<F_ref_cur.cols(); ++col)
-    {
-//      F_ref_cur(row,col) = (float)F_fm(row,col);
-      cu_F_cur_ref(row,col) = (float)F_cur_ref(row,col);
-    }
-  }
-  //ze::cu::Matrix3f F_cur_ref(F_ref_cur.transpose());
-#else
-  ze::cu::Matrix3f F_ref_cur;
-  ze::cu::Matrix3f F_cur_ref;
-  Eigen::Matrix3d F_fm, F_mf;
-  { // compute fundamental matrix
-    Eigen::Matrix3d R_ref_cur = T_ref_cur.getRotationMatrix();
-
-    // in ref coordinates
-    Eigen::Vector3d t_ref_cur = T_ref_cur.getPosition();
-
-    Eigen::Matrix3d tx_ref_cur;
-    tx_ref_cur << 0, -t_ref_cur[2], t_ref_cur[1],
-        t_ref_cur[2], 0, -t_ref_cur[0],
-        -t_ref_cur[1], t_ref_cur[0], 0;
-    Eigen::Matrix3d E_ref_cur = tx_ref_cur * R_ref_cur;
-    Eigen::Matrix3d K;
-    K << cu_cam.fx(), 0, cu_cam.cx(),
-        0, cu_cam.fy(), cu_cam.cy(),
-        0, 0, 1;
-
-    Eigen::Matrix3d Kinv = K.inverse();
-    F_fm = Kinv.transpose() * E_ref_cur * Kinv;
-    F_mf = F_fm.transpose();
-
-    // convert the Eigen-thingy to something that we can use in CUDA
-    for(size_t row=0; row<F_ref_cur.rows(); ++row)
-    {
-      for(size_t col=0; col<F_ref_cur.cols(); ++col)
-      {
-        F_ref_cur(row,col) = (float)F_fm(row,col);
-        F_cur_ref(row,col) = (float)F_mf(row,col);
-      }
-    }
-  } // end .. compute fundamental matrix
-#endif
+  ze::cu::Matrix3f cu_F_cur_ref(F_ref_cur.transpose());
 
   //! @todo (mwe) this also needs to get simpler from cpu transformation to gpu transformation...
   ze::Quaternion q_cur_ref = T_ref_cur.inverse().getRotation();
@@ -190,12 +144,12 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 using Solver = ze::cu::StereoPDSolver;
 std::tuple<ze::cu::StereoPDSolver, double, double>
 const EpipolarStereoTestsParametrizationTable[] = {
-//  //              solver                           scale_factor  error
-//  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
+  //              solver                           scale_factor  error
+  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.5,          0.0),
   //              solver                           scale_factor  error
   std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.8,          0.0),
-//  //              solver                           scale_factor  error
-//  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.95,         0.0),
+  //              solver                           scale_factor  error
+  std::make_tuple(Solver::EpipolarPrecondHuberL1,  0.95,         0.0),
 };
 
 //-----------------------------------------------------------------------------
