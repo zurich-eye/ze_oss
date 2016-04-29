@@ -5,7 +5,7 @@
     IMP bridge to Ros adds the ability to interconnect with the Ros framework
   </description>
   <version>0.1.4</version>
-  <license>tbd</license>
+  <license>ZE</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
 
