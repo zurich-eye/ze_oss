@@ -5,7 +5,7 @@
     Benchmark to check the duration of aligned allocation
   </description>
   <version>0.1.4</version>
-  <license>tbd</license>
+  <license>ZE</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
 
