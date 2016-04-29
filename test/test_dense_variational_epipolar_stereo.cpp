@@ -44,8 +44,8 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
   // Load two images:
   std::string data_path = ze::getTestDataDir("synthetic_room_pinhole");
   ImageGpu32fC1::Ptr cuimg_ref, cuimg_cur;
-  cvBridgeLoad(cuimg_ref, data_path + "/img/img0001_0.png", ze::PixelOrder::gray);
-  cvBridgeLoad(cuimg_cur, data_path + "/img/img0003_0.png", ze::PixelOrder::gray);
+  cvBridgeLoad(cuimg_ref, data_path + "/img/1.png", ze::PixelOrder::gray);
+  cvBridgeLoad(cuimg_cur, data_path + "/img/3.png", ze::PixelOrder::gray);
 
   // Load poses:
   std::map<int64_t, ze::Transformation> T_W_C_vec =
@@ -61,7 +61,7 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
 
   ze::ImageRaw32fC1 depth_ref(cam->width(), cam->height());
   CHECK_EQ(depth_ref.width(), depth_ref.stride());
-  ze::loadDepthmapFromFile(data_path + "/depth/img0001_0.depth",
+  ze::loadDepthmapFromFile(data_path + "/depth/1.depth",
                            depth_ref.numel(),
                            reinterpret_cast<float*>(depth_ref.data()));
 
