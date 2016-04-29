@@ -10,24 +10,27 @@
 
 namespace ze {
 
-using SeedState = Vector4;
-
-inline FloatType getDepth(const Eigen::Ref<const SeedState>& mu_sigma2_a_b)
+inline FloatType getDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 {
   return 1.0 / mu_sigma2_a_b(0);
 }
 
-inline FloatType getInvDepth(const Eigen::Ref<const SeedState>& mu_sigma2_a_b)
+inline FloatType getSigma2(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
+{
+  return mu_sigma2_a_b(1);
+}
+
+inline FloatType getInvDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 {
   return mu_sigma2_a_b(0);
 }
 
-inline FloatType getInvMinDepth(const Eigen::Ref<const SeedState>& mu_sigma2_a_b)
+inline FloatType getInvMinDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 {
   return mu_sigma2_a_b(0) + std::sqrt(mu_sigma2_a_b(1));
 }
 
-inline FloatType getInvMaxDepth(const Eigen::Ref<const SeedState>& mu_sigma2_a_b)
+inline FloatType getInvMaxDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 {
   return std::max(mu_sigma2_a_b(0) - std::sqrt(mu_sigma2_a_b(1)), FloatType{0.00000001});
 }
@@ -47,13 +50,13 @@ inline FloatType getInitSigma2FromMuRange(FloatType mu_range)
   return mu_range * mu_range / 36.0;
 }
 
-inline void increaseOutlierProbability(Eigen::Ref<SeedState> mu_sigma2_a_b)
+inline void increaseOutlierProbability(Eigen::Ref<Seed> mu_sigma2_a_b)
 {
   mu_sigma2_a_b(3) += 1;
 }
 
 inline bool isConverged(
-    const Eigen::Ref<const SeedState>& mu_sigma2_a_b,
+    const Eigen::Ref<const Seed>& mu_sigma2_a_b,
     FloatType mu_range, FloatType sigma2_convergence_threshold)
 {
   // If initial uncertainty was reduced by factor sigma2_convergence_threshold
@@ -73,7 +76,7 @@ inline bool updateFilterVogiatzis(
     const FloatType z, // Measurement
     const FloatType tau2,
     const FloatType mu_range,
-    Eigen::Ref<SeedState> mu_sigma2_a_b)
+    Eigen::Ref<Seed> mu_sigma2_a_b)
 {
   FloatType& mu = mu_sigma2_a_b(0);
   FloatType& sigma2 = mu_sigma2_a_b(1);
@@ -130,7 +133,7 @@ inline bool updateFilterVogiatzis(
 inline bool updateFilterGaussian(
     const FloatType z, // Measurement
     const FloatType tau2,
-    Eigen::Ref<SeedState> mu_sigma2_a_b)
+    Eigen::Ref<Seed> mu_sigma2_a_b)
 {
   FloatType& mu = mu_sigma2_a_b(0);
   FloatType& sigma2 = mu_sigma2_a_b(1);
