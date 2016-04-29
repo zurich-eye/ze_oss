@@ -72,12 +72,13 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesFullFrames)
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
         [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
-  {
-    ++measurements;
-    EXPECT_EQ(2, images.size());
-    EXPECT_EQ(0, imu_timestamps.size());
-    EXPECT_EQ(0, imu_measurements.size());
-  });
+        {
+          ++measurements;
+          EXPECT_EQ(2, images.size());
+          EXPECT_EQ(0, imu_timestamps.size());
+          EXPECT_EQ(0, imu_measurements.size());
+        }
+  );
 
   // trigger callbacks twice for images
   int64_t stamp = 1403636579763555584;
@@ -106,12 +107,13 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesWithImu)
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
         [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
-  {
-    ++measurements;
-    EXPECT_EQ(1, images.size());
-    EXPECT_EQ(1, imu_timestamps.size());
-    EXPECT_EQ(1, imu_measurements.size());
-  });
+        {
+          ++measurements;
+          EXPECT_EQ(1, images.size());
+          EXPECT_EQ(1, imu_timestamps.size());
+          EXPECT_EQ(1, imu_measurements.size());
+        }
+  );
 
   int64_t stamp1 = 1403636579763555583;
   int64_t stamp2 = 1403636579763555584;
@@ -143,12 +145,13 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfFramesInconsistent)
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
         [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
-  {
-    ++measurements;
-    EXPECT_EQ(2, images.size());
-    EXPECT_EQ(0, imu_timestamps.size());
-    EXPECT_EQ(0, imu_measurements.size());
-  });
+        {
+          ++measurements;
+          EXPECT_EQ(2, images.size());
+          EXPECT_EQ(0, imu_timestamps.size());
+          EXPECT_EQ(0, imu_measurements.size());
+        }
+  );
 
   // trigger callbacks twice for images
   int64_t stamp1 = 1403636579763555584;
@@ -183,9 +186,10 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuBefore)
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
         [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
-  {
-    ++measurements;
-  });
+        {
+          ++measurements;
+        }
+  );
 
   int64_t stamp1 = 1403636579763555584;
   int64_t stamp2 = 1403636579763555584;  // same as stamp1
@@ -214,9 +218,10 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuAfter)
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
         [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
-  {
-    ++measurements;
-  });
+        {
+          ++measurements;
+        }
+  );
 
   int64_t stamp1 = 1403636579763555584;
   int64_t stamp2 = 1403636579763555584;  // same as stamp1

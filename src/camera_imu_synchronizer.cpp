@@ -109,13 +109,15 @@ bool CameraImuSynchronizer::validateImuBuffers(const int64_t& min_stamp,
   // Check if we have received some IMU measurements for at least one of the imu's.
   if (std::none_of(oldest_newest_stamp_vector.begin(),
                    oldest_newest_stamp_vector.end(),
-                   [](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp) {
-                     if (std::get<2>(oldest_newest_stamp)) {
+                   [](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp)
+                   {
+                     if (std::get<2>(oldest_newest_stamp))
+                     {
                        return true;
                      }
                      return false;
                    })
-  )
+      )
   {
     LOG(WARNING) << "Received all images but no imu measurements!";
     resetImgBuffer();
@@ -125,7 +127,8 @@ bool CameraImuSynchronizer::validateImuBuffers(const int64_t& min_stamp,
   // At least one IMU measurements before image
   if (std::none_of(oldest_newest_stamp_vector.begin(),
                    oldest_newest_stamp_vector.end(),
-                   [&min_stamp](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp) {
+                   [&min_stamp](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp)
+                   {
                      if (std::get<0>(oldest_newest_stamp) < min_stamp) {
                        return true;
                      }
@@ -142,7 +145,8 @@ bool CameraImuSynchronizer::validateImuBuffers(const int64_t& min_stamp,
   if (std::none_of(oldest_newest_stamp_vector.begin(),
                    oldest_newest_stamp_vector.end(),
                    [&max_stamp](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp) {
-                     if (std::get<1>(oldest_newest_stamp) > max_stamp) {
+                     if (std::get<1>(oldest_newest_stamp) > max_stamp)
+                     {
                        return true;
                      }
                      return false;
