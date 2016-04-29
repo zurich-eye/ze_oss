@@ -66,15 +66,55 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
                            reinterpret_cast<float*>(depth_ref.data()));
 
   VLOG(10) << "compute fundamental matrix";
-  ze::TransformationVector transformations;
-  ze::CameraVector cameras;
-  transformations.push_back(ze::Transformation());
-  transformations.push_back(T_ref_cur);
-  cameras.push_back(cam);
-  cameras.push_back(cam);
-  ze::CameraRig rig(transformations, cameras, "dummy rig");
-  ze::Matrix3 F_ref_cur = fundamentalMatrix(T_ref_cur, rig);
-  ze::cu::Matrix3f F_cur_ref(F_ref_cur.transpose());
+#if 1
+  ze::Matrix3 F_ref_cur = fundamentalMatrix(T_ref_cur, *cam);
+  ze::Matrix3 F_cur_ref = F_ref_cur.inverse();
+  ze::cu::Matrix3f cu_F_cur_ref;
+  // convert the Eigen-thingy to something that we can use in CUDA
+  for(int row=0; row<F_ref_cur.rows(); ++row)
+  {
+    for(int col=0; col<F_ref_cur.cols(); ++col)
+    {
+//      F_ref_cur(row,col) = (float)F_fm(row,col);
+      cu_F_cur_ref(row,col) = (float)F_cur_ref(row,col);
+    }
+  }
+  //ze::cu::Matrix3f F_cur_ref(F_ref_cur.transpose());
+#else
+  ze::cu::Matrix3f F_ref_cur;
+  ze::cu::Matrix3f F_cur_ref;
+  Eigen::Matrix3d F_fm, F_mf;
+  { // compute fundamental matrix
+    Eigen::Matrix3d R_ref_cur = T_ref_cur.getRotationMatrix();
+
+    // in ref coordinates
+    Eigen::Vector3d t_ref_cur = T_ref_cur.getPosition();
+
+    Eigen::Matrix3d tx_ref_cur;
+    tx_ref_cur << 0, -t_ref_cur[2], t_ref_cur[1],
+        t_ref_cur[2], 0, -t_ref_cur[0],
+        -t_ref_cur[1], t_ref_cur[0], 0;
+    Eigen::Matrix3d E_ref_cur = tx_ref_cur * R_ref_cur;
+    Eigen::Matrix3d K;
+    K << cu_cam.fx(), 0, cu_cam.cx(),
+        0, cu_cam.fy(), cu_cam.cy(),
+        0, 0, 1;
+
+    Eigen::Matrix3d Kinv = K.inverse();
+    F_fm = Kinv.transpose() * E_ref_cur * Kinv;
+    F_mf = F_fm.transpose();
+
+    // convert the Eigen-thingy to something that we can use in CUDA
+    for(size_t row=0; row<F_ref_cur.rows(); ++row)
+    {
+      for(size_t col=0; col<F_ref_cur.cols(); ++col)
+      {
+        F_ref_cur(row,col) = (float)F_fm(row,col);
+        F_cur_ref(row,col) = (float)F_mf(row,col);
+      }
+    }
+  } // end .. compute fundamental matrix
+#endif
 
   //! @todo (mwe) this also needs to get simpler from cpu transformation to gpu transformation...
   ze::Quaternion q_cur_ref = T_ref_cur.inverse().getRotation();
@@ -91,7 +131,7 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
   // compute dense stereo
   StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
   stereo_params->solver = std::get<0>(GetParam());
-  stereo_params->ctf.scale_factor = std::get<1>(GetParam());;
+  stereo_params->ctf.scale_factor = std::get<1>(GetParam());
   stereo_params->ctf.iters = 100;
   stereo_params->ctf.warps  = 10;
   stereo_params->ctf.apply_median_filter = true;
@@ -102,7 +142,7 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
   stereo->addImage(cuimg_ref);
   stereo->addImage(cuimg_cur);
 
-  stereo->setFundamentalMatrix(F_cur_ref);
+  stereo->setFundamentalMatrix(cu_F_cur_ref);
   stereo->setIntrinsics({cu_cam, cu_cam});
   stereo->setExtrinsics(cu_T_cur_ref);
 
