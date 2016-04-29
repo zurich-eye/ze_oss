@@ -5,7 +5,7 @@
     IMP command line tools for calling specific algorithms mainly for testing purpose.
   </description>
   <version>0.1.4</version>
-  <license>tbd</license>
+  <license>ZE</license>
 
   <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
 
