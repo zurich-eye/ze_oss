@@ -33,14 +33,12 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
       0, projection_parameteres1(1), projection_parameteres1(3),
       0, 0, 1;
 
-  return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse().transpose());
+  return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
 }
 
 // ----------------------------------------------------------------------------
-//! Compute fundamental matrix from given camera transformation
-//! @note Function assumes a camera rig with two cameras and cam0 recording the
-//!       reference image and cam1 the current (moving) image
-inline Matrix3 fundamentalMatrix(const Transformation& T_ref_cur,
+//! Compute fundamental matrix from given transformation and camera (e.g. monocular moving)
+inline Matrix3 fundamentalMatrix(const Transformation& T,
                                  const ze::Camera& cam)
 {
   Matrix3 K;
@@ -50,7 +48,7 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_ref_cur,
       0, projection_parameteres(1), projection_parameteres(3),
       0, 0, 1;
 
-  return (K.inverse().transpose() * essentialMatrix(T_ref_cur) * K.inverse().transpose());
+  return (K.inverse().transpose() * essentialMatrix(T) * K.inverse());
 }
 
 } // namespace ze
