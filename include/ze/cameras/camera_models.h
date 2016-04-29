@@ -236,7 +236,8 @@ struct RadialTangentialDistortion
       x[0] += e_u * (a * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - b * c1) + e_v * (b * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - d * c1);
       x[1] += e_u * (-a * c1 + b * a2b2 * adabdb_inv) + e_v * (-b * c1 + d * a2b2 * adabdb_inv);
 
-      if ((e_u * e_u + e_v * e_v) < 1e-8) {
+      if ((e_u * e_u + e_v * e_v) < 1e-8)
+      {
         break;
       }
     }
@@ -358,7 +359,8 @@ struct EquidistantDistortion
       x[0] += e_u * (a * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - b * c1) + e_v * (b * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - d * c1);
       x[1] += e_u * (-a * c1 + b * a2b2 * adabdb_inv) + e_v * (-b * c1 + d * a2b2 * adabdb_inv);
 
-      if ((e_u * e_u + e_v * e_v) < 1e-8) {
+      if ((e_u * e_u + e_v * e_v) < 1e-8)
+      {
         break;
       }
     }

@@ -21,10 +21,10 @@ namespace ze {
 
 class CameraBenchmark
 {
- public:
-  CameraBenchmark(const Camera& cam, size_t sample_size, const std::string& test_name):
-    cam_(cam),
-    sample_size_(sample_size)
+public:
+  CameraBenchmark(const Camera& cam, size_t sample_size, const std::string& test_name)
+    : cam_(cam)
+    , sample_size_(sample_size)
   {
     test_name_ = test_name;
     px_ = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
@@ -37,30 +37,32 @@ class CameraBenchmark
       return;
     }
 
-    double p1 = project();
-    double p = (p1 - projectVectorized()) / p1;
-    double p2 = backProject();
-    double bp = (p2 - backProjectVectorized()) / p2;
+    FloatType p1 = project();
+    FloatType p = (p1 - projectVectorized()) / p1;
+    FloatType p2 = backProject();
+    FloatType bp = (p2 - backProjectVectorized()) / p2;
     VLOG(1) << "[" << test_name_ << "]" << "Vectorized back projection " << bp * 100 << "% faster." << "\n"
             << "[" << test_name_ << "]" << "Vectorized projection " << p * 100 << "% faster.";
   }
 
-  double backProjectVectorized()
+  FloatType backProjectVectorized()
   {
     // Test back-project vectorized
     Bearings f(3, sample_size_);
-    auto backProjectVectorizedLambda = [&](){
+    auto backProjectVectorizedLambda = [&]()
+    {
       f = cam_.backProjectVectorized(px_);
     };
     return runTimingBenchmark(backProjectVectorizedLambda, 10, 20,
                        test_name_ + ": Back-project vectorized", true);
   }
 
-  double backProject()
+  FloatType backProject()
   {
     // Test not vectorized.
     Bearings f(3, sample_size_);
-    auto backProjectLambda = [&](){
+    auto backProjectLambda = [&]()
+    {
       for (size_t i = 0; i < sample_size_; ++i)
       {
         f.col(i) = cam_.backProjectVectorized(px_.col(i));
@@ -70,22 +72,24 @@ class CameraBenchmark
                        test_name_ + ": Back-project N-times", true);
   }
 
-  double projectVectorized()
+  FloatType projectVectorized()
   {
     // Test back-project vectorized
     Keypoints px(2, sample_size_);
-    auto projectVectorizedLambda = [&](){
+    auto projectVectorizedLambda = [&]()
+    {
       px = cam_.projectVectorized(f_);
     };
     return runTimingBenchmark(projectVectorizedLambda, 10, 20,
                        test_name_ + ": Project vectorized", true);
   }
 
-  double project()
+  FloatType project()
   {
     // Test not vectorized.
     Keypoints px(2, sample_size_);
-    auto projectLambda = [&](){
+    auto projectLambda = [&]()
+    {
       for (size_t i = 0; i < sample_size_; ++i)
       {
         px.col(i) = cam_.project(f_.col(i));
@@ -94,7 +98,7 @@ class CameraBenchmark
     return runTimingBenchmark(projectLambda, 10, 20,
                        test_name_ + ": Project vectorized", true);
   }
- private:
+private:
   const Camera& cam_;
   std::string test_name_;
   size_t sample_size_;
@@ -104,11 +108,11 @@ class CameraBenchmark
 
 class CameraTestHarness
 {
- public:
-  CameraTestHarness(const Camera& cam, size_t sample_size, const std::string& test_name):
-    cam_(cam),
-    sample_size_(sample_size),
-    test_name_(test_name)
+public:
+  CameraTestHarness(const Camera& cam, size_t sample_size, const std::string& test_name)
+    : cam_(cam)
+    , sample_size_(sample_size)
+    , test_name_(test_name)
   {}
 
   void testProjection()
@@ -155,7 +159,7 @@ class CameraTestHarness
     }
   }
 
- private:
+private:
   const Camera& cam_;
   size_t sample_size_;
   std::string test_name_;
