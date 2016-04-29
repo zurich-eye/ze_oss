@@ -20,7 +20,8 @@ namespace ze {
 using ImuCallback =
   std::function<void (int64_t /*stamp*/,
                       const Vector3& /*acc*/,
-                      const Vector3& /*gyr*/)>;
+                      const Vector3& /*gyr*/,
+                      uint32_t /*imu-idx*/)>;
 using CameraCallback =
   std::function<void (int64_t /*stamp*/,
                       const ImageBase::Ptr& /*img*/,
@@ -51,6 +52,9 @@ public:
   //! Stop data provider.
   virtual void shutdown();
 
+  virtual size_t imu_count() const = 0;
+  virtual size_t camera_count() const = 0;
+
   void registerImuCallback(const ImuCallback& imu_callback);
 
   void registerCameraCallback(const CameraCallback& camera_callback);
@@ -60,6 +64,8 @@ protected:
   ImuCallback imu_callback_;
   CameraCallback camera_callback_;
   volatile bool running_ = true;
+
+private:
   SimpleSigtermHandler signal_handler_; //!< Sets running_ to false when Ctrl-C is pressed.
 };
 

@@ -29,7 +29,8 @@ DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
     const std::string& imu_topic,
     const std::map<std::string, size_t>& camera_topics)
-  : DataProviderBase(DataProviderType::Csv)
+  : DataProviderBase(DataProviderType::Csv),
+    camera_topics_(camera_topics)
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
@@ -82,7 +83,8 @@ bool DataProviderCsv::spinOnce()
         {
           dataset::ImuMeasurement::ConstPtr imu_data =
                 std::dynamic_pointer_cast<const dataset::ImuMeasurement>(data);
-          imu_callback_(imu_data->stamp_ns, imu_data->acc, imu_data->gyr);
+          // csv datasets only support a single imu.
+          imu_callback_(imu_data->stamp_ns, imu_data->acc, imu_data->gyr, 0);
         }
         else
         {
@@ -115,6 +117,16 @@ bool DataProviderCsv::ok() const
     return false;
   }
   return true;
+}
+
+size_t DataProviderCsv::camera_count() const
+{
+  return camera_topics_.size();
+}
+
+size_t DataProviderCsv::imu_count() const
+{
+  return 1;
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)

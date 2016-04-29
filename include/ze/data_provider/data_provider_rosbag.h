@@ -15,10 +15,10 @@ namespace ze {
 class DataProviderRosbag : public DataProviderBase
 {
 public:
-
+  // optional: imu_topics, required: camera_topics
   DataProviderRosbag(
       const std::string& bag_filename,
-      const std::string& imu_topic,
+      const std::map<std::string, size_t>& imu_topics,
       const std::map<std::string, size_t>& camera_topics);
 
   virtual ~DataProviderRosbag() = default;
@@ -29,10 +29,12 @@ public:
 
   virtual bool ok() const override;
 
+  virtual size_t imu_count() const;
+  virtual size_t camera_count() const;
+
   size_t size() const;
 
 private:
-
   std::unique_ptr<rosbag::Bag> bag_;
   std::unique_ptr<rosbag::View> bag_view_;
   rosbag::View::iterator bag_view_it_;
@@ -40,7 +42,7 @@ private:
 
   // subscribed topics:
   std::map<std::string, size_t> img_topic_camidx_map_; // camera_topic --> camera_id
-  std::string imu_topic_;
+  std::map<std::string, size_t> imu_topic_imuidx_map_; // imu_topic --> imu_id
   int64_t last_imu_stamp_ = -1;
 };
 
