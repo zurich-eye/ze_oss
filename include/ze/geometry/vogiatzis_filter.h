@@ -100,17 +100,17 @@ inline bool updateFilterVogiatzis(
   C1 /= normalization_constant;
   C2 /= normalization_constant;
   const FloatType f = C1 * (a+1.0) / (a+b+1.0) + C2 * a/(a+b+1.0);
-  const FloatType e = C1 * (a+1.0)*(a+2.0) / ((a+b+1.0) * (a+b+2.0))
+  const FloatType e = C1 * (a+1.0) * (a+2.0) / ((a+b+1.0) * (a+b+2.0))
                     + C2 * a * (a+1.0) / ((a+b+1.0)*(a+b+2.0));
 
   // update parameters
-  const FloatType mu_new = C1*m+C2*mu;
-  sigma2 = C1*(s2 + m*m) + C2*(sigma2 + mu*mu) - mu_new*mu_new;
+  const FloatType mu_new = C1 * m + C2 * mu;
+  sigma2 = C1 * (s2 + m * m) + C2 * (sigma2 + mu * mu) - mu_new * mu_new;
   mu = mu_new;
   a = (e - f) / (f - e / f);
   b = a * (1.0 - f) / f;
 
-  // TODO: This happens sometimes.
+  //! @todo Check if this happens sometimes.
   if(sigma2 < 0.0)
   {
     LOG(WARNING) << "Seed sigma2 is negative!";
