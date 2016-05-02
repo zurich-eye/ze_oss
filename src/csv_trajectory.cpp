@@ -159,6 +159,21 @@ SWEResultSeries::SWEResultSeries()
   header_ = "timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz";
 }
 
+SWEGlobalSeries::SWEGlobalSeries()
+{
+  order_["ts"] = 0;
+  order_["tx"] = 2;
+  order_["ty"] = 3;
+  order_["tz"] = 4;
+  order_["qx"] = 5;
+  order_["qy"] = 6;
+  order_["qz"] = 7;
+  order_["qw"] = 8;
+
+  header_ = "timestamp, state, x_GB, y_GB, z_GB, qx_GB, qy_GB, qz_GB, qw_GB, x_GM, y_GM, z_GM, qx_GM, qy_GM, qz_GM, qw_GM";
+  num_tokens_in_line_ = 16u;
+}
+
 EurocResultSeries::EurocResultSeries()
   : PoseSeries()
 {
