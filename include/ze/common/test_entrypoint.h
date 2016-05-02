@@ -60,6 +60,6 @@
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";\
   FLAGS_alsologtostderr = true; \
   FLAGS_colorlogtostderr = true; \
-  FLAGS_v = 1; \
+  /*FLAGS_v = 1;*/ \
   return RUN_ALL_TESTS();\
 }
