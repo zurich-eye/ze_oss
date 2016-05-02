@@ -8,6 +8,7 @@
 
 namespace ze {
 
+// ----------------------------------------------------------------------------
 //! Skew symmetric matrix.
 inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
 {
@@ -17,18 +18,21 @@ inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
           -w(1),  w(0),  0.0f).finished();
 }
 
+// ----------------------------------------------------------------------------
 //! Normalize a block of bearing vectors.
 inline void normalizeBearings(Bearings& bearings)
 {
   bearings = bearings.array().rowwise() / bearings.colwise().norm().array();
 }
 
+// ----------------------------------------------------------------------------
 //! Get element with max norm in a vector.
 inline FloatType normMax(const VectorX& v)
 {
   return v.lpNorm<Eigen::Infinity>();
 }
 
+// ----------------------------------------------------------------------------
 //! Get element with maximum norm on diagonal.
 template<typename Derived>
 FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
@@ -42,6 +46,7 @@ FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
   return max_val;
 }
 
+// ----------------------------------------------------------------------------
 //! Direct linear transform algorithm that calls svd to find a vector v that
 //! minimizes the algebraic error A*v
 //! @param A of size m*n, where m>=n (pad with zero rows if not!)
@@ -65,6 +70,7 @@ Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> getVectorElements(
   return Y;
 }
 
+// ----------------------------------------------------------------------------
 //! Get a slice of the matrix X by the specified column indices.
 template<typename Derived>
 Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic> getMatrixCols(

@@ -47,7 +47,6 @@ inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
       + (1 / (theta * theta) - (1 + std::cos(theta)) / (2 * theta * std::sin(theta))) * X * X;
 }
 
-
 // -----------------------------------------------------------------------------
 // Type traits used for optimization
 template<typename T> struct traits;
