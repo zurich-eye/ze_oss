@@ -73,6 +73,12 @@ public:
   SWEResultSeries();
 };
 
+class SWEGlobalSeries : public PoseSeries
+{
+public:
+  SWEGlobalSeries();
+};
+
 class EurocResultSeries : public PoseSeries
 {
 public:
