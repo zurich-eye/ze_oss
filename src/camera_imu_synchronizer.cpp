@@ -15,11 +15,38 @@ DEFINE_int32(data_sync_stop_after_n_frames, -1,
 namespace ze {
 
 CameraImuSynchronizer::CameraImuSynchronizer(
-    uint32_t num_frames, FloatType imu_buffer_length_seconds)
-  : camera_rig_size_(num_frames)
-  , img_buffer_(num_frames, std::make_pair(-1, nullptr))
-  , imu_buffer_(imu_buffer_length_seconds)
-{}
+    DataProviderBase& data_provider,
+    FloatType imu_buffer_length_seconds)
+{
+  subscribeDataProvider(data_provider);
+  camera_rig_size_ = data_provider.camera_count();
+  imu_count_ = data_provider.imu_count();
+  initBuffers(imu_buffer_length_seconds);
+}
+
+void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provider)
+{
+  using namespace std::placeholders;
+  if (camera_rig_size_ == 0)
+  {
+    LOG(ERROR) << "DataProvider must at least expose a single camera topic.";
+  }
+
+  data_provider.registerCameraCallback(
+        std::bind(&CameraImuSynchronizer::addImgData, this, _1, _2, _3));
+
+  if (imu_count_ != 0)
+  {
+    data_provider.registerImuCallback(
+          std::bind(&CameraImuSynchronizer::addImuData, this, _1, _2, _3, _4));
+  }
+}
+
+void CameraImuSynchronizer::initBuffers(FloatType imu_buffer_length_seconds)
+{
+  img_buffer_ = StampedImages(camera_rig_size_, std::make_pair(-1, nullptr));
+  imu_buffers_ = ImuBufferVector(imu_count_, Buffer<FloatType, 6>(imu_buffer_length_seconds));
+}
 
 void CameraImuSynchronizer::addImgData(
     int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx)
@@ -29,6 +56,21 @@ void CameraImuSynchronizer::addImgData(
   {
     LOG(WARNING) << "Received new camera image before the previous set was complete."
                  << " Unordered camera images are arriving!";
+  }
+  // time consistency checks
+  // ensure that the oldest image is < 2 ms offset from current image (same frame)
+  for (size_t i = 0; i < img_buffer_.size(); ++i)
+  {
+    if (i == camera_idx)
+    {
+      continue;
+    }
+    if (img_buffer_.at(i).first != -1 && (stamp - img_buffer_.at(i).first) > 2000)
+    {
+      // invalidate old data
+      img_buffer_.at(i).first = -1;
+      LOG(WARNING) << "Invalidated image of older frame.";
+    }
   }
 
   if (camera_idx == 0)
@@ -45,23 +87,13 @@ void CameraImuSynchronizer::addImgData(
 }
 
 void CameraImuSynchronizer::addImuData(
-    int64_t stamp, const Vector3& acc, const Vector3& gyr)
+    int64_t stamp, const Vector3& acc, const Vector3& gyr, const uint32_t imu_idx)
 {
   Vector6 acc_gyr;
   acc_gyr.head<3>() = acc;
   acc_gyr.tail<3>() = gyr;
-  imu_buffer_.insert(stamp, acc_gyr);
+  imu_buffers_.at(imu_idx).insert(stamp, acc_gyr);
   checkDataAndCallback();
-}
-
-void CameraImuSynchronizer::subscribeDataProvider(
-    DataProviderBase& data_provider)
-{
-  using namespace std::placeholders;
-  data_provider.registerCameraCallback(
-        std::bind(&CameraImuSynchronizer::addImgData, this, _1, _2, _3));
-  data_provider.registerImuCallback(
-        std::bind(&CameraImuSynchronizer::addImuData, this, _1, _2, _3));
 }
 
 void CameraImuSynchronizer::registerCameraImuCallback(
@@ -69,6 +101,67 @@ void CameraImuSynchronizer::registerCameraImuCallback(
 {
   cam_imu_callback_ = callback;
 }
+
+bool CameraImuSynchronizer::validateImuBuffers(
+    const int64_t& min_stamp,
+    const int64_t& max_stamp,
+    const std::vector<std::tuple<int64_t, int64_t, bool> >&
+      oldest_newest_stamp_vector)
+{
+  // Check if we have received some IMU measurements for at least one of the imu's.
+  if (std::none_of(oldest_newest_stamp_vector.begin(),
+                   oldest_newest_stamp_vector.end(),
+                   [](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp)
+                   {
+                     if (std::get<2>(oldest_newest_stamp))
+                     {
+                       return true;
+                     }
+                     return false;
+                   })
+      )
+  {
+    LOG(WARNING) << "Received all images but no imu measurements!";
+    resetImgBuffer();
+    return false;
+  }
+
+  // At least one IMU measurements before image
+  if (std::none_of(oldest_newest_stamp_vector.begin(),
+                   oldest_newest_stamp_vector.end(),
+                   [&min_stamp](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp)
+                   {
+                     if (std::get<0>(oldest_newest_stamp) < min_stamp) {
+                       return true;
+                     }
+                     return false;
+                   })
+  )
+  {
+    LOG(WARNING) << "Oldest IMU measurement is newer than image timestamp.";
+    resetImgBuffer();
+    return false;
+  }
+
+  // At least one IMU measurements after image
+  if (std::none_of(oldest_newest_stamp_vector.begin(),
+                   oldest_newest_stamp_vector.end(),
+                   [&max_stamp](const std::tuple<int64_t, int64_t, bool>& oldest_newest_stamp) {
+                     if (std::get<1>(oldest_newest_stamp) > max_stamp)
+                     {
+                       return true;
+                     }
+                     return false;
+                   })
+  )
+  {
+    VLOG(100) << "Waiting for IMU measurements.";
+    return false;
+  }
+
+  return true;
+}
+
 
 void CameraImuSynchronizer::checkDataAndCallback()
 {
@@ -92,46 +185,55 @@ void CameraImuSynchronizer::checkDataAndCallback()
                  << nanosecToMillisecTrunc(max_stamp - min_stamp) << " milliseconds";
   }
 
-  // Check if we have received some IMU measurements.
-  std::tuple<int64_t, int64_t, bool> oldest_newest_stamp =
-      imu_buffer_.getOldestAndNewestStamp();
-  if(!std::get<2>(oldest_newest_stamp))
-  {
-    LOG(WARNING) << "Received all images but no imu measurements!";
-    resetImgBuffer();
-    return;
-  }
+  // always provide imu structures in the callback (empty if no imu present)
+  ImuStampsVector imu_timestamps(imu_buffers_.size());
+  ImuAccGyrVector imu_measurements(imu_buffers_.size());
 
-  // Check that oldest IMU measurement is not newer than the image stamp.
-  if(std::get<0>(oldest_newest_stamp) > min_stamp)
+  if (imu_count_ != 0)
   {
-    LOG(WARNING) << "Oldest IMU measurement is newer than image timestamp.";
-    resetImgBuffer();
-    return;
-  }
+    // get oldest / newest stamp for all imu buffers
+    std::vector<std::tuple<int64_t, int64_t, bool> > oldest_newest_stamp_vector(imu_buffers_.size());
+    std::transform(
+          imu_buffers_.begin(),
+          imu_buffers_.end(),
+          oldest_newest_stamp_vector.begin(),
+          [](Buffer<FloatType, 6>& imu_buffer) {
+            return imu_buffer.getOldestAndNewestStamp();
+          }
+    );
 
-  // Check if we have IMU measurements until the latest image.
-  if(std::get<1>(oldest_newest_stamp) < max_stamp)
-  {
-    VLOG(100) << "Waiting for IMU measurements.";
-    return;
-  }
+    // imu buffers are not consistent with the image buffers
+    if (!validateImuBuffers(min_stamp, max_stamp, oldest_newest_stamp_vector))
+    {
+      return;
+    }
 
-  // If this is the very first image bundle, we send all IMU messages that we have
-  // received so far. For every later image bundle, we just send the IMU messages
-  // that we have received in between.
-  ImuStamps imu_timestamps;
-  ImuAccGyr imu_measurements;
-  if(last_img_bundle_min_stamp_ < 0)
-  {
-    int64_t oldest_stamp = std::get<0>(oldest_newest_stamp);
-    std::tie(imu_timestamps, imu_measurements) =
-        imu_buffer_.getBetweenValuesInterpolated(oldest_stamp, min_stamp);
-  }
-  else
-  {
-    std::tie(imu_timestamps, imu_measurements) =
-        imu_buffer_.getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
+    // If this is the very first image bundle, we send all IMU messages that we have
+    // received so far. For every later image bundle, we just send the IMU messages
+    // that we have received in between.
+    for (size_t i = 0; i < imu_buffers_.size(); ++i)
+    {
+      if(last_img_bundle_min_stamp_ < 0)
+      {
+        int64_t oldest_stamp = std::get<0>(oldest_newest_stamp_vector[i]);
+
+        ImuStamps imu_stamps;
+        ImuAccGyr imu_accgyr;
+        std::tie(imu_stamps, imu_accgyr) =
+            imu_buffers_[i].getBetweenValuesInterpolated(oldest_stamp, min_stamp);
+        imu_timestamps[i] = imu_stamps;
+        imu_measurements[i] = imu_accgyr;
+      }
+      else
+      {
+        ImuStamps imu_stamps;
+        ImuAccGyr imu_accgyr;
+        std::tie(imu_stamps, imu_accgyr) =
+            imu_buffers_[i].getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
+        imu_timestamps[i] = imu_stamps;
+        imu_measurements[i] = imu_accgyr;
+      }
+    }
   }
 
   // Let's process the callback.

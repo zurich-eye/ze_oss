@@ -20,13 +20,12 @@ namespace ze {
 
 DataProviderRosbag::DataProviderRosbag(
     const std::string& bag_filename,
-    const std::string& imu_topic,
+    const std::map<std::string, size_t>& imu_topic_imuidx_map,
     const std::map<std::string, size_t>& img_topic_camidx_map)
   : DataProviderBase(DataProviderType::Rosbag)
   , img_topic_camidx_map_(img_topic_camidx_map)
-  , imu_topic_(imu_topic)
+  , imu_topic_imuidx_map_(imu_topic_imuidx_map)
 {
-
   //! @todo: Check if topics exists.
   //! @todo: Display number of messages per topic in the beginning.
 
@@ -46,13 +45,23 @@ DataProviderRosbag::DataProviderRosbag(
   {
     topics.push_back(it.first);
   }
-  if (!imu_topic.empty())
+  for (auto it : imu_topic_imuidx_map_)
   {
-    topics.push_back(imu_topic);
+    topics.push_back(it.first);
   }
 
   bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics)));
   bag_view_it_ = bag_view_->begin();
+}
+
+size_t DataProviderRosbag::camera_count() const
+{
+  return img_topic_camidx_map_.size();
+}
+
+size_t DataProviderRosbag::imu_count() const
+{
+  return imu_topic_imuidx_map_.size();
 }
 
 void DataProviderRosbag::spin()
@@ -109,7 +118,8 @@ bool DataProviderRosbag::spinOnce()
     const sensor_msgs::ImuConstPtr m_imu = m.instantiate<sensor_msgs::Imu>();
     if (m_imu && imu_callback_)
     {
-      if (m.getTopic() == imu_topic_)
+      auto it = imu_topic_imuidx_map_.find(m.getTopic());
+      if (it != imu_topic_imuidx_map_.end())
       {
         const Eigen::Vector3d gyr(
               m_imu->angular_velocity.x,
@@ -121,7 +131,7 @@ bool DataProviderRosbag::spinOnce()
               m_imu->linear_acceleration.z);
         int64_t stamp = m_imu->header.stamp.toNSec();
         CHECK_GT(stamp, last_imu_stamp_);
-        imu_callback_(stamp, acc, gyr);
+        imu_callback_(stamp, acc, gyr, it->second);
         last_imu_stamp_ = stamp;
       }
       else

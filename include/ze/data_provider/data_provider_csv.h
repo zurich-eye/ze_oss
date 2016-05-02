@@ -122,6 +122,9 @@ public:
 
   virtual bool ok() const override;
 
+  virtual size_t imu_count() const;
+  virtual size_t camera_count() const;
+
   inline size_t size() const
   {
     return buffer_.size();
@@ -143,6 +146,8 @@ private:
 
   //! Points to the next published buffer value. Buffer can't change once loaded!
   DataBuffer::const_iterator buffer_it_;
+
+  std::map<std::string, size_t> camera_topics_;
 };
 
 } // namespace ze
