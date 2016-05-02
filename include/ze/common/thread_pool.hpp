@@ -41,12 +41,19 @@ namespace ze {
 class ThreadPool
 {
 public:
+  ThreadPool() = default;
 
-  //! The constructor launches the amount of specified worker threads.
-  ThreadPool(size_t n_threads);
+  //! Creates a thread pool and starts the amount of specified worker threads.
+  ThreadPool(size_t n_threads)
+  {
+    startThreads(n_threads);
+  }
 
   //! The destructor joins all threads.
   ~ThreadPool();
+
+  //! Launches the amount of specified worker threads.
+  void startThreads(size_t n_threads);
 
   //! Add task to threadpool. See for example usage in unit-test.
   template<class F, class... Args>

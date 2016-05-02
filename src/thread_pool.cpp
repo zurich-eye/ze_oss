@@ -2,7 +2,7 @@
 
 namespace ze {
 
-ThreadPool::ThreadPool(size_t threads)
+void ThreadPool::startThreads(size_t threads)
 {
   for(size_t i = 0;i<threads;++i)
   {
