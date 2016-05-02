@@ -28,6 +28,16 @@ public:
     : buffer_size_nanosec_(secToNanosec(buffer_size_seconds))
   {}
 
+  Buffer(const Buffer& from)
+  {
+    std::lock_guard<std::mutex>(from.mutex_);
+    if (from.buffer_.size() != 0)
+    {
+      throw std::runtime_error("Non-empty buffers are not copyable.");
+    }
+    buffer_size_nanosec_ = from.buffer_size_nanosec_;
+  }
+
   inline void insert(int64_t stamp, const Vector& data)
   {
     std::lock_guard<std::mutex> lock(mutex_);
