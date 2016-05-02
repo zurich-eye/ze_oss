@@ -11,7 +11,15 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
   , projection_params_(projection_params)
   , distortion_params_(distortion_params)
   , type_(type)
-{}
+{
+  // Pre-computations for specific types.
+  if (type == CameraType::PinholeFov)
+  {
+    const FloatType s = distortion_params_(0);
+    const FloatType tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
+    distortion_params_ = Vector2(s, tan_s_half_x2);
+  }
+}
 
 Bearings Camera::backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const
 {
