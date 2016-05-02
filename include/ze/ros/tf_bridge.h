@@ -5,6 +5,6 @@
 
 namespace ze {
 
-tf::Transform transformationToTF(const ze::Transformation& ze_T);
+tf::Transform transformationToTF(const Transformation& ze_T);
 
 } // ze namespace

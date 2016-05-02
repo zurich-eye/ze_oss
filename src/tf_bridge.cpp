@@ -2,7 +2,7 @@
 
 namespace ze {
 
-tf::Transform transformationToTF(const ze::Transformation& ze_T)
+tf::Transform transformationToTF(const Transformation& ze_T)
 {
   tf::Transform tf_T;
   tf_T.setOrigin(
@@ -12,10 +12,10 @@ tf::Transform transformationToTF(const ze::Transformation& ze_T)
           ze_T.getPosition().z()));
   tf_T.setRotation(
         tf::Quaternion(
-          ze_T.getEigenQuaternion().x(),
-          ze_T.getEigenQuaternion().y(),
-          ze_T.getEigenQuaternion().z(),
-          ze_T.getEigenQuaternion().w()));
+          ze_T.getRotation().x(),
+          ze_T.getRotation().y(),
+          ze_T.getRotation().z(),
+          ze_T.getRotation().w()));
   return tf_T;
 }
 

@@ -10,13 +10,15 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/ros/tf_bridge.h
+  include/ze/ros/bag_image_fetcher.hpp
   include/ze/ros/pose_msg_bridge.h
+  include/ze/ros/tf_bridge.h
   )
 
 set(SOURCES
-  src/tf_bridge.cpp
+  src/bag_image_fetcher.cpp
   src/pose_msg_bridge.cpp
+  src/tf_bridge.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
