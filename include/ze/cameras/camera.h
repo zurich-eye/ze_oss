@@ -19,9 +19,21 @@ enum class CameraType {
   PinholeRadialTangential = 3
 };
 
-inline bool isPinholeType(CameraType /*type*/)
+inline bool isPinholeType(CameraType type)
 {
-  return true; // For now, we only have pinhole cameras.
+  switch (type)
+  {
+    case CameraType::Pinhole:
+    case CameraType::PinholeFov:
+    case CameraType::PinholeEquidistant:
+    case CameraType::PinholeRadialTangential:
+      return true;
+      break;
+    default:
+      LOG(FATAL) << "Camera type not known.";
+      break;
+  }
+  return false;
 }
 
 class Camera
