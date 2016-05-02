@@ -9,8 +9,7 @@
 #include <imp/core/image_base.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
 
-namespace ze
-{
+namespace ze {
 // a dummy data provider
 class DataProviderDummy : public DataProviderBase
 {
@@ -71,7 +70,9 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesFullFrames)
 
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
-        [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
+        [&](const StampedImages& images,
+            const ImuStampsVector& imu_timestamps,
+            const ImuAccGyrVector& imu_measurements)
         {
           ++measurements;
           EXPECT_EQ(2, images.size());
@@ -83,9 +84,8 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesFullFrames)
   // trigger callbacks twice for images
   int64_t stamp = 1403636579763555584;
 
-  cv::Mat img;
-  auto img1 = std::make_shared<ImageCv8uC1>(img);
-  auto img2 = std::make_shared<ImageCv8uC1>(img);
+  auto img1 = std::make_shared<ImageRaw8uC1>(1, 1);
+  auto img2 = std::make_shared<ImageRaw8uC1>(1, 1);
 
   sync.addImgData(stamp, img1, 0);
   sync.addImgData(stamp, img2, 1);
@@ -106,7 +106,9 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesWithImu)
 
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
-        [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
+        [&](const StampedImages& images,
+            const ImuStampsVector& imu_timestamps,
+            const ImuAccGyrVector& imu_measurements)
         {
           ++measurements;
           EXPECT_EQ(1, images.size());
@@ -119,8 +121,7 @@ TEST(CameraImuSynchronizerTest, testCameraOnlyPublishesWithImu)
   int64_t stamp2 = 1403636579763555584;
   int64_t stamp3 = 1403636579763555585;
 
-  cv::Mat img;
-  auto img1 = std::make_shared<ImageCv8uC1>(img);
+  auto img1 = std::make_shared<ImageRaw8uC1>(1, 1);
 
   sync.addImuData(stamp1, Vector3(), Vector3(), 0);
   EXPECT_EQ(0, measurements);
@@ -144,7 +145,9 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfFramesInconsistent)
 
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
-        [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
+        [&](const StampedImages& images,
+            const ImuStampsVector& imu_timestamps,
+            const ImuAccGyrVector& imu_measurements)
         {
           ++measurements;
           EXPECT_EQ(2, images.size());
@@ -157,9 +160,8 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfFramesInconsistent)
   int64_t stamp1 = 1403636579763555584;
   int64_t stamp2 = 1403636579863555584;
 
-  cv::Mat img;
-  auto img1 = std::make_shared<ImageCv8uC1>(img);
-  auto img2 = std::make_shared<ImageCv8uC1>(img);
+  auto img1 = std::make_shared<ImageRaw8uC1>(1, 1);
+  auto img2 = std::make_shared<ImageRaw8uC1>(1, 1);
 
   sync.addImgData(stamp1, img1, 0);
   sync.addImgData(stamp2, img2, 1);
@@ -185,7 +187,9 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuBefore)
 
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
-        [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
+        [&](const StampedImages& images,
+            const ImuStampsVector& imu_timestamps,
+            const ImuAccGyrVector& imu_measurements)
         {
           ++measurements;
         }
@@ -195,8 +199,7 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuBefore)
   int64_t stamp2 = 1403636579763555584;  // same as stamp1
   int64_t stamp3 = 1403636579763555585;  // after stamp1
 
-  cv::Mat img;
-  auto img1 = std::make_shared<ImageCv8uC1>(img);
+  auto img1 = std::make_shared<ImageRaw8uC1>(1, 1);
 
   sync.addImgData(stamp1, img1, 0);
   sync.addImuData(stamp2, Vector3(), Vector3(), 0);
@@ -217,7 +220,9 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuAfter)
 
   size_t measurements = 0u;
   sync.registerCameraImuCallback(
-        [&](const StampedImages& images, const ImuStampsVector& imu_timestamps, const ImuAccGyrVector& imu_measurements)
+        [&](const StampedImages& images,
+            const ImuStampsVector& imu_timestamps,
+            const ImuAccGyrVector& imu_measurements)
         {
           ++measurements;
         }
@@ -227,8 +232,7 @@ TEST(CameraImuSynchronizerTest, testImagesAreDiscardedIfNoImuAfter)
   int64_t stamp2 = 1403636579763555584;  // same as stamp1
   int64_t stamp3 = 1403636579763555583;  // before stamp1
 
-  cv::Mat img;
-  auto img1 = std::make_shared<ImageCv8uC1>(img);
+  auto img1 = std::make_shared<ImageRaw8uC1>(1, 1);
 
 
   sync.addImuData(stamp3, Vector3(), Vector3(), 0);

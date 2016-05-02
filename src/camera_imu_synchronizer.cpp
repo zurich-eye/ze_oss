@@ -102,9 +102,11 @@ void CameraImuSynchronizer::registerCameraImuCallback(
   cam_imu_callback_ = callback;
 }
 
-bool CameraImuSynchronizer::validateImuBuffers(const int64_t& min_stamp,
-                                               const int64_t& max_stamp,
-                                               const std::vector<std::tuple<int64_t, int64_t, bool> >& oldest_newest_stamp_vector)
+bool CameraImuSynchronizer::validateImuBuffers(
+    const int64_t& min_stamp,
+    const int64_t& max_stamp,
+    const std::vector<std::tuple<int64_t, int64_t, bool> >&
+      oldest_newest_stamp_vector)
 {
   // Check if we have received some IMU measurements for at least one of the imu's.
   if (std::none_of(oldest_newest_stamp_vector.begin(),
@@ -187,7 +189,8 @@ void CameraImuSynchronizer::checkDataAndCallback()
   ImuStampsVector imu_timestamps(imu_buffers_.size());
   ImuAccGyrVector imu_measurements(imu_buffers_.size());
 
-  if (imu_count_ != 0) {
+  if (imu_count_ != 0)
+  {
     // get oldest / newest stamp for all imu buffers
     std::vector<std::tuple<int64_t, int64_t, bool> > oldest_newest_stamp_vector(imu_buffers_.size());
     std::transform(
@@ -208,7 +211,8 @@ void CameraImuSynchronizer::checkDataAndCallback()
     // If this is the very first image bundle, we send all IMU messages that we have
     // received so far. For every later image bundle, we just send the IMU messages
     // that we have received in between.
-    for (size_t i = 0; i < imu_buffers_.size(); ++i) {
+    for (size_t i = 0; i < imu_buffers_.size(); ++i)
+    {
       if(last_img_bundle_min_stamp_ < 0)
       {
         int64_t oldest_stamp = std::get<0>(oldest_newest_stamp_vector[i]);
