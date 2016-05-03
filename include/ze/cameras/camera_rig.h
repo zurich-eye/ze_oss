@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
+#include <ze/cameras/camera.h>
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
 #include <ze/common/transformation.h>
 
 namespace ze {
 
-class Camera;
-using CameraVector = std::vector<std::shared_ptr<Camera>>;
+using CameraVector = std::vector<Camera::Ptr>;
 
 class CameraRig
 {
@@ -79,7 +79,6 @@ public:
   //! @}
 
 private:
-
   //! The mounting transformations.
   TransformationVector T_C_B_;
 

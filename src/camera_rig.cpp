@@ -1,5 +1,4 @@
 #include <ze/cameras/camera_rig.h>
-#include <ze/cameras/camera.h>
 #include <ze/cameras/camera_yaml_serialization.h>
 
 namespace ze {
