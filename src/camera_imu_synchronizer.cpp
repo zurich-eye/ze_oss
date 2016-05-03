@@ -65,6 +65,7 @@ void CameraImuSynchronizer::addImgData(
     {
       continue;
     }
+
     if (img_buffer_.at(i).first != -1 && (stamp - img_buffer_.at(i).first) > 2000)
     {
       // invalidate old data
