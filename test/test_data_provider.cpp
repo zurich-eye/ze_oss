@@ -58,7 +58,7 @@ TEST(DataProviderTests, testRosbag)
   ASSERT_TRUE(fileExists(bag_filename));
 
   DataProviderRosbag dp(bag_filename, {{"/imu0", 0}}, { {"/cam0/image_raw", 0},
-                                                 {"/cam1/image_raw", 1} });
+                                                        {"/cam1/image_raw", 1} });
 
   size_t num_imu_measurements = 0u;
   dp.registerImuCallback(
@@ -99,8 +99,8 @@ TEST(DataProviderTests, testRosbagCamOnly)
   std::string bag_filename = data_dir + "/dataset.bag";
   ASSERT_TRUE(fileExists(bag_filename));
 
-  DataProviderRosbag dp(bag_filename, {{}}, { {"/cam0/image_raw", 0},
-                                                 {"/cam1/image_raw", 1} });
+  DataProviderRosbag dp(bag_filename, {}, { {"/cam0/image_raw", 0},
+                                            {"/cam1/image_raw", 1} });
 
   size_t num_imu_measurements = 0u;
   dp.registerImuCallback(
