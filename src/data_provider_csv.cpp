@@ -126,6 +126,7 @@ size_t DataProviderCsv::camera_count() const
 
 size_t DataProviderCsv::imu_count() const
 {
+  // Only a single imu is supported in csv files.
   return 1;
 }
 
