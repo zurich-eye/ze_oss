@@ -58,7 +58,7 @@ void triangulateManyAndComputeAngularErrors(
 //------------------------------------------------------------------------------
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
-    const Bearings& f_C,
+    const Bearings& p_C,
     const FloatType rank_tol)
 {
   // Number of observations.
@@ -66,7 +66,7 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
   CHECK_GE(m, 2u);
 
   // Compute unit-plane coorinates (divide by z) from bearing vectors.
-  const Matrix2X uv = f_C.topRows<2>().array().rowwise() / f_C.bottomRows<1>().array();
+  const Matrix2X uv = p_C.topRows<2>().array().rowwise() / p_C.bottomRows<1>().array();
 
   // Allocate DLT matrix.
   MatrixX4 A(m * 2, 4);
@@ -95,8 +95,8 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
 //------------------------------------------------------------------------------
 void triangulateGaussNewton(
     const TransformationVector& T_C_W,
-    const Bearings& f_C,
-    Position& p_W)
+    const Bearings& p_C,
+    Eigen::Ref<Position> p_W)
 {
   Position p_W_old = p_W;
   FloatType chi2 = 0.0;
@@ -121,7 +121,7 @@ void triangulateGaussNewton(
     {
       const Position p_C = T_C_W[i] * p_W;
       Matrix23 J = dUv_dLandmark(p_C) * T_C_W[i].getRotationMatrix();
-      Vector2 e(ze::project2(p_C) - ze::project2(f_C.col(i)));
+      Vector2 e(ze::project2(p_C) - ze::project2(p_C.col(i)));
       A.noalias() += J.transpose() * J;
       b.noalias() -= J.transpose() * e;
       new_chi2 += e.squaredNorm();

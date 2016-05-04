@@ -49,14 +49,13 @@ void triangulateManyAndComputeAngularErrors(
 //! @return Success.
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
-    const Bearings& f_C,
+    const Bearings& p_C,
     const FloatType rank_tol = 1e-9);
 
+//! Non-linear least squares refinement of the triangulation using Gauss-Newton.
 void triangulateGaussNewton(
     const TransformationVector& T_C_W,
-    const Bearings& f_C,
-    Position& p_W);
-
-
+    const Bearings& p_C,
+    Eigen::Ref<Position> p_W);
 
 } // namespace ze
