@@ -9,7 +9,7 @@
 
 namespace ze {
 
-/*! Collect statistics over multiple timings in milliseconds.
+/*! Collect samples and iteratively compute statistics.
  *
  * Usage:
 \code{.cpp}
