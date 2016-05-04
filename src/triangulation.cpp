@@ -2,11 +2,12 @@
 
 #include <algorithm>
 #include <ze/common/logging.hpp>
-
 #include <ze/common/matrix.h>
+#include <ze/geometry/pose_optimizer.h>
 
 namespace ze {
 
+//------------------------------------------------------------------------------
 Position triangulateNonLinear(
     const Transformation& T_A_B,
     const Eigen::Ref<const Bearing>& f_A,
@@ -28,6 +29,7 @@ Position triangulateNonLinear(
   return p_A;
 }
 
+//------------------------------------------------------------------------------
 void triangulateManyAndComputeAngularErrors(
     const Transformation& T_A_B,
     const Bearings& f_A_vec,
@@ -53,6 +55,7 @@ void triangulateManyAndComputeAngularErrors(
   }
 }
 
+//------------------------------------------------------------------------------
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
     const Bearings& f_C,
@@ -89,4 +92,68 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
   return std::make_pair(p_W_homogeneous, success);
 }
 
+//------------------------------------------------------------------------------
+void triangulateGaussNewton(
+    const TransformationVector& T_C_W,
+    const Bearings& f_C,
+    Position& p_W)
+{
+  Position p_W_old = p_W;
+  FloatType chi2 = 0.0;
+  Matrix3 A;
+  Vector3 b;
+
+  if(T_C_W.size() < 2u)
+  {
+    LOG(ERROR) << "Optimizing point with less than two observations";
+    return;
+  }
+
+  constexpr FloatType eps{0.0000000001};
+  for (uint32_t iter = 0; iter < 5u; ++iter)
+  {
+    A.setZero();
+    b.setZero();
+    FloatType new_chi2{0.0};
+
+    // compute residuals
+    for(size_t i = 0; i < T_C_W.size(); ++i)
+    {
+      const Position p_C = T_C_W[i] * p_W;
+      Matrix23 J = dUv_dLandmark(p_C) * T_C_W[i].getRotationMatrix();
+      Vector2 e(ze::project2(p_C) - ze::project2(f_C.col(i)));
+      A.noalias() += J.transpose() * J;
+      b.noalias() -= J.transpose() * e;
+      new_chi2 += e.squaredNorm();
+    }
+
+    // solve linear system
+    const Vector3 dp(A.ldlt().solve(b));
+
+    // check if error increased
+    if((iter > 0 && new_chi2 > chi2) || (bool) std::isnan((double)dp[0]))
+    {
+      VLOG(100) << "it " << iter
+                << "\t FAILURE \t new_chi2 = " << new_chi2;
+
+      p_W = p_W_old; // roll-back
+      break;
+    }
+
+    // update the model
+    Position new_point = traits<Position>::retract(p_W, dp);
+    p_W_old = p_W;
+    p_W = new_point;
+    chi2 = new_chi2;
+
+    VLOG(100) << "it " << iter
+              << "\t Success \t new_chi2 = " << new_chi2;
+
+    // stop when converged
+    if(ze::normMax(dp) <= eps)
+    {
+      break;
+    }
+  }
+}
 } // namespace ze

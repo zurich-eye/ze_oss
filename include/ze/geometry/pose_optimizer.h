@@ -153,7 +153,7 @@ inline Matrix3 dBearing_dLandmark(const Eigen::Ref<const Position>& p_C)
 inline Matrix23 dUv_dLandmark(const Eigen::Ref<const Position>& p_C)
 {
   const FloatType z_sq = p_C(2) * p_C(2);
-  const FloatType z_inv = 1.0 / p_C(2);
+  const FloatType z_inv = FloatType{1.0} / p_C(2);
   Matrix23 J;
   J << z_inv, 0.0, -p_C(0) / z_sq,
        0.0, z_inv, -p_C(1) / z_sq;

@@ -52,6 +52,11 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const Bearings& f_C,
     const FloatType rank_tol = 1e-9);
 
+void triangulateGaussNewton(
+    const TransformationVector& T_C_W,
+    const Bearings& f_C,
+    Position& p_W);
+
 
 
 } // namespace ze

@@ -8,10 +8,11 @@
 #include <ze/cameras/camera_utils.h>
 #include <ze/geometry/triangulation.h>
 
-TEST(TriangulationTests, testSolver)
-{
-  using namespace ze;
+namespace ze {
 
+std::tuple<Position, TransformationVector, Bearings>
+generateObservingCameras()
+{
   Transformation T_W_C;
   T_W_C.setRandom(); // Random camera to world transformation.
 
@@ -42,13 +43,45 @@ TEST(TriangulationTests, testSolver)
     }
   }
   f_C.conservativeResize(3, T_C_W_vec.size());
-  ASSERT_GE(T_C_W_vec.size(), 2u);
+  CHECK_GE(T_C_W_vec.size(), 2u);
+  return std::make_tuple(p_W_true, T_C_W_vec, f_C);
+}
+
+} // namespace ze
+
+TEST(TriangulationTests, testSolver)
+{
+  using namespace ze;
+
+  // Generate data.
+  Position p_W_true;
+  TransformationVector T_C_W_vec;
+  Bearings f_C;
+  std::tie(p_W_true, T_C_W_vec, f_C) = ze::generateObservingCameras();
 
   // Triangulate.
   Vector4 p_W_homogeneous;
   bool success;
   std::tie(p_W_homogeneous, success) = triangulateHomogeneousDLT(T_C_W_vec, f_C);
   Vector3 p_W_estimated = p_W_homogeneous.head<3>() / p_W_homogeneous(3);
+
+  // Compare error.
+  EXPECT_LT((p_W_estimated - p_W_true).norm(), 1e-10);
+}
+
+TEST(TriangulationTests, testNonlinearRefinement)
+{
+  using namespace ze;
+
+  // Generate data.
+  Position p_W_true;
+  TransformationVector T_C_W_vec;
+  Bearings f_C;
+  std::tie(p_W_true, T_C_W_vec, f_C) = ze::generateObservingCameras();
+
+  // Triangulate.
+  Position p_W_estimated = p_W_true + Vector3(0.01, 0.02, 0.01);
+  triangulateGaussNewton(T_C_W_vec, f_C, p_W_estimated);
 
   // Compare error.
   EXPECT_LT((p_W_estimated - p_W_true).norm(), 1e-10);
