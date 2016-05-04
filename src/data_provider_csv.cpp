@@ -36,6 +36,7 @@ DataProviderCsv::DataProviderCsv(
 
   if (!imu_topic.empty())
   {
+    imu_count_ = 1u;
     loadImuData(joinPath(csv_directory, imu_topic), 0u);
   }
 
@@ -122,15 +123,15 @@ bool DataProviderCsv::ok() const
   return true;
 }
 
-size_t DataProviderCsv::camera_count() const
+size_t DataProviderCsv::cameraCount() const
 {
   return camera_topics_.size();
 }
 
-size_t DataProviderCsv::imu_count() const
+size_t DataProviderCsv::imuCount() const
 {
   // Only a single imu is supported in csv files.
-  return 1;
+  return imu_count_;
 }
 
 void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)

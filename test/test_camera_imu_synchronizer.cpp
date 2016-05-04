@@ -18,11 +18,11 @@ public:
   void spin() {}
   virtual bool spinOnce() { return true; }
   virtual bool ok() const { return true; }
-  virtual size_t imu_count() const
+  virtual size_t imuCount() const
   {
     return imu_count_;
   };
-  virtual size_t camera_count() const
+  virtual size_t cameraCount() const
   {
     return camera_count_;
   }

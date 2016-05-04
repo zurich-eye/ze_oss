@@ -29,8 +29,8 @@ public:
 
   virtual bool ok() const override;
 
-  virtual size_t imu_count() const;
-  virtual size_t camera_count() const;
+  virtual size_t imuCount() const;
+  virtual size_t cameraCount() const;
 
   size_t size() const;
 

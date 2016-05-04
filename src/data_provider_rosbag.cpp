@@ -53,12 +53,12 @@ DataProviderRosbag::DataProviderRosbag(
   bag_view_it_ = bag_view_->begin();
 }
 
-size_t DataProviderRosbag::camera_count() const
+size_t DataProviderRosbag::cameraCount() const
 {
   return img_topic_camidx_map_.size();
 }
 
-size_t DataProviderRosbag::imu_count() const
+size_t DataProviderRosbag::imuCount() const
 {
   return imu_topic_imuidx_map_.size();
 }

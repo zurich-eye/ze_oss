@@ -52,8 +52,8 @@ public:
   //! Stop data provider.
   virtual void shutdown();
 
-  virtual size_t imu_count() const = 0;
-  virtual size_t camera_count() const = 0;
+  virtual size_t imuCount() const = 0;
+  virtual size_t cameraCount() const = 0;
 
   void registerImuCallback(const ImuCallback& imu_callback);
 

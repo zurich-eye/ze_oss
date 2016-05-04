@@ -122,8 +122,9 @@ public:
 
   virtual bool ok() const override;
 
-  virtual size_t imu_count() const;
-  virtual size_t camera_count() const;
+  virtual size_t imuCount() const;
+
+  virtual size_t cameraCount() const;
 
   inline size_t size() const
   {
@@ -148,6 +149,8 @@ private:
   DataBuffer::const_iterator buffer_it_;
 
   std::map<std::string, size_t> camera_topics_;
+
+  size_t imu_count_ = 0u;
 };
 
 } // namespace ze

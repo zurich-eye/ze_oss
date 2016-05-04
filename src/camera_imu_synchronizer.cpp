@@ -19,8 +19,8 @@ CameraImuSynchronizer::CameraImuSynchronizer(
     FloatType imu_buffer_length_seconds)
 {
   subscribeDataProvider(data_provider);
-  camera_rig_size_ = data_provider.camera_count();
-  imu_count_ = data_provider.imu_count();
+  camera_rig_size_ = data_provider.cameraCount();
+  imu_count_ = data_provider.imuCount();
   initBuffers(imu_buffer_length_seconds);
 }
 
