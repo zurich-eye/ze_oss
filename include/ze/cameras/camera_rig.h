@@ -32,7 +32,8 @@ public:
   //! @{
   inline const Transformation& T_C_B(size_t camera_index) const
   {
-    return T_C_B_.at(camera_index);
+    DEBUG_CHECK_LT(camera_index, T_C_B_.size());
+    return T_C_B_[camera_index];
   }
 
   inline const TransformationVector& T_C_B_vec() const
@@ -45,17 +46,20 @@ public:
   //! @{
   inline const Camera& at(size_t camera_index) const
   {
-    return *cameras_.at(camera_index);
+    DEBUG_CHECK_LT(camera_index, cameras_.size());
+    return *cameras_[camera_index];
   }
 
   inline std::shared_ptr<Camera> atShared(size_t camera_index)
   {
-    return cameras_.at(camera_index);
+    DEBUG_CHECK_LT(camera_index, cameras_.size());
+    return cameras_[camera_index];
   }
 
   inline std::shared_ptr<const Camera> atShared(size_t camera_index) const
   {
-    return cameras_.at(camera_index);
+    DEBUG_CHECK_LT(camera_index, cameras_.size());
+    return cameras_[camera_index];
   }
 
   inline const CameraVector& cameras() const { return cameras_; }
@@ -77,6 +81,11 @@ public:
   CameraVector::const_iterator cbegin() const { return cameras_.cbegin(); }
   CameraVector::const_iterator cend() const { return cameras_.cend(); }
   //! @}
+
+  //! Get a rig that contains only a subset of the cameras.
+  CameraRig::Ptr getSubRig(
+      const std::vector<uint32_t>& camera_indices,
+      const std::string& label);
 
 private:
   //! The mounting transformations.
