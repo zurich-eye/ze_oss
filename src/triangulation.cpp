@@ -119,9 +119,9 @@ void triangulateGaussNewton(
     // compute residuals
     for(size_t i = 0; i < T_C_W.size(); ++i)
     {
-      const Position p_C = T_C_W[i] * p_W;
-      Matrix23 J = dUv_dLandmark(p_C) * T_C_W[i].getRotationMatrix();
-      Vector2 e(ze::project2(p_C) - ze::project2(p_C.col(i)));
+      const Position p_C_estimated = T_C_W[i] * p_W;
+      Matrix23 J = dUv_dLandmark(p_C_estimated) * T_C_W[i].getRotationMatrix();
+      Vector2 e(ze::project2(p_C_estimated) - ze::project2(p_C.col(i)));
       A.noalias() += J.transpose() * J;
       b.noalias() -= J.transpose() * e;
       new_chi2 += e.squaredNorm();
@@ -131,7 +131,7 @@ void triangulateGaussNewton(
     const Vector3 dp(A.ldlt().solve(b));
 
     // check if error increased
-    if((iter > 0 && new_chi2 > chi2) || (bool) std::isnan((double)dp[0]))
+    if((iter > 0 && new_chi2 > chi2) || std::isnan(dp[0]))
     {
       VLOG(100) << "it " << iter
                 << "\t FAILURE \t new_chi2 = " << new_chi2;
@@ -156,4 +156,5 @@ void triangulateGaussNewton(
     }
   }
 }
+
 } // namespace ze

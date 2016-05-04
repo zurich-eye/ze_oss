@@ -80,7 +80,7 @@ TEST(TriangulationTests, testNonlinearRefinement)
   std::tie(p_W_true, T_C_W_vec, f_C) = ze::generateObservingCameras();
 
   // Triangulate.
-  Position p_W_estimated = p_W_true + Vector3(0.01, 0.02, 0.01);
+  Position p_W_estimated = p_W_true + Vector3(0.1, 0.05, 0.1);
   triangulateGaussNewton(T_C_W_vec, f_C, p_W_estimated);
 
   // Compare error.
