@@ -17,25 +17,24 @@ namespace ze {
 CameraImuSynchronizer::CameraImuSynchronizer(
     DataProviderBase& data_provider,
     FloatType imu_buffer_length_seconds)
+  : camera_rig_size_(data_provider.cameraCount())
+  , imu_count_(data_provider.imuCount())
 {
   subscribeDataProvider(data_provider);
-  camera_rig_size_ = data_provider.cameraCount();
-  imu_count_ = data_provider.imuCount();
   initBuffers(imu_buffer_length_seconds);
 }
 
 void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provider)
 {
   using namespace std::placeholders;
-  if (camera_rig_size_ == 0)
+  if (camera_rig_size_ == 0u)
   {
     LOG(ERROR) << "DataProvider must at least expose a single camera topic.";
   }
-
   data_provider.registerCameraCallback(
         std::bind(&CameraImuSynchronizer::addImgData, this, _1, _2, _3));
 
-  if (imu_count_ != 0)
+  if (imu_count_ > 0u)
   {
     data_provider.registerImuCallback(
           std::bind(&CameraImuSynchronizer::addImuData, this, _1, _2, _3, _4));
