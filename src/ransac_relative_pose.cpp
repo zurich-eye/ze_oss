@@ -71,7 +71,7 @@ bool RansacRelativePose::solveRelativePose(
   using Problem = opengv::sac_problems::relative_pose::CentralRelativePoseSacProblem;
   using Adapter = opengv::relative_pose::CentralRelativeAdapter;
   Adapter adapter(f_cur, f_ref);
-  boost::shared_ptr<Problem> problem(new Problem(adapter, Problem::STEWENIUS));
+  boost::shared_ptr<Problem> problem(new Problem(adapter, Problem::NISTER));
   opengv::sac::Ransac<Problem> ransac;
   ransac.sac_model_ = problem;
   ransac.threshold_ = ogv_threshold_;
