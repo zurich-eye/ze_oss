@@ -12,7 +12,6 @@
 #include <ze/common/path_utils.h>
 #include <imp/bridge/opencv/image_cv.hpp>
 
-DEFINE_int32(data_source_skip_frames, 0, "How many frames should skipped?");
 DEFINE_int32(data_source_stop_after_n_frames, -1,
              "How many frames should be processed?");
 
@@ -159,11 +158,7 @@ bool DataProviderRosbag::spinOnce()
       LOG_FIRST_N(WARNING, 1) << "No IMU callback registered but measurements available";
     }
 
-    //! @todo (MWE) hack for loop as += operator is not defined :(
-    for (int i=0; i<FLAGS_data_source_skip_frames+1; ++i)
-    {
-      ++bag_view_it_;
-    }
+    ++bag_view_it_;
     return true;
   }
   return false;

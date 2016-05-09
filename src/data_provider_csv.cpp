@@ -34,11 +34,14 @@ DataProviderCsv::DataProviderCsv(
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
-  loadImuData(csv_directory + ensureLeftSlash(imu_topic), 0u);
+  if (!imu_topic.empty())
+  {
+    loadImuData(joinPath(csv_directory, imu_topic), 0u);
+  }
 
   for (auto it : camera_topics)
   {
-    std::string dir = csv_directory + ensureLeftSlash(it.first);
+    std::string dir = joinPath(csv_directory, it.first);
     loadCameraData(dir, it.second, millisecToNanosec(100));
   }
 
