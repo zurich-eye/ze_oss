@@ -166,11 +166,8 @@ std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
   const Transformation T_C_W = data.T_C_B * T_B_W;
   Positions p_C = T_C_W.transformVectorized(data.p_W);
 
-  // Compute projection of points on unit-plane:
-  Keypoints uv_est = project2Vectorized(p_C);
-
-  // Compute difference between bearing vectors.
-  Keypoints uv_err = uv_est - data.uv;
+  // Compute difference on unit plane.
+  Keypoints uv_err = project2Vectorized(p_C) - data.uv;
   VectorX uv_err_norm = uv_err.colwise().norm();
 
   // Account that features at higher levels have higher uncertainty.
@@ -223,7 +220,8 @@ std::vector<KeypointIndex> getOutlierIndices(
 {
   FloatType chi2;
   VectorX err_norm_vec;
-  FloatType threshold = pixel_threshold;
+  FloatType error_multiplier = 1.0;
+  FloatType threshold = pixel_threshold; //! @todo: multiple thresholds for multiple residual blocks!
   switch (data.type)
   {
     case PoseOptimizerResidualType::Bearing:
@@ -236,7 +234,8 @@ std::vector<KeypointIndex> getOutlierIndices(
     case PoseOptimizerResidualType::UnitPlane:
       std::tie(chi2, err_norm_vec) =
           evaluateUnitPlaneErrors(T_B_W, false, data, nullptr, nullptr);
-      threshold = pixel_threshold / std::abs(cam.projectionParameters()(0));
+      error_multiplier = 1.0 / std::abs(cam.projectionParameters()(0));
+      threshold = pixel_threshold * error_multiplier;
       break;
     default:
       LOG(FATAL) << "Residual type not implemented.";
@@ -245,10 +244,13 @@ std::vector<KeypointIndex> getOutlierIndices(
 
   std::vector<KeypointIndex> outliers;
   outliers.reserve(err_norm_vec.size() / 2);
+  VLOG(1) << "Reproj. threshold = " << threshold;
   for (int i = 0; i < err_norm_vec.size(); ++i)
   {
     if (err_norm_vec(i) > threshold)
     {
+      VLOG(100) << "Outlier: Reproj. error = " << err_norm_vec(i) / error_multiplier
+              << "px";
       outliers.push_back(data.kp_idx(i));
     }
   }
