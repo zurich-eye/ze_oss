@@ -43,7 +43,8 @@ DataProviderRosbag::DataProviderRosbag(
   // empty bracket initialzer calls default constructor and
   // adds an empty element to the map
   if (imu_topic_imuidx_map_.size() == 1 &&
-      imu_topic_imuidx_map_.begin()->first.empty()) {
+      imu_topic_imuidx_map_.begin()->first.empty())
+  {
     imu_topic_imuidx_map_.clear();
   }
 
