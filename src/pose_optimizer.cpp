@@ -244,13 +244,12 @@ std::vector<KeypointIndex> getOutlierIndices(
 
   std::vector<KeypointIndex> outliers;
   outliers.reserve(err_norm_vec.size() / 2);
-  VLOG(1) << "Reproj. threshold = " << threshold;
+  VLOG(100) << "Reproj. threshold = " << threshold;
   for (int i = 0; i < err_norm_vec.size(); ++i)
   {
     if (err_norm_vec(i) > threshold)
     {
-      VLOG(100) << "Outlier: Reproj. error = " << err_norm_vec(i) / error_multiplier
-              << "px";
+      VLOG(100) << "Outlier: Reproj. error = " << err_norm_vec(i) / error_multiplier << "px";
       outliers.push_back(data.kp_idx(i));
     }
   }
