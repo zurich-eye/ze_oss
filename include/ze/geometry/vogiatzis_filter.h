@@ -12,7 +12,7 @@ namespace ze {
 
 inline FloatType getDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 {
-  return 1.0 / mu_sigma2_a_b(0);
+  return FloatType{1.0} / mu_sigma2_a_b(0);
 }
 
 inline FloatType getSigma2(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
@@ -37,17 +37,17 @@ inline FloatType getInvMaxDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
 
 inline FloatType getMeanFromDepth(FloatType depth)
 {
-  return 1.0 / depth;
+  return FloatType{1.0} / depth;
 }
 
 inline FloatType getMeanRangeFromDepthMinMax(FloatType depth_min, FloatType /*depth_max*/)
 {
-  return 1.0 / depth_min;
+  return FloatType{1.0} / depth_min;
 }
 
 inline FloatType getInitSigma2FromMuRange(FloatType mu_range)
 {
-  return mu_range * mu_range / 36.0;
+  return mu_range * mu_range / FloatType{36.0};
 }
 
 inline void increaseOutlierProbability(Eigen::Ref<Seed> mu_sigma2_a_b)
@@ -67,8 +67,9 @@ inline bool isConverged(
 
 inline FloatType getSigma2FromDepthSigma(FloatType depth, FloatType depth_sigma)
 {
-  const FloatType sigma = 0.5 * (1.0 / std::max(0.000000000001, depth - depth_sigma)
-                               - 1.0 / (depth + depth_sigma));
+  const FloatType sigma =
+      FloatType{0.5} * (FloatType{1.0} / std::max(0.000000000001, depth - depth_sigma)
+                      - FloatType{1.0} / (depth + depth_sigma));
   return sigma * sigma;
 }
 
