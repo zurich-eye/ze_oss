@@ -21,10 +21,10 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(
 
     std::string camera_type;
     int width, height;
-    Eigen::VectorXd intrinsics;
+    ze::VectorX intrinsics;
     const YAML::Node distortion_config = node["distortion"];
     std::string distortion_type;
-    Eigen::VectorXd distortion_parameters;
+    ze::VectorX distortion_parameters;
 
     if(!distortion_config)
     {
@@ -146,7 +146,7 @@ bool convert<std::shared_ptr<ze::CameraRig>>::decode(
         return false;
       }
 
-      Eigen::Matrix4d T_B_C;
+      ze::Matrix4 T_B_C;
       if (!YAML::safeGet(camera_node, "T_B_C", &T_B_C))
       {
         LOG(ERROR) << "Unable to get extrinsic transformation T_B_C for camera " << i;
