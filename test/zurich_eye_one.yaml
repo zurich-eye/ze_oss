@@ -1,11 +1,13 @@
 # ------------------------------------------------------------------------------
 # Function : Inertial sensor model parameter yaml test file.
+#            No temperature models.
 #            
 # Project  : Zurich Eye
 # Author   : Zurich Eye
 # Version  : V01  27JAN2016 Initial version.
 #                 22MAR2016 Additional models.
-# Comment  : TODO() Move to "ze_test_data" after discussion.
+#                 10MAY2016 rehderj terminology.
+# Comment  : 
 # ------------------------------------------------------------------------------
 
 label: "zuricheyeonetest"
@@ -52,7 +54,7 @@ imus:
         bandwidth: 200                  # "white noise" bandwidth [Hz]
         bias_noise_density: 2.66e-5     # Bias driving noise density [rad/s^2/sqrt(Hz)]
       intrinsic_model:
-        type: standard
+        type: calibrated
 
     accelerometers:
       noise_model:
@@ -62,22 +64,22 @@ imus:
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
         type: scale-misalignment
-        b:                              # Bias at room temperature (20 degC, ISO) [m/s^2]
+        b:                              # Fixed bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
           cols: 3
           rows: 1
-          data: [ 0.0,
-                  0.0,
-                  0.0 ]
+          data: [ +0.10,
+                  +0.12,
+                  -0.03 ]
         M:                              # Scale and misalignment matrix at room temperature []
           cols: 3
           rows: 3
-          data: [ 1.0, 0.0, 0.0,
-                  0.0, 1.0, 0.0,
-                  0.0, 0.0, 1.0 ]
-        delay: 1.00e-3                  # Delay [s]
+          data: [ +1.010, +0.012, -0.001,
+                  -0.002, +1.015, -0.005,
+                  +0.001, -0.002, +0.987 ]
+        delay: 1.05e-3                  # Delay [s]
         range: 150                      # Range [m/s^2]
 
-    T_B_S:                              # Body to IMU reference axes transform
+    T_B_S:                              # Body to IMU reference axes transform (deviation from EKalibr)
       cols: 4
       rows: 4
       data: [0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975,
@@ -96,27 +98,27 @@ imus:
         bandwidth: 200                  # "white noise" bandwidth [Hz]
         bias_noise_density: 2.66e-5     # Bias driving noise density [rad/s^2/sqrt(Hz)]
       intrinsic_model:
-        type: scale-misalignment-gsens
-        b:                              # Bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
+        type: scale-misalignment-gsensitivity
+        b:                              # Fixed bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
           cols: 3
           rows: 1
-          data: [ 0.0,
-                  0.0,
-                  0.0 ]
+          data: [ +0.01,
+                  -0.02,
+                  +0.00 ]
         M:                              # Scale and misalignment matrix at room temperature []
           cols: 3
           rows: 3
-          data: [ 1.0, 0.0, 0.0,
-                  0.0, 1.0, 0.0,
-                  0.0, 0.0, 1.0 ]
-        A:                              # g-sensitivity matrix at room temperature [srad/m]
+          data: [ +1.010, -0.010, +0.020,
+                  +0.010, +1.005, +0.001,
+                  +0.011, +0.007, +1.002 ]
+        Ma:                             # g-sensitivity matrix at room temperature [srad/m]
           cols: 3
           rows: 3
-          data: [ 0.0, 0.0, 0.0,
-                  0.0, 0.0, 0.0,
-                  0.0, 0.0, 0.0 ]
-        delay: 1.00e-3                  # Delay [s]
-        range: 150            e          # Range [m/s^2]
+          data: [ +0.010, +0.007, +0.002,
+                  -0.005, -0.010, -0.001,
+                  +0.011, +0.005, +0.009 ]
+        delay: 12.0e-3                  # Delay [s]
+        range: 150                      # Range [m/s^2]
 
     accelerometers:
       noise_model:
@@ -125,26 +127,26 @@ imus:
         bandwidth: 200                  # "white noise" bandwidth [Hz]
         bias_noise_density: 4.33e-4     # Bias driving noise density [m/s^3/sqrt(Hz)]
       intrinsic_model:
-        type: scale-misalignment-eccentricity
-        b:                              # Bias at room temperature (20 degC, ISO 1:2002) [m/s^2]
+        type: scale-misalignment-size-effect
+        b:                              # Fixed bias at room temperature [m/s^2]
           cols: 3
           rows: 1
-          data: [ 0.0,
-                  0.0,
-                  0.0 ]
+          data: [ +0.01,
+                  -0.50,
+                  -0.02 ]
         M:                              # Scale and misalignment matrix at room temperature []
           cols: 3
           rows: 3
-          data: [ 1.0, 0.0, 0.0,
-                  0.0, 1.0, 0.0,
-                  0.0, 0.0, 1.0 ]
+          data: [ +1.000, +0.002, -0.010,
+                  -0.050, -1.009, -0.009,
+                  -0.002, -0.007, +0.995 ]
         R:                              # Accel. column position vectors [rx_B, ry_B, rz_B] [m]
           cols: 3
           rows: 3
-          data: [ 0.0, 0.0, 0.0,
-                  0.0, 0.0, 0.0,
-                  0.0, 0.0, 0.0 ]
-        delay: 1.00e-3                  # Delay [s]
+          data: [ 0.0, +0.0010, +0.0008,
+                  0.0, +0.0015, -0.0012,
+                  0.0, -0.0002, -0.0003 ]
+        delay: 1.02e-3                  # Delay [s]
         range: 150                      # Range [m/s^2]
 
     T_B_S:                              # Body to IMU reference axes transform
