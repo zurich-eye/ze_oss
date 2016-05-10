@@ -39,6 +39,14 @@ DataProviderRosbag::DataProviderRosbag(
     LOG(FATAL) << "Could not open rosbag " << bag_filename << ": " << e.what();
   }
 
+  // empty bracket initialzer calls default constructor and
+  // adds an empty element to the map
+  if (imu_topic_imuidx_map_.size() == 1 &&
+      imu_topic_imuidx_map_.begin()->first.empty())
+  {
+    imu_topic_imuidx_map_.clear();
+  }
+
   std::vector<std::string> topics;
   for (auto it : img_topic_camidx_map_)
   {
@@ -51,6 +59,13 @@ DataProviderRosbag::DataProviderRosbag(
 
   bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics)));
   bag_view_it_ = bag_view_->begin();
+
+  // Ensure that topics exist
+  // The connection info only contains topics that are available in the bag
+  // If a topic is requested that is not avaiable, it does not show up in the info.
+  std::vector<const rosbag::ConnectionInfo *> connection_infos = bag_view_->getConnections();
+  CHECK(topics.size() == connection_infos.size())
+      << "Not all requested topics founds in bagfile";
 }
 
 size_t DataProviderRosbag::cameraCount() const
