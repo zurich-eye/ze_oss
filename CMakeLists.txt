@@ -10,13 +10,19 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/imu/imu_calibration.h
-  include/ze/imu/imu_calibration_yaml_serialization.h
+  include/ze/imu/imu_yaml_serialization.h
+  include/ze/imu/imu.h
+  include/ze/imu/imu_factory.h
+  include/ze/imu/imu_distortion.h
+  include/ze/imu/imu_distortion_scale_misalignment.h
   )
 
 set(SOURCES
-  src/imu_calibration.cpp
-  src/imu_calibration_yaml_serialization.cpp
+  src/imu_yaml_serialization.cpp
+  src/imu.cpp
+  src/imu_factory.cpp
+  src/imu_distortion.cpp
+  src/imu_distortion_scale_misalignment.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -24,8 +30,6 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
-#catkin_add_gtest(test_pose_optimizer test/test_pose_optimizer.cpp)
-#target_link_libraries(test_pose_optimizer ${PROJECT_NAME})
 
 ##########
 # EXPORT #
