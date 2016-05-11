@@ -1,0 +1,3 @@
+#pragma once
+
+#cmakedefine ZE_SINGLE_PRECISION_FLOAT
