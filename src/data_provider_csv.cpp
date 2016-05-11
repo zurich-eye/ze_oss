@@ -149,7 +149,8 @@ void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t play
     acc << std::stod(items[4]), std::stod(items[5]), std::stod(items[6]);
     gyr << std::stod(items[1]), std::stod(items[2]), std::stod(items[3]);
     auto imu_measurement =
-        std::make_shared<dataset::ImuMeasurement>(std::stoll(items[0]), acc, gyr);
+        std::make_shared<dataset::ImuMeasurement>(std::stoll(items[0]),
+        acc.cast<FloatType>(), gyr.cast<FloatType>());
 
     buffer_.insert(std::make_pair(
                      imu_measurement->stamp_ns + playback_delay,

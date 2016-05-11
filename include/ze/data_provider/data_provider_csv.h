@@ -46,15 +46,15 @@ struct ImuMeasurement : public MeasurementBase
   ZE_POINTER_TYPEDEFS(ImuMeasurement);
 
   ImuMeasurement() = delete;
-  ImuMeasurement(int64_t stamp_ns, const Eigen::Vector3d& acc, const Eigen::Vector3d& gyr)
+  ImuMeasurement(int64_t stamp_ns, const Vector3& acc, const Vector3& gyr)
     : MeasurementBase(stamp_ns, MeasurementType::Imu)
     , acc(acc)
     , gyr(gyr)
   {}
   virtual ~ImuMeasurement() = default;
 
-  const Eigen::Vector3d acc;
-  const Eigen::Vector3d gyr;
+  const Vector3 acc;
+  const Vector3 gyr;
 };
 
 struct CameraMeasurement : public MeasurementBase

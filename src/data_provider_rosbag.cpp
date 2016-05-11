@@ -135,11 +135,11 @@ bool DataProviderRosbag::spinOnce()
       auto it = imu_topic_imuidx_map_.find(m.getTopic());
       if (it != imu_topic_imuidx_map_.end())
       {
-        const Eigen::Vector3d gyr(
+        const Vector3 gyr(
               m_imu->angular_velocity.x,
               m_imu->angular_velocity.y,
               m_imu->angular_velocity.z);
-        const Eigen::Vector3d acc(
+        const Vector3 acc(
               m_imu->linear_acceleration.x,
               m_imu->linear_acceleration.y,
               m_imu->linear_acceleration.z);
