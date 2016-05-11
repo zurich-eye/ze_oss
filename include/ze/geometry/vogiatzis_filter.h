@@ -52,7 +52,7 @@ inline FloatType getInitSigma2FromMuRange(FloatType mu_range)
 
 inline void increaseOutlierProbability(Eigen::Ref<Seed> mu_sigma2_a_b)
 {
-  mu_sigma2_a_b(3) += 1;
+  mu_sigma2_a_b(3) += FloatType{1.0};
 }
 
 inline bool isConverged(
@@ -68,7 +68,7 @@ inline bool isConverged(
 inline FloatType getSigma2FromDepthSigma(FloatType depth, FloatType depth_sigma)
 {
   const FloatType sigma =
-      FloatType{0.5} * (FloatType{1.0} / std::max(0.000000000001, depth - depth_sigma)
+      FloatType{0.5} * (FloatType{1.0} / std::max(FloatType{1.0e-8}, depth - depth_sigma)
                       - FloatType{1.0} / (depth + depth_sigma));
   return sigma * sigma;
 }
@@ -92,7 +92,7 @@ inline bool updateFilterVogiatzis(
   }
 
   const FloatType oldsigma2 = sigma2;
-  const FloatType s2 = 1.0/(1.0/sigma2 + 1.0/tau2);
+  const FloatType s2 = 1.0 / (1.0 / sigma2 + 1.0 / tau2);
   const FloatType m = s2*(mu/sigma2 + z/tau2);
   const FloatType uniform_x = 1.0/mu_range;
   FloatType C1 = a / (a + b) * normPdf<FloatType>(z, mu, norm_scale);
