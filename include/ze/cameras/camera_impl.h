@@ -17,7 +17,8 @@ public:
 
   virtual ~PinholeProjection() = default;
 
-  virtual Keypoint project(const Eigen::Ref<const Bearing>& bearing) const override
+  virtual Keypoint project(
+      const Eigen::Ref<const Bearing>& bearing) const override
   {
     // Unit coordinates -> distortion -> pinhole, offset and scale.
     Keypoint px = bearing.head<2>() / bearing(2);
@@ -26,7 +27,8 @@ public:
     return px;
   }
 
-  virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const override
+  virtual Bearing backProject(
+      const Eigen::Ref<const Keypoint>& px) const override
   {
     Bearing bearing;
     bearing << px(0), px(1), 1.0;
@@ -35,13 +37,14 @@ public:
     return bearing.normalized();
   }
 
-  virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const override
+  virtual Matrix23 dProject_dLandmark(
+      const Eigen::Ref<const Position>& pos) const override
   {
     Matrix22 J_dist;
     FloatType z_inv = 1.0 / pos.z();
     FloatType z_inv_sq = z_inv * z_inv;
     Keypoint px_unitplane = pos.head<2>() * z_inv;
-    Distortion::dDistort_dPx(
+    Distortion::distort(
           this->distortion_params_.data(), px_unitplane.data(), J_dist.data());
     const FloatType fx = this->projection_params_[0];
     const FloatType fy = this->projection_params_[1];
@@ -53,6 +56,33 @@ public:
     J(1, 1) = fy * J_dist(1, 1) * z_inv;
     J(1, 2) = -fy * (pos.x() * J_dist(1, 0) + pos.y() * J_dist(1, 1)) * z_inv_sq;
     return J;
+  }
+
+  std::pair<Keypoint, Matrix23> projectWithJacobian(
+        const Eigen::Ref<const Position>& pos) const
+  {
+    //! @todo: project and jacobian computation do many duplicate things.
+    Keypoint px = project(pos);
+    Matrix23 J = dProject_dLandmark(pos);
+    return std::make_pair(px, J);
+  }
+
+  virtual FloatType getApproxAnglePerPixel() const override
+  {
+    //! @todo: Is this correct? And if yes, this is costlty to compute often!
+    //!        replace with acos and a dot product between the bearing vectors.
+    // abs() because ICL-NUIM has negative focal length.
+    return std::atan(1.0 / (2.0 * std::abs(this->projection_params_[0])))
+         + std::atan(1.0 / (2.0 * std::abs(this->projection_params_[1])));
+  }
+
+  virtual FloatType getApproxBearingAngleFromPixelDifference(FloatType px_diff) const override
+  {
+    //! @todo: Is this correct? And if yes, this is costlty to compute often!
+    //!        acos and a dot product between the bearing vectors.
+    // abs() because ICL-NUIM has negative focal length.
+    return std::atan(px_diff / (2.0 * std::abs(this->projection_params_[0])))
+         + std::atan(px_diff / (2.0 * std::abs(this->projection_params_[1])));
   }
 };
 
@@ -71,7 +101,7 @@ inline PinholeCamera createPinholeCamera(
     int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy)
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
-                       (Vector4() << fx, fy, cx, cy).finished(), Vector());
+                       (Vector4() << fx, fy, cx, cy).finished(), VectorX());
 }
 
 inline FovCamera createFovCamera(

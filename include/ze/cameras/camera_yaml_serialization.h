@@ -1,10 +1,13 @@
 #pragma once
 
-#include <glog/logging.h>
+#include <memory>
+
+#include <ze/common/logging.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace ze {
 class Camera;
+class CameraRig;
 }  // namespace ze
 
 namespace YAML {
@@ -12,16 +15,15 @@ namespace YAML {
 template<>
 struct convert<std::shared_ptr<ze::Camera>>
 {
-  // Parse camera from yaml node.
   static bool decode(const Node& node, std::shared_ptr<ze::Camera>& camera);
   static Node encode(const std::shared_ptr<ze::Camera>& camera);
 };
 
 template<>
-struct convert<ze::Camera>
+struct convert<std::shared_ptr<ze::CameraRig>>
 {
-  static bool decode(const Node& node, ze::Camera& camera);
-  static Node encode(const ze::Camera& camera);
+  static bool decode(const Node& node, std::shared_ptr<ze::CameraRig>& camera);
+  static Node encode(const std::shared_ptr<ze::CameraRig>& camera_rig);
 };
 
 }  // namespace YAML
