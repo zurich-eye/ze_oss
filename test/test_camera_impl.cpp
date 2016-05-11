@@ -130,17 +130,25 @@ public:
   {
     Vector3 bearing = cam_.backProject(Vector2(200, 300));
     Vector2 px = cam_.project(bearing);
-    ASSERT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-6));
+#ifndef ZE_SINGLE_PRECISION_FLOAT
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-6));
+#else
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200, 300), 1e-4));
+#endif
   }
 
   void testJacobian()
   {
+#ifndef ZE_SINGLE_PRECISION_FLOAT
     Vector3 bearing = cam_.backProject(Vector2(200, 300));
     Matrix23 H = cam_.dProject_dLandmark(bearing);
     Matrix23 H_numerical =
         numericalDerivative<Vector2, Vector3>(
         std::bind(&Camera::project, &cam_, std::placeholders::_1), bearing);
     EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
+#else
+    LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
+#endif
   }
 
   void testAll()
@@ -215,10 +223,10 @@ TEST(CameraImplTests, testYamlParsingPinhole)
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
   ASSERT_TRUE(ze::fileExists(yaml_file));
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(1), 310.0);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(2), 376.5);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(3), 240.5);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(1), 310.0);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(2), 376.5);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(3), 240.5);
 }
 
 TEST(CameraImplTests, testYamlParsingFoV)
@@ -226,8 +234,8 @@ TEST(CameraImplTests, testYamlParsingFoV)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_fov.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
-  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), 0.940454);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), 0.940454);
 }
 
 TEST(CameraImplTests, testYamlParsingRadTan)
@@ -235,8 +243,8 @@ TEST(CameraImplTests, testYamlParsingRadTan)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_radtan.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
-  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.28340811217029355);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), -0.28340811217029355);
 }
 
 TEST(CameraImplTests, testYamlParsingEquidistant)
@@ -244,8 +252,8 @@ TEST(CameraImplTests, testYamlParsingEquidistant)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_equidistant.yaml";
   ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
-  EXPECT_DOUBLE_EQ(cam->projectionParameters()(0), 320.0);
-  EXPECT_DOUBLE_EQ(cam->distortionParameters()(0), -0.0027973061697674074);
+  EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
+  EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), -0.0027973061697674074);
 }
 
 ZE_UNITTEST_ENTRYPOINT
