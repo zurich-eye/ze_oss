@@ -12,6 +12,7 @@
 
 TEST(ClamTests, testJacobians)
 {
+#ifndef ZE_SINGLE_PRECISION_FLOAT
   using namespace ze;
 
   Transformation T_C_B, T_Bc_Br;
@@ -44,6 +45,9 @@ TEST(ClamTests, testJacobians)
         std::bind(&reprojectionResidual, f_Br, p_Br, cam, T_C_B,
                   T_Bc_Br, std::placeholders::_1, px_Cc, nullptr, nullptr), inv_depth);
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H2, H2_numeric, 1e-6));
+#else
+  LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
+#endif
 }
 
 

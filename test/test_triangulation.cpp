@@ -10,6 +10,12 @@
 
 namespace ze {
 
+#ifndef ZE_SINGLE_PRECISION_FLOAT
+  FloatType tol = 1e-10;
+#else
+  FloatType tol = 1e-6;
+#endif
+
 std::tuple<Position, TransformationVector, Bearings>
 generateObservingCameras()
 {
@@ -66,7 +72,7 @@ TEST(TriangulationTests, testSolver)
   Vector3 p_W_estimated = p_W_homogeneous.head<3>() / p_W_homogeneous(3);
 
   // Compare error.
-  EXPECT_LT((p_W_estimated - p_W_true).norm(), 1e-10);
+  EXPECT_LT((p_W_estimated - p_W_true).norm(), tol);
 }
 
 TEST(TriangulationTests, testNonlinearRefinement)
@@ -84,7 +90,7 @@ TEST(TriangulationTests, testNonlinearRefinement)
   triangulateGaussNewton(T_C_W_vec, f_C, p_W_estimated);
 
   // Compare error.
-  EXPECT_LT((p_W_estimated - p_W_true).norm(), 1e-10);
+  EXPECT_LT((p_W_estimated - p_W_true).norm(), tol);
 }
 
 ZE_UNITTEST_ENTRYPOINT
