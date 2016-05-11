@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <Eigen/Core>
 #include <Eigen/StdVector>
-#include <ze/common/config.h>
+#include <ze/common/config.hpp>
 
 namespace ze {
 

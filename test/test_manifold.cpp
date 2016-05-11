@@ -11,7 +11,7 @@ TEST(ManifoldTests, testScalarTraits)
   ze::testRetractJacobians<ze::FloatType>(1.0, 1.5);
   ze::testLocalJacobians<ze::FloatType>(1.0, 1.5);
 #else
-  LOG(WARNING) << "Test ignored for single precision float.";
+  LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
 #endif
 }
 
@@ -26,7 +26,7 @@ TEST(ManifoldTests, testEigenTraits)
   ze::testLocalJacobians<ze::Vector3>(
         ze::Vector3(1.0, 1.2, 1.3), ze::Vector3(2.0, 1.0, 0.0));
 #else
-  LOG(WARNING) << "Test ignored for single precision float.";
+  LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
 #endif
 }
 

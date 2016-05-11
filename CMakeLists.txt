@@ -13,7 +13,7 @@ include(ze_setup)
 option(ZE_SINGLE_PRECISION_FLOAT "Compile with single precision float" OFF)
 
 message("ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
-configure_file(include/ze/common/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.h)
+configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
 #############
 # LIBRARIES #
@@ -22,7 +22,7 @@ set(HEADERS
   include/ze/common/benchmark.h
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
-  include/ze/common/config.h
+  include/ze/common/config.hpp
   include/ze/common/combinatorics.h
   include/ze/common/csv_trajectory.h
   include/ze/common/file_utils.h
