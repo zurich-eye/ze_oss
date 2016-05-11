@@ -15,7 +15,6 @@
 
   <depend>ze_cmake</depend>
   <depend>imp_core</depend>
-  <depend>cv_bridge</depend>
   
   <test_depend>gtest</test_depend>
 </package>

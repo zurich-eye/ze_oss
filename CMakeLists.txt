@@ -10,6 +10,9 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
+find_package(OpenCV REQUIRED core highgui imgproc)
+list(APPEND catkin_LIBRARIES ${OpenCV_LIBS})
+
 set(HEADERS
   include/imp/bridge/opencv/cv_connector_pixel_types.hpp
   include/imp/bridge/opencv/image_cv.hpp
