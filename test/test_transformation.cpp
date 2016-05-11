@@ -4,18 +4,28 @@
 #include <ze/common/test_manifold.h>
 #include <ze/common/transformation.h>
 
+#ifndef ZE_SINGLE_PRECISION_FLOAT
+constexpr ze::FloatType tol = 1e-9;
+#else
+constexpr ze::FloatType tol = 1e-7;
+#endif
+
 TEST(TransformationTests, testManifoldSO3)
 {
   EXPECT_EQ(ze::traits<ze::Quaternion>::dimension, 3);
   ze::testManifoldInvariants<ze::Quaternion>(
         ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
-        ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)));
+        ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)), tol);
+#ifndef ZE_SINGLE_PRECISION_FLOAT
   ze::testRetractJacobians<ze::Quaternion>(
         ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
         ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)));
   ze::testLocalJacobians<ze::Quaternion>(
         ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
         ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)));
+#else
+  LOG(WARNING) << "Test ignored for single precision float.";
+#endif
 }
 
 TEST(TransformationTests, testSetRandom)
