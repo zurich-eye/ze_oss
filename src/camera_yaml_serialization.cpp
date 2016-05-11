@@ -146,23 +146,16 @@ bool convert<std::shared_ptr<ze::CameraRig>>::decode(
         return false;
       }
 
-      Eigen::Matrix4d T_B_C;
+      ze::Matrix4 T_B_C;
       if (!YAML::safeGet(camera_node, "T_B_C", &T_B_C))
       {
         LOG(ERROR) << "Unable to get extrinsic transformation T_B_C for camera " << i;
         return false;
       }
       cameras.push_back(camera);
-      Eigen::Vector3d t = T_B_C.block<3,1>(0,3);
-      Eigen::Quaterniond q = T_B_C.block<3,3>(0,0);
-      if(std::abs(q.squaredNorm() - 1.0) > 1e-4)
-      {
-        LOG(WARNING) << "Quaternion norm is = " << q.norm();
-        CHECK_NEAR(q.norm(), 1.0, 0.01);
-      }
-      q.normalize(); // the yaml may not specify the quaternion up to desired precision.
-      T_Ci_B.push_back(ze::Transformation(q.cast<ze::FloatType>(),
-                                          t.cast<ze::FloatType>()).inverse());
+      T_Ci_B.push_back(ze::Transformation(
+                         ze::Quaternion::fromApproximateRotationMatrix(T_B_C.block<3,3>(0,0)),
+                         T_B_C.block<3,1>(0,3)).inverse());
     }
 
     camera_rig.reset(new ze::CameraRig(T_Ci_B, cameras, label));
