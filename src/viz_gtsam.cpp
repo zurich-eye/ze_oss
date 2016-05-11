@@ -24,7 +24,7 @@ void drawGtsamPoint3(
   size_t i = 0;
   for(const auto& it : gtsam_points)
   {
-    points.col(i++) = it.value.vector();
+    points.col(i++) = it.value.vector().cast<FloatType>();
   }
   visualizer.drawPoints(ns, id, points, color, size);
 }
@@ -43,8 +43,8 @@ void drawGtsamPose3(
   poses.reserve(num_poses);
   for(const auto& it : gtsam_poses)
   {
-    poses.push_back(Transformation(Quaternion(it.value.rotation().matrix()),
-                                   it.value.translation().vector()));
+    poses.push_back(Transformation(Eigen::Quaterniond(it.value.rotation().matrix()).cast<FloatType>(),
+                                   it.value.translation().vector().cast<FloatType>()));
   }
   visualizer.drawCoordinateFrames(ns, id, poses, size);
 }
