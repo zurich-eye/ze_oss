@@ -91,7 +91,8 @@ bool RansacRelativePose::solveRelativePose(
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
   Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Quaternion(R), t);
+  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
+
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
   inliers_ = ransac.inliers_;
@@ -130,7 +131,8 @@ bool RansacRelativePose::solveTranslationOnly(
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
   Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Quaternion(R), t);
+  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
+
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
   inliers_ = ransac.inliers_;
@@ -168,7 +170,7 @@ bool RansacRelativePose::solveRotationOnly(
   // Process results.
   Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
   Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Quaternion(R), t);
+  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
 
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
