@@ -86,6 +86,15 @@ public:
       HessianMatrix* H,
       GradientVector* g);
 
+  void update(
+      const Transformation& state,
+      const UpdateVector& dx,
+      Transformation& new_state)
+  {
+    new_state = traits<Transformation>::retract(state, dx);
+    new_state.getRotation().normalize();
+  }
+
 private:
   std::vector<PoseOptimizerFrameData>& data_;
 
