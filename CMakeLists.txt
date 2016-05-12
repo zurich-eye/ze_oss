@@ -14,19 +14,23 @@ catkin_python_setup()
 # LIBRARIES #
 #############
 set(HEADERS
+  include/ze/imu/imu_model.h
+  include/ze/imu/imu_rig.h
+  include/ze/imu/imu_intrinsic_model.h
+  include/ze/imu/imu_noise_model.h
+  include/ze/imu/accelerometer_model.h
+  include/ze/imu/gyroscope_model.h
   include/ze/imu/imu_yaml_serialization.h
-  include/ze/imu/imu.h
-  include/ze/imu/imu_factory.h
-  include/ze/imu/imu_distortion.h
-  include/ze/imu/imu_distortion_scale_misalignment.h
   )
 
 set(SOURCES
-  src/imu_yaml_serialization.cpp
-  src/imu.cpp
-  src/imu_factory.cpp
-  src/imu_distortion.cpp
-  src/imu_distortion_scale_misalignment.cpp
+    src/imu_model.cpp
+    src/imu_rig.cpp
+    src/imu_intrinsic_model.cpp
+    src/imu_noise_model.cpp
+    src/accelerometer_model.cpp
+    src/gyroscope_model.cpp
+    src/imu_yaml_serialization.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -34,6 +38,24 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
+
+catkin_add_gtest(test_accelerometer_model test/test_accelerometer_model.cpp)
+target_link_libraries(test_accelerometer_model ${PROJECT_NAME})
+
+catkin_add_gtest(test_gyroscope_model test/test_gyroscope_model.cpp)
+target_link_libraries(test_gyroscope_model ${PROJECT_NAME})
+
+catkin_add_gtest(test_imu_model test/test_imu_model.cpp)
+target_link_libraries(test_imu_model ${PROJECT_NAME})
+
+catkin_add_gtest(test_yaml_serialization test/test_yaml_serialization.cpp)
+target_link_libraries(test_yaml_serialization ${PROJECT_NAME})
+
+catkin_add_gtest(test_intrinsic_model test/test_intrinsic_model.cpp)
+target_link_libraries(test_intrinsic_model ${PROJECT_NAME})
+
+catkin_add_gtest(test_noise_model test/test_noise_model.cpp)
+target_link_libraries(test_noise_model ${PROJECT_NAME})
 
 ##########
 # EXPORT #
