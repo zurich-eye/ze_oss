@@ -5,10 +5,9 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
-include(ze_macros_cuda)
-find_cuda()
 
 set(HEADERS
+  include/imp/bridge/ros/cu_ros_bridge.hpp
   include/imp/bridge/ros/ros_bridge.hpp
   )
 

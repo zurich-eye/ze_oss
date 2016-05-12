@@ -1,68 +1,20 @@
-#include <imp/bridge/ros/ros_bridge.hpp>
+#pragma once
 
+#include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 
-#include <imp/core/image_raw.hpp>
-#include <ze/common/logging.hpp>
-#include <ze/common/types.h>
-
+#include <imp/core/image.hpp>
+#include <imp/cu_core/cu_image_gpu.cuh>
+#include <imp/bridge/ros/ros_bridge.hpp>
 
 namespace ze {
 
 namespace imgenc = sensor_msgs::image_encodings;
 
 //------------------------------------------------------------------------------
-std::pair<PixelType, PixelOrder> getPixelTypeFromRosImageEncoding(
-    const std::string& encoding)
-{
-  //! @todo (MWE) we do not support bayer or YUV images yet.
-  if (encoding == imgenc::BGR8)
-  {
-    return std::make_pair(PixelType::i8uC3, PixelOrder::bgr);
-  }
-  else if (encoding == imgenc::MONO8)
-  {
-    return std::make_pair(PixelType::i8uC1, PixelOrder::gray);
-  }
-  else if (encoding == imgenc::RGB8)
-  {
-    return std::make_pair(PixelType::i8uC3, PixelOrder::rgb);
-  }
-  else if (encoding == imgenc::MONO16)
-  {
-    return std::make_pair(PixelType::i16uC1, PixelOrder::gray);
-  }
-  else if (encoding == imgenc::BGR16)
-  {
-    return std::make_pair(PixelType::i16uC3, PixelOrder::bgr);
-  }
-  else if (encoding == imgenc::RGB16)
-  {
-    return std::make_pair(PixelType::i16uC3, PixelOrder::rgb);
-  }
-  else if (encoding == imgenc::BGRA8)
-  {
-    return std::make_pair(PixelType::i8uC4, PixelOrder::bgra);
-  }
-  else if (encoding == imgenc::RGBA8)
-  {
-    return std::make_pair(PixelType::i8uC4, PixelOrder::rgba);
-  }
-  else if (encoding == imgenc::BGRA16)
-  {
-    return std::make_pair(PixelType::i16uC4, PixelOrder::bgra);
-  }
-  else if (encoding == imgenc::RGBA16)
-  {
-    return std::make_pair(PixelType::i16uC4, PixelOrder::rgba);
-  }
-  LOG(FATAL) << "Unsupported image encoding " + encoding + ".";
-  return std::make_pair(PixelType::undefined, PixelOrder::undefined);
-}
-
-//------------------------------------------------------------------------------
-ImageBase::Ptr toImageCpu(
-    const sensor_msgs::Image& src, PixelOrder /*pixel_order*/)
+template<typename Pixel>
+cu::ImageGpu<Pixel>::Ptr toImageGpu(
+    const sensor_msgs::Image& src /*, PixelOrder pixel_order*/)
 {
   PixelType src_pixel_type;
   PixelOrder src_pixel_order;
@@ -85,8 +37,9 @@ ImageBase::Ptr toImageCpu(
       ImageRaw8uC1 src_wrapped(
           reinterpret_cast<Pixel8uC1*>(const_cast<uint8_t*>(&src.data[0])),
           width, height, pitch, true);
-      ImageRaw8uC1::Ptr dst =
-          std::make_shared<ImageRaw8uC1>(src_wrapped); // Deep copy of the image data.
+      cu::ImageGpu8uC1::Ptr dst =
+          std::make_shared<cu::ImageGpu<Pixel8uC1>>(width, height);
+      dst->copyFrom(src_wrapped);
       return dst;
     }
 //  case imp::PixelType::i8uC2:

@@ -17,7 +17,6 @@
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
   <depend>imp_core</depend>
-  <depend>imp_cu_core</depend>
 
   <test_depend>gtest</test_depend>
 </package>
