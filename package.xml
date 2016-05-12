@@ -19,7 +19,7 @@
   <depend>ze_common</depend>
   <depend>imp_core</depend>
   <depend>imp_bridge_opencv</depend>
-  <depend>cv_bridge</depend>
+  <depend>imp_bridge_ros</depend>
   <depend>rosbag</depend>
   <depend>sensor_msgs</depend>
 
