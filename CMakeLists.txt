@@ -39,4 +39,4 @@ catkin_add_gtest(test_load_image test/test_load_image.cpp)
 target_link_libraries(test_load_image ${PROJECT_NAME})
 
 cs_install()
-cs_export()
+cs_export(CFG_EXTRAS ze_imp_bridge_opencv-extras.cmake)
