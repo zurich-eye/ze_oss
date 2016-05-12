@@ -1,16 +1,15 @@
-#ifndef IMP_CU_MEMORY_STORAGE_CUH
-#define IMP_CU_MEMORY_STORAGE_CUH
+#pragma once
 
 #include <iostream>
-
-#include <cuda_runtime_api.h>
-
+#include <cuda_device_runtime_api.h>
+#include <imp/core/exception.hpp>
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>
 #include <imp/core/size.hpp>
-#include <imp/cu_core/cu_exception.hpp>
+#include <ze/common/logging.hpp>
 
-namespace ze { namespace cu {
+namespace ze {
+namespace cu {
 
 template <typename Pixel, ze::PixelType pixel_type = ze::PixelType::undefined>
 struct MemoryStorage
@@ -24,10 +23,7 @@ public:
   //! @todo (MWE) do we wanna have a init flag for device memory?
   static Pixel* alloc(const size_t num_elements)
   {
-    if (num_elements == 0)
-    {
-      throw ze::Exception("Failed to allocate memory: num_elements=0");
-    }
+    CHECK_GT(num_elements, 0u);
 
     const size_t memory_size = sizeof(Pixel) * num_elements;
     //std::cout << "cu::MemoryStorage::alloc: memory_size=" << memory_size << "; sizeof(Pixel)=" << sizeof(Pixel) << std::endl;
@@ -35,14 +31,8 @@ public:
     Pixel* p_data = nullptr;
     cudaError_t cu_err = cudaMalloc((void**)&p_data, memory_size);
 
-    if (cu_err == cudaErrorMemoryAllocation)
-    {
-      throw std::bad_alloc();
-    }
-    else if (cu_err != cudaSuccess)
-    {
-      throw ze::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_NE(cu_err, cudaErrorMemoryAllocation);
+    CHECK_EQ(cu_err, cudaSuccess);
 
     return p_data;
   }
@@ -57,10 +47,8 @@ public:
   static Pixel* alignedAlloc(const std::uint32_t width, const std::uint32_t height,
                              size_t* pitch)
   {
-    if (width == 0 || height == 0)
-    {
-      throw ze::cu::Exception("Failed to allocate memory: width or height is zero");
-    }
+    CHECK_GT(width, 0u);
+    CHECK_GT(height, 0u);
 
     size_t width_bytes = width * sizeof(Pixel);
     //std::cout << "width_bytes: " << width_bytes << std::endl;
@@ -79,14 +67,8 @@ public:
     *pitch = intern_pitch;
     //("pitch: %lu, i_pitch: %lu, width_bytes: %lu\n", *pitch, intern_pitch, width_bytes);
 
-    if (cu_err == cudaErrorMemoryAllocation)
-    {
-      throw std::bad_alloc();
-    }
-    else if (cu_err != cudaSuccess)
-    {
-      throw ze::cu::Exception("CUDA memory allocation failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_NE(cu_err, cudaErrorMemoryAllocation);
+    CHECK_EQ(cu_err, cudaSuccess);
 
     return p_data;
   }
@@ -144,7 +126,6 @@ private:
 std::function< void(Pixel* )> f;
 };
 
-              } // namespace cu
+} // namespace cu
 } // namespace ze
 
-#endif // IMP_CU_MEMORY_STORAGE_CUH

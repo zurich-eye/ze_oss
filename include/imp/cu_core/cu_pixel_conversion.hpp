@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cuda_runtime_api.h>
 #include <imp/core/pixel.hpp>
 #include <imp/core/pixel_enums.hpp>
 
