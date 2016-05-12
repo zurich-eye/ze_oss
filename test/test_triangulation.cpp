@@ -13,7 +13,7 @@ namespace ze {
 #ifndef ZE_SINGLE_PRECISION_FLOAT
   FloatType tol = 1e-10;
 #else
-  FloatType tol = 1e-6;
+  FloatType tol = 3e-6;
 #endif
 
 std::tuple<Position, TransformationVector, Bearings>

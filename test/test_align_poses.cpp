@@ -72,7 +72,7 @@ TEST(AlignPosesTest, testOptimization)
 
   // Compute error.
   Transformation T_err = T_A0_B0.inverse() * T_A0_B0_estimate;
-  EXPECT_LT(T_err.log().norm(), 1e-5);
+  EXPECT_LT(T_err.log().norm(), 1.5e-5);
 }
 
 ZE_UNITTEST_ENTRYPOINT
