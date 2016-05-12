@@ -99,7 +99,7 @@ void triangulateGaussNewton(
     Eigen::Ref<Position> p_W)
 {
   Position p_W_old = p_W;
-  FloatType chi2 = 0.0;
+  FloatType chi2{0.0};
   Matrix3 A;
   Vector3 b;
 
@@ -109,7 +109,7 @@ void triangulateGaussNewton(
     return;
   }
 
-  constexpr FloatType eps{0.0000000001};
+  constexpr FloatType eps{1e-7};
   for (uint32_t iter = 0; iter < 5u; ++iter)
   {
     A.setZero();
