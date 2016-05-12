@@ -123,7 +123,7 @@ public:
     Keypoints px2 = cam_.projectVectorized(f1);
     Keypoints px_error = px1 - px2;
     FloatType max_error = px_error.colwise().norm().array().maxCoeff();
-    EXPECT_LT(max_error, 1e-4);
+    EXPECT_LT(max_error, 1.3e-4);
   }
 
   void testProjectionSingle()
