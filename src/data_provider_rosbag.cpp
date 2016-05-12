@@ -4,13 +4,12 @@
 #include <rosbag/query.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
-#include <sensor_msgs/image_encodings.h>
-#include <cv_bridge/cv_bridge.h>
 
 #include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/path_utils.h>
-#include <imp/bridge/opencv/image_cv.hpp>
+
+#include <imp/bridge/ros/ros_bridge.hpp>
 
 DEFINE_int32(data_source_stop_after_n_frames, -1,
              "How many frames should be processed?");
@@ -107,17 +106,8 @@ bool DataProviderRosbag::spinOnce()
           return false;
         }
 
-        cv::Mat img;
-        try
-        {
-          img = cv_bridge::toCvCopy(m_img, "mono8")->image;
-        }
-        catch (cv_bridge::Exception& e)
-        {
-          LOG(FATAL) << "Could not read image: " << e.what();
-        }
-        auto img_ptr = std::make_shared<ImageCv8uC1>(img);
-        camera_callback_(m_img->header.stamp.toNSec(), img_ptr, it->second);
+        ze::ImageBase::Ptr img = toImageCpu(*m_img);
+        camera_callback_(m_img->header.stamp.toNSec(), img, it->second);
       }
       else
       {
