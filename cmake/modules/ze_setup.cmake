@@ -35,3 +35,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
 else ()
   set (CMAKE_CXX_STANDARD 11)
 endif ()
+
+# forward pure cmake dependencies if not added by <depend> in the package xml
+# but should be forwarded from/to the packages
+list(APPEND catkin_LIBRARIES ${ZE_LIBRARIES})
