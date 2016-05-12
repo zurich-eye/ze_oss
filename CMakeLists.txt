@@ -5,23 +5,27 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
+include(ze_gtsam_optional)
 
 #############
 # LIBRARIES #
 #############
 set(HEADERS
   include/ze/visualization/viz_common.h
-  include/ze/visualization/viz_gtsam.h
   include/ze/visualization/viz_interface.h
   include/ze/visualization/viz_ros.h
   include/ze/visualization/viz_ros_utils.h
   )
 
 set(SOURCES
-  src/viz_common.cpp
-  src/viz_gtsam.cpp  
+  src/viz_common.cpp 
   src/viz_ros.cpp
   )
+
+if(${gtsam_catkin_FOUND})
+  list(APPEND HEADERS include/ze/visualization/viz_gtsam.h)
+  list(APPEND SOURCES src/viz_gtsam.cpp)
+endif()
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
