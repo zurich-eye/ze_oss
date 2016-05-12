@@ -32,17 +32,11 @@ set(IMPL_FILES
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
 #target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
-###
-### GTESTS
-###
-
-# TODO (MWE)
-
-# catkin_add_gtest(${PROJECT_NAME}-test
-#    test/test_main.cpp
-#    test/todo.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
+#########
+# TESTS #
+#########
+catkin_add_gtest(test_load_image test/test_load_image.cpp)
+target_link_libraries(test_load_image ${PROJECT_NAME})
 
 cs_install()
 cs_export()
