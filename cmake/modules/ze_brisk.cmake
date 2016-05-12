@@ -1,0 +1,12 @@
+find_package(brisk REQUIRED)
+
+if(${brisk_FOUND})
+  message("BRISK found.")
+  message("BRISK libraries: ${brisk_LIBRARIES}")
+  message("BRISK headers: ${brisk_INCLUDE_DIRS}")
+  list(APPEND catkin_LIBRARIES  ${brisk_LIBRARIES})
+  include_directories(${brisk_INCLUDE_DIRS})
+  list(APPEND catkin_INCLUDE_DIRS ${brisk_INCLUDE_DIRS})
+else()
+  message("BRISK not found.")
+endif()
