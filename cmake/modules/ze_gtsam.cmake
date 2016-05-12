@@ -1,0 +1,8 @@
+if(ZE_USE_GTSAM)
+  find_package(gtsam_catkin REQUIRED)
+  message(STATUS "GTSAM found.")
+  message(STATUS "GTSAM libraries: ${gtsam_catkin_LIBRARIES}.")
+  message(STATUS "GTSAM headers: ${gtsam_catkin_INCLUDE_DIRS}.")
+  list(APPEND catkin_LIBRARIES  ${gtsam_catkin_LIBRARIES})
+  list(APPEND INCLUDE_DIRS ${gtsam_catkin_INCLUDE_DIRS})
+endif()
