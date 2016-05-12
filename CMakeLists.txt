@@ -5,33 +5,19 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
+include(ze_macros_cuda)
+find_cuda()
 
 set(HEADERS
   include/imp/bridge/ros/ros_bridge.hpp
-  #include/imp/bridge/ros/cu_image_bridge.hpp
   )
 
 set(SOURCES
-  src/empty.cpp
+  src/ros_bridge.cpp
   )
 
-set(IMPL_FILES
-  )
-
-cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
+cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME})
-
-###
-### GTESTS
-###
-
-# TODO (MWE)
-
-# catkin_add_gtest(${PROJECT_NAME}-test
-#    test/test_main.cpp
-#    test/todo.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
 cs_install()
 cs_export()
