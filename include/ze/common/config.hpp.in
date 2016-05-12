@@ -1,3 +1,4 @@
 #pragma once
 
 #cmakedefine ZE_SINGLE_PRECISION_FLOAT
+#cmakedefine ZE_USE_BRISK

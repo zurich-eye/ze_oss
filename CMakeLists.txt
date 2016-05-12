@@ -11,8 +11,11 @@ include(ze_setup)
 # SETTINGS #
 ############
 option(ZE_SINGLE_PRECISION_FLOAT "Compile with single precision float" OFF)
-
 message("ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
+
+option(ZE_USE_BRISK "Compile without BRISK" ON)
+message("ZE_USE_BRISK: ${ZE_USE_BRISK}")
+
 configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
 #############
