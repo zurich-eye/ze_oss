@@ -297,7 +297,6 @@ using Vec32fC2 = Vec2<float>;
 using Vec32fC3 = Vec3<float>;
 using Vec32fC4 = Vec4<float>;
 
-
 //------------------------------------------------------------------------------
 // Pixel traits.
 template<typename> struct pixel_type { static constexpr PixelType type = PixelType::undefined; };
