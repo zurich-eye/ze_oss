@@ -13,7 +13,7 @@ namespace ze {
 //------------------------------------------------------------------------------
 template<typename Pixel>
 void cvBridgeLoad(ImageCvPtr<Pixel>& out,
-                  const std::string& filename, ze::PixelOrder pixel_order)
+                  const std::string& filename, PixelOrder pixel_order)
 {
   CHECK(fileExists(filename)) << "File does not exist: " << filename;
   cv::Mat mat;
@@ -31,7 +31,7 @@ void cvBridgeLoad(ImageCvPtr<Pixel>& out,
 
   switch(pixel_type<Pixel>::type)
   {
-  case ze::PixelType::i8uC1:
+  case PixelType::i8uC1:
     if (pixel_order == PixelOrder::gray)
     {
       out = std::make_shared<ImageCv<Pixel>>(mat);
@@ -42,7 +42,7 @@ void cvBridgeLoad(ImageCvPtr<Pixel>& out,
       cv::cvtColor(mat, out->cvMat(), CV_BGR2GRAY);
     }
   break;
-  case ze::PixelType::i32fC1:
+  case PixelType::i32fC1:
     out = std::make_shared<ImageCv<Pixel>>(mat.cols, mat.rows);
     if (mat.channels() > 1)
     {
@@ -51,7 +51,7 @@ void cvBridgeLoad(ImageCvPtr<Pixel>& out,
     mat.convertTo(out->cvMat(), CV_32F, 1./255.);
   break;
   default:
-    throw ze::Exception("Conversion for reading given pixel_type not supported yet.", __FILE__, __FUNCTION__, __LINE__);
+    throw Exception("Conversion for reading given pixel_type not supported yet.", __FILE__, __FUNCTION__, __LINE__);
   }
 }
 
@@ -94,6 +94,9 @@ void cvBridgeShow(const std::string& winname, const ImageCv<Pixel>& img,
   cv::imshow(winname, norm_mat);
 }
 
+//-----------------------------------------------------------------------------
+// Convenience functions.
+ImageCv8uC1::Ptr cvBridgeLoad8uC1(const std::string& filename);
 
 //------------------------------------------------------------------------------
 //enum class OcvBridgeLoadAs

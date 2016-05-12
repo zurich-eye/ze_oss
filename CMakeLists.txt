@@ -21,6 +21,7 @@ set(HEADERS
   )
 
 set(SOURCES
+  src/cv_bridge.cpp
   src/cv_connector_pixel_types.cpp
   src/image_cv.cpp
   )
