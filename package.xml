@@ -17,10 +17,11 @@
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
   
-  <!-- ros -->
   <depend>roscpp</depend>
   <depend>visualization_msgs</depend>
   <depend>image_transport</depend>
+  
+  <depend>gtsam_catkin</depend>
   
   <test_depend>gtest</test_depend>
 </package>
