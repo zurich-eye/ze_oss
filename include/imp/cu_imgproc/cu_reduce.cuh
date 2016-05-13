@@ -14,7 +14,7 @@ namespace cu {
 template<typename Pixel>
 void reduce(ImageGpu<Pixel>& dst,
             const ImageGpu<Pixel>& src,
-            InterpolationMode interp = InterpolationMode::linear,
+            InterpolationMode interp = InterpolationMode::Linear,
             bool gauss_prefilter=true);
 
 

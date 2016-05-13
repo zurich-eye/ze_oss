@@ -35,7 +35,7 @@ createImagePyramidGpu(
     typename ImageGpu::Ptr prev = std::dynamic_pointer_cast<ImageGpu>(pyr->atShared(i-1));
     typename ImageGpu::Ptr img = std::dynamic_pointer_cast<ImageGpu>(pyr->atShared(i));
     VLOG(300) << "Creating GPU ImagePyramid Level " << i << " of size " << sz;
-    ze::cu::reduce(*img, *prev, InterpolationMode::linear, true);
+    ze::cu::reduce(*img, *prev, InterpolationMode::Linear, true);
   }
   return pyr;
 }
