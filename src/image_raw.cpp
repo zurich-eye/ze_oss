@@ -7,18 +7,8 @@ namespace ze {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageRaw<Pixel>::ImageRaw(std::uint32_t width, std::uint32_t height)
-  : Base(width, height)
-  , is_gpu_memory_(true)
-{
-  data_.reset(Memory::alignedAlloc(width, height, &this->pitch_));
-}
-
-//-----------------------------------------------------------------------------
-template<typename Pixel>
-ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size)
-  : Base(size)
-  , is_gpu_memory_(true)
+ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size, PixelOrder pixel_order)
+  : Base(size, pixel_order)
 {
   data_.reset(Memory::alignedAlloc(size, &this->pitch_));
 }
@@ -47,9 +37,8 @@ ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
 template<typename Pixel>
 ImageRaw<Pixel>
 ::ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, bool use_ext_data_pointer)
-  : Base(width, height)
-  , is_gpu_memory_(true)
+           size_t pitch, bool use_ext_data_pointer, PixelOrder pixel_order)
+  : Base(width, height, pixel_order)
 {
   CHECK(data);
 
@@ -87,9 +76,9 @@ template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(Pixel* data,
                           std::uint32_t width, std::uint32_t height,
                           size_t pitch,
-                          const std::shared_ptr<void const>& tracked)
-  : Base(width, height)
-  , is_gpu_memory_(false)
+                          const std::shared_ptr<void const>& tracked,
+                          PixelOrder pixel_order)
+  : Base(width, height, pixel_order)
 {
   CHECK(data);
   CHECK(tracked);

@@ -6,6 +6,7 @@
 #include <functional>
 #include <algorithm>
 
+#include <ze/common/logging.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/core/size.hpp>
 #include <imp/core/types.hpp>
@@ -66,22 +67,17 @@ public:
   }
 
   /**
-   * @brief alignedAlloc allocates an aligned block that guarantees to host the image of size \a width \a x \a height
-   * @param width Image width
-   * @param height Image height
+   * @brief alignedAlloc allocates an aligned block of memory that guarantees to host the image of size \a size
+   * @param size Image size
+   * @param pitch Row alignment [bytes] if padding is needed.
    * @param init_with_zeros Flag if the memory elements should be zeroed out (default=false).
-   *
-   * @note The allocator ensures that the starting adress of every row is aligned
-   *       accordingly.
-   *
+   * @return
    */
-  static Pixel* alignedAlloc(const std::uint32_t width, const std::uint32_t height,
-                             size_t* pitch, bool init_with_zeros=false)
+  static Pixel* alignedAlloc(
+      ze::Size2u size, size_t* pitch, bool init_with_zeros=false)
   {
-    if (width == 0 || height == 0)
-    {
-      throw ze::Exception("Failed to allocate memory: width or height is zero");
-    }
+    CHECK_GT(size[0], 0);
+    CHECK_GT(size[0], 0);
 
     // restrict the memory address alignment to be in the interval ]0,128] and
     // of power-of-two using the 'complement and compare' method
@@ -89,26 +85,13 @@ public:
            ((memaddr_align & (~memaddr_align + 1)) == memaddr_align));
 
     // check if the width allows a correct alignment of every row, otherwise add padding
-    const size_t width_bytes = width * sizeof(Pixel);
+    const size_t width_bytes = size[0] * sizeof(Pixel);
     // bytes % memaddr_align = 0 for bytes=n*memaddr_align is the reason for
     // the decrement in the following compution:
     const size_t bytes_to_add = (memaddr_align-1) - ((width_bytes-1) % memaddr_align);
-    const std::uint32_t pitched_width = width + bytes_to_add/sizeof(Pixel);
+    const std::uint32_t pitched_width = size[0] + bytes_to_add/sizeof(Pixel);
     *pitch = width_bytes + bytes_to_add;
-    return alignedAlloc(pitched_width*height, init_with_zeros);
-  }
-
-  /**
-   * @brief alignedAlloc allocates an aligned block of memory that guarantees to host the image of size \a size
-   * @param size Image size
-   * @param pitch Row alignment [bytes] if padding is needed.
-   * @param init_with_zeros Flag if the memory elements should be zeroed out (default=false).
-   * @return
-   */
-  static Pixel* alignedAlloc(ze::Size2u size, size_t* pitch,
-                             bool init_with_zeros=false)
-  {
-    return alignedAlloc(size[0], size[1], pitch, init_with_zeros);
+    return alignedAlloc(pitched_width*size[1], init_with_zeros);
   }
 
 

@@ -40,14 +40,19 @@ public:
   virtual ~ImageRaw() = default;
 
   /**
-   * @brief ImageRaw construcs an image of given size \a width x \a height
-   */
-  ImageRaw(std::uint32_t width, std::uint32_t height);
-
-  /**
    * @brief ImageRaw construcs an image of given \a size
    */
-  ImageRaw(const ze::Size2u& size);
+  ImageRaw(const ze::Size2u& size,
+           PixelOrder pixel_order = ze::PixelOrder::undefined);
+
+  /**
+   * @brief ImageRaw construcs an image of given size \a width x \a height
+   */
+  ImageRaw(std::uint32_t width, std::uint32_t height,
+           PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageRaw({width, height}, pixel_order)
+  {
+  }
 
   /**
    * @brief ImageRaw copy constructs an image from the given image \a from
@@ -68,7 +73,8 @@ public:
    * @param use_ext_data_pointer Flagg if the image should be copied (true) or if the data is just safed as 'reference' (false)
    */
   ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, bool use_ext_data_pointer = false);
+           size_t pitch, bool use_ext_data_pointer = false,
+           PixelOrder pixel_order = ze::PixelOrder::undefined);
 
   /**
    * @brief ImageRaw constructs an image with the given data shared with the given tracked object
@@ -80,7 +86,8 @@ public:
    * @note we assume that the tracked object takes care about memory deallocations
    */
   ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, const std::shared_ptr<void const>& tracked);
+           size_t pitch, const std::shared_ptr<void const>& tracked,
+           PixelOrder pixel_order = ze::PixelOrder::undefined);
 
 
   /** Returns a pointer to the pixel data.
