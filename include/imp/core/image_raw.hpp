@@ -29,7 +29,7 @@ template<typename Pixel>
 class ImageRaw : public ze::Image<Pixel>
 {
 public:
-  ZE_POINTER_TYPEDEFS(Image);
+  ZE_POINTER_TYPEDEFS(ImageRaw);
 
   using Base = Image<Pixel>;
   using Memory = ze::MemoryStorage<Pixel>;

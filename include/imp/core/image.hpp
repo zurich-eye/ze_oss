@@ -161,18 +161,17 @@ protected:
   {
   }
 
-  Image(std::uint32_t width, std::uint32_t height,
-        PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : Image(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, {width, height})
+  Image(
+      const Size2u &size,
+      PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, size)
   {
   }
 
   Image(
-      PixelType pixel_type,
-      size_t pixel_size,
-      PixelOrder pixel_order,
-      const Size2u &size)
-    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, size)
+      std::uint32_t width, std::uint32_t height,
+      PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : Image({width, height}, pixel_order)
   {
   }
 

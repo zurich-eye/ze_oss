@@ -1,7 +1,11 @@
 #pragma once
 
+#include <ze/common/logging.hpp>
 #include <ze/common/types.h>
-
+#include <imp/core/pixel_enums.hpp>
+#include <imp/core/roi.hpp>
+#include <imp/core/size.hpp>
+#include <imp/core/types.hpp>
 
 namespace ze {
 
@@ -14,7 +18,7 @@ struct ImageHeader
   Size2u size{0, 0};
   Roi2u roi{0, 0, 0, 0}; //!< Region of interest. x,y offset and width, height.
   size_t pitch{0}; //!< Row alignment in bytes.
-  bool memory_type{MemoryType::Undefined}; //!< Memory Type.
+  MemoryType memory_type{MemoryType::Undefined}; //!< Memory Type.
 
   ImageHeader() = default;
   ~ImageHeader() = default;
@@ -22,7 +26,7 @@ struct ImageHeader
   ImageHeader(
       PixelType _pixel_type,
       size_t _pixel_size = 0,
-      PixelOrder _pixel_order,
+      PixelOrder _pixel_order = PixelOrder::undefined,
       Size2u _size = Size2u{0,0},
       Roi2u _roi = Roi2u{0,0,0,0},
       size_t _pitch = 0,
@@ -36,7 +40,7 @@ struct ImageHeader
     , memory_type(_memory_type)
   { ; }
 
-  bool isGpuMemory()
+  bool isGpuMemory() const
   {
     switch (memory_type)
     {
@@ -44,11 +48,11 @@ struct ImageHeader
     case MemoryType::CpuAligned:
       return false;
     case MemoryType::Managed:
-    case MemoryType::Managed:
+    case MemoryType::ManagedAligned:
     case MemoryType::Unified:
     case MemoryType::UnifiedAligned:
       return true;
-    defualt:
+    default:
       CHECK(false) << "Undefined or unitialized memory";
       break;
     }

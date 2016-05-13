@@ -10,16 +10,17 @@ template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size, PixelOrder pixel_order)
   : Base(size, pixel_order)
 {
-  data_.reset(Memory::alignedAlloc(size, &this->pitch_));
+  data_.reset(Memory::alignedAlloc(size, &this->header_.pitch));
+  this->header_.memory_type = MemoryType::CpuAligned;
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const ImageRaw& from)
   : Base(from)
-  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
+  data_.reset(Memory::alignedAlloc(this->size(), &this->header_.pitch));
+  this->header_.memory_type = MemoryType::CpuAligned;
   from.copyTo(*this);
 }
 
@@ -27,9 +28,9 @@ ImageRaw<Pixel>::ImageRaw(const ImageRaw& from)
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
   : Base(from)
-  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
+  data_.reset(Memory::alignedAlloc(this->size(), &this->header_.pitch));
+  this->header_.memory_type = MemoryType::CpuAligned;
   from.copyTo(*this);
 }
 
@@ -47,16 +48,18 @@ ImageRaw<Pixel>
     // This uses the external data pointer as internal data pointer.
     auto dealloc_nop = [](Pixel*) { ; };
     data_ = std::unique_ptr<Pixel, Deallocator>(data, Deallocator(dealloc_nop));
-    this->pitch_ = pitch;
+    this->header_.pitch = pitch;
+    this->header_.memory_type = (Memory::isAligned(data)) ?
+                                   MemoryType::CpuAligned : MemoryType::Cpu;
   }
   else
   {
-    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
-    size_t stride = pitch / sizeof(Pixel);
+    data_.reset(Memory::alignedAlloc(this->size(), &this->header_.pitch));
+    this->header_.memory_type = MemoryType::CpuAligned;
 
     if (this->bytes() == pitch*height)
     {
-      std::copy(data, data+stride*height, data_.get());
+      std::copy(data, data+this->stride()*height, data_.get());
     }
     else
     {
@@ -64,7 +67,7 @@ ImageRaw<Pixel>
       {
         for (std::uint32_t x=0; x<width; ++x)
         {
-          data_.get()[y*this->stride()+x] = data[y*stride + x];
+          data_.get()[y*this->stride()+x] = data[y*this->stride() + x];
         }
       }
     }
@@ -85,8 +88,10 @@ ImageRaw<Pixel>::ImageRaw(Pixel* data,
 
   auto dealloc_nop = [](Pixel*) { ; };
   data_ = std::unique_ptr<Pixel, Deallocator>(data, Deallocator(dealloc_nop));
-  this->pitch_ = pitch;
+  this->header_.pitch = pitch;
   tracked_ = tracked;
+  this->header_.memory_type = (Memory::isAligned(data)) ?
+                                 MemoryType::CpuAligned : MemoryType::Cpu;
 }
 
 //-----------------------------------------------------------------------------

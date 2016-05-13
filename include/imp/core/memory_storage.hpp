@@ -22,6 +22,14 @@ public:
   virtual ~MemoryStorage() = delete;
 
   /**
+   * @brief isAligned checks if the given data pointer \a p is aligned according to \a memaddr_align
+   */
+  static bool isAligned(void* p)
+  {
+    return reinterpret_cast<intptr_t>(p) % memaddr_align == 0;
+  }
+
+  /**
    * @brief alignedAlloc allocates an aligned block of memory
    * @param num_elements Number of (minimum) allocated elements
    * @param init_with_zeros Flag if the memory elements should be zeroed out (default=false).

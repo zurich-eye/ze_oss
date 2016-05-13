@@ -46,10 +46,10 @@ public:
 
   inline Size2u size() const {return header_.size;}
 
-  inline Roi2u roi() const {return roi;}
+  inline Roi2u roi() const {return header_.roi;}
 
   /** Returns the distance in bytes between starts of consecutive rows. */
-  inline size_t pitch() const {return pitch;}
+  inline size_t pitch() const {return header_.pitch;}
 
   inline std::uint32_t width() const {return header_.size[0];}
 
@@ -57,7 +57,7 @@ public:
 
   inline std::uint8_t nChannels() const
   {
-    switch (pixel_type_)
+    switch (header_.pixel_type)
     {
     case PixelType::i8uC1:
     case PixelType::i16uC1:
@@ -104,7 +104,7 @@ public:
   inline std::uint8_t bitDepth() const {return 8*header_.pixel_size;}
 
   /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  inline bool isGpuMemory() const {return header_.is_gpu_memory();}
+  inline bool isGpuMemory() const {return header_.isGpuMemory();}
 
   friend std::ostream& operator<<(std::ostream &os, const ImageBase& image);
 
@@ -115,7 +115,7 @@ protected:
       PixelType pixel_type,
       size_t pixel_size,
       PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : header_(pixel_type, pixel_order)
+    : header_(pixel_type, pixel_size, pixel_order)
   {
   }
 
@@ -124,7 +124,7 @@ protected:
       size_t pixel_size,
       PixelOrder pixel_order,
       const Size2u &size)
-    : header_(pixel_type, pixel_order, size)
+    : header_(pixel_type, pixel_size, pixel_order, size)
   {
   }
 
