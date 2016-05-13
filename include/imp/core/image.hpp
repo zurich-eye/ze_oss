@@ -53,7 +53,7 @@ public:
     return *data(x, y);
   }
 
-  /** Get Pixel value at position x,y. */
+  /** Get reference to pixel value at position x,y. */
   Pixel& pixel(std::uint32_t x, std::uint32_t y)
   {
     return *data(x, y);
@@ -61,6 +61,12 @@ public:
 
   /** Get Pixel value at position x,y. */
   Pixel operator()(std::uint32_t x, std::uint32_t y) const
+  {
+    return *data(x, y);
+  }
+
+  /** Get reference to pixel value at position x,y. */
+  Pixel& operator()(std::uint32_t x, std::uint32_t y)
   {
     return *data(x, y);
   }
