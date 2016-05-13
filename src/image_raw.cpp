@@ -10,16 +10,17 @@ namespace ze {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageRaw<Pixel>::ImageRaw(std::uint32_t width, std::uint32_t height)
-  : Base(width, height)
+ImageRaw<Pixel>::ImageRaw(
+    std::uint32_t width, std::uint32_t height, PixelOrder pixel_order)
+  : Base(width, height, pixel_order)
 {
   data_.reset(Memory::alignedAlloc(width, height, &pitch_));
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size)
-  : Base(size)
+ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size, PixelOrder pixel_order)
+  : Base(size, pixel_order)
 {
   data_.reset(Memory::alignedAlloc(size, &pitch_));
 }
@@ -46,8 +47,8 @@ ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
 template<typename Pixel>
 ImageRaw<Pixel>
 ::ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, bool use_ext_data_pointer)
-  : Base(width, height)
+           size_t pitch, bool use_ext_data_pointer, PixelOrder pixel_order)
+  : Base(width, height, pixel_order)
 {
   if (data == nullptr)
   {
@@ -88,8 +89,9 @@ template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(Pixel* data,
                           std::uint32_t width, std::uint32_t height,
                           size_t pitch,
-                          const std::shared_ptr<void const>& tracked)
-  : Base(width, height)
+                          const std::shared_ptr<void const>& tracked,
+                          PixelOrder pixel_order)
+  : Base(width, height, pixel_order)
 {
   if (data == nullptr || tracked == nullptr)
   {
