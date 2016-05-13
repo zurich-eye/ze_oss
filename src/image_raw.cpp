@@ -3,33 +3,33 @@
 #include <iostream>
 #include <ze/common/logging.hpp>
 
-#include <imp/core/exception.hpp>
-
-
 namespace ze {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(std::uint32_t width, std::uint32_t height)
   : Base(width, height)
+  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(width, height, &pitch_));
+  data_.reset(Memory::alignedAlloc(width, height, &this->pitch_));
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const ze::Size2u& size)
   : Base(size)
+  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(size, &pitch_));
+  data_.reset(Memory::alignedAlloc(size, &this->pitch_));
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const ImageRaw& from)
   : Base(from)
+  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
+  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
   from.copyTo(*this);
 }
 
@@ -37,8 +37,9 @@ ImageRaw<Pixel>::ImageRaw(const ImageRaw& from)
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
   : Base(from)
+  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
+  data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
   from.copyTo(*this);
 }
 
@@ -48,22 +49,20 @@ ImageRaw<Pixel>
 ::ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
            size_t pitch, bool use_ext_data_pointer)
   : Base(width, height)
+  , is_gpu_memory_(true)
 {
-  if (data == nullptr)
-  {
-    throw ze::Exception("input data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(data);
 
   if(use_ext_data_pointer)
   {
     // This uses the external data pointer as internal data pointer.
     auto dealloc_nop = [](Pixel*) { ; };
     data_ = std::unique_ptr<Pixel, Deallocator>(data, Deallocator(dealloc_nop));
-    pitch_ = pitch;
+    this->pitch_ = pitch;
   }
   else
   {
-    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
+    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
     size_t stride = pitch / sizeof(Pixel);
 
     if (this->bytes() == pitch*height)
@@ -90,15 +89,14 @@ ImageRaw<Pixel>::ImageRaw(Pixel* data,
                           size_t pitch,
                           const std::shared_ptr<void const>& tracked)
   : Base(width, height)
+  , is_gpu_memory_(false)
 {
-  if (data == nullptr || tracked == nullptr)
-  {
-    throw ze::Exception("input data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(data);
+  CHECK(tracked);
 
   auto dealloc_nop = [](Pixel*) { ; };
   data_ = std::unique_ptr<Pixel, Deallocator>(data, Deallocator(dealloc_nop));
-  pitch_ = pitch;
+  this->pitch_ = pitch;
   tracked_ = tracked;
 }
 

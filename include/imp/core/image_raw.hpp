@@ -3,6 +3,8 @@
 #include <memory>
 #include <algorithm>
 
+#include <ze/common/types.h>
+#include <ze/common/macros.h>
 #include <imp/core/image.hpp>
 #include <imp/core/memory_storage.hpp>
 
@@ -27,7 +29,7 @@ template<typename Pixel>
 class ImageRaw : public ze::Image<Pixel>
 {
 public:
-  using Ptr = typename std::shared_ptr<ImageRaw<Pixel>>;
+  ZE_POINTER_TYPEDEFS(Image);
 
   using Base = Image<Pixel>;
   using Memory = ze::MemoryStorage<Pixel>;
@@ -90,15 +92,8 @@ public:
   virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) override;
   virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const override;
 
-  /** Returns the distance in bytes between starts of consecutive rows. */
-  virtual size_t pitch() const override { return pitch_; }
-
-  /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  virtual bool isGpuMemory() const override { return false; }
-
 protected:
   std::unique_ptr<Pixel, Deallocator> data_; //!< the actual image data
-  size_t pitch_ = 0; //!< Row alignment in bytes.
   std::shared_ptr<void const> tracked_ = nullptr; //!< tracked object to share memory
 };
 

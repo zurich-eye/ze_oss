@@ -17,23 +17,6 @@ public:
   ZE_POINTER_TYPEDEFS(Image);
   using pixel_t = Pixel;
 
-protected:
-  Image(ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(std::uint32_t width, std::uint32_t height,
-        PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(width, height, pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(const ze::Size2u &size,
-        ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(size, pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(const Image& from) = default;
-
 public:
   Image() = delete;
   virtual ~Image() = default;
@@ -171,23 +154,29 @@ public:
     }
   }
 
-  /** Returns the length of a row (not including the padding!) in bytes. */
-  virtual size_t rowBytes() const
+
+protected:
+  Image(ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order)
   {
-    return this->width() * sizeof(Pixel);
   }
 
-  /** Returns the distance in pixels between starts of consecutive rows. */
-  virtual size_t stride() const override
+  Image(std::uint32_t width, std::uint32_t height,
+        PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : Image(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, {width, height})
   {
-    return this->pitch()/sizeof(Pixel);
   }
 
-  /** Returns the bit depth of the data pointer. */
-  virtual std::uint8_t bitDepth() const override
+  Image(
+      PixelType pixel_type,
+      size_t pixel_size,
+      PixelOrder pixel_order,
+      const Size2u &size)
+    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, size)
   {
-    return 8*sizeof(Pixel);
   }
+
+//  Image(const Image& from) = default;
 };
 
 //-----------------------------------------------------------------------------
