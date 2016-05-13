@@ -59,9 +59,6 @@ public:
    */
   virtual void setValue(const Pixel& value) override;
 
-  /** Returns the distance in bytes between starts of consecutive rows. */
-  virtual size_t pitch() const override { return mat_.step; }
-
   /** Returns the bit depth of the opencv matrix elements. */
   virtual std::uint8_t bitDepth() const override {return 8*mat_.elemSize(); }
 

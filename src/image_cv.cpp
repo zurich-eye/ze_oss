@@ -14,6 +14,7 @@ ImageCv<Pixel>::ImageCv(std::uint32_t width, std::uint32_t height)
   : Base(width, height)
   , mat_(height, width, ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
+  this->pitch_ = mat_.step;
 }
 
 //-----------------------------------------------------------------------------
@@ -22,6 +23,7 @@ ImageCv<Pixel>::ImageCv(const ze::Size2u& size)
   : Base(size)
   , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
+  this->pitch_ = mat_.step;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,6 +40,7 @@ ImageCv<Pixel>::ImageCv(const Image<Pixel>& from)
   : Base(from)
   , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
+  this->pitch_ = mat_.step;
   from.copyTo(*this);
 }
 
@@ -47,6 +50,7 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
   : Base(mat.cols, mat.rows, pixel_order)
   , mat_(mat)
 {
+  this->pitch_ = mat_.step;
   if (this->pixelType() != ze::pixelTypeFromCv(mat_.type()))
   {
     throw ze::Exception("OpenCV pixel type does not match to the internally used one.",
