@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <cuda_device_runtime_api.h>
+#include <cuda_runtime_api.h>
 #include <imp/core/exception.hpp>
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>

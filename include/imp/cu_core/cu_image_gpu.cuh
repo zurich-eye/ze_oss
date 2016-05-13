@@ -115,19 +115,12 @@ public:
   auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data()));
   auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data()));
 
-
   /**
    * @brief setValue Sets image data to the specified \a value.
    * @param value Value to be set to the whole image data.
    * @note @todo (MWE) TBD: region-of-interest is considered
    */
   virtual void setValue(const Pixel& value) override;
-
-  /** Returns the distance in bytes between starts of consecutive rows. */
-  virtual size_t pitch() const override { return pitch_; }
-
-  /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  virtual bool isGpuMemory() const override { return true; }
 
   /** Returns a data structure to operate within a cuda kernel (does not copy any memory!). */
 //  std::unique_ptr<GpuData2D<Pixel>> gpuData() { return gpu_data_; }
@@ -152,7 +145,6 @@ public:
 
 protected:
   std::unique_ptr<Pixel, Deallocator> data_; //!< the actual image data
-  size_t pitch_ = 0; //!< Row alignment in bytes.
 
 private:
   cudaChannelFormatDesc channel_format_desc_;

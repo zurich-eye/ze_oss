@@ -15,13 +15,13 @@
 namespace ze {
 namespace cu {
 
-
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const ze::Size2u& size)
   : Base(size)
+  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->size(), &pitch_));
+  data_.reset(Memory::alignedAlloc(this->size(), &this->pitch_));
   channel_format_desc_ = toCudaChannelFormatDesc(pixel_type<Pixel>::type);
 }
 
@@ -29,6 +29,7 @@ ImageGpu<Pixel>::ImageGpu(const ze::Size2u& size)
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const ImageGpu& from)
   : ImageGpu(from.size())
+  , is_gpu_memory_(true)
 {
   this->copyFrom(from);
 }
@@ -37,6 +38,7 @@ ImageGpu<Pixel>::ImageGpu(const ImageGpu& from)
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
   : ImageGpu(from.size())
+  , is_gpu_memory_(true)
 {
   this->copyFrom(from);
 }
@@ -59,11 +61,11 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 //    auto dealloc_nop = [](Pixel*) { ; };
 //    data_ = std::unique_ptr<Pixel, Deallocator>(
 //          data, Deallocator(dealloc_nop));
-//    pitch_ = pitch;
+//    this->pitch_ = pitch;
 //  }
 //  else
 //  {
-//    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
+//    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &this->pitch_));
 //    size_t stride = pitch / sizeof(Pixel);
 
 //    if (this->bytes() == pitch*height)
@@ -87,7 +89,6 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 template<typename Pixel>
 ImageGpu<Pixel>::~ImageGpu()
 {
-  //  delete gpu_data_;
 }
 
 //-----------------------------------------------------------------------------
@@ -95,17 +96,13 @@ template<typename Pixel>
 void ImageGpu<Pixel>::setRoi(const ze::Roi2u& roi)
 {
   this->roi_ = roi;
-  //  gpu_data_.roi = roi;
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void ImageGpu<Pixel>::copyTo(ze::Image<Pixel>& dst) const
 {
-  if (this->size()!= dst.size())
-  {
-    throw ze::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_EQ(this->size(), dst.size());
   cudaMemcpyKind memcpy_kind = dst.isGpuMemory() ? cudaMemcpyDeviceToDevice :
                                                    cudaMemcpyDeviceToHost;
   const cudaError cu_err = cudaMemcpy2D(dst.data(), dst.pitch(),
