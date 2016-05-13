@@ -84,7 +84,7 @@ ImageBase::Ptr toImageCpu(
     {
       ImageRaw8uC1 src_wrapped(
           reinterpret_cast<Pixel8uC1*>(const_cast<uint8_t*>(&src.data[0])),
-          width, height, pitch, true);
+          width, height, pitch, true, PixelOrder::gray);
       ImageRaw8uC1::Ptr dst =
           std::make_shared<ImageRaw8uC1>(src_wrapped); // Deep copy of the image data.
       return dst;
