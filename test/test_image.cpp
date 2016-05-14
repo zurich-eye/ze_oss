@@ -196,45 +196,45 @@ TYPED_TEST(ImageRawTest, CheckValues)
   }
 }
 
-//-----------------------------------------------------------------------------
-TYPED_TEST(ImageRawTest, CheckRoiValues)
-{
-  this->setValue();
-  this->setValueRoi();
+////-----------------------------------------------------------------------------
+//TYPED_TEST(ImageRawTest, CheckRoiValues)
+//{
+//  this->setValue();
+//  this->setValueRoi();
 
-  for (ze::uint32_t y=0u; y<512; ++y)
-  {
-    for (ze::uint32_t x=0u; x<512; ++x)
-    {
-      if (x>=this->roi_.x() && x<(this->roi_.x()+this->roi_.width()) &&
-          y>=this->roi_.y() && y<(this->roi_.y()+this->roi_.height()))
-      {
-        EXPECT_EQ(this->image_512_(x,y), this->random_value2_);
-        EXPECT_EQ(this->image_512_[y][x], this->random_value2_);
-        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value2_);
+//  for (ze::uint32_t y=0u; y<512; ++y)
+//  {
+//    for (ze::uint32_t x=0u; x<512; ++x)
+//    {
+//      if (x>=this->roi_.x() && x<(this->roi_.x()+this->roi_.width()) &&
+//          y>=this->roi_.y() && y<(this->roi_.y()+this->roi_.height()))
+//      {
+//        EXPECT_EQ(this->image_512_(x,y), this->random_value2_);
+//        EXPECT_EQ(this->image_512_[y][x], this->random_value2_);
+//        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value2_);
 
-        if (x<511)
-        {
-          EXPECT_EQ(this->image_511_(x,y), this->random_value2_);
-          EXPECT_EQ(this->image_511_[y][x], this->random_value2_);
-          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value2_);
-        }
-      }
-      else
-      {
-        EXPECT_EQ(this->image_512_(x,y), this->random_value1_);
-        EXPECT_EQ(this->image_512_[y][x], this->random_value1_);
-        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value1_);
+//        if (x<511)
+//        {
+//          EXPECT_EQ(this->image_511_(x,y), this->random_value2_);
+//          EXPECT_EQ(this->image_511_[y][x], this->random_value2_);
+//          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value2_);
+//        }
+//      }
+//      else
+//      {
+//        EXPECT_EQ(this->image_512_(x,y), this->random_value1_);
+//        EXPECT_EQ(this->image_512_[y][x], this->random_value1_);
+//        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value1_);
 
-        if (x<511)
-        {
-          EXPECT_EQ(this->image_511_(x,y), this->random_value1_);
-          EXPECT_EQ(this->image_511_[y][x], this->random_value1_);
-          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value1_);
-        }
-      }
-    }
-  }
-}
+//        if (x<511)
+//        {
+//          EXPECT_EQ(this->image_511_(x,y), this->random_value1_);
+//          EXPECT_EQ(this->image_511_[y][x], this->random_value1_);
+//          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value1_);
+//        }
+//      }
+//    }
+//  }
+//}
 
 ZE_UNITTEST_ENTRYPOINT
