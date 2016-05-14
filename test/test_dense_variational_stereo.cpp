@@ -29,8 +29,7 @@ DEFINE_bool(visualize, false, "Show input images and results");
 //-----------------------------------------------------------------------------
 // parameters: solver, scale_factor, expected error
 class DenseStereoTests
-    : public ::testing::TestWithParam<std::tuple<
-    ze::cu::StereoPDSolver, double, double>>
+    : public ::testing::TestWithParam<std::tuple<ze::cu::StereoPDSolver, double, double>>
 { };
 
 //-----------------------------------------------------------------------------
