@@ -209,9 +209,6 @@ struct Roi<T, 2>
   constexpr const T& height() const noexcept {return this->sz[1];}
 };
 
-
-
-
 //------------------------------------------------------------------------------
 // some convencience typedefs
 
