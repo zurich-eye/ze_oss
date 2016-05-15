@@ -85,9 +85,6 @@ public:
 //  ImageGpu(Pixel* data, std::uint32_t width, std::uint32_t height,
 //           size_t pitch, bool use_ext_data_pointer = false);
 
-  /** sets a region of interest */
-  virtual void setRoi(const ze::Roi2u& roi) override;
-
   /**
    * @brief copyTo copies the internal image data to another class instance
    * @param dst Image class that will receive this image's data.

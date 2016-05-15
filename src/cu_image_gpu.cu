@@ -19,17 +19,16 @@ namespace cu {
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const ze::Size2u& size)
   : Base(size)
-  , is_gpu_memory_(true)
 {
-  data_.reset(Memory::alignedAlloc(this->size(), &this->pitch_));
+  data_.reset(Memory::alignedAlloc(this->size(), &this->header_.pitch));
   channel_format_desc_ = toCudaChannelFormatDesc(pixel_type<Pixel>::type);
+  this->header_.memory_type = MemoryType::GpuAligned;
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const ImageGpu& from)
   : ImageGpu(from.size())
-  , is_gpu_memory_(true)
 {
   this->copyFrom(from);
 }
@@ -38,7 +37,6 @@ ImageGpu<Pixel>::ImageGpu(const ImageGpu& from)
 template<typename Pixel>
 ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
   : ImageGpu(from.size())
-  , is_gpu_memory_(true)
 {
   this->copyFrom(from);
 }
@@ -89,13 +87,6 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 template<typename Pixel>
 ImageGpu<Pixel>::~ImageGpu()
 {
-}
-
-//-----------------------------------------------------------------------------
-template<typename Pixel>
-void ImageGpu<Pixel>::setRoi(const ze::Roi2u& roi)
-{
-  this->roi_ = roi;
 }
 
 //-----------------------------------------------------------------------------
