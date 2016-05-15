@@ -4,6 +4,7 @@
 
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
+#include <ze/common/logging.hpp>
 #include <imp/core/image_base.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
@@ -73,18 +74,18 @@ public:
    */
   virtual void setValue(const Pixel& value)
   {
-    if (this->bytes() == this->pitch()*this->height())
+    CHECK(roi() != Roi2u(0,0,0,0)) << "ROI not set. Should not happen when initializing the image header properly.";
+    // safety check if memory is contiguous and roi is not set.
+    if ((this->bytes() == this->pitch()*this->height()) &&
+        (this->roi() == ze::Roi2u(this->size())))
     {
       std::fill(this->data(), this->data()+this->stride()*this->height(), value);
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (std::uint32_t y=this->roi().y(); y<this->roi().y()+this->roi().height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
-        {
-          this->data()[y*this->stride()+x] = value;
-        }
+        std::fill_n(this->data(this->roi().x(),y), this->roi().width(), value);
       }
     }
   }
@@ -92,6 +93,7 @@ public:
   /**
    * @brief copyTo copies the internal image data to another class instance
    * @param dst Image class that will receive this image's data.
+   * @todo (MWE) handle roi
    */
   virtual void copyTo(Image& dst) const
   {

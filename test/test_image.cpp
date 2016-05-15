@@ -134,18 +134,18 @@ TYPED_TEST(ImageRawTest, CheckSize)
   EXPECT_EQ(this->size_511_, this->image_511_.size());
 }
 
-//TYPED_TEST(ImageRawTest, CheckNoRoi)
-//{
-//  EXPECT_EQ(ze::Roi2u{0,0,512,512}, this->image_512_.roi());
-//  EXPECT_EQ(ze::Roi2u{this->size_511_}, this->image_511_.roi());
-//}
+TYPED_TEST(ImageRawTest, CheckNoRoi)
+{
+  EXPECT_EQ(ze::Roi2u(0,0,512,512), this->image_512_.roi());
+  EXPECT_EQ(ze::Roi2u(this->size_511_), this->image_511_.roi());
+}
 
-//TYPED_TEST(ImageRawTest, CheckRoi)
-//{
-//  this->setRoi();
-//  EXPECT_EQ(this->roi_, this->image_512_.roi());
-//  EXPECT_EQ(this->roi_, this->image_511_.roi());
-//}
+TYPED_TEST(ImageRawTest, CheckRoi)
+{
+  this->setRoi();
+  EXPECT_EQ(this->roi_, this->image_512_.roi());
+  EXPECT_EQ(this->roi_, this->image_511_.roi());
+}
 
 TYPED_TEST(ImageRawTest, CheckBytes)
 {
@@ -187,54 +187,47 @@ TYPED_TEST(ImageRawTest, CheckValues)
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+TYPED_TEST(ImageRawTest, CheckRoiValues)
+{
+  this->setValue();
+  this->setValueRoi();
+
   for (ze::uint32_t y=0u; y<512; ++y)
   {
-    for (ze::uint32_t x=0u; x<511; ++x)
+    for (ze::uint32_t x=0u; x<512; ++x)
     {
+      if (x>=this->roi_.x() && x<(this->roi_.x()+this->roi_.width()) &&
+          y>=this->roi_.y() && y<(this->roi_.y()+this->roi_.height()))
+      {
+        EXPECT_EQ(this->image_512_(x,y), this->random_value2_);
+        EXPECT_EQ(this->image_512_[y][x], this->random_value2_);
+        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value2_);
 
+        if (x<511)
+        {
+          EXPECT_EQ(this->image_511_(x,y), this->random_value2_);
+          EXPECT_EQ(this->image_511_[y][x], this->random_value2_);
+          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value2_);
+        }
+      }
+      else
+      {
+        EXPECT_EQ(this->image_512_(x,y), this->random_value1_);
+        EXPECT_EQ(this->image_512_[y][x], this->random_value1_);
+        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value1_);
+
+        if (x<511)
+        {
+          EXPECT_EQ(this->image_511_(x,y), this->random_value1_);
+          EXPECT_EQ(this->image_511_[y][x], this->random_value1_);
+          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value1_);
+        }
+      }
     }
   }
 }
-
-////-----------------------------------------------------------------------------
-//TYPED_TEST(ImageRawTest, CheckRoiValues)
-//{
-//  this->setValue();
-//  this->setValueRoi();
-
-//  for (ze::uint32_t y=0u; y<512; ++y)
-//  {
-//    for (ze::uint32_t x=0u; x<512; ++x)
-//    {
-//      if (x>=this->roi_.x() && x<(this->roi_.x()+this->roi_.width()) &&
-//          y>=this->roi_.y() && y<(this->roi_.y()+this->roi_.height()))
-//      {
-//        EXPECT_EQ(this->image_512_(x,y), this->random_value2_);
-//        EXPECT_EQ(this->image_512_[y][x], this->random_value2_);
-//        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value2_);
-
-//        if (x<511)
-//        {
-//          EXPECT_EQ(this->image_511_(x,y), this->random_value2_);
-//          EXPECT_EQ(this->image_511_[y][x], this->random_value2_);
-//          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value2_);
-//        }
-//      }
-//      else
-//      {
-//        EXPECT_EQ(this->image_512_(x,y), this->random_value1_);
-//        EXPECT_EQ(this->image_512_[y][x], this->random_value1_);
-//        EXPECT_EQ(*this->image_512_.data(x,y), this->random_value1_);
-
-//        if (x<511)
-//        {
-//          EXPECT_EQ(this->image_511_(x,y), this->random_value1_);
-//          EXPECT_EQ(this->image_511_[y][x], this->random_value1_);
-//          EXPECT_EQ(*this->image_511_.data(x,y), this->random_value1_);
-//        }
-//      }
-//    }
-//  }
-//}
 
 ZE_UNITTEST_ENTRYPOINT

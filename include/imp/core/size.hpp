@@ -88,7 +88,9 @@ struct SizeBase
   {
     T a=1;
     for (auto elem : sz)
+    {
       a *= elem;
+    }
     return a;
   }
 

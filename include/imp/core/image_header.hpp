@@ -35,7 +35,7 @@ struct ImageHeader
     , pixel_size(_pixel_size)
     , pixel_order(_pixel_order)
     , size(_size)
-    , roi(_roi)
+    , roi((_roi != Roi2u{0,0,0,0})? _roi : Roi2u(size))
     , pitch(_pitch)
     , memory_type(_memory_type)
   { ; }
@@ -56,6 +56,11 @@ struct ImageHeader
       CHECK(false) << "Undefined or unitialized memory";
       break;
     }
+  }
+
+  bool hasRoi() const
+  {
+    return ((roi != Roi2u{0,0,0,0}) && (roi != Roi2u(size)));
   }
 };
 

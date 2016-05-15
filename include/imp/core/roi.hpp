@@ -105,14 +105,14 @@ template<typename T, std::uint8_t DIM, typename Derived>
 inline bool operator==(const RoiBase<T, DIM, Derived>& lhs,
                        const RoiBase<T, DIM, Derived>& rhs)
 {
-  return ( (lhs.pt() == rhs.pt()) && (lhs.sz() == rhs.sz()) );
+  return ( (lhs.pt == rhs.pt) && (lhs.sz == rhs.sz) );
 }
 
 template<typename T, std::uint8_t DIM, typename Derived>
 inline bool operator!=(const RoiBase<T, DIM, Derived>& lhs,
                        const RoiBase<T, DIM, Derived>& rhs)
 {
-  return ( (lhs.pt() != rhs.pt()) || (lhs.sz() != rhs.sz()) );
+  return ( (lhs.pt != rhs.pt) || (lhs.sz != rhs.sz) );
 }
 
 //------------------------------------------------------------------------------
