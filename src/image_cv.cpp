@@ -8,23 +8,25 @@
 
 namespace ze {
 
-//-----------------------------------------------------------------------------
-template<typename Pixel>
-ImageCv<Pixel>::ImageCv(std::uint32_t width, std::uint32_t height)
-  : Base(width, height)
-  , mat_(height, width, ze::pixelTypeToCv(pixel_type<Pixel>::type))
-{
-  this->pitch_ = mat_.step;
-}
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageCv<Pixel>::ImageCv(const ze::Size2u& size)
-  : Base(size)
+ImageCv<Pixel>::ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order)
+  : Base(size, pixel_order)
   , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
-  this->pitch_ = mat_.step;
+  this->header_.pitch = mat_.step;
 }
+
+
+//-----------------------------------------------------------------------------
+template<typename Pixel>
+ImageCv<Pixel>::ImageCv(std::uint32_t width, std::uint32_t height,
+                        ze::PixelOrder pixel_order)
+  : ImageCv({width, height}, pixel_order)
+{
+}
+
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
@@ -32,6 +34,7 @@ ImageCv<Pixel>::ImageCv(const ImageCv<Pixel>& from)
   : Base(from)
   , mat_(from.cvMat())
 {
+  this->header_.pitch = mat_.step;
 }
 
 //-----------------------------------------------------------------------------
@@ -40,17 +43,17 @@ ImageCv<Pixel>::ImageCv(const Image<Pixel>& from)
   : Base(from)
   , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
-  this->pitch_ = mat_.step;
+  this->header_.pitch = mat_.step;
   from.copyTo(*this);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
-  : Base(mat.cols, mat.rows, pixel_order)
+  : Base(ze::Size2u(mat.cols, mat.rows), pixel_order)
   , mat_(mat)
 {
-  this->pitch_ = mat_.step;
+  this->header_.pitch = mat_.step;
   if (this->pixelType() != ze::pixelTypeFromCv(mat_.type()))
   {
     throw ze::Exception("OpenCV pixel type does not match to the internally used one.",
@@ -65,19 +68,19 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
     case ze::PixelType::i16uC1:
     case ze::PixelType::i32fC1:
     case ze::PixelType::i32sC1:
-      this->pixel_order_ = ze::PixelOrder::gray;
+      this->header_.pixel_order = ze::PixelOrder::gray;
       break;
     case ze::PixelType::i8uC3:
     case ze::PixelType::i16uC3:
     case ze::PixelType::i32fC3:
     case ze::PixelType::i32sC3:
-      this->pixel_order_ = ze::PixelOrder::bgr;
+      this->header_.pixel_order = ze::PixelOrder::bgr;
       break;
     case ze::PixelType::i8uC4:
     case ze::PixelType::i16uC4:
     case ze::PixelType::i32fC4:
     case ze::PixelType::i32sC4:
-      this->pixel_order_ = ze::PixelOrder::bgra;
+      this->header_.pixel_order = ze::PixelOrder::bgra;
       break;
     default:
       // if we have something else than 1,3 or 4-channel images, we do not set the

@@ -28,14 +28,14 @@ public:
   using ConstPtr = typename std::shared_ptr<ImageCv<Pixel> const>;
 
 public:
-  ImageCv() = default;
+  ImageCv() = delete;
   virtual ~ImageCv() = default;
 
-  ImageCv(std::uint32_t width, std::uint32_t height);
-  ImageCv(const ze::Size2u& size);
+  ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
+  ImageCv(std::uint32_t width, std::uint32_t height, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
   ImageCv(const ImageCv<Pixel>& from);
   ImageCv(const Base& from);
-  ImageCv(cv::Mat mat, ze::PixelOrder pixel_order_=ze::PixelOrder::undefined);
+  ImageCv(cv::Mat mat, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
 //  ImageCv(Pixel* data, std::uint32_t width, std::uint32_t height,
 //          size_t pitch, bool use_ext_data_pointer = false);
 
@@ -58,12 +58,6 @@ public:
    * @param value Value to be set to the whole image data.
    */
   virtual void setValue(const Pixel& value) override;
-
-  /** Returns the bit depth of the opencv matrix elements. */
-  virtual std::uint8_t bitDepth() const override {return 8*mat_.elemSize(); }
-
-  /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  virtual bool isGpuMemory() const override { return false; }
 
 protected:
   cv::Mat mat_;
