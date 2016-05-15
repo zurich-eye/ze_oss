@@ -16,7 +16,8 @@ ImageCv<Pixel>::ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order)
   , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
   this->header_.pitch = mat_.step;
-}
+  this->header_.memory_type = (Memory::isAligned(data)) ?
+        MemoryType::CpuAligned : MemoryType::Cpu;}
 
 
 //-----------------------------------------------------------------------------
@@ -35,6 +36,8 @@ ImageCv<Pixel>::ImageCv(const ImageCv<Pixel>& from)
   , mat_(from.cvMat())
 {
   this->header_.pitch = mat_.step;
+  this->header_.memory_type = (Memory::isAligned(data)) ?
+        MemoryType::CpuAligned : MemoryType::Cpu;
 }
 
 //-----------------------------------------------------------------------------
@@ -44,6 +47,8 @@ ImageCv<Pixel>::ImageCv(const Image<Pixel>& from)
   , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
   this->header_.pitch = mat_.step;
+  this->header_.memory_type = (Memory::isAligned(data)) ?
+        MemoryType::CpuAligned : MemoryType::Cpu;
   from.copyTo(*this);
 }
 
@@ -54,10 +59,12 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
   , mat_(mat)
 {
   this->header_.pitch = mat_.step;
+  this->header_.memory_type = (Memory::isAligned(data)) ?
+        MemoryType::CpuAligned : MemoryType::Cpu;
   if (this->pixelType() != ze::pixelTypeFromCv(mat_.type()))
   {
     throw ze::Exception("OpenCV pixel type does not match to the internally used one.",
-                         __FILE__, __FUNCTION__, __LINE__);
+                        __FILE__, __FUNCTION__, __LINE__);
   }
 
   if (this->pixelOrder() == ze::PixelOrder::undefined)
