@@ -54,7 +54,7 @@ struct ImageHeader
       return true;
     default:
       CHECK(false) << "Undefined or unitialized memory";
-      break;
+      return false;
     }
   }
 
