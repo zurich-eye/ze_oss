@@ -47,6 +47,8 @@ struct ImageHeader
     case MemoryType::Cpu:
     case MemoryType::CpuAligned:
       return false;
+    case MemoryType::Gpu:
+    case MemoryType::GpuAligned:
     case MemoryType::Managed:
     case MemoryType::ManagedAligned:
     case MemoryType::Unified:
