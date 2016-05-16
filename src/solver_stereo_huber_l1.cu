@@ -67,15 +67,15 @@ void SolverStereoHuberL1::init(const SolverStereoAbstract& rhs)
   if(params_->ctf.apply_median_filter)
   {
     ze::cu::filterMedian3x3(*from->u0_, *from->u_);
-    ze::cu::resample(*u_, *from->u0_, ze::InterpolationMode::point, false);
+    ze::cu::resample(*u_, *from->u0_, ze::InterpolationMode::Point, false);
   }
   else
   {
-    ze::cu::resample(*u_, *from->u_, ze::InterpolationMode::point, false);
+    ze::cu::resample(*u_, *from->u_, ze::InterpolationMode::Point, false);
   }
   *u_ *= inv_sf;
 
-  ze::cu::resample(*pu_, *from->pu_, ze::InterpolationMode::point, false);
+  ze::cu::resample(*pu_, *from->pu_, ze::InterpolationMode::Point, false);
 }
 
 //------------------------------------------------------------------------------
