@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <imp/core/memory_storage.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/bridge/opencv/cv_connector_pixel_types.hpp>
 
@@ -16,7 +17,7 @@ ImageCv<Pixel>::ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order)
   , mat_(size[1], size[0], ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
   this->header_.pitch = mat_.step;
-  this->header_.memory_type = (Memory::isAligned(data)) ?
+  this->header_.memory_type = (MemoryStorage<Pixel>::isAligned(data())) ?
         MemoryType::CpuAligned : MemoryType::Cpu;}
 
 
@@ -36,7 +37,7 @@ ImageCv<Pixel>::ImageCv(const ImageCv<Pixel>& from)
   , mat_(from.cvMat())
 {
   this->header_.pitch = mat_.step;
-  this->header_.memory_type = (Memory::isAligned(data)) ?
+  this->header_.memory_type = (MemoryStorage<Pixel>::isAligned(data())) ?
         MemoryType::CpuAligned : MemoryType::Cpu;
 }
 
@@ -47,7 +48,7 @@ ImageCv<Pixel>::ImageCv(const Image<Pixel>& from)
   , mat_(from.height(), from.width(), ze::pixelTypeToCv(pixel_type<Pixel>::type))
 {
   this->header_.pitch = mat_.step;
-  this->header_.memory_type = (Memory::isAligned(data)) ?
+  this->header_.memory_type = (MemoryStorage<Pixel>::isAligned(data())) ?
         MemoryType::CpuAligned : MemoryType::Cpu;
   from.copyTo(*this);
 }
@@ -59,7 +60,7 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
   , mat_(mat)
 {
   this->header_.pitch = mat_.step;
-  this->header_.memory_type = (Memory::isAligned(data)) ?
+  this->header_.memory_type = (MemoryStorage<Pixel>::isAligned(data())) ?
         MemoryType::CpuAligned : MemoryType::Cpu;
   if (this->pixelType() != ze::pixelTypeFromCv(mat_.type()))
   {
@@ -120,7 +121,7 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
 //  }
 //  else
 //  {
-//    data_.reset(Memory::alignedAlloc(this->width(), this->height(), &pitch_));
+//    data_.reset(MemoryStorage<Pixel>::alignedAlloc(this->width(), this->height(), &pitch_));
 //    size_t stride = pitch / sizeof(pixel_storage_t);
 
 //    if (this->bytes() == pitch*height)
