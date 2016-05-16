@@ -47,7 +47,7 @@ void resample(ImageGpu<Pixel>& dst,
   float sf_y = static_cast<float>(src_roi.height()) / static_cast<float>(dst_roi.height());
 
   cudaTextureFilterMode tex_filter_mode =
-      (interp == InterpolationMode::linear) ? cudaFilterModeLinear
+      (interp == InterpolationMode::Linear) ? cudaFilterModeLinear
                                             : cudaFilterModePoint;
   if (src.bitDepth() < 32)
     tex_filter_mode = cudaFilterModePoint;
@@ -76,8 +76,8 @@ void resample(ImageGpu<Pixel>& dst,
 
   switch(interp)
   {
-  case InterpolationMode::point:
-  case InterpolationMode::linear:
+  case InterpolationMode::Point:
+  case InterpolationMode::Linear:
     // fallthrough intended
     k_resample
         <<<
@@ -85,12 +85,12 @@ void resample(ImageGpu<Pixel>& dst,
         >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
              dst_roi.x(), dst_roi.y(), sf_x , sf_y, *src_tex);
   break;
-    //  case InterpolationMode::cubic:
+    //  case InterpolationMode::Cubic:
     //    cuTransformCubicKernel_32f_C1
     //        <<< dimGridOut, dimBlock, 0, stream >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
     //                                      sf_x , sf_y);
     //    break;
-    //  case InterpolationMode::cubicSpline:
+    //  case InterpolationMode::CubicSpline:
     //    cuTransformCubicSplineKernel_32f_C1
     //        <<< dimGridOut, dimBlock, 0, stream >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
     //                                      sf_x , sf_y);

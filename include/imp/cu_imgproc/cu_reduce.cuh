@@ -24,7 +24,7 @@ void reduce(ImageGpu<Pixel>& dst,
 // template<typename Pixel, imp::PixelType pixel_type>
 // void resample(ImageGpu<Pixel, pixel_type>& dst,
 //               const ImageGpu<Pixel, pixel_type>& src,
-//               InterpolationMode interp = InterpolationMode::linear,
+//               InterpolationMode interp = InterpolationMode::Linear,
 //               bool gauss_prefilter=false);
 
 
