@@ -2,7 +2,10 @@
 
 #include <ze/common/types.h>
 #include <ze/common/test_entrypoint.h>
+#include <ze/common/benchmark.h>
 #include <ze/common/ring_view.h>
+
+DEFINE_bool(run_benchmark, false, "Benchmark the buffer vs. ringbuffer");
 
 TEST(RingViewTest, testFullRingScalar)
 {
@@ -31,7 +34,6 @@ TEST(RingViewTest, testFullRingScalarFixedSIze)
   ring_view<int, 100> rv(vec.begin(), vec.end());
   EXPECT_EQ(100, rv.capacity());
 }
-
 
 TEST(RingViewTest, testEmptyRingScalar)
 {
@@ -113,5 +115,36 @@ TEST(RingViewTest, testResetFront)
   EXPECT_EQ(1, rv.at(0));
 }
 
+TEST(RingViewTest, benchmarkFixedVsDynamicSize)
+{
+  if (!FLAGS_run_benchmark) {
+    return;
+  }
+
+  using namespace ze;
+
+  std::vector<int> vec(100);
+  ring_view<int> rv1(vec.begin(), vec.end());
+  ring_view<int, 100> rv2(vec.begin(), vec.end());
+
+  std::vector<int> vec2(128);
+  ring_view<int> rv3(vec2.begin(), vec2.end());
+  ring_view<int, 128> rv4(vec2.begin(), vec2.end());
+
+  //////
+  // access
+  auto atFixed = [&]() { rv2.at(26); };
+  FloatType atFixed_r = runTimingBenchmark(atFixed, 1000, 20, "At Fixed", true);
+  auto atDynamic = [&]() { rv1.at(26); };
+  FloatType atDynamic_r = runTimingBenchmark(atDynamic, 1000, 20, "At Fixed", true);
+  auto atFixed_128 = [&]() { rv4.at(26); };
+  FloatType atFixed128_r = runTimingBenchmark(atFixed_128, 1000, 20, "At Fixed", true);
+  auto atDynamic_128 = [&]() { rv3.at(26); };
+  FloatType atDynamic128_r = runTimingBenchmark(atDynamic_128, 1000, 20, "At Fixed", true);
+
+  std::cout << "Fixed: " << atFixed_r << ", Fixed128: " << atFixed128_r << "\n";
+  std::cout << "Dynamic: " << atDynamic_r << ", Dynamic128: " << atDynamic128_r << "\n";
+
+}
 ZE_UNITTEST_ENTRYPOINT
 
