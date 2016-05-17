@@ -23,6 +23,16 @@ TEST(RingViewTest, testFullRingScalar)
   ASSERT_EQ(0, rv.back_idx());
 }
 
+TEST(RingViewTest, testFullRingScalarFixedSIze)
+{
+  using namespace ze;
+
+  std::vector<int> vec(100);
+  ring_view<int, 100> rv(vec.begin(), vec.end());
+  EXPECT_EQ(100, rv.capacity());
+}
+
+
 TEST(RingViewTest, testEmptyRingScalar)
 {
   using namespace ze;

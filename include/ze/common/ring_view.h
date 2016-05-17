@@ -43,12 +43,14 @@ using enable_if_t = typename enable_if<B,T>::type;
 
 }
 
+template<bool B>
+using EnableIfB = typename std::enable_if<B, int>::type;
 
-template<class T, class Popper = move_popper<T>>
+template<class T, size_t Capacity = 0, class Popper = move_popper<T>>
 class ring_view
 {
 public:
-  using type = ring_view<T, Popper>;
+  using type = ring_view<T, Capacity, Popper>;
   using value_type = T;
   using pointer = T*;
   using reference = T&;
@@ -61,9 +63,9 @@ public:
 
   ring_view() = default;
 
+  // Dynamic Size Capacity Constructors
   // Construct a full ring_view.
-  //
-  template<class ContiguousIterator>
+  template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 == 0> = 0>
   ring_view(ContiguousIterator begin,
             ContiguousIterator end,
             Popper p = Popper()) noexcept :
@@ -76,7 +78,7 @@ public:
 
   // Construct a "partially full" ring_view.
   //
-  template<class ContiguousIterator>
+  template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 == 0> = 0>
   ring_view(ContiguousIterator begin,
             ContiguousIterator end,
             ContiguousIterator first,
@@ -88,6 +90,35 @@ public:
     front_idx_(first - begin),
     popper_(std::move(p))
   {}
+
+  // Fixed Size Capacity Constructors
+  template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 != 0> = 0>
+  ring_view(ContiguousIterator begin,
+            ContiguousIterator end,
+            Popper p = Popper()) noexcept :
+    data_(&*begin),
+    size_(end - begin),
+    front_idx_(0),
+    popper_(std::move(p))
+  {
+    CHECK((end - begin) == Capacity) << "Fixed size capacity must match data structure capacity.";
+  }
+
+  // Construct a "partially full" ring_view.
+  //
+  template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 != 0> = 0>
+  ring_view(ContiguousIterator begin,
+            ContiguousIterator end,
+            ContiguousIterator first,
+            size_type size,
+            Popper p = Popper()) noexcept :
+    data_(&*begin),
+    size_(size),
+    front_idx_(first - begin),
+    popper_(std::move(p))
+  {
+    CHECK((end - begin) == Capacity) << "Fixed size capacity must match data structure capacity.";
+  }
 
   // Notice that an iterator contains a pointer to the ring_view itself.
   // Destroying ring_view rv invalidates rv.begin(), just as with an owning
@@ -266,7 +297,7 @@ private:
 
   T *data_;
   size_type size_;
-  size_type capacity_;
+  std::conditional_t<Capacity == 0, const size_type, size_type> capacity_ = Capacity;
   size_type front_idx_;
   Popper popper_;
 };
