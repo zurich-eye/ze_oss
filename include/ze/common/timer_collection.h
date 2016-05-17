@@ -18,16 +18,17 @@ namespace ze {
  *
  * Usage with explicit start and stop:
 \code{.cpp}
-  ze::TimerCollection timers;
-  timers["name"].start();
+  // Use the macro to declare the timer:
+  DECLARE_TIMER(TimerName, timers, foo, bar);
+  timers[TimerName::foo].start();
   ...
-  timers["name"].stop();
+  timers[TimerName::foo].stop();
 \endcode
  * Or RAII-style, use a TimedScope object that stops the timer when it
  * goes out of scope.
 \code{.cpp}
   {
-    auto t = timers["name"].timeScope();
+    auto t = timers[TimerName::foo].timeScope();
     ...
   }
 \endcode
@@ -100,6 +101,6 @@ std::ostream& operator<<(std::ostream& out, const TimerCollection<TimerEnum>& ti
 
 } // end namespace ze
 
-#define DECLARE_TIMER(classname, membername, ...)                           \
-  enum class classname : uint32_t { __VA_ARGS__, dimension };               \
+#define DECLARE_TIMER(classname, membername, ...)              \
+  enum class classname : uint32_t { __VA_ARGS__, dimension };  \
   ze::TimerCollection<classname> membername { #__VA_ARGS__ }
