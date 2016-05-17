@@ -92,7 +92,7 @@ __global__ void k_convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
 
 //-----------------------------------------------------------------------------
 __global__ void k_rofPrimalEnergy(Pixel32fC1* d_ep,  size_t stride,
-                                  std::uint32_t width, std::uint32_t height,
+                                  uint32_t width, uint32_t height,
                                   float lambda, Texture2D f_tex, Texture2D u_tex)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -109,7 +109,7 @@ __global__ void k_rofPrimalEnergy(Pixel32fC1* d_ep,  size_t stride,
 
 //-----------------------------------------------------------------------------
 __global__ void k_rofDualEnergy(Pixel32fC1* d_ed,  size_t stride,
-                                std::uint32_t width, std::uint32_t height,
+                                uint32_t width, uint32_t height,
                                 float lambda, Texture2D f_tex, Texture2D p_tex)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;

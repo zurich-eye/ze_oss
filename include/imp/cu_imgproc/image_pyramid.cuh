@@ -26,8 +26,8 @@ createImagePyramidGpu(
 
   for (size_t i=1; i<pyr->numLevels(); ++i)
   {
-    Size2u sz(static_cast<std::uint32_t>(sz0.width() * pyr->scaleFactor(i) + 0.5f),
-              static_cast<std::uint32_t>(sz0.height() * pyr->scaleFactor(i) + 0.5f));
+    Size2u sz(static_cast<uint32_t>(sz0.width() * pyr->scaleFactor(i) + 0.5f),
+              static_cast<uint32_t>(sz0.height() * pyr->scaleFactor(i) + 0.5f));
 
     // init level memory with either ImageGpu or ImageRaw
     using ImageGpu = typename ze::cu::ImageGpu<Pixel>;

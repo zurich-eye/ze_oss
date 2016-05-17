@@ -62,8 +62,8 @@ __device__ __forceinline__ void d_calcNaturalEdge(Pixel3<T>& g,
 template<typename Pixel, typename EdgePixel>
 __global__ void k_naturalEdges(EdgePixel *g, const size_t stride,
                                const float alpha, const float q,
-                               const std::uint32_t xoff, const std::uint32_t yoff,
-                               const std::uint32_t width, const std::uint32_t height,
+                               const uint32_t xoff, const uint32_t yoff,
+                               const uint32_t width, const uint32_t height,
                                Texture2D src_tex)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;

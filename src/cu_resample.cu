@@ -19,8 +19,8 @@ namespace cu {
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 __global__ void k_resample(Pixel* d_dst, size_t stride,
-                           std::uint32_t dst_width, std::uint32_t dst_height,
-                           std::uint32_t roi_x, std::uint32_t roi_y,
+                           uint32_t dst_width, uint32_t dst_height,
+                           uint32_t roi_x, uint32_t roi_y,
                            float sf_x, float sf_y, Texture2D src_tex)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x + roi_x;

@@ -20,8 +20,8 @@ namespace cu {
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 __global__ void  k_median3x3(Pixel* dst, const size_t stride,
-                             const std::uint32_t xoff, const std::uint32_t yoff,
-                             const std::uint32_t width, const std::uint32_t height,
+                             const uint32_t xoff, const uint32_t yoff,
+                             const uint32_t width, const uint32_t height,
                              Texture2D src_tex)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
