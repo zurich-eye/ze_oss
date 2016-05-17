@@ -10,7 +10,7 @@ namespace cu {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-LinearMemory<Pixel>::LinearMemory(const std::uint32_t& length)
+LinearMemory<Pixel>::LinearMemory(const uint32_t& length)
   : LinearMemoryBase(length)
   , data_(Memory::alloc(this->length()))
 {

@@ -117,7 +117,7 @@ class CuLinearMemoryTest : public ::testing::Test
   }
 
 
-  size_t pixel_size_ = sizeof(Pixel);
+  uint8_t pixel_size_ = sizeof(Pixel);
   size_t pixel_bit_depth_ = 8*sizeof(Pixel);
 
   size_t numel_ = 10000;

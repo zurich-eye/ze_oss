@@ -44,8 +44,8 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 ////-----------------------------------------------------------------------------
 //template<typename Pixel>
 //ImageGpu<Pixel>
-//::ImageGpu(Pixel* data, std::uint32_t width, std::uint32_t height,
-//           size_t pitch, bool use_ext_data_pointer)
+//::ImageGpu(Pixel* data, uint32_t width, uint32_t height,
+//           uint32_t pitch, bool use_ext_data_pointer)
 //  : Base(width, height)
 //{
 //  if (data == nullptr)
@@ -72,9 +72,9 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 //    }
 //    else
 //    {
-//      for (std::uint32_t y=0; y<height; ++y)
+//      for (uint32_t y=0; y<height; ++y)
 //      {
-//        for (std::uint32_t x=0; x<width; ++x)
+//        for (uint32_t x=0; x<width; ++x)
 //        {
 //          data_.get()[y*this->stride()+x] = data[y*stride + x];
 //        }
@@ -111,10 +111,7 @@ void ImageGpu<Pixel>::copyTo(ze::Image<Pixel>& dst) const
 template<typename Pixel>
 void ImageGpu<Pixel>::copyFrom(const Image<Pixel>& from)
 {
-  if (this->size()!= from.size())
-  {
-    throw ze::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_EQ(this->size(), from.size());
   cudaMemcpyKind memcpy_kind = from.isGpuMemory() ? cudaMemcpyDeviceToDevice :
                                                     cudaMemcpyHostToDevice;
   const cudaError cu_err = cudaMemcpy2D(this->data(), this->pitch(),
@@ -130,32 +127,22 @@ void ImageGpu<Pixel>::copyFrom(const Image<Pixel>& from)
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 Pixel* ImageGpu<Pixel>::data(
-    std::uint32_t ox, std::uint32_t oy)
+    uint32_t ox, uint32_t oy)
 {
-  //  if (ox > this->width() || oy > this->height())
-  //  {
-  //    throw ze::cu::Exception("Request starting offset is outside of the image.", __FILE__, __FUNCTION__, __LINE__);
-  //  }
-
-  if (ox != 0 || oy != 0)
-  {
-    throw ze::cu::Exception("Device memory pointer offset is not possible from host function");
-  }
-
+  CHECK_EQ(0, ox);
+  CHECK_EQ(0, oy);
   return data_.get();
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 const Pixel* ImageGpu<Pixel>::data(
-    std::uint32_t ox, std::uint32_t oy) const
+    uint32_t ox, uint32_t oy) const
 {
   if (ox != 0 || oy != 0)
   {
     throw ze::cu::Exception("Device memory pointer offset is not possible from host function");
   }
-
-  //  return reinterpreft_cast<const Pixel*>(data_.get());
   return data_.get();
 }
 

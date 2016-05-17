@@ -21,11 +21,11 @@ public:
   virtual ~MemoryStorage() = delete;
 
   //! @todo (MWE) do we wanna have a init flag for device memory?
-  static Pixel* alloc(const size_t num_elements)
+  static Pixel* alloc(const uint32_t num_elements)
   {
     CHECK_GT(num_elements, 0u);
 
-    const size_t memory_size = sizeof(Pixel) * num_elements;
+    const uint32_t memory_size = sizeof(Pixel) * num_elements;
     //std::cout << "cu::MemoryStorage::alloc: memory_size=" << memory_size << "; sizeof(Pixel)=" << sizeof(Pixel) << std::endl;
 
     Pixel* p_data = nullptr;
@@ -44,13 +44,13 @@ public:
    * @param pitch Row alignment [bytes]
    *
    */
-  static Pixel* alignedAlloc(const std::uint32_t width, const std::uint32_t height,
-                             size_t* pitch)
+  static Pixel* alignedAlloc(const uint32_t width, const uint32_t height,
+                             uint32_t* pitch)
   {
     CHECK_GT(width, 0u);
     CHECK_GT(height, 0u);
 
-    size_t width_bytes = width * sizeof(Pixel);
+    uint32_t width_bytes = width * sizeof(Pixel);
     //std::cout << "width_bytes: " << width_bytes << std::endl;
     const int align_bytes = 1536;
     if (pixel_type == ze::PixelType::i8uC3 && width_bytes % align_bytes)
@@ -62,9 +62,9 @@ public:
     size_t intern_pitch;
     Pixel* p_data = nullptr;
     cudaError_t cu_err = cudaMallocPitch((void **)&p_data, &intern_pitch,
-                                         width_bytes, (size_t)height);
+                                         width_bytes, (uint32_t)height);
 
-    *pitch = intern_pitch;
+    *pitch = static_cast<uint32_t>(intern_pitch);
     //("pitch: %lu, i_pitch: %lu, width_bytes: %lu\n", *pitch, intern_pitch, width_bytes);
 
     CHECK_NE(cu_err, cudaErrorMemoryAllocation);
@@ -80,7 +80,7 @@ public:
    * @param pitch Row alignment [bytes]
    * @return
    */
-  static Pixel* alignedAlloc(ze::Size2u size, size_t* pitch)
+  static Pixel* alignedAlloc(ze::Size2u size, uint32_t* pitch)
   {
     return alignedAlloc(size[0], size[1], pitch);
   }

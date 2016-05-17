@@ -22,7 +22,7 @@ namespace cu {
  * @return a / b rounded up
  */
 __host__ __device__ __forceinline__
-std::uint32_t divUp(std::uint32_t a, std::uint32_t b)
+uint32_t divUp(uint32_t a, uint32_t b)
 {
   return (a % b != 0) ? (a / b + 1) : (a / b);
 }
@@ -222,7 +222,7 @@ struct Fragmentation
     : dimGrid(divUp(roi.width(), dimBlock.x), divUp(roi.height(), dimBlock.y))
   {
   }
-  Fragmentation(std::uint32_t width, std::uint32_t height)
+  Fragmentation(uint32_t width, uint32_t height)
     : dimGrid(divUp(width, dimBlock.x), divUp(height, dimBlock.y))
   {
   }

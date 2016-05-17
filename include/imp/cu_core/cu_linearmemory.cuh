@@ -26,10 +26,10 @@ public:
   __host__ LinearMemory() = delete;
   virtual ~LinearMemory() { }
 
-  __host__ LinearMemory(const std::uint32_t& length);
+  __host__ LinearMemory(const uint32_t& length);
   __host__ LinearMemory(const ze::cu::LinearMemory<Pixel>& from);
   __host__ LinearMemory(const ze::LinearMemory<Pixel>& from);
-//  __host__ LinearMemory(Pixel* host_data, const std::uint32_t& length,
+//  __host__ LinearMemory(Pixel* host_data, const uint32_t& length,
 //                        bool use_ext_data_pointer = false);
 
   /**

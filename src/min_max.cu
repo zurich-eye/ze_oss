@@ -13,8 +13,8 @@ namespace cu {
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 __global__ void k_minMax(Pixel* d_col_mins, Pixel* d_col_maxs,
-                         std::uint32_t roi_x, std::uint32_t roi_y,
-                         std::uint32_t roi_width, std::uint32_t roi_height,
+                         uint32_t roi_x, uint32_t roi_y,
+                         uint32_t roi_width, uint32_t roi_height,
                          Texture2D img_tex)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -45,8 +45,8 @@ __global__ void k_minMax(Pixel* d_col_mins, Pixel* d_col_maxs,
 template<typename Pixel, typename SrcPixel>
 __global__ void k_minMax(Pixel* d_col_mins, Pixel* d_col_maxs,
                          SrcPixel* src, size_t src_stride,
-                         std::uint32_t roi_x, std::uint32_t roi_y,
-                         std::uint32_t roi_width, std::uint32_t roi_height)
+                         uint32_t roi_x, uint32_t roi_y,
+                         uint32_t roi_width, uint32_t roi_height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
 

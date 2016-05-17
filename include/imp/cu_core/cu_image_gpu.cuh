@@ -56,7 +56,7 @@ public:
   /**
    * @brief ImageGpu construcs an image of given size \a width x \a height
    */
-  ImageGpu(std::uint32_t width, std::uint32_t height)
+  ImageGpu(uint32_t width, uint32_t height)
     : ImageGpu(ze::Size2u(width,height)) {;}
 
   /**
@@ -82,8 +82,8 @@ public:
    * @param pitch Length of a row in bytes (including padding).
    * @param use_ext_data_pointer Flagg if the image should be copied (true) or if the data is just safed as 'reference' (false)
    */
-//  ImageGpu(Pixel* data, std::uint32_t width, std::uint32_t height,
-//           size_t pitch, bool use_ext_data_pointer = false);
+//  ImageGpu(Pixel* data, uint32_t width, uint32_t height,
+//           uint32_t pitch, bool use_ext_data_pointer = false);
 
   /**
    * @brief copyTo copies the internal image data to another class instance
@@ -103,8 +103,8 @@ public:
    * @param[in] oy Vertical/Row offset of the pointer array.
    * @return Pointer to the pixel array.
    */
-  virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) override;
-  virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const override;
+  virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) override;
+  virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const override;
 
   /** Returns a cuda vector* that is pointing to the beginning for the data buffer.
    * @note this is mainly for convenience when calling cuda functions / kernels.
