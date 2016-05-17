@@ -1,9 +1,12 @@
 #pragma once
 
-#include <unordered_map>
+#include <array>
 #include <string>
 #include <sstream>
 
+#include <ze/common/file_utils.h>
+#include <ze/common/logging.hpp>
+#include <ze/common/string_utils.h>
 #include <ze/common/time_conversions.h>
 #include <ze/common/timer_statistics.h>
 #include <ze/common/types.h>
@@ -29,42 +32,74 @@ namespace ze {
   }
 \endcode
 */
+template<typename TimerEnum>
 class TimerCollection
 {
 public:
-  using Timers = std::unordered_map<std::string, TimerStatistics>;
+  using Timers = std::array<TimerStatistics, static_cast<uint32_t>(TimerEnum::dimension)>;
+  using TimerNames = std::vector<std::string>;
 
-  TimerCollection() = default;
+  TimerCollection() = delete;
+
+  //! This constructor is used by the macro DECLARE_TIMER() below.
+  TimerCollection(const std::string& timer_names_comma_separated)
+    : names_(splitString(timer_names_comma_separated, ','))
+  {
+    CHECK_EQ(names_.size(), timers_.size());
+  }
+
+  TimerCollection(const std::vector<std::string>& timer_names)
+    : names_(timer_names)
+  {
+    CHECK_EQ(names_.size(), timers_.size());
+  }
+
   ~TimerCollection() = default;
 
-  inline TimerStatistics& operator[](const std::string& name)
+  inline TimerStatistics& operator[](TimerEnum t)
   {
-    return timers_[name];
+    return timers_[static_cast<uint32_t>(t)];
   }
 
-  inline TimerStatistics& operator[](std::string&& name)
+  inline const TimerStatistics& operator[](TimerEnum t) const
   {
-    return timers_[std::forward<std::string>(name)];
+    return timers_[static_cast<uint32_t>(t)];
   }
 
-  inline size_t size() const { return timers_.size(); }
+  constexpr size_t size() const noexcept { return timers_.size(); }
 
   //! Saves timings to file in YAML format.
-  void saveToFile(const std::string& directory, const std::string& filename);
+  inline void saveToFile(const std::string& directory, const std::string& filename)
+  {
+    std::ofstream fs;
+    CHECK(isDir(directory));
+    openOutputFileStream(joinPath(directory, filename), &fs);
+    fs << *this;
+  }
 
-  //! @name Timer iterator.
-  //! @{
-  typedef Timers::value_type value_type;
-  typedef Timers::const_iterator const_iterator;
-  Timers::const_iterator begin() const { return timers_.begin(); }
-  Timers::const_iterator end() const { return timers_.end(); }
-  //! @}
+  inline const Timers& timers() const { return timers_; }
+
+  inline const TimerNames& names() const { return names_; }
 
 private:
   Timers timers_;
+  std::vector<std::string> names_;
 };
 
 //! Print Timer Collection:
-std::ostream& operator<<(std::ostream& out, const TimerCollection& timers);
+template<typename TimerEnum>
+std::ostream& operator<<(std::ostream& out, const TimerCollection<TimerEnum>& timers)
+{
+  for (size_t i = 0u; i < timers.size(); ++i)
+  {
+    out << timers.names().at(i) << ":\n"
+        << timers.timers().at(i).statistics();
+  }
+  return out;
+}
 
 } // end namespace ze
+
+#define DECLARE_TIMER(classname, membername, ...)                           \
+  enum class classname : uint32_t { __VA_ARGS__, dimension };               \
+  ze::TimerCollection<classname> membername { #__VA_ARGS__ }
