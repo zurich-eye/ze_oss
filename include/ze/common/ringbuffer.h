@@ -32,6 +32,7 @@ public:
 
   // time ring is used to keep track of the positions of the data
   // in the dataring
+  // uses fixed size ring_view
   typedef ring_view<time_t> timering_t;
 
   using DataType = Eigen::Matrix<Scalar, ValueDim, 1>;
@@ -149,7 +150,7 @@ public:
 
   //! returns an iterator to the first element in the times_ ring that
   //! is greater or equal to stamp
-  inline timering_t::iterator lower_bound(time_t stamp);
+  inline typename timering_t::iterator lower_bound(time_t stamp);
 
 protected:
   mutable std::mutex mutex_;
@@ -158,14 +159,14 @@ protected:
   timering_t times_;
 
   //! return the data at a given point in time
-  inline DataType dataAtTimeIterator(timering_t::iterator iter) const
+  inline DataType dataAtTimeIterator(typename timering_t::iterator iter) const
   {
     //! @todo: i believe this is wrong.
     return data_.col(iter.container_index());
   }
 
   //! return the data at a given point in time (const)
-  inline DataType dataAtTimeIterator(timering_t::const_iterator iter) const
+  inline DataType dataAtTimeIterator(typename timering_t::const_iterator iter) const
   {
     //! @todo: i believe this is wrong.
     return data_.col(iter.container_index());

@@ -265,7 +265,7 @@ Ringbuffer<Scalar, ValueDim, Size>::lower_bound(time_t stamp)
   {
     offset = times_.size() - 1;
   }
-  timering_t::iterator candidate = times_.begin() + offset;
+  typename timering_t::iterator candidate = times_.begin() + offset;
 
   if (*candidate == stamp)
   {
