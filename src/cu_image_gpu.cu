@@ -129,8 +129,8 @@ template<typename Pixel>
 Pixel* ImageGpu<Pixel>::data(
     uint32_t ox, uint32_t oy)
 {
-  CHECK_EQ(0, ox);
-  CHECK_EQ(0, oy);
+  CHECK_EQ(0u, ox);
+  CHECK_EQ(0u, oy);
   return data_.get();
 }
 
@@ -139,7 +139,7 @@ template<typename Pixel>
 const Pixel* ImageGpu<Pixel>::data(
     uint32_t ox, uint32_t oy) const
 {
-  if (ox != 0 || oy != 0)
+  if (ox != 0u || oy != 0u)
   {
     throw ze::cu::Exception("Device memory pointer offset is not possible from host function");
   }

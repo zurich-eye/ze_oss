@@ -1,5 +1,4 @@
-#ifndef IMP_CU_MATRIX_CUH
-#define IMP_CU_MATRIX_CUH
+#pragma once
 
 #include <cuda_runtime.h>
 #pragma GCC diagnostic push
@@ -12,11 +11,11 @@
 #include <imp/core/pixel.hpp>
 #include <ze/common/matrix.h>
 
-namespace ze{
-namespace cu{
+namespace ze {
+namespace cu {
 
 //------------------------------------------------------------------------------
-template<typename _Type, size_t _rows, size_t _cols>
+template<typename _Type, uint32_t _rows, uint32_t _cols>
 class Matrix
 {
   using Type = _Type;
@@ -34,9 +33,9 @@ public:
   Matrix(const ze::Matrix3& from)
   {
     // copy element by element
-    for(int row = 0; row < _rows; ++row)
+    for (uint32_t row = 0u; row < _rows; ++row)
     {
-      for(int col = 0; col < _cols; ++col)
+      for (uint32_t col = 0u; col < _cols; ++col)
       {
         data_[row*cols_ + col] = from(row, col);
       }
@@ -44,16 +43,16 @@ public:
   }
 
   __host__ __device__ __forceinline__
-  size_t rows() const { return rows_; }
+  uint32_t rows() const { return rows_; }
 
   __host__ __device__ __forceinline__
-  size_t cols() const { return cols_; }
+  uint32_t cols() const { return cols_; }
 
   /** Data access operator given a \a row and a \a col
    * @return unchangable value at \a (row,col)
    */
   __host__ __device__ __forceinline__
-  const Type& operator()(int row, int col) const
+  const Type& operator()(uint32_t row, uint32_t col) const
   {
     return data_[row*cols_ + col];
   }
@@ -62,7 +61,7 @@ public:
    * @return changable value at \a (row,col)
    */
   __host__ __device__ __forceinline__
-  Type& operator()(int row, int col)
+  Type& operator()(uint32_t row, uint32_t col)
   {
     return data_[row*cols_ + col];
   }
@@ -71,7 +70,7 @@ public:
    * @return unchangable value at \a (row,col)
    */
   __host__ __device__ __forceinline__
-  const Type& operator[](int ind) const
+  const Type& operator[](uint32_t ind) const
   {
     return data_[ind];
   }
@@ -80,20 +79,22 @@ public:
    * @return changable value at \a (row,col)
    */
   __host__ __device__ __forceinline__
-  Type & operator[](int ind)
+  Type & operator[](uint32_t ind)
   {
     return data_[ind];
   }
 
-  template<size_t block_rows,size_t block_cols>
+  template<uint32_t block_rows,uint32_t block_cols>
   __host__ __forceinline__
-  Matrix<Type,block_rows,block_cols> block(size_t top_left_row, size_t top_left_col) const
+  Matrix<Type, block_rows, block_cols> block(uint32_t top_left_row, uint32_t top_left_col) const
   {
-    Matrix<Type,block_rows,block_cols> out;
-    size_t data_offset = top_left_row*cols_ + top_left_col;
-    for(size_t row = 0; row < block_rows; ++row)
+    Matrix<Type, block_rows, block_cols> out;
+    uint32_t data_offset = top_left_row * cols_ + top_left_col;
+    for(uint32_t row = 0u; row < block_rows; ++row)
     {
-      memcpy(&out[row*block_cols],&data_[data_offset+row*cols_],block_cols*sizeof(Type));
+      memcpy(&out[row * block_cols],
+             &data_[data_offset+row*cols_],
+             block_cols * sizeof(Type));
     }
     return out;
   }
@@ -102,20 +103,20 @@ public:
   template<typename TypeFrom>
   __host__ inline Matrix(const Eigen::Matrix<TypeFrom,R,C>& mat)
   {
-    for (size_t row=0; row<R; ++row)
+    for (uint32_t row = 0u; row < R; ++row)
     {
-      for (size_t col=0; col<C; ++col)
+      for (uint32_t col = 0u; col < C; ++col)
       {
-        data[row*C+col] = (Type)mat(row,col);
+        data[row * C + col] = (Type)mat(row,col);
       }
     }
   }
 #endif
 
 private:
-  Type data_[_rows*_cols];
-  size_t rows_ = _rows;
-  size_t cols_ = _cols;
+  Type data_[_rows * _cols];
+  uint32_t rows_ = _rows;
+  uint32_t cols_ = _cols;
 };
 
 //------------------------------------------------------------------------------
@@ -127,18 +128,18 @@ using Vector3f = Matrix<float,1,3>;
 
 
 //------------------------------------------------------------------------------
-template<typename Type, size_t _rows, size_t CR, size_t _cols>
+template<typename Type, uint32_t _rows, uint32_t CR, uint32_t _cols>
 __host__ __device__ __forceinline__
 Matrix<Type, _rows, _cols> operator*(const Matrix<Type, _rows, CR> & lhs,
                                      const Matrix<Type, CR, _cols> & rhs)
 {
   Matrix<Type, _rows, _cols> result;
-  for(size_t row=0; row<_rows; ++row)
+  for (uint32_t row = 0u; row < _rows; ++row)
   {
-    for(size_t col=0; col<_cols; ++col)
+    for (uint32_t col = 0u; col < _cols; ++col)
     {
       result(row, col) = 0;
-      for(size_t i=0; i<CR; ++i)
+      for (uint32_t i = 0u; i < CR; ++i)
       {
         result(row, col) += lhs(row,i) * rhs(i,col);
       }
@@ -199,19 +200,21 @@ float3 transform(const Matrix<float,3,4>& T, const float3& v)
 }
 
 //------------------------------------------------------------------------------
-template<typename T, size_t rows, size_t cols>
+template<typename T, uint32_t rows, uint32_t cols>
 __host__
 inline std::ostream& operator<<(std::ostream &os,
                                 const cu::Matrix<T, rows, cols>& m)
 {
   os << "[";
-  for (int r=0; r<rows; ++r)
+  for (uint32_t r=0u; r<rows; ++r)
   {
-    for (int c=0; c<cols; ++c)
+    for (uint32_t c=0u; c<cols; ++c)
     {
       os << m(r,c);
       if (c<cols-1)
+      {
         os << ",";
+      }
     }
     os << "; ";
   }
@@ -219,8 +222,5 @@ inline std::ostream& operator<<(std::ostream &os,
   return os;
 }
 
-}
-}
-
-#endif // IMP_CU_MATRIX_CUH
-
+} // namespace cu
+} // namespace ze
