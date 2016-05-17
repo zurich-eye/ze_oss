@@ -37,7 +37,8 @@ template<typename TimerEnum>
 class TimerCollection
 {
 public:
-  using Timers = std::array<TimerStatistics, static_cast<uint32_t>(TimerEnum::dimension)>;
+  using Timers = std::array<TimerStatistics,
+                            static_cast<uint32_t>(TimerEnum::dimension)>;
   using TimerNames = std::vector<std::string>;
 
   TimerCollection() = delete;

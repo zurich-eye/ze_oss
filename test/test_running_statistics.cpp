@@ -1,7 +1,8 @@
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/running_statistics.h>
+#include <ze/common/running_statistics_collection.h>
 
-TEST(RunningStatisticsTest, test)
+TEST(RunningStatisticsTest, testRunningStatistics)
 {
   ze::RunningStatistics stat;
   stat.addSample(1.1);
@@ -19,4 +20,21 @@ TEST(RunningStatisticsTest, test)
   VLOG(1) << "Statistics:\n" << stat;
 }
 
+TEST(RunningStatisticsTest, testCollection)
+{
+  using namespace ze;
+
+  DECLARE_STATISTICS(Statistics, stats, foo, bar);
+  stats[Statistics::foo].addSample(1.0);
+  stats[Statistics::foo].addSample(1.0);
+  stats[Statistics::foo].addSample(1.0);
+  stats[Statistics::bar].addSample(2.0);
+  EXPECT_EQ(stats[Statistics::foo].numSamples(), 3u);
+  EXPECT_EQ(stats[Statistics::bar].numSamples(), 1u);
+  EXPECT_FLOATTYPE_EQ(stats[Statistics::foo].mean(), 1.0);
+  EXPECT_FLOATTYPE_EQ(stats[Statistics::bar].mean(), 2.0);
+  VLOG(1) << stats;
+}
+
 ZE_UNITTEST_ENTRYPOINT
+
