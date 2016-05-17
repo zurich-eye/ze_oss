@@ -23,7 +23,7 @@ ImageCv<Pixel>::ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageCv<Pixel>::ImageCv(std::uint32_t width, std::uint32_t height,
+ImageCv<Pixel>::ImageCv(uint32_t width, uint32_t height,
                         ze::PixelOrder pixel_order)
   : ImageCv({width, height}, pixel_order)
 {
@@ -62,11 +62,9 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
   this->header_.pitch = mat_.step;
   this->header_.memory_type = (MemoryStorage<Pixel>::isAligned(data())) ?
         MemoryType::CpuAligned : MemoryType::Cpu;
-  if (this->pixelType() != ze::pixelTypeFromCv(mat_.type()))
-  {
-    throw ze::Exception("OpenCV pixel type does not match to the internally used one.",
-                        __FILE__, __FUNCTION__, __LINE__);
-  }
+
+  CHECK(this->pixelType() == ze::pixelTypeFromCv(mat_.type()))
+      << "OpenCV pixel type does not match to the internally used one.";
 
   if (this->pixelOrder() == ze::PixelOrder::undefined)
   {
@@ -93,6 +91,8 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
     default:
       // if we have something else than 1,3 or 4-channel images, we do not set the
       // pixel order automatically.
+      VLOG(100) << "Undefined default order for given pixel type. "
+                << "Only 1, 3 and 4 channel images have a default order.";
       break;
     }
   }
@@ -102,8 +102,8 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
 ////-----------------------------------------------------------------------------
 //template<typename Pixel, imp::PixelType pixel_type>
 //ImageCv<Pixel>
-//::ImageCv(Pixel* data, std::uint32_t width, std::uint32_t height,
-//           size_t pitch, bool use_ext_data_pointer)
+//::ImageCv(Pixel* data, uint32_t width, uint32_t height,
+//           uint32_t pitch, bool use_ext_data_pointer)
 //  : Base(width, height)
 //{
 //  if (data == nullptr)
@@ -130,9 +130,9 @@ ImageCv<Pixel>::ImageCv(cv::Mat mat, ze::PixelOrder pixel_order)
 //    }
 //    else
 //    {
-//      for (std::uint32_t y=0; y<height; ++y)
+//      for (uint32_t y=0; y<height; ++y)
 //      {
-//        for (std::uint32_t x=0; x<width; ++x)
+//        for (uint32_t x=0; x<width; ++x)
 //        {
 //          data_.get()[y*this->stride()+x] = data[y*stride + x];
 //        }
@@ -157,24 +157,21 @@ const cv::Mat& ImageCv<Pixel>::cvMat() const
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-Pixel* ImageCv<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
+Pixel* ImageCv<Pixel>::data(uint32_t ox, uint32_t oy)
 {
-  if (ox > this->width() || oy > this->height())
-  {
-    throw ze::Exception("Request starting offset is outside of the image.", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_LT(ox, this->width());
+  CHECK_LT(oy, this->height());
+
   Pixel* buffer = (Pixel*)mat_.data;
   return &buffer[oy*this->stride() + ox];
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-const Pixel* ImageCv<Pixel>::data(std::uint32_t ox, std::uint32_t oy) const
+const Pixel* ImageCv<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
-  if (ox > this->width() || oy > this->height())
-  {
-    throw ze::Exception("Request starting offset is outside of the image.", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_LT(ox, this->width());
+  CHECK_LT(oy, this->height());
 
   Pixel* buffer = (Pixel*)mat_.data;
   return reinterpret_cast<const Pixel*>(&buffer[oy*this->stride() + ox]);

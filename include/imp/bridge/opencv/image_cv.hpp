@@ -32,12 +32,12 @@ public:
   virtual ~ImageCv() = default;
 
   ImageCv(const ze::Size2u& size, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
-  ImageCv(std::uint32_t width, std::uint32_t height, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
+  ImageCv(uint32_t width, uint32_t height, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
   ImageCv(const ImageCv<Pixel>& from);
   ImageCv(const Base& from);
   ImageCv(cv::Mat mat, ze::PixelOrder pixel_order=ze::PixelOrder::undefined);
-//  ImageCv(Pixel* data, std::uint32_t width, std::uint32_t height,
-//          size_t pitch, bool use_ext_data_pointer = false);
+//  ImageCv(Pixel* data, uint32_t width, uint32_t height,
+//          uint32_t pitch, bool use_ext_data_pointer = false);
 
   /** Returns the internal OpenCV image/mat
    */
@@ -50,8 +50,8 @@ public:
    * @param[in] oy Vertical offset of the pointer array.
    * @return Pointer to the pixel array.
    */
-  virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) override;
-  virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const override;
+  virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) override;
+  virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const override;
 
   /**
    * @brief setValue Sets image data to the specified \a value.
@@ -89,7 +89,7 @@ typedef ImageCv<ze::Pixel32fC4> ImageCv32fC4;
 
 //typedef ImageCv<std::uint8_t, imp::PixelType::i8uC1> ImageCv8uC1;
 //typedef ImageCv<std::uint16_t, imp::PixelType::i8uC1> ImageCv16uC1;
-//typedef ImageCv<std::int32_t, imp::PixelType::i8uC1> ImageCv32sC1;
+//typedef ImageCv<sstd::int32_t, imp::PixelType::i8uC1> ImageCv32sC1;
 //typedef ImageCv<float, imp::PixelType::i8uC1> ImageCv32fC1;
 
 // shared pointers
