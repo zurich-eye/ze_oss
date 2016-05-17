@@ -28,23 +28,23 @@ public:
    * @param[in] oy Vertical offset of the pointer array.
    * @return Pointer to the pixel array.
    */
-  virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) = 0;
-  virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const = 0;
+  virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) = 0;
+  virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const = 0;
 
   /** Get Pixel value at position x,y. */
-  Pixel pixel(std::uint32_t x, std::uint32_t y) const
+  Pixel pixel(uint32_t x, uint32_t y) const
   {
     return *data(x, y);
   }
 
   /** Get Pixel value at position x,y. */
-  Pixel& pixel(std::uint32_t x, std::uint32_t y)
+  Pixel& pixel(uint32_t x, uint32_t y)
   {
     return *data(x, y);
   }
 
   /** Get Pixel value at position x,y. */
-  Pixel operator()(std::uint32_t x, std::uint32_t y) const
+  Pixel operator()(uint32_t x, uint32_t y) const
   {
     return *data(x, y);
   }
@@ -58,11 +58,11 @@ public:
   /** Get Pointer to beginning of row \a row (y index).
    * This enables the usage of [y][x] operator.
    */
-  Pixel* operator[] (std::uint32_t row)
+  Pixel* operator[] (uint32_t row)
   {
     return data(0,row);
   }
-  const Pixel* operator[] (std::uint32_t row) const
+  const Pixel* operator[] (uint32_t row) const
   {
     return data(0,row);
   }
@@ -83,7 +83,7 @@ public:
     }
     else
     {
-      for (std::uint32_t y=this->roi().y(); y<this->roi().y()+this->roi().height(); ++y)
+      for (uint32_t y=this->roi().y(); y<this->roi().y()+this->roi().height(); ++y)
       {
         std::fill_n(this->data(this->roi().x(),y), this->roi().width(), value);
       }
@@ -97,10 +97,8 @@ public:
    */
   virtual void copyTo(Image& dst) const
   {
-    if (this->width() != dst.width() || this->height() != dst.height())
-    {
-      throw ze::Exception("Copying failed: Image size differs.", __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(this->width(), dst.width());
+    CHECK_EQ(this->height(), dst.height());
 
     // check if dst image is on the gpu and the src image is not so we can
     // use the copyFrom functionality from the dst image as the Image class
@@ -115,9 +113,9 @@ public:
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (uint32_t y=0; y<this->height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
+        for (uint32_t x=0; x<this->width(); ++x)
         {
           dst[y][x] = this->pixel(x,y);
         }
@@ -131,10 +129,7 @@ public:
    */
   virtual void copyFrom(const Image& from)
   {
-    if (this->size()!= from.size())
-    {
-      throw ze::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(this->size(), from.size());
 
     if (from.isGpuMemory())
     {
@@ -146,9 +141,9 @@ public:
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (uint32_t y=0; y<this->height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
+        for (uint32_t x=0; x<this->width(); ++x)
         {
           (*this)[y][x] = from.pixel(y,x);
         }
@@ -171,7 +166,7 @@ protected:
   }
 
   Image(
-      std::uint32_t width, std::uint32_t height,
+      uint32_t width, uint32_t height,
       PixelOrder pixel_order = ze::PixelOrder::undefined)
     : Image({width, height}, pixel_order)
   {

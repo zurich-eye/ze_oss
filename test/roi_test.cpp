@@ -14,7 +14,7 @@ TEST(IMPCoreTestSuite,roiTest)
   // 1D case uint
   //
   {
-    std::uint32_t x=1, len=10;
+    uint32_t x=1, len=10;
     ze::Roi1u roi(x,len);
     ASSERT_TRUE(x == roi.x());
     ASSERT_TRUE(len == roi.length());
@@ -42,7 +42,7 @@ TEST(IMPCoreTestSuite,roiTest)
 
   // operator==, etc.
   {
-    std::uint32_t x=1, y=2, w=10, h=13;
+    uint32_t x=1, y=2, w=10, h=13;
     ze::Roi2u roi1(x,y,w,h);
     ze::Roi2u roi2(x,y,w,h);
     ze::Roi2u roi3(x+1,y,w,h);

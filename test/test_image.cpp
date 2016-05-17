@@ -57,6 +57,7 @@ class ImageRawTest : public ::testing::Test
     using T = typename Pixel::T;
     auto random_val_generator = getRandomGenerator<T>();
 
+    // initialize two random value and ensure that they are reasonably different
     T val1 = random_val_generator();
     T val2;
     do
@@ -88,7 +89,7 @@ class ImageRawTest : public ::testing::Test
   }
 
 protected:
-  size_t pixel_size_ = sizeof(Pixel);
+  uint8_t pixel_size_ = sizeof(Pixel);
   size_t pixel_bit_depth_ = 8*sizeof(Pixel);
 
   ze::Size2u size_512_{512u,512u};

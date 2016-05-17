@@ -213,17 +213,17 @@ struct Roi<T, 2>
 // some convencience typedefs
 
 // 1D
-using Roi1u = Roi<std::uint32_t, 1>;
+using Roi1u = Roi<uint32_t, 1>;
 using Roi1i = Roi<std::int32_t, 1>;
 using Roi1f = Roi<float, 1>;
 using Roi1d = Roi<float, 1>;
 // 2D
-using Roi2u = Roi<std::uint32_t, 2>;
+using Roi2u = Roi<uint32_t, 2>;
 using Roi2i = Roi<std::int32_t, 2>;
 using Roi2f = Roi<float, 2>;
 using Roi2d = Roi<float, 2>;
 //3D
-using Roi3u = Roi<std::uint32_t, 3>;
+using Roi3u = Roi<uint32_t, 3>;
 using Roi3i = Roi<std::int32_t, 3>;
 using Roi3f = Roi<float, 3>;
 using Roi3d = Roi<float, 3>;

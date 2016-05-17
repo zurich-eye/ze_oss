@@ -12,7 +12,7 @@ TEST(IMPCoreTestSuite,testSize)
   {
     ze::Size1u sz1u;
     EXPECT_EQ(0u, sz1u.length());
-    std::uint32_t len=101;
+    uint32_t len=101;
     ze::Size1u sz(len);
     EXPECT_EQ(len, sz.length());
     EXPECT_EQ(len, sz.data()[0]);

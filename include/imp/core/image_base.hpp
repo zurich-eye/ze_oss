@@ -49,11 +49,11 @@ public:
   inline Roi2u roi() const {return header_.roi;}
 
   /** Returns the distance in bytes between starts of consecutive rows. */
-  inline size_t pitch() const {return header_.pitch;}
+  inline uint32_t pitch() const {return header_.pitch;}
 
-  inline std::uint32_t width() const {return header_.size[0];}
+  inline uint32_t width() const {return header_.size[0];}
 
-  inline std::uint32_t height() const {return header_.size[1];}
+  inline uint32_t height() const {return header_.size[1];}
 
   inline std::uint8_t nChannels() const
   {
@@ -113,7 +113,7 @@ protected:
 
   ImageBase(
       PixelType pixel_type,
-      size_t pixel_size,
+      uint8_t pixel_size,
       PixelOrder pixel_order = ze::PixelOrder::undefined)
     : header_(pixel_type, pixel_size, pixel_order)
   {
@@ -121,7 +121,7 @@ protected:
 
   ImageBase(
       PixelType pixel_type,
-      size_t pixel_size,
+      uint8_t pixel_size,
       PixelOrder pixel_order,
       const Size2u &size)
     : header_(pixel_type, pixel_size, pixel_order, size)
@@ -130,10 +130,10 @@ protected:
 
   ImageBase(
       PixelType pixel_type,
-      size_t pixel_size,
+      uint8_t pixel_size,
       PixelOrder pixel_order,
-      std::uint32_t width,
-      std::uint32_t height)
+      uint32_t width,
+      uint32_t height)
     : ImageBase(pixel_type, pixel_size, pixel_order, {width, height})
   {
   }

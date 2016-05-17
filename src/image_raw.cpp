@@ -37,8 +37,8 @@ ImageRaw<Pixel>::ImageRaw(const Image<Pixel>& from)
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>
-::ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, bool use_ext_data_pointer, PixelOrder pixel_order)
+::ImageRaw(Pixel* data, uint32_t width, uint32_t height,
+           uint32_t pitch, bool use_ext_data_pointer, PixelOrder pixel_order)
   : Base(width, height, pixel_order)
 {
   CHECK(data);
@@ -63,9 +63,9 @@ ImageRaw<Pixel>
     }
     else
     {
-      for (std::uint32_t y=0; y<height; ++y)
+      for (uint32_t y=0; y<height; ++y)
       {
-        for (std::uint32_t x=0; x<width; ++x)
+        for (uint32_t x=0; x<width; ++x)
         {
           data_.get()[y*this->stride()+x] = data[y*this->stride() + x];
         }
@@ -77,8 +77,8 @@ ImageRaw<Pixel>
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 ImageRaw<Pixel>::ImageRaw(Pixel* data,
-                          std::uint32_t width, std::uint32_t height,
-                          size_t pitch,
+                          uint32_t width, uint32_t height,
+                          uint32_t pitch,
                           const std::shared_ptr<void const>& tracked,
                           PixelOrder pixel_order)
   : Base(width, height, pixel_order)
@@ -96,7 +96,7 @@ ImageRaw<Pixel>::ImageRaw(Pixel* data,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
+Pixel* ImageRaw<Pixel>::data(uint32_t ox, uint32_t oy)
 {
   CHECK_LT(ox, this->width());
   CHECK_LT(oy, this->height());
@@ -105,7 +105,7 @@ Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy)
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-const Pixel* ImageRaw<Pixel>::data(std::uint32_t ox, std::uint32_t oy) const
+const Pixel* ImageRaw<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
   CHECK_LT(ox, this->width());
   CHECK_LT(oy, this->height());

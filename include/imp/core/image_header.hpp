@@ -13,11 +13,11 @@ namespace ze {
 struct ImageHeader
 {
   PixelType pixel_type{PixelType::undefined};
-  size_t pixel_size{0}; //!< Pixel size in bytes.
+  uint8_t pixel_size{0}; //!< Pixel size in bytes.
   PixelOrder pixel_order{PixelOrder::undefined};
   Size2u size{0, 0};
   Roi2u roi{0, 0, 0, 0}; //!< Region of interest. x,y offset and width, height.
-  size_t pitch{0}; //!< Row alignment in bytes.
+  uint32_t pitch{0}; //!< Row alignment in bytes.
   MemoryType memory_type{MemoryType::Undefined}; //!< Memory Type.
 
   ImageHeader() = default;
@@ -25,11 +25,11 @@ struct ImageHeader
 
   ImageHeader(
       PixelType _pixel_type,
-      size_t _pixel_size = 0,
+      uint8_t _pixel_size = 0,
       PixelOrder _pixel_order = PixelOrder::undefined,
       Size2u _size = Size2u{0,0},
       Roi2u _roi = Roi2u{0,0,0,0},
-      size_t _pitch = 0,
+      uint32_t _pitch = 0,
       MemoryType _memory_type = MemoryType::Undefined)
     : pixel_type(_pixel_type)
     , pixel_size(_pixel_size)

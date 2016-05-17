@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cmath>
 #include <imp/core/pixel_enums.hpp>
+#include <ze/common/types.h>
 
 #ifdef WITH_CUDA
 #  include<cuda_runtime_api.h>
@@ -235,30 +236,30 @@ union Pixel4
 
 //------------------------------------------------------------------------------
 // convenience typedefs
-typedef Pixel1<std::uint8_t> Pixel8uC1;
-typedef Pixel2<std::uint8_t> Pixel8uC2;
-typedef Pixel3<std::uint8_t> Pixel8uC3;
-typedef Pixel4<std::uint8_t> Pixel8uC4;
+typedef Pixel1<uint8_t> Pixel8uC1;
+typedef Pixel2<uint8_t> Pixel8uC2;
+typedef Pixel3<uint8_t> Pixel8uC3;
+typedef Pixel4<uint8_t> Pixel8uC4;
 
-typedef Pixel1<std::int16_t> Pixel16sC1;
-typedef Pixel2<std::int16_t> Pixel16sC2;
-typedef Pixel3<std::int16_t> Pixel16sC3;
-typedef Pixel4<std::int16_t> Pixel16sC4;
+typedef Pixel1<int16_t> Pixel16sC1;
+typedef Pixel2<int16_t> Pixel16sC2;
+typedef Pixel3<int16_t> Pixel16sC3;
+typedef Pixel4<int16_t> Pixel16sC4;
 
-typedef Pixel1<std::uint16_t> Pixel16uC1;
-typedef Pixel2<std::uint16_t> Pixel16uC2;
-typedef Pixel3<std::uint16_t> Pixel16uC3;
-typedef Pixel4<std::uint16_t> Pixel16uC4;
+typedef Pixel1<uint16_t> Pixel16uC1;
+typedef Pixel2<uint16_t> Pixel16uC2;
+typedef Pixel3<uint16_t> Pixel16uC3;
+typedef Pixel4<uint16_t> Pixel16uC4;
 
-typedef Pixel1<std::int32_t> Pixel32sC1;
-typedef Pixel2<std::int32_t> Pixel32sC2;
-typedef Pixel3<std::int32_t> Pixel32sC3;
-typedef Pixel4<std::int32_t> Pixel32sC4;
+typedef Pixel1<int32_t> Pixel32sC1;
+typedef Pixel2<int32_t> Pixel32sC2;
+typedef Pixel3<int32_t> Pixel32sC3;
+typedef Pixel4<int32_t> Pixel32sC4;
 
-typedef Pixel1<std::uint32_t> Pixel32uC1;
-typedef Pixel2<std::uint32_t> Pixel32uC2;
-typedef Pixel3<std::uint32_t> Pixel32uC3;
-typedef Pixel4<std::uint32_t> Pixel32uC4;
+typedef Pixel1<uint32_t> Pixel32uC1;
+typedef Pixel2<uint32_t> Pixel32uC2;
+typedef Pixel3<uint32_t> Pixel32uC3;
+typedef Pixel4<uint32_t> Pixel32uC4;
 
 typedef Pixel1<float> Pixel32fC1;
 typedef Pixel2<float> Pixel32fC2;
@@ -272,30 +273,30 @@ template<typename T> using Vec2 = Pixel2<T>;
 template<typename T> using Vec3 = Pixel3<T>;
 template<typename T> using Vec4 = Pixel4<T>;
 
-using Vec8uC1 = Vec1<std::uint8_t>;
-using Vec8uC2 = Vec2<std::uint8_t>;
-using Vec8uC3 = Vec3<std::uint8_t>;
-using Vec8uC4 = Vec4<std::uint8_t>;
+using Vec8uC1 = Pixel8uC1;
+using Vec8uC2 = Pixel8uC2;
+using Vec8uC3 = Pixel8uC3;
+using Vec8uC4 = Pixel8uC4;
 
-using Vec16uC1 = Vec1<std::uint16_t>;
-using Vec16uC2 = Vec2<std::uint16_t>;
-using Vec16uC3 = Vec3<std::uint16_t>;
-using Vec16uC4 = Vec4<std::uint16_t>;
+using Vec16uC1 = Pixel16sC1;
+using Vec16uC2 = Pixel16sC2;
+using Vec16uC3 = Pixel16sC3;
+using Vec16uC4 = Pixel16sC4;
 
-using Vec32sC1 = Vec1<std::int32_t>;
-using Vec32sC2 = Vec2<std::int32_t>;
-using Vec32sC3 = Vec3<std::int32_t>;
-using Vec32sC4 = Vec4<std::int32_t>;
+using Vec32sC1 = Pixel32sC1;
+using Vec32sC2 = Pixel32sC2;
+using Vec32sC3 = Pixel32sC3;
+using Vec32sC4 = Pixel32sC4;
 
-using Vec32uC1 = Vec1<std::uint32_t>;
-using Vec32uC2 = Vec2<std::uint32_t>;
-using Vec32uC3 = Vec3<std::uint32_t>;
-using Vec32uC4 = Vec4<std::uint32_t>;
+using Vec32uC1 = Pixel32uC1;
+using Vec32uC2 = Pixel32uC2;
+using Vec32uC3 = Pixel32uC3;
+using Vec32uC4 = Pixel32uC4;
 
-using Vec32fC1 = Vec1<float>;
-using Vec32fC2 = Vec2<float>;
-using Vec32fC3 = Vec3<float>;
-using Vec32fC4 = Vec4<float>;
+using Vec32fC1 = Pixel32fC1;
+using Vec32fC2 = Pixel32fC2;
+using Vec32fC3 = Pixel32fC3;
+using Vec32fC4 = Pixel32fC4;
 
 //------------------------------------------------------------------------------
 // Pixel traits.

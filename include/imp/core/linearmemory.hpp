@@ -21,9 +21,9 @@ public:
 public:
   LinearMemory() = delete;
   virtual ~LinearMemory() { }
-  LinearMemory(const std::uint32_t& length);
+  LinearMemory(const uint32_t& length);
   LinearMemory(const LinearMemory<Pixel>& from);
-  LinearMemory(Pixel* host_data, const std::uint32_t& length,
+  LinearMemory(Pixel* host_data, const uint32_t& length,
                bool use_ext_data_pointer = false);
 
   /**
@@ -34,13 +34,13 @@ public:
    * @note The pointer can be offset to position \a offset.
    *
    */
-  Pixel* data(std::uint32_t offset = 0);
+  Pixel* data(uint32_t offset = 0);
 
   /** Returns a const pointer to the device buffer.
    * @param[in] offset Desired offset within the array.
    * @return Const pointer to the device buffer.
    */
-  const Pixel* data(std::uint32_t offset = 0) const;
+  const Pixel* data(uint32_t offset = 0) const;
 
   /** Sets a certain value to all pixels in the data vector.
    */
@@ -66,10 +66,10 @@ public:
   virtual bool isGpuMemory() const  override { return false; }
 
   /** Pixel access with (idx). */
-   inline Pixel& operator()(std::uint32_t idx) {return *this->data(idx);}
+   inline Pixel& operator()(uint32_t idx) {return *this->data(idx);}
    /** Pixel access with [idx]. */
-   inline Pixel& operator[](std::uint32_t idx) {return *this->data(idx);}
-   inline const Pixel& operator[](std::uint32_t idx) const {return *this->data(idx);}
+   inline Pixel& operator[](uint32_t idx) {return *this->data(idx);}
+   inline const Pixel& operator[](uint32_t idx) const {return *this->data(idx);}
 
 private:
   std::unique_ptr<Pixel, Deallocator> data_;
