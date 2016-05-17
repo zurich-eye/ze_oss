@@ -34,7 +34,7 @@ __device__ Pixel k_linearized_update(Pixel& d_srcdst, Texture2D& lin_tex,
  */
 template<typename PPixel>
 __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t stride,
-                               std::uint32_t width, std::uint32_t height,
+                               uint32_t width, uint32_t height,
                                const float lambda, const float tau,
                                const float lin_step,
                                Texture2D u_tex, Texture2D u0_tex,
@@ -86,7 +86,7 @@ __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t strid
 //-----------------------------------------------------------------------------
 template<typename DPixel>
 __global__ void k_dualUpdate(DPixel* d_pu, const size_t stride_pu,
-                             std::uint32_t width, std::uint32_t height,
+                             uint32_t width, uint32_t height,
                              const float eps_u, const float sigma,
                              Texture2D u_prev_tex, Texture2D pu_tex)
 {

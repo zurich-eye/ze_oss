@@ -99,7 +99,7 @@ void SolverStereoHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
   float lin_step = 0.5f;
 
   // warping
-  for (std::uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
+  for (uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
   {
       VLOG(101) << "SOLVING warp iteration of Huber-L1 stereo model. warp: " << warp;
 
@@ -112,7 +112,7 @@ void SolverStereoHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
         >>> (ix_->data(), it_->data(), ix_->stride(), ix_->width(), ix_->height(),
              *i1_tex_, *i2_tex_, *u0_tex_);
 
-    for (std::uint32_t iter = 0; iter < params_->ctf.iters; ++iter)
+    for (uint32_t iter = 0; iter < params_->ctf.iters; ++iter)
     {
       // dual kernel
       k_dualUpdate

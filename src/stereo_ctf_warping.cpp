@@ -133,12 +133,7 @@ void StereoCtFWarping::solve()
   {
     this->init();
   }
-
-  if (!this->ready())
-  {
-    throw ze::Exception("not initialized correctly. bailing out.",
-                         __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(this->ready()) << "not initialized correctly; bailing out;";
 
   // the image vector that is used as input for the level solvers
   std::vector<ImageGpu32fC1::Ptr> lev_images;
@@ -175,11 +170,7 @@ void StereoCtFWarping::solve()
 //------------------------------------------------------------------------------
 ImageGpu32fC1::Ptr StereoCtFWarping::computePrimalEnergy(size_t level)
 {
-  if (!this->ready())
-  {
-    throw Exception("not initialized correctly; bailing out.",
-                    __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(this->ready()) << "not initialized correctly; bailing out;";
   level = max(params_->ctf.finest_level,
               min(params_->ctf.coarsest_level, level));
   return levels_.at(level)->computePrimalEnergy();
@@ -188,11 +179,7 @@ ImageGpu32fC1::Ptr StereoCtFWarping::computePrimalEnergy(size_t level)
 //------------------------------------------------------------------------------
 StereoCtFWarping::ImageGpu32fC1::Ptr StereoCtFWarping::getDisparities(size_t level)
 {
-  if (!this->ready())
-  {
-    throw Exception("not initialized correctly; bailing out.",
-                    __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(this->ready()) << "not initialized correctly; bailing out;";
   level = max(params_->ctf.finest_level,
               min(params_->ctf.coarsest_level, level));
   return levels_.at(level)->getDisparities();
@@ -201,11 +188,7 @@ StereoCtFWarping::ImageGpu32fC1::Ptr StereoCtFWarping::getDisparities(size_t lev
 //------------------------------------------------------------------------------
 StereoCtFWarping::ImageGpu32fC1::Ptr StereoCtFWarping::getOcclusion(size_t level)
 {
-  if (!this->ready())
-  {
-    throw Exception("not initialized correctly; bailing out.",
-                    __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(this->ready()) << "not initialized correctly; bailing out;";
   level = max(params_->ctf.finest_level,
               min(params_->ctf.coarsest_level, level));
   return levels_.at(level)->getOcclusion();

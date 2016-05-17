@@ -185,7 +185,7 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
                         params_->edge_sigma, params_->edge_alpha, params_->edge_q);
 
   // warping
-  for (std::uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
+  for (uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
   {
     VLOG(100) << "SOLVING warp iteration of Huber-L1 stereo model." << std::endl;
 
@@ -216,7 +216,7 @@ void SolverEpipolarStereoPrecondHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> i
              params_->lambda, *ix_tex_);
 #endif
 
-    for (std::uint32_t iter = 0; iter < params_->ctf.iters; ++iter)
+    for (uint32_t iter = 0; iter < params_->ctf.iters; ++iter)
     {
 #if USE_EDGES
       // dual update kernel

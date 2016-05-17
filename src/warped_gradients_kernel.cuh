@@ -15,8 +15,8 @@ namespace cu {
 //------------------------------------------------------------------------------
 template<typename Pixel>
 __global__ void k_warpedGradients(Pixel* ix, Pixel* it, size_t stride,
-                                  std::uint32_t width, std::uint32_t height,
-                                  //std::uint32_t roi_x, std::uint32_t roi_y,
+                                  uint32_t width, uint32_t height,
+                                  //uint32_t roi_x, uint32_t roi_y,
                                   Texture2D i1_tex, Texture2D i2_tex, Texture2D u0_tex)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x /*+ roi_x*/;
@@ -58,7 +58,7 @@ __global__ void k_warpedGradients(Pixel* ix, Pixel* it, size_t stride,
 template<typename Pixel>
 __global__ void k_warpedGradientsEpipolarConstraint(
     Pixel* iw, Pixel* ix, Pixel* it, size_t stride,
-    std::uint32_t width, std::uint32_t height,
+    uint32_t width, uint32_t height,
     cu::PinholeCamera cam1, cu::PinholeCamera cam2,
     const cu::Matrix3f F_mov_fix, const cu::SE3<float> T_mov_fix,
     Texture2D i1_tex, Texture2D i2_tex, Texture2D u0_tex,

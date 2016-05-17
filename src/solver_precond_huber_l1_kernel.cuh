@@ -15,8 +15,8 @@ namespace cu {
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 __global__ void k_preconditioner(Pixel* xi, size_t stride,
-                                 std::uint32_t width, std::uint32_t height,
-                                 // std::uint32_t roi_x, std::uint32_t roi_y,
+                                 uint32_t width, uint32_t height,
+                                 // uint32_t roi_x, uint32_t roi_y,
                                  float lambda, Texture2D ix_tex)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -53,7 +53,7 @@ __device__ Pixel k_linearized_update(Pixel& d_srcdst, Texture2D& lin_tex,
  */
 template<typename PPixel>
 __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t stride,
-                               std::uint32_t width, std::uint32_t height,
+                               uint32_t width, uint32_t height,
                                const float lambda, const float tau,
                                const float lin_step,
                                Texture2D u_tex, Texture2D u0_tex,
@@ -87,7 +87,7 @@ __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t strid
  */
 template<typename PPixel>
 __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t stride,
-                               std::uint32_t width, std::uint32_t height,
+                               uint32_t width, uint32_t height,
                                const float tau, const float lin_step,
                                Texture2D lambda_tex,
                                Texture2D u_tex, Texture2D u0_tex,
@@ -119,7 +119,7 @@ __global__ void k_primalUpdate(PPixel* d_u, PPixel* d_u_prev, const size_t strid
 template<typename PPixel, typename DPixel>
 __global__ void k_dualUpdate(DPixel* d_pu, const size_t stride_pu,
                              PPixel* d_q, const size_t stride_q,
-                             std::uint32_t width, std::uint32_t height,
+                             uint32_t width, uint32_t height,
                              const float lambda, const float eps_u,
                              const float sigma, const float eta,
                              Texture2D u_prev_tex, Texture2D u0_tex,
@@ -155,7 +155,7 @@ __global__ void k_dualUpdate(DPixel* d_pu, const size_t stride_pu,
 template<typename PPixel, typename DPixel>
 __global__ void k_dualUpdate(DPixel* d_pu, const size_t stride_pu,
                              PPixel* d_q, const size_t stride_q,
-                             std::uint32_t width, std::uint32_t height,
+                             uint32_t width, uint32_t height,
                              const float eps_u,
                              const float sigma, const float eta,
                              Texture2D lambda_tex,
