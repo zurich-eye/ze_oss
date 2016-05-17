@@ -121,7 +121,7 @@ bool internal::validateIntrinsic(const std::string& value)
 }
 
 ////------------------------------------------------------------------------------
-//// Noise Model loading writing.
+//// Noise Model loading.
 std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
 {
   if(!node.IsMap())
@@ -157,7 +157,7 @@ std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
 }
 
 //------------------------------------------------------------------------------
-// Intrinsic Model loading writing.
+// Intrinsic Model loading.
 typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
     const Node& node)
 {
@@ -230,8 +230,6 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
 
   return nullptr;
 }
-
-
 
 //------------------------------------------------------------------------------
 // ImuRig loading.
