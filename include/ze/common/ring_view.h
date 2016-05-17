@@ -23,12 +23,14 @@ namespace detail {
 } // namespace detail
 
 template<class T>
-struct null_popper {
+struct null_popper
+{
     void operator()(T&) { }
 };
 
 template<class T>
-struct move_popper {
+struct move_popper
+{
     T operator()(T& t) { return std::move(t); }
 };
 
@@ -41,7 +43,7 @@ using conditional_t = typename std::conditional<B,T,F>::type;
 template< bool B, class T = void >
 using enable_if_t = typename enable_if<B,T>::type;
 
-}
+} // namespace std
 
 template<bool B>
 using EnableIfB = typename std::enable_if<B, int>::type;
@@ -221,9 +223,12 @@ public:
            typename=std::enable_if_t<b && std::is_move_assignable<T>::value>>
   void push_back(T&& value) noexcept(std::is_nothrow_move_assignable<T>::value)
   {
-    if (full()) {
+    if (full())
+    {
         increment_front_and_back_();
-    } else {
+    }
+    else
+    {
         increment_back_();
     }
     back_() = std::move(value);
@@ -244,7 +249,6 @@ public:
   {
     lhs.swap(rhs);
   }
-
 
   // not public in proposal:
   // Access the i'th element of the ring, not of the underlying datastructure
@@ -276,8 +280,13 @@ private:
 
   reference front_() noexcept { return *(data_ + front_idx_); }
   const_reference front_() const noexcept { return *(data_ + front_idx_); }
-  reference back_() noexcept { return *(data_ + (front_idx_ + size_ - 1) % capacity_); }
-  const_reference back_() const noexcept { return *(data_ + (front_idx_ + size_ - 1) % capacity_); }
+  reference back_() noexcept
+  {
+    return *(data_ + (front_idx_ + size_ - 1) % capacity_);
+  }
+  const_reference back_() const noexcept {
+    return *(data_ + (front_idx_ + size_ - 1) % capacity_);
+  }
 
   void increment_front_() noexcept {
     front_idx_ = (front_idx_ + 1) % capacity_;
@@ -297,7 +306,8 @@ private:
 
   T *data_;
   size_type size_;
-  std::conditional_t<Capacity == 0, const size_type, size_type> capacity_ = Capacity;
+  std::conditional_t<Capacity == 0, const size_type, size_type> capacity_ =
+      Capacity;
   size_type front_idx_;
   Popper popper_;
 };
@@ -351,11 +361,13 @@ public:
     it.idx_ -= i; return it;
   }
 
-  friend ring_view_iterator& operator+=(ring_view_iterator& it, ring_view_iterator& it2) noexcept
+  friend ring_view_iterator& operator+=(ring_view_iterator& it,
+                                        ring_view_iterator& it2) noexcept
   {
     it.idx_ += it2.idx_; return it;
   }
-  friend ring_view_iterator& operator-=(ring_view_iterator& it, ring_view_iterator& it2) noexcept
+  friend ring_view_iterator& operator-=(ring_view_iterator& it,
+                                        ring_view_iterator& it2) noexcept
   {
     it.idx_ -= it2.idx_; return it;
   }

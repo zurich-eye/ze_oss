@@ -2,7 +2,7 @@
 
 namespace ze {
 
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::TimeDataBoolTuple
 Ringbuffer<Scalar, ValueDim, Size>::getNearestValue(time_t stamp)
 {
@@ -17,14 +17,14 @@ Ringbuffer<Scalar, ValueDim, Size>::getNearestValue(time_t stamp)
   }
 
   auto it_before = iterator_equal_or_before(stamp);
-  //! @todo an approx equality should return the desired result immediately
+  //! @todo an approx equality could return the desired result immediately
   if(*it_before == stamp)
   {
     return std::make_tuple(*it_before, dataAtTimeIterator(it_before), true);
   }
 
   auto it_after = iterator_equal_or_after(stamp);
-  //! @todo an approx equality should return the desired result immediately
+  //! @todo an approx equality could return the desired result immediately
   if(*it_after == stamp)
   {
     return std::make_tuple(*it_after, dataAtTimeIterator(it_after), true);
@@ -63,8 +63,9 @@ Ringbuffer<Scalar, ValueDim, Size>::getNearestValue(time_t stamp)
   return std::make_tuple(*it_before, dataAtTimeIterator(it_before), true);
 }
 
-template <typename Scalar, int ValueDim, int Size>
-typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair Ringbuffer<Scalar, ValueDim, Size>::getOldestValue() const
+template <typename Scalar, size_t ValueDim, size_t Size>
+typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair
+Ringbuffer<Scalar, ValueDim, Size>::getOldestValue() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if(times_.empty())
@@ -74,8 +75,9 @@ typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair Ringbuffer<Scalar, Val
   return std::make_pair(dataAtTimeIterator(times_.begin()), true);
 }
 
-template <typename Scalar, int ValueDim, int Size>
-typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair Ringbuffer<Scalar, ValueDim, Size>::getNewestValue() const
+template <typename Scalar, size_t ValueDim, size_t Size>
+typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair
+Ringbuffer<Scalar, ValueDim, Size>::getNewestValue() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if(times_.empty())
@@ -85,8 +87,9 @@ typename Ringbuffer<Scalar, ValueDim, Size>::DataBoolPair Ringbuffer<Scalar, Val
   return std::make_pair(dataAtTimeIterator((times_.end()-1)), true);
 }
 
-template <typename Scalar, int ValueDim, int Size>
-std::tuple<uint64_t, uint64_t, bool>  Ringbuffer<Scalar, ValueDim, Size>::getOldestAndNewestStamp() const
+template <typename Scalar, size_t ValueDim, size_t Size>
+std::tuple<uint64_t, uint64_t, bool>
+Ringbuffer<Scalar, ValueDim, Size>::getOldestAndNewestStamp() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if(times_.empty())
@@ -96,7 +99,7 @@ std::tuple<uint64_t, uint64_t, bool>  Ringbuffer<Scalar, ValueDim, Size>::getOld
   return std::make_tuple(times_.front(), times_.back(), true);
 }
 
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::TimeDataRangePair
 Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
     time_t stamp_from,
@@ -165,21 +168,16 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
                                             it_from_after.container_index(),
                                             end_block_size);
 
-      values.block(0, 1, ValueDim, end_block_size) = data_.block(
-                                                       0,
-                                                       it_from_after.container_index(),
-                                                       ValueDim,
-                                                       end_block_size);
+      values.block(0, 1, ValueDim, end_block_size) =
+          data_.block(0, it_from_after.container_index(),
+                      ValueDim, end_block_size);
       // second batch at beginning
       size_t begin_block_size = range - 2 - end_block_size;
       stamps.segment(end_block_size + 1, begin_block_size) =
           times_raw_.segment(0, begin_block_size);
 
-      values.block(0, end_block_size + 1, ValueDim, begin_block_size) = data_.block(
-                                                         0,
-                                                         0,
-                                                         ValueDim,
-                                                         begin_block_size);
+      values.block(0, end_block_size + 1, ValueDim, begin_block_size) =
+          data_.block(0, 0, ValueDim, begin_block_size);
     }
     // copyable in a single block
     else
@@ -206,11 +204,10 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
   values.col(range - 1) = (1.0 - w2) * dataAtTimeIterator(it_to_before)
                           + w2 * dataAtTimeIterator(it_to_after);
 
-
   return std::make_pair(stamps, values);
 }
 
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_before(time_t stamp)
 {
@@ -233,7 +230,7 @@ Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_before(time_t stamp)
   return it;
 }
 
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_after(time_t stamp)
 {
@@ -241,7 +238,7 @@ Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_after(time_t stamp)
   return lower_bound(stamp);
 }
 
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::lower_bound(time_t stamp)
 {

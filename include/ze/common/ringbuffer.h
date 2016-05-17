@@ -18,7 +18,7 @@ namespace ze {
 //! Opposed to the `Buffer`, values are expected to be received ORDERED in
 //! TIME!
 // Oldest entry: buffer.begin(), newest entry: buffer.rbegin()
-template <typename Scalar, int ValueDim, int Size>
+template <typename Scalar, size_t ValueDim, size_t Size>
 class Ringbuffer
 {
 public:
@@ -43,8 +43,6 @@ public:
   using TimeDataBoolTuple = std::tuple<time_t, DataType, bool>;
   using TimeDataRangePair = std::pair<times_dynamic_t, data_dynamic_t >;
 
-  static constexpr int kDim = ValueDim;
-
   Ringbuffer()
     : times_(timering_t(times_raw_.data(),
                         times_raw_.data() + Size,
@@ -64,7 +62,7 @@ public:
     data_.col(times_.back_idx()) = data;
   }
 
-  //! Get value with timestamp closest to stamp. Boolean in returns if successful.
+  //! Get value with timestamp closest to stamp. Boolean returns if successful.
   std::tuple<time_t, DataType, bool> getNearestValue(time_t stamp);
 
   //! Get oldest value in buffer.
@@ -111,7 +109,7 @@ public:
     removeDataBeforeTimestamp_impl(stamp);
   }
 
-  inline void removeDataOlderThan(double seconds)
+  inline void removeDataOlderThan(FloatType seconds)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if(times_.empty())
