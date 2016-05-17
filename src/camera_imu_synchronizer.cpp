@@ -56,6 +56,7 @@ void CameraImuSynchronizer::addImgData(
     LOG(WARNING) << "Received new camera image before the previous set was complete."
                  << " Unordered camera images are arriving!";
   }
+
   // time consistency checks
   // ensure that the oldest image is < 2 ms offset from current image (same frame)
   for (size_t i = 0; i < img_buffer_.size(); ++i)
@@ -65,7 +66,12 @@ void CameraImuSynchronizer::addImgData(
       continue;
     }
 
-    if (img_buffer_.at(i).first != -1 && (stamp - img_buffer_.at(i).first) > 2000)
+    if (img_buffer_.at(i).first != -1 && img_buffer_.at(i).first > stamp)
+    {
+      LOG(WARNING) << "Unordered images arriving.";
+    }
+
+    if (img_buffer_.at(i).first != -1 && std::abs(stamp - img_buffer_.at(i).first) > 2000)
     {
       // invalidate old data
       img_buffer_.at(i).first = -1;
@@ -161,7 +167,6 @@ bool CameraImuSynchronizer::validateImuBuffers(
 
   return true;
 }
-
 
 void CameraImuSynchronizer::checkDataAndCallback()
 {
