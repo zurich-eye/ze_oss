@@ -44,7 +44,7 @@ public:
   static Pixel* alignedAlloc(const uint32_t num_elements,
                              bool init_with_zeros=false)
   {
-    CHECK_GT(num_elements, 0) << "Failed to allocate memory: num_elements=0";
+    CHECK_GT(num_elements, 0u) << "Failed to allocate memory: num_elements=0";
 
     // restrict the memory address alignment to be in the interval ]0,128] and
     // of power-of-two using the 'complement and compare' method
@@ -82,8 +82,8 @@ public:
   static Pixel* alignedAlloc(
       ze::Size2u size, uint32_t* pitch, bool init_with_zeros=false)
   {
-    CHECK_GT(size.width(), 0);
-    CHECK_GT(size.height(), 0);
+    CHECK_GT(size.width(), 0u);
+    CHECK_GT(size.height(), 0u);
 
     // restrict the memory address alignment to be in the interval ]0,128] and
     // of power-of-two using the 'complement and compare' method
