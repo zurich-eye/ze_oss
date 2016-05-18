@@ -149,10 +149,10 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // first element interpolated:
   stamps(0) = stamp_from;
-  const double w1 =
+  const FloatType w1 =
       static_cast<Scalar>(stamp_from - *it_from_before) /
       static_cast<Scalar>(*it_from_after - *it_from_before);
-  values.col(0) = (1.0 - w1) * dataAtTimeIterator(it_from_before)
+  values.col(0) = (FloatType{1.0} - w1) * dataAtTimeIterator(it_from_before)
                   + w1 * dataAtTimeIterator(it_from_after);
 
   // this is a real edge case where we hit the two consecutive timestamps
@@ -168,40 +168,35 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
                                             it_from_after.container_index(),
                                             end_block_size);
 
-      values.block(0, 1, ValueDim, end_block_size) =
-          data_.block(0, it_from_after.container_index(),
-                      ValueDim, end_block_size);
+      values.middleCols(1, end_block_size) =
+          data_.middleCols(it_from_after.container_index(), end_block_size);
       // second batch at beginning
       size_t begin_block_size = range - 2 - end_block_size;
       stamps.segment(end_block_size + 1, begin_block_size) =
           times_raw_.segment(0, begin_block_size);
 
-      values.block(0, end_block_size + 1, ValueDim, begin_block_size) =
-          data_.block(0, 0, ValueDim, begin_block_size);
+      values.middleCols(end_block_size + 1, begin_block_size) =
+          data_.middleCols(0, begin_block_size);
     }
     // copyable in a single block
     else
     {
-      stamps.block(1, 0, range - 2, 1) = times_raw_.block(
-                                           it_from_after.container_index(),
-                                           0,
-                                           range - 2,
-                                           1);
+      stamps.segment(1, range - 2) = times_raw_.segment(
+                                       it_from_after.container_index(),
+                                       range - 2);
 
-      values.block(0, 1, ValueDim, range - 2) = data_.block(
-                                                  0,
+      values.middleCols(1, range - 2) = data_.middleCols(
                                                   it_from_after.container_index(),
-                                                  ValueDim,
                                                   range - 2);
     }
   }
 
   // last element interpolated
   stamps(range - 1) = stamp_to;
-  const double w2 =
+  const FloatType w2 =
       static_cast<Scalar>(stamp_to - *it_to_before) /
       static_cast<Scalar>(*it_to_after - *it_to_before);
-  values.col(range - 1) = (1.0 - w2) * dataAtTimeIterator(it_to_before)
+  values.col(range - 1) = (FloatType{1.0} - w2) * dataAtTimeIterator(it_to_before)
                           + w2 * dataAtTimeIterator(it_to_after);
 
   return std::make_pair(stamps, values);

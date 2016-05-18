@@ -19,7 +19,7 @@
 #include <utility>
 // detail
 namespace detail {
-    template<class, bool> class ring_view_iterator;
+template<class, bool> class ring_view_iterator;
 } // namespace detail
 
 template<class T>
@@ -79,7 +79,6 @@ public:
   {}
 
   // Construct a "partially full" ring_view.
-  //
   template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 == 0> = 0>
   ring_view(ContiguousIterator begin,
             ContiguousIterator end,
@@ -107,7 +106,6 @@ public:
   }
 
   // Construct a "partially full" ring_view.
-  //
   template<class ContiguousIterator, size_t C1 = Capacity, EnableIfB<C1 != 0> = 0>
   ring_view(ContiguousIterator begin,
             ContiguousIterator end,
@@ -125,8 +123,6 @@ public:
   // Notice that an iterator contains a pointer to the ring_view itself.
   // Destroying ring_view rv invalidates rv.begin(), just as with an owning
   // container.
-  //
-
   iterator begin() noexcept { return iterator(0, this); }
   iterator end() noexcept { return iterator(size(), this); }
   const_iterator begin() const noexcept { return cbegin(); }
@@ -182,7 +178,6 @@ public:
   // in the same way as calling pop_front() on an empty vector or list is
   // undefined.
   // Without pop_front(), you can't use ring_view as a std::queue.
-  //
   void pop_front()
   {
     assert(not empty());
@@ -205,7 +200,6 @@ public:
   // the call to push_back(), we rotate the indices and
   // invalidate all iterators into the ring.
   // Without push_back(), you can't use ring_view as a std::queue.
-  //
   template<bool b=true,
            typename=std::enable_if_t<b && std::is_copy_assignable<T>::value>>
   void push_back(const T& value)
@@ -288,19 +282,23 @@ private:
     return *(data_ + (front_idx_ + size_ - 1) % capacity_);
   }
 
-  void increment_front_() noexcept {
+  void increment_front_() noexcept
+  {
     front_idx_ = (front_idx_ + 1) % capacity_;
     --size_;
   }
 
-  void increment_back_() noexcept {
+  void increment_back_() noexcept
+  {
     ++size_;
   }
-  void decrement_back_() noexcept {
+  void decrement_back_() noexcept
+  {
     --size_;
   }
 
-  void increment_front_and_back_() noexcept {
+  void increment_front_and_back_() noexcept
+  {
       front_idx_ = (front_idx_ + 1) % capacity_;
   }
 
@@ -382,33 +380,33 @@ public:
     it -= i; return it;
   }
 
-  template<bool C> bool operator==(const ring_view_iterator<RV,C>& rhs
-                                   ) const noexcept
+  template<bool C>
+  bool operator==(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ == rhs.idx_;
   }
-  template<bool C> bool operator!=(const ring_view_iterator<RV,C>& rhs
-                                   ) const noexcept
+  template<bool C>
+  bool operator!=(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ != rhs.idx_;
   }
-  template<bool C> bool operator<(const ring_view_iterator<RV,C>& rhs
-                                  ) const noexcept
+  template<bool C>
+  bool operator<(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ < rhs.idx_;
   }
-  template<bool C> bool operator<=(const ring_view_iterator<RV,C>& rhs
-                                   ) const noexcept
+  template<bool C>
+  bool operator<=(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ <= rhs.idx_;
   }
-  template<bool C> bool operator>(const ring_view_iterator<RV,C>& rhs
-                                  ) const noexcept
+  template<bool C>
+  bool operator>(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ > rhs.idx_;
   }
-  template<bool C> bool operator>=(const ring_view_iterator<RV,C>& rhs
-                                   ) const noexcept
+  template<bool C>
+  bool operator>=(const ring_view_iterator<RV,C>& rhs) const noexcept
   {
     return idx_ >= rhs.idx_;
   }
