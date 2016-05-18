@@ -6,7 +6,7 @@
 
 namespace ze {
 
-//! Base Class for Intrinsic Models for both IMU and Gyros
+//! Base Class for Intrinsic Models for both Accels and Gyros
 class ImuIntrinsicModel
 {
 public:
@@ -63,7 +63,7 @@ public:
   static constexpr IntrinsicModels Type = ImuIntrinsicModel::ScaleMisalignment;
 
   //! delay, range, bias, scale misalignment matrix
-  ImuIntrinsicModelScaleMisalignment(FloatType delay, uint32_t range,
+  ImuIntrinsicModelScaleMisalignment(FloatType delay, FloatType range,
                                      const Vector3& b, const Matrix3& M);
 
   //! distort in place
@@ -80,7 +80,7 @@ public:
 
 private:
   FloatType delay_;
-  uint32_t range_;
+  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
 };
@@ -97,7 +97,7 @@ public:
 
   //! delay, range, bias, scale misalignment matrix, g-sensitivity matrix
   ImuIntrinsicModelScaleMisalignmentGSensitivity(FloatType delay,
-                                                 uint32_t range,
+                                                 FloatType range,
                                                  const Vector3& b,
                                                  const Matrix3& M,
                                                  const Matrix3& Ma);
@@ -116,7 +116,7 @@ public:
 
 private:
   FloatType delay_;
-  uint32_t range_;
+  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
   Matrix3 Ma_;
@@ -133,7 +133,7 @@ public:
 
   //! delay, range, bias, scale misalignment matrix, accel. column position vectors
   ImuIntrinsicModelScaleMisalignmentSizeEffect(FloatType delay,
-                                               uint32_t range,
+                                               FloatType range,
                                                const Vector3& b,
                                                const Matrix3& M,
                                                const Matrix3& R);
@@ -145,14 +145,14 @@ public:
 
   // getters
   inline FloatType delay() const { return delay_; }
-  inline uint32_t range() const { return range_; }
+  inline FloatType range() const { return range_; }
   inline const Vector3& b() const { return b_; }
   inline const Matrix3& M() const { return M_; }
   inline const Matrix3& R() const { return R_; }
 
 private:
   FloatType delay_;
-  uint32_t range_;
+  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
   Matrix3 R_;

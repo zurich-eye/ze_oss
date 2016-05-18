@@ -45,7 +45,7 @@ void ImuIntrinsicModelCalibrated::distort(measurement_t* in) const
 // Intrinsic Model Scale Misalignment
 ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
     FloatType delay,
-    uint32_t range,
+    FloatType range,
     const Vector3& b,
     const Matrix3& M)
   : ImuIntrinsicModel(Type)
@@ -54,6 +54,7 @@ ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
   , b_(b)
   , M_(M)
 {
+  CHECK(range > 0) << "Range must be > 0";
 }
 
 void ImuIntrinsicModelScaleMisalignment::undistort(measurement_t* in) const
@@ -70,7 +71,7 @@ void ImuIntrinsicModelScaleMisalignment::distort(measurement_t* in) const
 // Intrinsic Model Scale Misalignment g-Sensitivity
 ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignmentGSensitivity(
     FloatType delay,
-    uint32_t range,
+    FloatType range,
     const Vector3& b,
     const Matrix3& M,
     const Matrix3& Ma)
@@ -81,6 +82,7 @@ ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignme
   , M_(M)
   , Ma_(Ma)
 {
+  CHECK(range > 0) << "Range must be > 0";
 }
 
 void ImuIntrinsicModelScaleMisalignmentGSensitivity::undistort(
@@ -99,7 +101,7 @@ void ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
 // Intrinsic Model Scale Misalignment Size Effect
 ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignmentSizeEffect(
     FloatType delay,
-    uint32_t range,
+    FloatType range,
     const Vector3& b,
     const Matrix3& M,
     const Matrix3& R)
@@ -110,6 +112,7 @@ ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignment
   , M_(M)
   , R_(R)
 {
+  CHECK(range > 0) << "Range must be > 0";
 }
 
 void ImuIntrinsicModelScaleMisalignmentSizeEffect::undistort(

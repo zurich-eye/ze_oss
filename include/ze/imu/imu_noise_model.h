@@ -50,17 +50,17 @@ public:
   static constexpr ImuNoiseModel::NoiseTypes Type = ImuNoiseModel::WhiteBrownian;
 
   ImuNoiseWhiteBrownian(FloatType noise_density,
-                        uint32_t bandwidth,
+                        FloatType bandwidth,
                         FloatType bias_noise_density);
 
   // getters
   inline FloatType noiseDensity() const { return noise_density_; }
-  inline uint32_t bandwidth() const { return bandwidth_; }
+  inline FloatType bandwidth() const { return bandwidth_; }
   inline FloatType biasNoiseDensity() const { return bias_noise_density_; }
 
 private:
   FloatType noise_density_;
-  uint32_t bandwidth_;
+  FloatType bandwidth_;
   FloatType bias_noise_density_;
 };
 

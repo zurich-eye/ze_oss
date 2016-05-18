@@ -23,7 +23,7 @@ public:
   ImuModel(const AccelerometerModel::Ptr accelerometer,
            const GyroscopeModel::Ptr gyroscope);
 
-  //! Load an imu form a yaml file. Returns a nullptr if the loading fails.
+  //! Load an imu from a yaml file. Returns a nullptr if the loading fails.
   static Ptr loadFromYaml(const std::string& path);
 
   void setLabel(const std::string& label) { label_ = label; }
