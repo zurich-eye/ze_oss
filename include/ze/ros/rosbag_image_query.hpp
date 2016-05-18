@@ -1,3 +1,4 @@
+// Modified by ze.
 // Copyright (c) 2016, Robotics and Perception Group, Titus Cieslewski
 // All Rights Reserved
 //
@@ -33,24 +34,22 @@
 #include <vector>
 
 #include <rosbag/bag.h>
-
-namespace cv {
-class Mat;
-}  // namespace cv
+#include <imp/bridge/ros/ros_bridge.hpp>
+#include <imp/core/image.hpp>
 
 namespace ze {
 
-class BagImageFetcher
+class RosbagImageQuery
 {
 public:
-  BagImageFetcher(const std::string& bag_file, const std::string& image_topic);
+  RosbagImageQuery(const std::string& bag_file);
 
-  //! don't use nanosec timestamp because of bad resolution for unix timestamps.
-  bool getImage(const double timestamp_s, cv::Mat* result);
+  ImageBase::Ptr getImageAtTime(
+      const std::string& img_topic,
+      const int64_t stamp_ns);
 
 private:
   rosbag::Bag bag_;
-  const std::vector<std::string> query_topics_;
 };
 
 }  // namespace ze

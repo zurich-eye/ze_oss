@@ -10,13 +10,13 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/ros/bag_image_fetcher.hpp
+  include/ze/ros/rosbag_image_query.hpp
   include/ze/ros/pose_msg_bridge.h
   include/ze/ros/tf_bridge.h
   )
 
 set(SOURCES
-  src/bag_image_fetcher.cpp
+  src/rosbag_image_query.cpp
   src/pose_msg_bridge.cpp
   src/tf_bridge.cpp
   )
