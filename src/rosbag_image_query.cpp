@@ -50,7 +50,7 @@ RosbagImageQuery::RosbagImageQuery(const std::string& bag_file)
   }
 }
 
-std::pair<int64_t, ImageBase::Ptr> RosbagImageQuery::getStampedImageAtTime(
+StampedImage RosbagImageQuery::getStampedImageAtTime(
     const std::string& img_topic, const int64_t stamp_ns)
 {
   // Considering rounding errors.

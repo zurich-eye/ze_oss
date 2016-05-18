@@ -46,7 +46,7 @@ public:
   RosbagImageQuery(const std::string& bag_file);
   ~RosbagImageQuery() = default;
 
-  std::pair<int64_t, ImageBase::Ptr> getStampedImageAtTime(
+  StampedImage getStampedImageAtTime(
       const std::string& img_topic,
       const int64_t stamp_ns);
 
