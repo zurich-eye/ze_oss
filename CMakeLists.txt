@@ -26,7 +26,8 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
-
+catkin_add_gtest(test_rosbag_image_query test/test_rosbag_image_query.cpp)
+target_link_libraries(test_rosbag_image_query ${PROJECT_NAME})
 
 ##########
 # EXPORT #

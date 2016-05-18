@@ -1,4 +1,4 @@
-// Modified by ze.
+// Heavily modified by ze.
 // Copyright (c) 2016, Robotics and Perception Group, Titus Cieslewski
 // All Rights Reserved
 //
@@ -30,56 +30,72 @@
 
 #include <ze/ros/rosbag_image_query.hpp>
 
-#include <cv_bridge/cv_bridge.h>
 #include <glog/logging.h>
 #include <rosbag/view.h>
+#include <ze/common/file_utils.h>
+#include <ze/common/time_conversions.h>
 
 namespace ze {
 
-RosbagImageQuery::RosbagImageQuery(const std::string& bag_file)
+RosbagImageQuery::RosbagImageQuery(
+    const std::string& bag_file, const std::vector<std::string>& image_topics)
 {
+  CHECK(fileExists(bag_file)) << "File does not exist: " << bag_file;
   try
   {
     bag_.open(bag_file, rosbag::BagMode::Read);
   }
   catch (rosbag::BagException& exception)
   {
-    LOG(FATAL) << "Opening bag failed: " << exception.what();
+    LOG(FATAL) << "Could not open rosbag: " << bag_file << ": " << exception.what();
   }
 }
 
-ImageBase::Ptr RosbagImageQuery::getImageAtTime(
-    const std::string& img_topic, const int64_t stamp_ns);
+std::pair<int64_t, ImageBase::Ptr> RosbagImageQuery::getStampedImageAtTime(
+    const std::string& img_topic, const int64_t stamp_ns)
 {
   // Considering rounding errors.
-  constexpr int64_t search_range_ns = 10000;
-  ros::Time time, time_min, time_max;
-  time.fromNSec(stamp_ns);
+  constexpr int64_t search_range_ns = millisecToNanosec(10);
+  ros::Time time_min, time_max;
   time_min.fromNSec(stamp_ns - search_range_ns);
   time_max.fromNSec(stamp_ns + search_range_ns);
   rosbag::View view(
       bag_, rosbag::TopicQuery({img_topic}), time_min, time_max);
 
+  VLOG(1) << "Found messages that fit = " << view.size();
   int64_t best_time_diff = std::numeric_limits<int64_t>::max();
+  sensor_msgs::ImageConstPtr best_match_message;
   for (const rosbag::MessageInstance& message : view)
   {
-    const int64_t time_distance_s = std::abs((message.getTime() - time).toNSec());
-    if (time_distance_s < min_time_distance_s)
+    const int64_t time_diff =
+        std::abs(static_cast<int64_t>(message.getTime().toNSec()) - stamp_ns);
+    if (time_diff < best_time_diff)
     {
-      min_time_distance_s = time_distance_s;
-      const sensor_msgs::ImageConstPtr image_message =
-          message.instantiate<sensor_msgs::Image>();
-      CHECK(image_message);
-      *result = cv_bridge::toCvCopy(image_message)->image;
+      best_time_diff = time_diff;
+      best_match_message = message.instantiate<sensor_msgs::Image>();
+      CHECK(best_match_message);
     }
     else
     {
-      // Already passed relevant time.
-      break;
+      break; // Already passed relevant time.
     }
   }
 
-  return min_time_distance_s != std::numeric_limits<double>::max();
+  // Extract image
+  int64_t best_match_stamp = -1;
+  ImageBase::Ptr best_match_img;
+  if (best_match_message)
+  {
+    best_match_stamp = best_match_message->header.stamp.toNSec();
+    best_match_img = toImageCpu(*best_match_message);
+  }
+  else
+  {
+    LOG(WARNING) << "No image found in bag with this timestamp. If this "
+                 << "problem is persistent, you may need to re-index the bag: "
+                 << "rosrun ze_rosbag_tools bagrestamper.py -i dataset.bag -o dataset_new.bag";
+  }
+  return std::make_pair(best_match_stamp, best_match_img);
 }
 
 }  // namespace ze

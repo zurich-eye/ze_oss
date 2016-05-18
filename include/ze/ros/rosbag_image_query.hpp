@@ -1,4 +1,4 @@
-// Modified by ze.
+// Heavily modified by ze.
 // Copyright (c) 2016, Robotics and Perception Group, Titus Cieslewski
 // All Rights Reserved
 //
@@ -42,9 +42,11 @@ namespace ze {
 class RosbagImageQuery
 {
 public:
-  RosbagImageQuery(const std::string& bag_file);
+  RosbagImageQuery(
+      const std::string& bag_file,
+      const std::vector<std::string>& image_topics);
 
-  ImageBase::Ptr getImageAtTime(
+  std::pair<int64_t, ImageBase::Ptr> getStampedImageAtTime(
       const std::string& img_topic,
       const int64_t stamp_ns);
 
