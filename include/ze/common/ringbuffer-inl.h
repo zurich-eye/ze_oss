@@ -211,7 +211,7 @@ template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_before(time_t stamp)
 {
-  CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
+  DEBUG_CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
   auto it = lower_bound(stamp);
 
   if(*it == stamp)
@@ -234,7 +234,7 @@ template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_after(time_t stamp)
 {
-  CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
+  DEBUG_CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
   return lower_bound(stamp);
 }
 

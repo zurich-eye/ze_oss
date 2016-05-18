@@ -62,11 +62,11 @@ TEST(RingBufferTest, testLowerBound)
   }
   buffer.lock();
 
-  ASSERT_TRUE(buffer.lower_bound(2) == buffer.times().begin() + 1);
-  ASSERT_TRUE(buffer.lower_bound(11) == buffer.times().end());
-  ASSERT_TRUE(buffer.lower_bound(10) == buffer.times().end());
-  ASSERT_TRUE(buffer.lower_bound(9) == buffer.times().end() - 1);
-  ASSERT_TRUE(buffer.lower_bound(0) == buffer.times().begin());
+  EXPECT_EQ(buffer.lower_bound(2), buffer.times().begin() + 1);
+  EXPECT_EQ(buffer.lower_bound(11), buffer.times().end());
+  EXPECT_EQ(buffer.lower_bound(10), buffer.times().end());
+  EXPECT_EQ(buffer.lower_bound(9), buffer.times().end() - 1);
+  EXPECT_EQ(buffer.lower_bound(0), buffer.times().begin());
 }
 
 TEST(RingBufferTest, testRemoveOlderThanTimestamp)
@@ -298,13 +298,13 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   FloatType buffer_insert = runTimingBenchmark(insertBuffer, 10, 20,
                      "Buffer: Insert", true);
 
-  std::cout << "[Insert]" << "Buffer/Ringbuffer: " <<  buffer_insert / ringbuffer_insert << "\n";
+  VLOG(1) << "[Insert]" << "Buffer/Ringbuffer: " <<  buffer_insert / ringbuffer_insert << "\n";
 
   FloatType oldest, newest;
   std::tie(newest, oldest, std::ignore) = ringbuffer.getOldestAndNewestStamp();
 
-  std::cout << "BufferSize: " << buffer.size() << "\n";
-  std::cout << "RingbufferSize: " << ringbuffer.size() << "\n";
+  VLOG(1) << "BufferSize: " << buffer.size() << "\n";
+  VLOG(1) << "RingbufferSize: " << ringbuffer.size() << "\n";
 
   //////
   // get nearest value
@@ -324,7 +324,7 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   FloatType buffer_nearest = runTimingBenchmark(getNearestValueBuffer, 10, 20,
                      "Buffer: Nearest Value", true);
 
-  std::cout << "[NearestValue]" << "Buffer/Ringbuffer: " <<  buffer_nearest / ringbuffer_nearest << "\n";
+  VLOG(1) << "[NearestValue]" << "Buffer/Ringbuffer: " <<  buffer_nearest / ringbuffer_nearest << "\n";
 
   //////
   // interpolation
@@ -346,7 +346,7 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   FloatType buffer_interpolate = runTimingBenchmark(getBetweenValuesInterpolatedBuffer, 10, 20,
                      "Buffer: Interpolate", true);
 
-  std::cout << "[Interpolate]" << "Buffer/Ringbuffer: " <<  buffer_interpolate / ringbuffer_interpolate << "\n";
+  VLOG(1) << "[Interpolate]" << "Buffer/Ringbuffer: " <<  buffer_interpolate / ringbuffer_interpolate << "\n";
 
   //////
   // iterator equal or before
@@ -370,7 +370,7 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   buffer.unlock();
   ringbuffer.unlock();
 
-  std::cout << "[IteratorBf]" << "Buffer/Ringbuffer: " <<  buffer_iterator / ringbuffer_iterator << "\n";
+  VLOG(1) << "[IteratorBf]" << "Buffer/Ringbuffer: " <<  buffer_iterator / ringbuffer_iterator << "\n";
 
   //////
   // iterator equal or after
@@ -394,7 +394,7 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   buffer.unlock();
   ringbuffer.unlock();
 
-  std::cout << "[IteratorAf]" << "Buffer/Ringbuffer: " <<  buffer_iterator_af / ringbuffer_iterator_af << "\n";
+  VLOG(1) << "[IteratorAf]" << "Buffer/Ringbuffer: " <<  buffer_iterator_af / ringbuffer_iterator_af << "\n";
 
   //////
   // removeDataBeforeTimestamp
@@ -414,7 +414,7 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   FloatType buffer_remove = runTimingBenchmark(removeDataBeforeTimestampBuffer, 10, 20,
                      "Buffer: Interpolate", true);
 
-  std::cout << "[Remove]" << "Buffer/Ringbuffer: " <<  buffer_remove / ringbuffer_remove << "\n";
+  VLOG(1) << "[Remove]" << "Buffer/Ringbuffer: " <<  buffer_remove / ringbuffer_remove << "\n";
 }
 
 ZE_UNITTEST_ENTRYPOINT

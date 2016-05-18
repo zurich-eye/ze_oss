@@ -142,8 +142,8 @@ TEST(RingViewTest, benchmarkFixedVsDynamicSize)
   auto atDynamic_128 = [&]() { rv3.at(26); };
   FloatType atDynamic128_r = runTimingBenchmark(atDynamic_128, 1000, 20, "At Fixed", true);
 
-  std::cout << "Fixed: " << atFixed_r << ", Fixed128: " << atFixed128_r << "\n";
-  std::cout << "Dynamic: " << atDynamic_r << ", Dynamic128: " << atDynamic128_r << "\n";
+  VLOG(1) << "Fixed: " << atFixed_r << ", Fixed128: " << atFixed128_r << "\n";
+  VLOG(1) << "Dynamic: " << atDynamic_r << ", Dynamic128: " << atDynamic128_r << "\n";
 
 }
 ZE_UNITTEST_ENTRYPOINT
