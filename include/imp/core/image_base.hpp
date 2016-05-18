@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
@@ -162,9 +163,10 @@ inline std::ostream& operator<<(std::ostream &os, const ImageBase& image)
   return os;
 }
 
-
 // convenience typedefs
 using ImageBasePtr = std::shared_ptr<ImageBase>;
+using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
+using StampedImages = std::vector<StampedImage>;
 
 } // namespace ze
 
