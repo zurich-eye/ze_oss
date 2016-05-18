@@ -11,7 +11,7 @@ TEST(NoiseModelTests, testWhiteBrownian)
   ASSERT_DOUBLE_EQ(0.1, noise->noiseDensity());
   ASSERT_EQ(2, noise->bandwidth());
   ASSERT_DOUBLE_EQ(0.2, noise->biasNoiseDensity());
-  ASSERT_TRUE(ImuNoiseWhiteBrownian::WhiteBrownian == noise->type());
+  ASSERT_TRUE(ImuNoiseType::WhiteBrownian == noise->type());
 }
 
 ZE_UNITTEST_ENTRYPOINT

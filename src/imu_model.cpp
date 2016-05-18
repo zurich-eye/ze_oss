@@ -19,7 +19,7 @@ ImuModel::Ptr ImuModel::loadFromYaml(const std::string& path)
   }
   catch (const std::exception& ex)
   {
-    LOG(ERROR) << "Failed to load Camera from file " << path << " with the error: \n"
+    LOG(ERROR) << "Failed to load IMU from file " << path << " with the error: \n"
                << ex.what();
   }
   return ImuModel::Ptr();

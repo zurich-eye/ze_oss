@@ -8,6 +8,12 @@
 
 namespace ze {
 
+enum class ImuNoiseType
+{
+  None,
+  WhiteBrownian
+};
+
 //----------------------------
 // Noise model base class
 class ImuNoiseModel
@@ -15,19 +21,13 @@ class ImuNoiseModel
 public:
   ZE_POINTER_TYPEDEFS(ImuNoiseModel);
 
-  enum NoiseTypes
-  {
-    None,
-    WhiteBrownian
-  };
+  explicit ImuNoiseModel(ImuNoiseType type);
 
-  explicit ImuNoiseModel(NoiseTypes type);
-
-  inline NoiseTypes type() const { return type_; }
+  inline ImuNoiseType type() const { return type_; }
   std::string typeAsString() const;
 
  private:
-  NoiseTypes type_;
+  ImuNoiseType type_;
 };
 
 //----------------------------
@@ -36,7 +36,7 @@ class ImuNoiseNone: public ImuNoiseModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuNoiseNone);
-  static constexpr ImuNoiseModel::NoiseTypes Type = ImuNoiseModel::None;
+  static constexpr ImuNoiseType Type = ImuNoiseType::None;
 
   ImuNoiseNone();
 };
@@ -47,7 +47,7 @@ class ImuNoiseWhiteBrownian: public ImuNoiseModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuNoiseWhiteBrownian);
-  static constexpr ImuNoiseModel::NoiseTypes Type = ImuNoiseModel::WhiteBrownian;
+  static constexpr ImuNoiseType Type = ImuNoiseType::WhiteBrownian;
 
   ImuNoiseWhiteBrownian(FloatType noise_density,
                         FloatType bandwidth,

@@ -6,25 +6,26 @@
 
 namespace ze {
 
+enum class ImuIntrinsicType
+{
+  Calibrated,
+  ScaleMisalignment,
+  ScaleMisalignmentGSensitivity,
+  ScaleMisalignmentSizeEffect
+};
+
+
 //! Base Class for Intrinsic Models for both Accels and Gyros
 class ImuIntrinsicModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModel);
 
-  enum IntrinsicModels
-  {
-    Calibrated,
-    ScaleMisalignment,
-    ScaleMisalignmentGSensitivity,
-    ScaleMisalignmentSizeEffect
-  };
-
-  explicit ImuIntrinsicModel(IntrinsicModels type);
+  explicit ImuIntrinsicModel(ImuIntrinsicType type);
 
   typedef Eigen::Matrix<FloatType, 3, 1> measurement_t;
 
-  inline IntrinsicModels type() const { return type_; }
+  inline ImuIntrinsicType type() const { return type_; }
   std::string typeAsString() const;
 
   //! distort in place
@@ -34,7 +35,7 @@ public:
   virtual void undistort(measurement_t* in) const = 0;
 
 private:
-  IntrinsicModels type_;
+  ImuIntrinsicType type_;
 };
 
 //---------------------------------------------
@@ -43,7 +44,7 @@ class ImuIntrinsicModelCalibrated: public ImuIntrinsicModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelCalibrated);
-  static constexpr IntrinsicModels Type = ImuIntrinsicModel::Calibrated;
+  static constexpr ImuIntrinsicType Type = ImuIntrinsicType::Calibrated;
 
   ImuIntrinsicModelCalibrated();
 
@@ -60,7 +61,7 @@ class ImuIntrinsicModelScaleMisalignment : public ImuIntrinsicModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelScaleMisalignment);
-  static constexpr IntrinsicModels Type = ImuIntrinsicModel::ScaleMisalignment;
+  static constexpr ImuIntrinsicType Type = ImuIntrinsicType::ScaleMisalignment;
 
   //! delay, range, bias, scale misalignment matrix
   ImuIntrinsicModelScaleMisalignment(FloatType delay, FloatType range,
@@ -92,8 +93,8 @@ class ImuIntrinsicModelScaleMisalignmentGSensitivity : public ImuIntrinsicModel
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelScaleMisalignmentGSensitivity);
 
-  static constexpr IntrinsicModels Type =
-      ImuIntrinsicModel::ScaleMisalignmentGSensitivity;
+  static constexpr ImuIntrinsicType Type =
+      ImuIntrinsicType::ScaleMisalignmentGSensitivity;
 
   //! delay, range, bias, scale misalignment matrix, g-sensitivity matrix
   ImuIntrinsicModelScaleMisalignmentGSensitivity(FloatType delay,
@@ -128,8 +129,8 @@ class ImuIntrinsicModelScaleMisalignmentSizeEffect : public ImuIntrinsicModel
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelScaleMisalignmentSizeEffect);
-  static constexpr IntrinsicModels Type =
-      ImuIntrinsicModel::ScaleMisalignmentSizeEffect;
+  static constexpr ImuIntrinsicType Type =
+      ImuIntrinsicType::ScaleMisalignmentSizeEffect;
 
   //! delay, range, bias, scale misalignment matrix, accel. column position vectors
   ImuIntrinsicModelScaleMisalignmentSizeEffect(FloatType delay,

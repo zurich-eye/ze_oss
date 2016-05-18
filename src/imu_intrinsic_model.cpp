@@ -4,7 +4,7 @@ namespace ze {
 
 //----------------------------
 // Intrinsics Base Class
-ImuIntrinsicModel::ImuIntrinsicModel(IntrinsicModels type)
+ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
   : type_(type)
 {
 }
@@ -13,10 +13,10 @@ std::string ImuIntrinsicModel::typeAsString() const
 {
   switch (type())
   {
-    case Calibrated: return "Calibrated";
-    case ScaleMisalignment: return "Scale Misalignment";
-    case ScaleMisalignmentGSensitivity: return "Scale Misalignment g-Sensitivity";
-    case ScaleMisalignmentSizeEffect: return "Scale Misalignment Size Effect";
+    case ImuIntrinsicType::Calibrated: return "Calibrated";
+    case ImuIntrinsicType::ScaleMisalignment: return "Scale Misalignment";
+    case ImuIntrinsicType::ScaleMisalignmentGSensitivity: return "Scale Misalignment g-Sensitivity";
+    case ImuIntrinsicType::ScaleMisalignmentSizeEffect: return "Scale Misalignment Size Effect";
     default:
       LOG(FATAL) << "Unknown intrinsics model";
   }

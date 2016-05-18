@@ -5,7 +5,7 @@ namespace ze {
 //----------------------------
 // Noise model base class
 
-ImuNoiseModel::ImuNoiseModel(NoiseTypes type)
+ImuNoiseModel::ImuNoiseModel(ImuNoiseType type)
   : type_(type)
 {
 }
@@ -14,8 +14,8 @@ std::string ImuNoiseModel::typeAsString() const
 {
   switch (type())
   {
-    case WhiteBrownian: return "White Brownian";
-    case None: return "No Noise";
+    case ImuNoiseType::WhiteBrownian: return "White Brownian";
+    case ImuNoiseType::None: return "No Noise";
     default:
       LOG(FATAL) << "Unknown noise model";
   }

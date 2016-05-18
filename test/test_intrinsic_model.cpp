@@ -8,7 +8,7 @@ TEST(IntrinsicModelTests, testIntrinsicModelCalibrated)
   ImuIntrinsicModelCalibrated::Ptr model =
       std::make_shared<ImuIntrinsicModelCalibrated>();
 
-  ASSERT_TRUE(ImuIntrinsicModelCalibrated::Calibrated == model->type());
+  ASSERT_TRUE(ImuIntrinsicType::Calibrated == model->type());
 }
 
 TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignment)
@@ -19,7 +19,7 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignment)
   ImuIntrinsicModelScaleMisalignment::Ptr model =
       std::make_shared<ImuIntrinsicModelScaleMisalignment>(0.1, 10, b, M);
 
-  EXPECT_TRUE(ImuIntrinsicModelScaleMisalignment::ScaleMisalignment == model->type());
+  EXPECT_TRUE(ImuIntrinsicType::ScaleMisalignment == model->type());
   EXPECT_DOUBLE_EQ(0.1, model->delay());
   EXPECT_EQ(10, model->range());
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(b, model->b()));
@@ -37,9 +37,7 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentGSensitivity)
       std::make_shared<ImuIntrinsicModelScaleMisalignmentGSensitivity>(
         0.1, 10, b, M, Ma);
 
-  ASSERT_TRUE(
-        ImuIntrinsicModelScaleMisalignmentGSensitivity::ScaleMisalignmentGSensitivity ==
-        model->type());
+  ASSERT_TRUE(ImuIntrinsicType::ScaleMisalignmentGSensitivity == model->type());
 
   EXPECT_DOUBLE_EQ(0.1, model->delay());
   EXPECT_EQ(10, model->range());
@@ -58,9 +56,7 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentSizeEffect)
       std::make_shared<ImuIntrinsicModelScaleMisalignmentSizeEffect>(
         0.1, 10, b, M, R);
 
-  ASSERT_TRUE(
-        ImuIntrinsicModelScaleMisalignmentSizeEffect::ScaleMisalignmentSizeEffect ==
-        model->type());
+  ASSERT_TRUE(ImuIntrinsicType::ScaleMisalignmentSizeEffect == model->type());
 
   EXPECT_DOUBLE_EQ(0.1, model->delay());
   EXPECT_EQ(10, model->range());
