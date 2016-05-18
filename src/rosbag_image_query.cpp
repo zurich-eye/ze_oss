@@ -51,10 +51,12 @@ RosbagImageQuery::RosbagImageQuery(const std::string& bag_file)
 }
 
 StampedImage RosbagImageQuery::getStampedImageAtTime(
-    const std::string& img_topic, const int64_t stamp_ns)
+    const std::string& img_topic,
+    const int64_t stamp_ns,
+    const FloatType search_range_ms)
 {
   // Considering rounding errors.
-  constexpr int64_t search_range_ns = millisecToNanosec(10);
+  const int64_t search_range_ns = millisecToNanosec(search_range_ms);
   ros::Time time_min, time_max;
   time_min.fromNSec(stamp_ns - search_range_ns);
   time_max.fromNSec(stamp_ns + search_range_ns);
