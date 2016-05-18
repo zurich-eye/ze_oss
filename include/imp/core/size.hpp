@@ -88,7 +88,9 @@ struct SizeBase
   {
     T a=1;
     for (auto elem : sz)
+    {
       a *= elem;
+    }
     return a;
   }
 
@@ -301,17 +303,17 @@ struct Size<T, 3>
 // some convencience typedefs
 
 // 1D
-typedef Size<std::uint32_t, 1> Size1u;
+typedef Size<uint32_t, 1> Size1u;
 typedef Size<std::int32_t, 1> Size1i;
 typedef Size<float, 1> Size1f;
 typedef Size<double, 1> Size1d;
 // 2D
-typedef Size<std::uint32_t, 2> Size2u;
+typedef Size<uint32_t, 2> Size2u;
 typedef Size<std::int32_t, 2> Size2i;
 typedef Size<float, 2> Size2f;
 typedef Size<double, 2> Size2d;
 //3D
-typedef Size<std::uint32_t, 3> Size3u;
+typedef Size<uint32_t, 3> Size3u;
 typedef Size<std::int32_t, 3> Size3i;
 typedef Size<float, 3> Size3f;
 typedef Size<double, 3> Size3d;

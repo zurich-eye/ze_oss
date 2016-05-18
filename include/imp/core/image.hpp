@@ -4,6 +4,7 @@
 
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
+#include <ze/common/logging.hpp>
 #include <imp/core/image_base.hpp>
 #include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
@@ -17,23 +18,6 @@ public:
   ZE_POINTER_TYPEDEFS(Image);
   using pixel_t = Pixel;
 
-protected:
-  Image(ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(std::uint32_t width, std::uint32_t height,
-        PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(width, height, pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(const ze::Size2u &size,
-        ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : ImageBase(size, pixel_type<Pixel>::type, pixel_order)
-  { ; }
-
-  Image(const Image& from) = default;
-
 public:
   Image() = delete;
   virtual ~Image() = default;
@@ -44,29 +28,29 @@ public:
    * @param[in] oy Vertical offset of the pointer array.
    * @return Pointer to the pixel array.
    */
-  virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) = 0;
-  virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const = 0;
+  virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) = 0;
+  virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const = 0;
 
   /** Get Pixel value at position x,y. */
-  Pixel pixel(std::uint32_t x, std::uint32_t y) const
-  {
-    return *data(x, y);
-  }
-
-  /** Get reference to pixel value at position x,y. */
-  Pixel& pixel(std::uint32_t x, std::uint32_t y)
+  Pixel pixel(uint32_t x, uint32_t y) const
   {
     return *data(x, y);
   }
 
   /** Get Pixel value at position x,y. */
-  Pixel operator()(std::uint32_t x, std::uint32_t y) const
+  Pixel& pixel(uint32_t x, uint32_t y)
+  {
+    return *data(x, y);
+  }
+
+  /** Get Pixel value at position x,y. */
+  Pixel operator()(uint32_t x, uint32_t y) const
   {
     return *data(x, y);
   }
 
   /** Get reference to pixel value at position x,y. */
-  Pixel& operator()(std::uint32_t x, std::uint32_t y)
+  Pixel& operator()(uint32_t x, uint32_t y)
   {
     return *data(x, y);
   }
@@ -80,11 +64,11 @@ public:
   /** Get Pointer to beginning of row \a row (y index).
    * This enables the usage of [y][x] operator.
    */
-  Pixel* operator[] (std::uint32_t row)
+  Pixel* operator[] (uint32_t row)
   {
     return data(0,row);
   }
-  const Pixel* operator[] (std::uint32_t row) const
+  const Pixel* operator[] (uint32_t row) const
   {
     return data(0,row);
   }
@@ -96,18 +80,18 @@ public:
    */
   virtual void setValue(const Pixel& value)
   {
-    if (this->bytes() == this->pitch()*this->height())
+    CHECK(roi() != Roi2u(0,0,0,0)) << "ROI not set. Should not happen when initializing the image header properly.";
+    // safety check if memory is contiguous and roi is not set.
+    if ((this->bytes() == this->pitch()*this->height()) &&
+        (this->roi() == ze::Roi2u(this->size())))
     {
       std::fill(this->data(), this->data()+this->stride()*this->height(), value);
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (uint32_t y=this->roi().y(); y<this->roi().y()+this->roi().height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
-        {
-          this->data()[y*this->stride()+x] = value;
-        }
+        std::fill_n(this->data(this->roi().x(),y), this->roi().width(), value);
       }
     }
   }
@@ -115,13 +99,12 @@ public:
   /**
    * @brief copyTo copies the internal image data to another class instance
    * @param dst Image class that will receive this image's data.
+   * @todo (MWE) handle roi
    */
   virtual void copyTo(Image& dst) const
   {
-    if (this->width() != dst.width() || this->height() != dst.height())
-    {
-      throw ze::Exception("Copying failed: Image size differs.", __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(this->width(), dst.width());
+    CHECK_EQ(this->height(), dst.height());
 
     // check if dst image is on the gpu and the src image is not so we can
     // use the copyFrom functionality from the dst image as the Image class
@@ -136,9 +119,9 @@ public:
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (uint32_t y=0; y<this->height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
+        for (uint32_t x=0; x<this->width(); ++x)
         {
           dst[y][x] = this->pixel(x,y);
         }
@@ -152,10 +135,7 @@ public:
    */
   virtual void copyFrom(const Image& from)
   {
-    if (this->size()!= from.size())
-    {
-      throw ze::Exception("Copying failed: Image sizes differ.", __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(this->size(), from.size());
 
     if (from.isGpuMemory())
     {
@@ -167,9 +147,9 @@ public:
     }
     else
     {
-      for (std::uint32_t y=0; y<this->height(); ++y)
+      for (uint32_t y=0; y<this->height(); ++y)
       {
-        for (std::uint32_t x=0; x<this->width(); ++x)
+        for (uint32_t x=0; x<this->width(); ++x)
         {
           (*this)[y][x] = from.pixel(y,x);
         }
@@ -177,23 +157,28 @@ public:
     }
   }
 
-  /** Returns the length of a row (not including the padding!) in bytes. */
-  virtual size_t rowBytes() const
+
+protected:
+  Image(ze::PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order)
   {
-    return this->width() * sizeof(Pixel);
   }
 
-  /** Returns the distance in pixels between starts of consecutive rows. */
-  virtual size_t stride() const override
+  Image(
+      const Size2u &size,
+      PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageBase(pixel_type<Pixel>::type, sizeof(Pixel), pixel_order, size)
   {
-    return this->pitch()/sizeof(Pixel);
   }
 
-  /** Returns the bit depth of the data pointer. */
-  virtual std::uint8_t bitDepth() const override
+  Image(
+      uint32_t width, uint32_t height,
+      PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : Image({width, height}, pixel_order)
   {
-    return 8*sizeof(Pixel);
   }
+
+//  Image(const Image& from) = default;
 };
 
 //-----------------------------------------------------------------------------
@@ -223,4 +208,3 @@ template<typename Pixel>
 using ImagePtr = typename std::shared_ptr<Image<Pixel>>;
 
 } // namespace ze
-

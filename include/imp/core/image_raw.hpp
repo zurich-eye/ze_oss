@@ -3,6 +3,8 @@
 #include <memory>
 #include <algorithm>
 
+#include <ze/common/types.h>
+#include <ze/common/macros.h>
 #include <imp/core/image.hpp>
 #include <imp/core/memory_storage.hpp>
 
@@ -27,7 +29,7 @@ template<typename Pixel>
 class ImageRaw : public ze::Image<Pixel>
 {
 public:
-  using Ptr = typename std::shared_ptr<ImageRaw<Pixel>>;
+  ZE_POINTER_TYPEDEFS(ImageRaw);
 
   using Base = Image<Pixel>;
   using Memory = ze::MemoryStorage<Pixel>;
@@ -38,16 +40,19 @@ public:
   virtual ~ImageRaw() = default;
 
   /**
-   * @brief ImageRaw construcs an image of given size \a width x \a height
-   */
-  ImageRaw(std::uint32_t width, std::uint32_t height,
-           PixelOrder pixel_order = ze::PixelOrder::undefined);
-
-  /**
    * @brief ImageRaw construcs an image of given \a size
    */
   ImageRaw(const ze::Size2u& size,
            PixelOrder pixel_order = ze::PixelOrder::undefined);
+
+  /**
+   * @brief ImageRaw construcs an image of given size \a width x \a height
+   */
+  ImageRaw(uint32_t width, uint32_t height,
+           PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : ImageRaw({width, height}, pixel_order)
+  {
+  }
 
   /**
    * @brief ImageRaw copy constructs an image from the given image \a from
@@ -67,8 +72,8 @@ public:
    * @param pitch Length of a row in bytes (including padding).
    * @param use_ext_data_pointer Flagg if the image should be copied (true) or if the data is just safed as 'reference' (false)
    */
-  ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, bool use_ext_data_pointer = false,
+  ImageRaw(Pixel* data, uint32_t width, uint32_t height,
+           uint32_t pitch, bool use_ext_data_pointer = false,
            PixelOrder pixel_order = ze::PixelOrder::undefined);
 
   /**
@@ -80,8 +85,8 @@ public:
    * @param tracked Tracked object that shares the given image data
    * @note we assume that the tracked object takes care about memory deallocations
    */
-  ImageRaw(Pixel* data, std::uint32_t width, std::uint32_t height,
-           size_t pitch, const std::shared_ptr<void const>& tracked,
+  ImageRaw(Pixel* data, uint32_t width, uint32_t height,
+           uint32_t pitch, const std::shared_ptr<void const>& tracked,
            PixelOrder pixel_order = ze::PixelOrder::undefined);
 
 
@@ -91,18 +96,11 @@ public:
    * @param[in] oy Vertical/Row offset of the pointer array.
    * @return Pointer to the pixel array.
    */
-  virtual Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) override;
-  virtual const Pixel* data(std::uint32_t ox = 0, std::uint32_t oy = 0) const override;
-
-  /** Returns the distance in bytes between starts of consecutive rows. */
-  virtual size_t pitch() const override { return pitch_; }
-
-  /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  virtual bool isGpuMemory() const override { return false; }
+  virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) override;
+  virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const override;
 
 protected:
   std::unique_ptr<Pixel, Deallocator> data_; //!< the actual image data
-  size_t pitch_ = 0; //!< Row alignment in bytes.
   std::shared_ptr<void const> tracked_ = nullptr; //!< tracked object to share memory
 };
 

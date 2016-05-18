@@ -24,6 +24,7 @@ set(HEADERS
   include/imp/core/memory_storage.hpp
   include/imp/core/linearmemory_base.hpp
   include/imp/core/linearmemory.hpp
+  include/imp/core/image_header.hpp
   include/imp/core/image_base.hpp
   include/imp/core/image.hpp
   include/imp/core/image_raw.hpp
@@ -50,6 +51,9 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/single_shot_timer_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
+
+catkin_add_gtest(test_image test/test_image.cpp)
+target_link_libraries(test_image ${PROJECT_NAME})
 
 cs_install()
 cs_export()

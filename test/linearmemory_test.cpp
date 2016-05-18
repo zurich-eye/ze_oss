@@ -72,7 +72,7 @@ class LinearMemoryTest : public ::testing::Test
     linmem_.setValue(pixel2_);
   }
 
-  size_t pixel_size_ = sizeof(Pixel);
+  uint8_t pixel_size_ = sizeof(Pixel);
   size_t pixel_bit_depth_ = 8*sizeof(Pixel);
 
   size_t numel_ = 123;
@@ -140,7 +140,7 @@ TYPED_TEST(LinearMemoryTest, ReturnsFalseForNonGpuMemory)
 TYPED_TEST(LinearMemoryTest, CheckValues)
 {
   this->setValue();
-  for (std::uint32_t i=0u; i<this->numel_; ++i)
+  for (uint32_t i=0u; i<this->numel_; ++i)
   {
     EXPECT_EQ(this->linmem_[i], this->pixel1_);
   }
@@ -150,7 +150,7 @@ TYPED_TEST(LinearMemoryTest, CheckValuesInConstLinearMemory)
 {
   this->setValue();
   const ze::LinearMemory<TypeParam> const_linmem(this->linmem_);
-  for (std::uint32_t i=0u; i<this->numel_; ++i)
+  for (uint32_t i=0u; i<this->numel_; ++i)
   {
     EXPECT_EQ(const_linmem[i], this->pixel1_);
   }
@@ -162,7 +162,7 @@ TYPED_TEST(LinearMemoryTest, CheckRoiValues)
   this->setValue();
   this->setValueRoi();
 
-  for (std::uint32_t i=0u; i<this->numel_; ++i)
+  for (uint32_t i=0u; i<this->numel_; ++i)
   {
     if (i>=this->roi_.x() && i<(this->roi_.x()+this->roi_.length()))
     {

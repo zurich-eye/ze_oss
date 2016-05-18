@@ -6,10 +6,23 @@ namespace ze {
 
 enum class InterpolationMode
 {
-  point,
-  linear,
-  cubic,
-  cubicSpline
+  Point,
+  Linear,
+  Cubic,
+  CubicSpline
+};
+
+enum class MemoryType
+{
+  Undefined,
+  Cpu,
+  CpuAligned,
+  Gpu,
+  GpuAligned,
+  Unified,
+  UnifiedAligned,
+  Managed,
+  ManagedAligned
 };
 
 

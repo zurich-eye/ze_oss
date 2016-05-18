@@ -10,7 +10,7 @@ namespace ze {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-LinearMemory<Pixel>::LinearMemory(const std::uint32_t& length)
+LinearMemory<Pixel>::LinearMemory(const uint32_t& length)
   : LinearMemoryBase(length)
   , data_(Memory::alignedAlloc(this->length()))
 {
@@ -21,10 +21,7 @@ template<typename Pixel>
 LinearMemory<Pixel>::LinearMemory(const LinearMemory<Pixel>& from)
   : LinearMemoryBase(from)
 {
-  if (from.data_ == 0)
-  {
-    throw ze::Exception("input data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(from.data_);
   data_.reset(Memory::alignedAlloc(this->length()));
   std::copy(from.data_.get(), from.data_.get()+from.length(), data_.get());
 }
@@ -32,14 +29,11 @@ LinearMemory<Pixel>::LinearMemory(const LinearMemory<Pixel>& from)
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 LinearMemory<Pixel>::LinearMemory(Pixel* host_data,
-                                  const std::uint32_t& length,
+                                  const uint32_t& length,
                                   bool use_ext_data_pointer)
   : LinearMemoryBase(length)
 {
-  if (host_data == nullptr)
-  {
-    throw ze::Exception("input data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK(host_data);
 
   if(use_ext_data_pointer)
   {
@@ -59,24 +53,17 @@ LinearMemory<Pixel>::LinearMemory(Pixel* host_data,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-Pixel* LinearMemory<Pixel>::data(std::uint32_t offset)
+Pixel* LinearMemory<Pixel>::data(uint32_t offset)
 {
-  if (offset > this->length())
-  {
-    throw ze::Exception("offset not in range", __FILE__, __FUNCTION__, __LINE__);
-  }
-
+  CHECK_LE(offset, this->length());
   return &(data_.get()[offset]);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-const Pixel* LinearMemory<Pixel>::data(std::uint32_t offset) const
+const Pixel* LinearMemory<Pixel>::data(uint32_t offset) const
 {
-  if (offset > this->length())
-  {
-    throw ze::Exception("offset not in range", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_LE(offset, this->length());
   return reinterpret_cast<const Pixel*>(&(data_.get()[offset]));
 }
 
@@ -93,10 +80,7 @@ void LinearMemory<Pixel>::setValue(const Pixel& value)
 template<typename Pixel>
 void LinearMemory<Pixel>::copyTo(LinearMemory<Pixel>& dst)
 {
-  if (this->length() != dst.length())
-  {
-    throw ze::Exception("source and destination array are of different length", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_EQ(this->length(), dst.length());
   std::copy(data_.get(), data_.get()+this->length(), dst.data_.get());
 }
 

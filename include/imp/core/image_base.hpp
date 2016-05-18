@@ -1,10 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
+#include <ze/common/types.h>
+#include <ze/common/macros.h>
+#include <imp/core/image_header.hpp>
 #include <imp/core/pixel_enums.hpp>
-#include <imp/core/size.hpp>
 #include <imp/core/roi.hpp>
+#include <imp/core/size.hpp>
 #include <imp/core/types.hpp>
 
 namespace ze {
@@ -18,99 +22,43 @@ namespace ze {
 class ImageBase
 {
 public:
-  using Ptr = std::shared_ptr<ImageBase>;
-
-protected:
-  ImageBase() = delete;
-
-  ImageBase(PixelType pixel_type, PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : pixel_type_(pixel_type)
-    , pixel_order_(pixel_order)
-    , size_(0,0)
-    , roi_(0,0,0,0)
-  {
-  }
-
-  ImageBase(std::uint32_t width, std::uint32_t height,
-            PixelType pixel_type,
-            PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : pixel_type_(pixel_type)
-    , pixel_order_(pixel_order)
-    , size_(width, height)
-    , roi_(size_)
-  {
-  }
-
-  ImageBase(const Size2u &size, PixelType pixel_type,
-            PixelOrder pixel_order = ze::PixelOrder::undefined)
-    : pixel_type_(pixel_type)
-    , pixel_order_(pixel_order)
-    , size_(size)
-    , roi_(size)
-  {
-  }
-
-  ImageBase(const ImageBase &from)
-    : pixel_type_(from.pixelType())
-    , pixel_order_(from.pixelOrder())
-    , size_(from.size_)
-    , roi_(from.roi_)
-  {
-  }
+  ZE_POINTER_TYPEDEFS(ImageBase);
 
 public:
   virtual ~ImageBase() = default;
 
   ImageBase& operator= (const ImageBase &from)
   {
-    // TODO == operator
-    this->pixel_type_ = from.pixel_type_;
-    this->pixel_order_ = from.pixel_order_;
-    this->size_ = from.size_;
-    this->roi_ = from.roi_;
+    // TODO operator==
+    this->header_ = from.header_;
     return *this;
   }
 
-  virtual void setRoi(const ze::Roi2u& roi)
-  {
-    roi_ = roi;
-  }
+  inline void setRoi(const ze::Roi2u& roi) {header_.roi = roi;}
 
   /** Returns the element types. */
   PixelType pixelType() const
   {
-    return pixel_type_;
+    return header_.pixel_type;
   }
 
   /** Returns the pixel's channel order. */
-  PixelOrder pixelOrder() const
-  {
-    return pixel_order_;
-  }
+  inline PixelOrder pixelOrder() const {return header_.pixel_order;}
 
-  Size2u size() const
-  {
-    return size_;
-  }
+  inline Size2u size() const {return header_.size;}
 
-  Roi2u roi() const
-  {
-    return roi_;
-  }
+  inline Roi2u roi() const {return header_.roi;}
 
-  std::uint32_t width() const
-  {
-    return size_[0];
-  }
+  /** Returns the distance in bytes between starts of consecutive rows. */
+  inline uint32_t pitch() const {return header_.pitch;}
 
-  std::uint32_t height() const
-  {
-    return size_[1];
-  }
+  inline uint32_t width() const {return header_.size[0];}
 
-  std::uint8_t nChannels() const
+  inline uint32_t height() const {return header_.size[1];}
+
+  inline std::uint8_t nChannels() const
   {
-    switch (pixel_type_)
+    switch (header_.pixel_type)
     {
     case PixelType::i8uC1:
     case PixelType::i16uC1:
@@ -142,39 +90,62 @@ public:
   }
 
   /** Returns the number of pixels in the image. */
-  size_t numel() const
-  {
-    return (size_[0]*size_[1]);
-  }
+  inline size_t numel() const {return (header_.size[0]*header_.size[1]);}
 
   /** Returns the total amount of bytes saved in the data buffer. */
-  virtual size_t bytes() const
-  {
-    return this->height() * this->pitch();
-  }
+  inline size_t bytes() const {return header_.size[1]*header_.pitch;}
 
   /** Returns the length of a row (not including the padding!) in bytes. */
-  virtual size_t rowBytes() const = 0;
-
-  /** Returns the distance in bytes between starts of consecutive rows. */
-  virtual size_t pitch() const = 0;
+  inline size_t rowBytes() const {return header_.size[0]*header_.pixel_size;}
 
   /** Returns the distance in pixels between starts of consecutive rows. */
-  virtual size_t stride() const = 0;
+  inline size_t stride() const {return header_.pitch/header_.pixel_size;}
 
   /** Returns the bit depth of the data pointer. */
-  virtual std::uint8_t bitDepth() const = 0;
+  inline std::uint8_t bitDepth() const {return 8*header_.pixel_size;}
 
   /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
-  virtual bool isGpuMemory() const = 0;
+  inline bool isGpuMemory() const {return header_.isGpuMemory();}
 
   friend std::ostream& operator<<(std::ostream &os, const ImageBase& image);
 
 protected:
-  PixelType pixel_type_;
-  PixelOrder pixel_order_;
-  Size2u size_;
-  Roi2u roi_;
+  ImageBase() = delete;
+
+  ImageBase(
+      PixelType pixel_type,
+      uint8_t pixel_size,
+      PixelOrder pixel_order = ze::PixelOrder::undefined)
+    : header_(pixel_type, pixel_size, pixel_order)
+  {
+  }
+
+  ImageBase(
+      PixelType pixel_type,
+      uint8_t pixel_size,
+      PixelOrder pixel_order,
+      const Size2u &size)
+    : header_(pixel_type, pixel_size, pixel_order, size)
+  {
+  }
+
+  ImageBase(
+      PixelType pixel_type,
+      uint8_t pixel_size,
+      PixelOrder pixel_order,
+      uint32_t width,
+      uint32_t height)
+    : ImageBase(pixel_type, pixel_size, pixel_order, {width, height})
+  {
+  }
+
+  ImageBase(const ImageBase &from)
+    : header_(from.header_)
+  {
+  }
+
+protected:
+  ImageHeader header_;
 };
 
 inline std::ostream& operator<<(std::ostream &os, const ImageBase& image)
@@ -192,9 +163,10 @@ inline std::ostream& operator<<(std::ostream &os, const ImageBase& image)
   return os;
 }
 
-
 // convenience typedefs
 using ImageBasePtr = std::shared_ptr<ImageBase>;
+using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
+using StampedImages = std::vector<StampedImage>;
 
 } // namespace ze
 

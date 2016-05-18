@@ -18,7 +18,7 @@ protected:
     , roi_(from.roi_)
   { }
 
-  LinearMemoryBase(const std::uint32_t& length)
+  LinearMemoryBase(const uint32_t& length)
     : size_(length)
     , roi_(0, length)
   { }
@@ -29,7 +29,7 @@ public:
   { }
 
   /** Returns the number of elements available in the internal buffer. */
-  std::uint32_t length() const
+  uint32_t length() const
   {
     return size_.length();
   }
@@ -41,7 +41,7 @@ public:
   void setRoi(const ze::Roi1u& roi)
   {
     roi_.x() = std::max(0u, std::min(this->length()-1, roi.x()));
-    std::uint32_t remaining_elements = this->length()-roi_.x();
+    uint32_t remaining_elements = this->length()-roi_.x();
     roi_.length() = std::max(1u, std::min(remaining_elements, roi.length()));
   }
 
