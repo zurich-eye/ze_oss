@@ -43,6 +43,8 @@ public:
 
   Camera() = delete;
 
+  //! This constructor is used by the derived classes. If you want a camera,
+  //! create one of the derived cameras in camera_impl.
   Camera(const uint32_t width, const uint32_t height, const CameraType type,
          const VectorX& projection_params, const VectorX& distortion_params);
 

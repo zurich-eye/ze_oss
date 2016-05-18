@@ -12,12 +12,30 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
   , distortion_params_(distortion_params)
   , type_(type)
 {
-  // Pre-computations for specific types.
-  if (type == CameraType::PinholeFov)
+  CHECK_EQ(projection_params_.size(), 4);
+  switch (type_)
   {
-    const FloatType s = distortion_params_(0);
-    const FloatType tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
-    distortion_params_ = Vector2(s, tan_s_half_x2);
+    case CameraType::Pinhole:
+      CHECK_EQ(distortion_params_.size(), 1);
+      break;
+    case CameraType::PinholeRadialTangential:
+      CHECK_EQ(distortion_params_.size(), 4);
+      break;
+    case CameraType::PinholeEquidistant:
+      CHECK_EQ(distortion_params_.size(), 4);
+      break;
+    case CameraType::PinholeFov:
+    {
+      CHECK_EQ(distortion_params_.size(), 1);
+      // Pre-computations for improved speed.
+      const FloatType s = distortion_params_(0);
+      const FloatType tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
+      distortion_params_ = Vector2(s, tan_s_half_x2);
+      break;
+    }
+    default:
+      LOG(FATAL) << "Unknown camera model.";
+      break;
   }
 }
 
