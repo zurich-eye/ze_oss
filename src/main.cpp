@@ -1,13 +1,10 @@
+#include <arrayfire.h>
 #include <glog/logging.h>
 #include <gflags/gflags.h>
-
-#include <arrayfire.h>
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/bridge/opencv/cv_bridge.hpp>
+#include <imp/bridge/af/feature_detection.hpp>
 
-#include <af/internal.h>
-
-// Generate random data, sum and print the result.
 int main(int argc, char** argv)
 {
   google::InitGoogleLogging(argv[0]);
@@ -26,9 +23,7 @@ int main(int argc, char** argv)
 
   VLOG(1) << "loaded image size: " << in_img->size();
 
-  af::array a = createStridedArray(in_img->cuData(), 0, af::dim4(in_img->width(), in_img->height(), 1, 1),
-                                   af::dim4(1, in_img->stride(), 1, 1), f32, afDevice);
-  //a /= 255;
+  af::array a = ze::cu::createFromImp(*in_img);
 
   // Sum the values and copy the result to the CPU:
   double sum = af::sum<float>(a);

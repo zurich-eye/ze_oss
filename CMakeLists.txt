@@ -16,14 +16,18 @@ find_package(ArrayFire REQUIRED)
 include_directories(${ArrayFire_INCLUDE_DIRS})
 
 set(HEADERS
+  include/imp/bridge/af/feature_detection.hpp
   )
 
 set(SOURCES
-  src/main.cpp
+  src/feature_detection.cpp
   )
 
-cs_add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
+cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
 target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES} ${ArrayFire_LIBRARIES})
+
+cs_add_executable(main src/main.cpp)
+target_link_libraries(main ${PROJECT_NAME})
 
 ###
 ### GTESTS
