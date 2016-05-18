@@ -51,7 +51,8 @@ void cvBridgeLoad(ImageCvPtr<Pixel>& out,
     mat.convertTo(out->cvMat(), CV_32F, 1./255.);
   break;
   default:
-    throw Exception("Conversion for reading given pixel_type not supported yet.", __FILE__, __FUNCTION__, __LINE__);
+    CHECK(false) << "Conversion for reading given pixel_type not supported yet.";
+    break;
   }
 }
 
