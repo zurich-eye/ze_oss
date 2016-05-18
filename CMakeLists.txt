@@ -33,11 +33,10 @@ target_link_libraries(main ${PROJECT_NAME})
 ### GTESTS
 ###
 
-# catkin_add_gtest(${PROJECT_NAME}-test
-#    test/test_main.cpp
-#    test/todo.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
+catkin_add_gtest(${PROJECT_NAME}-test
+    test/bridge_feature_detection.cpp
+ )
+target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
 cs_install()
 cs_export()
