@@ -42,4 +42,10 @@ inline constexpr FloatType nanosecToMillisecTrunc(int64_t nanoseconds)
   return static_cast<FloatType>(nanoseconds) / 1e6;
 }
 
+//! Return total nanoseconds from seconds and nanoseconds pair.
+inline constexpr int64_t nanosecFromSecAndNanosec(int32_t sec, int32_t nsec)
+{
+  return static_cast<int64_t>(sec) * 1000000000ll + static_cast<int64_t>(nsec);
+}
+
 } // namespace ze
