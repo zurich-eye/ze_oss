@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 
+#include <ze/common/string_utils.h>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/timer.h>
 #include <ze/common/timer_collection.h>
@@ -45,21 +46,21 @@ TEST(TimerTests, testTimerScope)
 
 TEST(TimerTests, testTimerCollection)
 {
-  ze::TimerCollection timers;
+  DECLARE_TIMER(TestTimer, timers, foo, bar);
+
   for(int i = 0; i < 10; ++i)
   {
-    timers["foo"].start();
+    timers[TestTimer::foo].start();
     std::this_thread::sleep_for(ze::Timer::ms(50));
-    timers["foo"].stop();
+    timers[TestTimer::foo].stop();
 
-    timers["bar"].start();
+    timers[TestTimer::bar].start();
     std::this_thread::sleep_for(ze::Timer::ms(10));
-    timers["bar"].stop();
+    timers[TestTimer::bar].stop();
   }
   VLOG(1) << timers;
   EXPECT_NO_FATAL_FAILURE(timers.saveToFile("/tmp", "test_timer.yaml"));
   EXPECT_EQ(timers.size(), 2u);
 }
-
 
 ZE_UNITTEST_ENTRYPOINT

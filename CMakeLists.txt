@@ -61,12 +61,10 @@ set(HEADERS
 set(SOURCES
   src/csv_trajectory.cpp
   src/matrix.cpp
-  src/running_statistics_collection.cpp
   src/sample.cpp
   src/signal_handler.cpp
   src/test_utils.cpp
   src/thread_pool.cpp
-  src/timer_collection.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

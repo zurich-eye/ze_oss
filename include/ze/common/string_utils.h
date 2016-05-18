@@ -80,7 +80,7 @@ inline std::vector<std::string> splitString(const std::string& s, char delim)
   std::vector<std::string> items;
   while (std::getline(ss, item, delim))
   {
-    items.push_back(item);
+    items.push_back(trimString(item));
   }
   return items;
 }
