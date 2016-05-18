@@ -37,8 +37,7 @@
 
 namespace ze {
 
-RosbagImageQuery::RosbagImageQuery(
-    const std::string& bag_file, const std::vector<std::string>& image_topics)
+RosbagImageQuery::RosbagImageQuery(const std::string& bag_file)
 {
   CHECK(fileExists(bag_file)) << "File does not exist: " << bag_file;
   try
@@ -62,7 +61,7 @@ std::pair<int64_t, ImageBase::Ptr> RosbagImageQuery::getStampedImageAtTime(
   rosbag::View view(
       bag_, rosbag::TopicQuery({img_topic}), time_min, time_max);
 
-  VLOG(1) << "Found messages that fit = " << view.size();
+  VLOG(100) << "Found messages that fit = " << view.size();
   int64_t best_time_diff = std::numeric_limits<int64_t>::max();
   sensor_msgs::ImageConstPtr best_match_message;
   for (const rosbag::MessageInstance& message : view)

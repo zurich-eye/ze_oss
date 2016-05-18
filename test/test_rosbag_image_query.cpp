@@ -13,8 +13,8 @@ TEST(RosbagImageQueryTests, testImageQuery)
   using namespace ze;
 
   std::string data_dir = getTestDataDir("rosbag_euroc_snippet");
-  std::string bag_filename = joinPath(data_dir, "dataset_new.bag");
-  RosbagImageQuery rosbag(bag_filename, {"/cam0/image_raw"});
+  std::string bag_filename = joinPath(data_dir, "dataset.bag");
+  RosbagImageQuery rosbag(bag_filename);
 
   {
     // stamp of the first image in the bag:

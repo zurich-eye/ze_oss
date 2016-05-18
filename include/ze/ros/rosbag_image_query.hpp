@@ -42,9 +42,9 @@ namespace ze {
 class RosbagImageQuery
 {
 public:
-  RosbagImageQuery(
-      const std::string& bag_file,
-      const std::vector<std::string>& image_topics);
+  RosbagImageQuery() = delete;
+  RosbagImageQuery(const std::string& bag_file);
+  ~RosbagImageQuery() = default;
 
   std::pair<int64_t, ImageBase::Ptr> getStampedImageAtTime(
       const std::string& img_topic,
