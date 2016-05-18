@@ -32,7 +32,6 @@
 
 #include <string>
 #include <vector>
-
 #include <rosbag/bag.h>
 #include <imp/bridge/ros/ros_bridge.hpp>
 #include <imp/core/image.hpp>
