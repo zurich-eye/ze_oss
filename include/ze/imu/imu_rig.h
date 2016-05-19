@@ -32,7 +32,8 @@ public:
   //! @{
   inline const Transformation& T_C_B(size_t imu_index) const
   {
-    return T_C_B_.at(imu_index);
+    DEBUG_CHECK_LT(imu_index, T_C_B_.size());
+    return T_C_B_[imu_index];
   }
 
   inline const TransformationVector& T_C_B_vec() const

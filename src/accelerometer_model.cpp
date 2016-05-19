@@ -9,12 +9,12 @@ AccelerometerModel::AccelerometerModel(
 {
 }
 
-void AccelerometerModel::distort(measurement_t* in) const
+void AccelerometerModel::distort(Eigen::Ref<measurement_t> in) const
 {
   intrinsicModel_->distort(in);
 }
 
-void AccelerometerModel::undistort(measurement_t* in) const
+void AccelerometerModel::undistort(Eigen::Ref<measurement_t> in) const
 {
   intrinsicModel_->undistort(in);
 }

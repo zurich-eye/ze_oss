@@ -12,12 +12,12 @@ GyroscopeModel::GyroscopeModel(
 {
 }
 
-void GyroscopeModel::distort(measurement_t* in) const
+void GyroscopeModel::distort(Eigen::Ref<measurement_t> in) const
 {
   intrinsicModel_->distort(in);
 }
 
-void GyroscopeModel::undistort(measurement_t* in) const
+void GyroscopeModel::undistort(Eigen::Ref<measurement_t> in) const
 {
   intrinsicModel_->undistort(in);
 }

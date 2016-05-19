@@ -25,12 +25,12 @@ ImuModel::Ptr ImuModel::loadFromYaml(const std::string& path)
   return ImuModel::Ptr();
 }
 
-void ImuModel::distort(measurement_t* in) const
+void ImuModel::distort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
 
-void ImuModel::undistort(ImuModel::measurement_t* in) const
+void ImuModel::undistort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }

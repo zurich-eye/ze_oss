@@ -29,10 +29,10 @@ public:
   std::string typeAsString() const;
 
   //! distort in place
-  virtual void distort(measurement_t* in) const = 0;
+  virtual void distort(Eigen::Ref<measurement_t> in) const = 0;
 
   //! undistort in place
-  virtual void undistort(measurement_t* in) const = 0;
+  virtual void undistort(Eigen::Ref<measurement_t> in) const = 0;
 
 private:
   ImuIntrinsicType type_;
@@ -49,10 +49,10 @@ public:
   ImuIntrinsicModelCalibrated();
 
   //! distort in place
-  virtual void distort(measurement_t* in) const;
+  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
   //! undistort in place
-  virtual void undistort(measurement_t* in) const;
+  virtual void undistort(Eigen::Ref<measurement_t> in) const;
 };
 
 //------------------------------------------------------------------------------
@@ -68,10 +68,10 @@ public:
                                      const Vector3& b, const Matrix3& M);
 
   //! distort in place
-  virtual void distort(measurement_t* in) const;
+  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
   //! undistort in place
-  virtual void undistort(measurement_t* in) const;
+  virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
   inline FloatType delay() const { return delay_; }
@@ -103,10 +103,10 @@ public:
                                                  const Matrix3& M,
                                                  const Matrix3& Ma);
   //! distort in place
-  virtual void distort(measurement_t* in) const;
+  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
   //! undistort in place
-  virtual void undistort(measurement_t* in) const;
+  virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
   inline FloatType delay() const { return delay_; }
@@ -139,10 +139,10 @@ public:
                                                const Matrix3& M,
                                                const Matrix3& R);
   //! distort in place
-  virtual void distort(measurement_t* in) const;
+  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
   //! undistort in place
-  virtual void undistort(measurement_t* in) const;
+  virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
   inline FloatType delay() const { return delay_; }

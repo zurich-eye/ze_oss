@@ -31,12 +31,12 @@ ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated()
 {
 }
 
-void ImuIntrinsicModelCalibrated::undistort(measurement_t* in) const
+void ImuIntrinsicModelCalibrated::undistort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
 
-void ImuIntrinsicModelCalibrated::distort(measurement_t* in) const
+void ImuIntrinsicModelCalibrated::distort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
@@ -57,12 +57,12 @@ ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
   CHECK(range > 0) << "Range must be > 0";
 }
 
-void ImuIntrinsicModelScaleMisalignment::undistort(measurement_t* in) const
+void ImuIntrinsicModelScaleMisalignment::undistort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
 
-void ImuIntrinsicModelScaleMisalignment::distort(measurement_t* in) const
+void ImuIntrinsicModelScaleMisalignment::distort(Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
@@ -86,13 +86,13 @@ ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignme
 }
 
 void ImuIntrinsicModelScaleMisalignmentGSensitivity::undistort(
-    measurement_t* in) const
+    Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
 
 void ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
-    measurement_t* in) const
+    Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
@@ -116,13 +116,13 @@ ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignment
 }
 
 void ImuIntrinsicModelScaleMisalignmentSizeEffect::undistort(
-    measurement_t* in) const
+    Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }
 
 void ImuIntrinsicModelScaleMisalignmentSizeEffect::distort(
-    measurement_t* in) const
+    Eigen::Ref<measurement_t> in) const
 {
   //! @todo
 }

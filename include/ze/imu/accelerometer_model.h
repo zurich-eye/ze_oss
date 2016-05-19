@@ -21,10 +21,10 @@ public:
                      ImuNoiseModel::Ptr noiseModel);
 
   //! distort in place
-  void distort(measurement_t* in) const;
+  void distort(Eigen::Ref<measurement_t> in) const;
 
   //! undistort in place
-  void undistort(measurement_t* in) const;
+  void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
   inline const ImuNoiseModel::Ptr noiseModel() const { return noiseModel_; }
