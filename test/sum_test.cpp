@@ -32,34 +32,6 @@ getRandomGenerator()
   return random_val;
 }
 
-TEST(IMPCuCoreTestSuite,sumTest_8uC1)
-{
-  // setup random number generator
-  auto random_val = getRandomGenerator<std::uint8_t>();
-
-  const size_t width = 752;
-  const size_t height = 480;
-  ze::ImageRaw8uC1 im(width,height);
-
-  double gt_sum = 0.0;
-  for (size_t y=0; y<height; ++y)
-  {
-    for (size_t x=0; x<width; ++x)
-    {
-      std::uint8_t random_value = random_val();
-      im[y][x] = random_value;
-      gt_sum += im.pixel(x, y);
-    }
-  }
-  IMP_CUDA_CHECK();
-  ze::cu::ImageGpu8uC1 cu_im(im);
-  IMP_CUDA_CHECK();
-  double cu_sum = ze::cu::sum(cu_im);
-  EXPECT_FLOAT_EQ(gt_sum, cu_sum);
-  VLOG(2) << "GT sum: " << gt_sum;
-  VLOG(2) << "GPU sum: " << cu_sum;
-}
-
 TEST(IMPCuCoreTestSuite,sumTest_32fC1)
 {
   // setup random number generator
@@ -83,7 +55,7 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
   double cu_sum = ze::cu::sum(cu_im);
-  EXPECT_DOUBLE_EQ(gt_sum, cu_sum);
+  EXPECT_NEAR(gt_sum, cu_sum, 0.1);
   VLOG(2) << "GT sum: " << gt_sum;
   VLOG(2) << "GPU sum: " << cu_sum;
 }

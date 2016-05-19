@@ -12,13 +12,16 @@ namespace cu {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-__global__ void k_sumCol(Pixel* d_col_sums,
-                         std::uint32_t roi_x, std::uint32_t roi_y,
-                         std::uint32_t roi_width, std::uint32_t roi_height,
-                         Texture2D img_tex)
+__global__
+void k_sumCol(
+    Pixel* d_col_sums,
+    std::uint32_t roi_x,
+    std::uint32_t roi_y,
+    std::uint32_t roi_width,
+    std::uint32_t roi_height,
+    Texture2D img_tex)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
-
   if (x<roi_width)
   {
     float xx = x + roi_x;
@@ -30,11 +33,9 @@ __global__ void k_sumCol(Pixel* d_col_sums,
       tex2DFetch(val, img_tex, xx, yy);
       col_sum += val;
     }
-
     d_col_sums[x] = col_sum;
   }
 }
-
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
@@ -71,8 +72,10 @@ Pixel sum(const ImageGpu<Pixel>& img)
   return ze::cu::sum<Pixel>(*img.genTexture(), img.roi());
 }
 
-
 // template instantiations for all our image types
+// TODO (MPI) only 32fC1 is currently supported
+
+/*
 template ze::Pixel8uC1 sum(const ImageGpu8uC1& img);
 template ze::Pixel8uC2 sum(const ImageGpu8uC2& img);
 template ze::Pixel8uC4 sum(const ImageGpu8uC4& img);
@@ -84,10 +87,14 @@ template ze::Pixel16uC4 sum(const ImageGpu16uC4& im);
 template ze::Pixel32sC1 sum(const ImageGpu32sC1& im);
 template ze::Pixel32sC2 sum(const ImageGpu32sC2& im);
 template ze::Pixel32sC4 sum(const ImageGpu32sC4& im);
+*/
 
 template ze::Pixel32fC1 sum(const ImageGpu32fC1& im);
+
+/*
 template ze::Pixel32fC2 sum(const ImageGpu32fC2& im);
 template ze::Pixel32fC4 sum(const ImageGpu32fC4& im);
+*/
 
 } // namespace cu
 } // namespace ze
