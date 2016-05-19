@@ -5,7 +5,7 @@ namespace cu {
 
 af::array createFromImp(const ImageGpu32fC1& in_img)
 {
-  return af::createStridedArray(
+  af::array a = af::createStridedArray(
         in_img.cuData(), 0,
         af::dim4(
           in_img.width(),
@@ -16,6 +16,7 @@ af::array createFromImp(const ImageGpu32fC1& in_img)
           1, 1),
         f32,
         afDevice);
+  return a;
 }
 
 } // cu namespace
