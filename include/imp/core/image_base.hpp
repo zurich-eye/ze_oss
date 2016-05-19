@@ -150,7 +150,6 @@ protected:
   ImageBase(const ImageBase &from)
     : std::enable_shared_from_this<ImageBase>()
     , header_(from.header_)
-
   {
   }
 
