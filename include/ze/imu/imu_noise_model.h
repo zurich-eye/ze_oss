@@ -14,7 +14,7 @@ enum class ImuNoiseType
   WhiteBrownian
 };
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Noise model base class
 class ImuNoiseModel
 {
@@ -30,7 +30,7 @@ public:
   ImuNoiseType type_;
 };
 
-//----------------------------
+//------------------------------------------------------------------------------
 // No noise model
 class ImuNoiseNone: public ImuNoiseModel
 {
@@ -41,7 +41,7 @@ public:
   ImuNoiseNone();
 };
 
-//----------------------------
+//------------------------------------------------------------------------------
 // White brownian noise model
 class ImuNoiseWhiteBrownian: public ImuNoiseModel
 {

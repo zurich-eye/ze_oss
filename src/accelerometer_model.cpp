@@ -2,8 +2,6 @@
 
 namespace ze {
 
-//----------------------------
-// White brownian noise model
 AccelerometerModel::AccelerometerModel(
     const ImuIntrinsicModel::Ptr intrinsicModel, const ImuNoiseModel::Ptr noiseModel)
   : intrinsicModel_(intrinsicModel)

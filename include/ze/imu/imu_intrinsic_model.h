@@ -38,7 +38,7 @@ private:
   ImuIntrinsicType type_;
 };
 
-//---------------------------------------------
+//------------------------------------------------------------------------------
 // Calibrated
 class ImuIntrinsicModelCalibrated: public ImuIntrinsicModel
 {
@@ -55,7 +55,7 @@ public:
   virtual void undistort(measurement_t* in) const;
 };
 
-//---------------------------------------------
+//------------------------------------------------------------------------------
 // Scale Misalignment
 class ImuIntrinsicModelScaleMisalignment : public ImuIntrinsicModel
 {
@@ -86,7 +86,7 @@ private:
   Matrix3 M_;
 };
 
-//---------------------------------------------
+//------------------------------------------------------------------------------
 // Scale Misalignment g-Sensitivity
 class ImuIntrinsicModelScaleMisalignmentGSensitivity : public ImuIntrinsicModel
 {
@@ -123,7 +123,7 @@ private:
   Matrix3 Ma_;
 };
 
-//---------------------------------------------
+//------------------------------------------------------------------------------
 // Scale MisalignmentSize Effect
 class ImuIntrinsicModelScaleMisalignmentSizeEffect : public ImuIntrinsicModel
 {

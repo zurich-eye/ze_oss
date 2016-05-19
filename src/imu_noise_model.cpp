@@ -2,7 +2,7 @@
 
 namespace ze {
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Noise model base class
 
 ImuNoiseModel::ImuNoiseModel(ImuNoiseType type)
@@ -21,13 +21,13 @@ std::string ImuNoiseModel::typeAsString() const
   }
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // No Noise model
 ImuNoiseNone::ImuNoiseNone(): ImuNoiseModel(Type)
 {
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // White brownian noise model
 ImuNoiseWhiteBrownian::ImuNoiseWhiteBrownian(FloatType noise_density,
            FloatType bandwidth,

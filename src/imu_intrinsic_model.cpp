@@ -2,7 +2,7 @@
 
 namespace ze {
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Intrinsics Base Class
 ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
   : type_(type)
@@ -24,7 +24,7 @@ std::string ImuIntrinsicModel::typeAsString() const
   return "";
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Calibrated
 ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated()
   : ImuIntrinsicModel(Type)
@@ -41,7 +41,7 @@ void ImuIntrinsicModelCalibrated::distort(measurement_t* in) const
   //! @todo
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment
 ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
     FloatType delay,
@@ -67,7 +67,7 @@ void ImuIntrinsicModelScaleMisalignment::distort(measurement_t* in) const
   //! @todo
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment g-Sensitivity
 ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignmentGSensitivity(
     FloatType delay,
@@ -97,7 +97,7 @@ void ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
   //! @todo
 }
 
-//----------------------------
+//------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment Size Effect
 ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignmentSizeEffect(
     FloatType delay,

@@ -94,8 +94,8 @@ bool convert<std::shared_ptr<ze::ImuModel>>::decode(
   return true;
 }
 
-////------------------------------------------------------------------------------
-//// Validation of types
+//------------------------------------------------------------------------------
+// Validation of types
 
 bool internal::validateNoise(const std::string& value)
 {
@@ -120,8 +120,8 @@ bool internal::validateIntrinsic(const std::string& value)
   return false;
 }
 
-////------------------------------------------------------------------------------
-//// Noise Model loading.
+//------------------------------------------------------------------------------
+// Noise Model loading.
 std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
 {
   if(!node.IsMap())
