@@ -12,7 +12,7 @@ namespace cu {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-__global__ void k_sumCol(Pixel* d_col_mins, Pixel* d_col_maxs,
+__global__ void k_sumCol(Pixel* d_col_sums,
                          std::uint32_t roi_x, std::uint32_t roi_y,
                          std::uint32_t roi_width, std::uint32_t roi_height,
                          Texture2D img_tex)
@@ -22,22 +22,16 @@ __global__ void k_sumCol(Pixel* d_col_mins, Pixel* d_col_maxs,
   if (x<roi_width)
   {
     float xx = x + roi_x;
-    float yy = roi_y;
 
-    Pixel cur_min, cur_max;
-    img_tex.fetch(cur_min, xx, ++yy);
-    cur_max = cur_min;
-
+    Pixel col_sum{0};
     Pixel val;
-    for (; yy<roi_y+roi_height; ++yy)
+    for (float yy = roi_y; yy<roi_y+roi_height; ++yy)
     {
-      img_tex.fetch(val, xx, yy);
-      if (val<cur_min) cur_min = val;
-      if (val>cur_max) cur_max = val;
+      tex2DFetch(val, img_tex, xx, yy);
+      col_sum += val;
     }
 
-    d_col_mins[x] = cur_min;
-    d_col_maxs[x] = cur_max;
+    d_col_sums[x] = col_sum;
   }
 }
 
