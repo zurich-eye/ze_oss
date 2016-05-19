@@ -21,7 +21,7 @@ public:
   ImuRig() = delete;
 
   ImuRig(
-      const TransformationVector& T_C_B,
+      const TransformationVector& T_B_S,
       const ImuVector& imus,
       const std::string& label);
 
@@ -30,15 +30,26 @@ public:
 
   //! @name Imu poses with respect to body frame.
   //! @{
-  inline const Transformation& T_C_B(size_t imu_index) const
+  inline const Transformation& T_S_B(size_t imu_index) const
   {
-    DEBUG_CHECK_LT(imu_index, T_C_B_.size());
-    return T_C_B_[imu_index];
+    DEBUG_CHECK_LT(imu_index, T_S_B_.size());
+    return T_S_B_[imu_index];
   }
 
-  inline const TransformationVector& T_C_B_vec() const
+  inline const TransformationVector& T_S_B_vec() const
   {
-    return T_C_B_;
+    return T_S_B_;
+  }
+
+  inline const Transformation& T_B_S(size_t imu_index) const
+  {
+    DEBUG_CHECK_LT(imu_index, T_B_S_.size());
+    return T_B_S_[imu_index];
+  }
+
+  inline const TransformationVector& T_B_S_vec() const
+  {
+    return T_B_S_;
   }
   //! @}
 
@@ -81,7 +92,8 @@ public:
 
 private:
   //! The mounting transformations.
-  TransformationVector T_C_B_;
+  TransformationVector T_S_B_;
+  TransformationVector T_B_S_;
 
   //! The imu models.
   ImuVector imus_;

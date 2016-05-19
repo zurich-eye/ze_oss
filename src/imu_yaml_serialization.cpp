@@ -265,7 +265,7 @@ bool convert<std::shared_ptr<ze::ImuRig>>::decode(
       return false;
     }
 
-    ze::TransformationVector T_Ci_S;
+    ze::TransformationVector T_B_Si;
     ze::ImuVector imus;
     for (size_t i = 0; i < num_imus; ++i)
     {
@@ -296,10 +296,10 @@ bool convert<std::shared_ptr<ze::ImuRig>>::decode(
       }
 
       imus.push_back(imu);
-      T_Ci_S.push_back(ze::Transformation(T_B_S).inverse());
+      T_B_Si.push_back(ze::Transformation(T_B_S).inverse());
     }
 
-    imu_rig.reset(new ze::ImuRig(T_Ci_S, imus, label));
+    imu_rig.reset(new ze::ImuRig(T_B_Si, imus, label));
   }
   catch (const std::exception& ex)
   {

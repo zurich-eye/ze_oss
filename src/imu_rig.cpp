@@ -4,17 +4,23 @@
 namespace ze {
 
 ImuRig::ImuRig(
-    const TransformationVector& T_C_B,
+    const TransformationVector& T_B_S,
     const ImuVector& imus,
     const std::string& label)
-  : T_C_B_(T_C_B)
+  : T_B_S_(T_B_S)
   , imus_(imus)
   , label_(label)
 {
-  CHECK_EQ(T_C_B_.size(), imus_.size());
+  CHECK_EQ(T_B_S_.size(), imus_.size());
   for(size_t i = 0; i < size(); ++i)
   {
     CHECK_NOTNULL(imus_[i].get());
+  }
+
+  // set inverse transformations
+  for(size_t i = 0; i < size(); ++i)
+  {
+    T_S_B_.push_back(T_B_S_[i].inverse());
   }
 }
 
