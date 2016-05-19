@@ -146,7 +146,7 @@ void StereoCtFWarping::solve()
   lev_images.clear();
   for (auto pyr : image_pyramids_)
   {
-    lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->atShared(lev)));
+    lev_images.push_back(pyr->atShared(lev)->as<ImageGpu32fC1>());
   }
   levels_.at(lev)->solve(lev_images);
 
@@ -161,7 +161,7 @@ void StereoCtFWarping::solve()
     lev_images.clear();
     for (auto pyr : image_pyramids_)
     {
-      lev_images.push_back(std::dynamic_pointer_cast<ImageGpu32fC1>(pyr->atShared(lev-1)));
+      lev_images.push_back(pyr->atShared(lev-1)->as<ImageGpu32fC1>());
     }
     levels_.at(lev-1)->solve(lev_images);
   }
