@@ -60,6 +60,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/image_gpu_simple_test.cpp
   #test/image_gpu_test.cpp
   test/min_max_test.cpp
+  test/sum_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
