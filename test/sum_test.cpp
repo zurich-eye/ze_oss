@@ -56,6 +56,6 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
   IMP_CUDA_CHECK();
   double cu_sum = ze::cu::sum(cu_im);
   EXPECT_NEAR(gt_sum, cu_sum, 0.1);
-  VLOG(2) << "GT sum: " << gt_sum;
-  VLOG(2) << "GPU sum: " << cu_sum;
+  printf("GT sum: %f\n", gt_sum);
+  printf("GPU sum: %f\n", cu_sum);
 }
