@@ -19,7 +19,7 @@ namespace ze {
  * It defines the common interface that must be implemented for IMP images
  *
  */
-class ImageBase
+class ImageBase: public std::enable_shared_from_this<ImageBase>
 {
 public:
   ZE_POINTER_TYPEDEFS(ImageBase);
@@ -107,6 +107,14 @@ public:
   /** Returns flag if the image data resides on the device/GPU (TRUE) or host/GPU (FALSE) */
   inline bool isGpuMemory() const {return header_.isGpuMemory();}
 
+
+  /** Cast between image types */
+  template<class DERIVED>
+  inline typename DERIVED::Ptr as()
+  {
+    return std::dynamic_pointer_cast<DERIVED>(shared_from_this());
+  }
+
   friend std::ostream& operator<<(std::ostream &os, const ImageBase& image);
 
 protected:
@@ -140,7 +148,9 @@ protected:
   }
 
   ImageBase(const ImageBase &from)
-    : header_(from.header_)
+    : std::enable_shared_from_this<ImageBase>()
+    , header_(from.header_)
+
   {
   }
 
