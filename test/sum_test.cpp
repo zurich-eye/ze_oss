@@ -17,8 +17,7 @@ typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
   std::default_random_engine generator;
-  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                std::numeric_limits<T>::max());
+  std::uniform_int_distribution<T> distribution(0, 255);
   auto random_val = std::bind(distribution, generator);
   return random_val;
 }
@@ -28,8 +27,7 @@ typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
   std::default_random_engine generator;
-  std::uniform_real_distribution<T> distribution(FLT_MIN,
-                                                 std::numeric_limits<T>::max());
+  std::uniform_real_distribution<T> distribution(0, 1);
   auto random_val = std::bind(distribution, generator);
   return random_val;
 }
@@ -85,7 +83,7 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
   double cu_sum = ze::cu::sum(cu_im);
-  EXPECT_FLOAT_EQ(gt_sum, cu_sum);
+  EXPECT_DOUBLE_EQ(gt_sum, cu_sum);
   VLOG(2) << "GT sum: " << gt_sum;
   VLOG(2) << "GPU sum: " << cu_sum;
 }
