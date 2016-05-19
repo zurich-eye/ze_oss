@@ -17,11 +17,15 @@ void minMax(const ImageGpu<Pixel>& img, Pixel& min, Pixel& max);
 template<typename Pixel>
 void minMax(const Texture2D& img_tex, Pixel& min, Pixel& max, const ze::Roi2u& roi);
 
-//template<typename Pixel>
-//void sum(const ImageGpu<Pixel>& img, double& sum);
+/**
+ * @brief Computing the sum of all pixels
+ * @note For multi-channel images, the seperate channels are not handeled individually.
+ */
+template<typename Pixel>
+Pixel sum(const ImageGpu<Pixel>& img);
 
-//template<typename Pixel>
-//void sum(const Texture2D& img_tex, double& sum, const imp::Roi2u& roi);
+template<typename Pixel>
+Pixel sum(const Texture2D& img_tex, const ze::Roi2u& roi);
 
 } // namespace cu
 } // namespace ze

@@ -115,54 +115,8 @@ void minMax(const Texture2D& img_tex, Pixel& min_val, Pixel& max_val, const ze::
 template<typename Pixel>
 void minMax(const ImageGpu<Pixel>& img, Pixel& min_val, Pixel& max_val)
 {
+  ze::cu::minMax(*img.genTexture(), min_val, max_val, img.roi());
   IMP_CUDA_CHECK();
-  ze::Roi2u roi = img.roi();
-
-//  std::shared_ptr<Texture2D> img_tex = img.genTexture(
-//        false, cudaFilterModePoint, cudaAddressModeClamp, cudaReadModeElementType);
-
-#if 1
-  std::shared_ptr<Texture2D> img_tex = img.genTexture();
-  IMP_CUDA_CHECK();
-  ze::cu::minMax(*img_tex, min_val, max_val, roi);
-  IMP_CUDA_CHECK();
-#else
-
-  ze::cu::LinearMemory<Pixel> d_col_mins(roi.width());
-  ze::cu::LinearMemory<Pixel> d_col_maxs(roi.width());
-  IMP_CUDA_CHECK();
-  d_col_mins.setValue(Pixel(0));
-  d_col_maxs.setValue(Pixel(0));
-
-  Fragmentation<512,1> frag(roi.width(), 1);
-  k_minMax
-      <<<
-        frag.dimGrid, frag.dimBlock
-      >>> (d_col_mins.data(), d_col_maxs.data(),
-           img.data(), img.stride(),
-           roi.x(), roi.y(), roi.width(), roi.height());
-  IMP_CUDA_CHECK();
-
-  ze::LinearMemory<Pixel> h_col_mins(d_col_mins.length());
-  ze::LinearMemory<Pixel> h_col_maxs(d_col_maxs.length());
-  h_col_mins.setValue(Pixel(0));
-  h_col_maxs.setValue(Pixel(0));
-
-  d_col_mins.copyTo(h_col_mins);
-  d_col_maxs.copyTo(h_col_maxs);
-
-  min_val = h_col_mins(0);
-  max_val = h_col_maxs(0);
-
-  for (auto i=1u; i<roi.width(); ++i)
-  {
-    min_val = ze::cu::min(min_val, h_col_mins(i));
-    max_val = ze::cu::max(max_val, h_col_maxs(i));
-  }
-
-  IMP_CUDA_CHECK();
-
-#endif
 }
 
 

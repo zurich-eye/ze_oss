@@ -40,6 +40,7 @@ set(CU_SRCS
   src/cu_linearmemory.cu
   src/cu_image_gpu.cu
   src/min_max.cu
+  src/sum.cu
   )
 
 #cuda_compile(CU_OBJ ${CU_SRC})
