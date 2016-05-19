@@ -24,7 +24,7 @@ class Ringbuffer
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  typedef uint64_t time_t;
+  typedef int64_t time_t;
   typedef Eigen::Matrix<time_t, Size, 1> times_t;
   typedef Eigen::Matrix<time_t, Eigen::Dynamic, 1> times_dynamic_t;
   typedef Eigen::Matrix<Scalar, ValueDim, Size> data_t;
@@ -103,7 +103,7 @@ public:
   }
 
   //! technically does not remove but only moves the beginning of the ring
-  inline void removeDataBeforeTimestamp(uint64_t stamp)
+  inline void removeDataBeforeTimestamp(time_t stamp)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     removeDataBeforeTimestamp_impl(stamp);

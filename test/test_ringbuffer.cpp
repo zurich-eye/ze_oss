@@ -180,7 +180,7 @@ TEST(RingBufferTest, testInterpolation)
     buffer.insert(secToNanosec(i), Vector2(i, i));
   }
 
-  Eigen::Matrix<uint64_t, Eigen::Dynamic, 1> stamps;
+  Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
   Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(1.2), secToNanosec(5.4));
@@ -242,7 +242,7 @@ TEST(RingBufferTest, testInterpolationBounds)
     buffer.insert(secToNanosec(i), Vector2(i, i));
   }
 
-  Eigen::Matrix<uint64_t, Eigen::Dynamic, 1> stamps;
+  Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
   Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(0), secToNanosec(2));

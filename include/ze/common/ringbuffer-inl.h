@@ -88,7 +88,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getNewestValue() const
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
-std::tuple<uint64_t, uint64_t, bool>
+std::tuple<int64_t, int64_t, bool>
 Ringbuffer<Scalar, ValueDim, Size>::getOldestAndNewestStamp() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
