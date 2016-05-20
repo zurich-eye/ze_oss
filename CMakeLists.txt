@@ -16,10 +16,12 @@ find_package(ArrayFire REQUIRED)
 include_directories(${ArrayFire_INCLUDE_DIRS})
 
 set(HEADERS
+  include/imp/bridge/af/image_af.hpp
   include/imp/bridge/af/feature_detection.hpp
   )
 
 set(SOURCES
+  src/image_af.cpp
   src/feature_detection.cpp
   )
 

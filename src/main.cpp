@@ -5,6 +5,8 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/bridge/af/feature_detection.hpp>
 
+#include <imp/bridge/af/image_af.hpp>
+
 constexpr const char* img_file_path = "/home/mpi/workspace/zurich_eye_ws/src/ze_test_data/data/ze_feature_detection/752x480/pyr_0.png";
 
 int main(int argc, char** argv)
@@ -14,6 +16,7 @@ int main(int argc, char** argv)
   FLAGS_alsologtostderr = true;
   FLAGS_colorlogtostderr = true;
 
+#if 0
   ze::ImageCv32fC1::Ptr cv_img;
   ze::cvBridgeLoad(
         cv_img,
@@ -52,5 +55,10 @@ int main(int argc, char** argv)
   printf("GT sum: %f\n", gt_sum);
 
   //! TODO (MPI): who takes care of freeing gpu memory?
+#endif
+
+  ze::ImageAF32fC1 im(752, 480);
+  im.fast();
+
   return 0;
 }
