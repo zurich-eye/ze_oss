@@ -19,8 +19,6 @@ inline BearingsVector bearingsVectorFromBearings(const Bearings& f)
   {
     v.push_back(f.col(i).cast<double>());
   }
-  //const Vector3* data = reinterpret_cast<const Vector3*>(f.data());
-  //BearingsVector v(data, data + f.cols());
   return v;
 }
 
