@@ -12,9 +12,15 @@
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_image_reduction.cuh>
+#include <ze/common/test_utils.h>
+#include <ze/common/file_utils.h>
+#include <ze/common/benchmark.h>
 
 namespace ze {
-namespace test {
+namespace test_sum {
+
+constexpr uint32_t g_num_iter_per_epoch = 20;
+constexpr uint32_t g_num_epochs = 40;
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
@@ -51,7 +57,7 @@ double gtSum(const ze::ImageRaw32fC1& im)
 
 ze::ImageRaw32fC1 generateRandomImage(size_t width, size_t height)
 {
-  auto random_val = ze::test::getRandomGenerator<float>();
+  auto random_val = getRandomGenerator<float>();
   ze::ImageRaw32fC1 im(width,height);
   for (size_t y=0; y<im.height(); ++y)
   {
@@ -77,7 +83,7 @@ ze::ImageRaw32fC1 generateConstantImage(size_t width, size_t height, float val)
   return im;
 }
 
-} // test namespace
+} // test_sum namespace
 } // ze namespace
 
 TEST(IMPCuCoreTestSuite,sumTest_32fC1)
@@ -85,69 +91,26 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
   const size_t width = 752;
   const size_t height = 480;
   ze::ImageRaw32fC1 im =
-      ze::test::generateRandomImage(width, height);
-  double gt_sum = ze::test::gtSum(im);
+      ze::test_sum::generateRandomImage(width, height);
+  double gt_sum = ze::test_sum::gtSum(im);
 
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
-  double cu_sum = ze::cu::sum(cu_im);
-  EXPECT_NEAR(gt_sum, cu_sum, 0.1);
+  double cu_sum;
+  auto sumTextureLambda = [&](){
+      cu_sum = ze::cu::sum(cu_im);
+  };
+  ze::cu::sum(cu_im); //! Warm-up
+  ze::runTimingBenchmark(
+          sumTextureLambda,
+          ze::test_sum::g_num_iter_per_epoch,
+          ze::test_sum::g_num_epochs,
+          "sum using texture memory",
+          true);
+  const double tolerance = 0.1;
+  EXPECT_NEAR(gt_sum, cu_sum, tolerance);
   printf("GT sum: %f\n", gt_sum);
   printf("GPU sum: %f\n", cu_sum);
-}
-
-TEST(IMPCuCoreTestSuite,sumByReductionTestConstImg_32fC1)
-{
-  const size_t width = 752;
-  const size_t height = 480;
-  const float val = 0.1f;
-  ze::ImageRaw32fC1 im =
-      ze::test::generateConstantImage(width, height, val);
-  printf("test image has been filled with constant value %f\n", val);
-  double gt_sum = static_cast<double>(width*height) * val;
-
-  IMP_CUDA_CHECK();
-  ze::cu::ImageGpu32fC1 cu_im(im);
-  IMP_CUDA_CHECK();
-  dim3 num_threads_per_block;
-  dim3 num_blocks_per_grid;
-  num_threads_per_block.x = 16;
-  num_threads_per_block.y = 16;
-  num_blocks_per_grid.x = 4;
-  num_blocks_per_grid.y = 4;
-  ze::cu::ImageReducer<float> reducer(
-        num_threads_per_block,
-        num_blocks_per_grid);
-  double cu_sum = reducer.sum(cu_im.cuData(), cu_im.stride(), cu_im.width(), cu_im.height());
-  EXPECT_NEAR(gt_sum, cu_sum, 0.01);
-  printf("GT sum: %f\n", gt_sum);
-  printf("GPU sum: %f\n", cu_sum);
-}
-
-TEST(IMPCuCoreTestSuite,sumByReductionTestRndImg_32fC1)
-{
-  const size_t width = 752;
-  const size_t height = 480;
-  const float val = 0.1f;
-  ze::ImageRaw32fC1 im =
-      ze::test::generateRandomImage(width, height);
-  double gt_sum = ze::test::gtSum(im);
-
-  IMP_CUDA_CHECK();
-  ze::cu::ImageGpu32fC1 cu_im(im);
-  IMP_CUDA_CHECK();
-  dim3 num_threads_per_block;
-  dim3 num_blocks_per_grid;
-  num_threads_per_block.x = 16;
-  num_threads_per_block.y = 16;
-  num_blocks_per_grid.x = 4;
-  num_blocks_per_grid.y = 4;
-  ze::cu::ImageReducer<float> reducer(
-        num_threads_per_block,
-        num_blocks_per_grid);
-  double cu_sum = reducer.sum(cu_im.cuData(), cu_im.stride(), cu_im.width(), cu_im.height());
-  EXPECT_NEAR(gt_sum, cu_sum, 0.01);
-  printf("GT sum: %f\n", gt_sum);
-  printf("GPU sum: %f\n", cu_sum);
+  printf("Test tolerance: %f\n", tolerance);
 }
