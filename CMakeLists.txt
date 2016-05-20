@@ -34,6 +34,7 @@ set(CU_HDRS
   include/imp/cu_core/cu_pinhole_camera.cuh
   include/imp/cu_core/cu_se3.cuh
   include/imp/cu_core/cu_matrix.cuh
+  include/imp/cu_core/cu_image_reduction.cuh
   )
 
 set(CU_SRCS
@@ -41,6 +42,7 @@ set(CU_SRCS
   src/cu_image_gpu.cu
   src/min_max.cu
   src/sum.cu
+  src/cu_image_reduction.cu
   )
 
 #cuda_compile(CU_OBJ ${CU_SRC})
