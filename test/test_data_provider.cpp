@@ -96,7 +96,7 @@ TEST(DataProviderTests, testRosbagCamOnly)
   using namespace ze;
 
   std::string data_dir = getTestDataDir("rosbag_euroc_snippet");
-  std::string bag_filename = joinPath(data_dir + "dataset.bag");
+  std::string bag_filename = joinPath(data_dir, "dataset.bag");
   ASSERT_TRUE(fileExists(bag_filename));
 
   DataProviderRosbag dp(bag_filename, {}, { {"/cam0/image_raw", 0},
