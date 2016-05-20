@@ -68,6 +68,13 @@ public:
       const TransformationVector& poses,
       const FloatType size = 0.2) override;
 
+  virtual void drawTrajectory(
+      const std::string& topic,
+      const size_t id,
+      const std::vector<Position>& points,
+      const Color& color,
+      const FloatType size = 0.02) override;
+
 private:
   std::shared_ptr<ros::NodeHandle> nh_;
   std::shared_ptr<ros::Publisher> pub_marker_;

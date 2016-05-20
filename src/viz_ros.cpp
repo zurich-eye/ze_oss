@@ -223,4 +223,31 @@ void VisualizerRos::drawCoordinateFrames(
   pub_marker_->publish(m);
 }
 
+void VisualizerRos::drawTrajectory(
+    const std::string& topic,
+    const size_t id,
+    const std::vector<Position>& points,
+    const Color& color,
+    const FloatType size)
+{
+  if(pub_marker_->getNumSubscribers() == 0)
+    return;
+
+  visualization_msgs::Marker m;
+  m.header.frame_id = world_frame;
+  m.header.stamp = ros::Time::now();
+  m.ns = topic;
+  m.id = id;
+  m.type = visualization_msgs::Marker::LINE_STRIP;
+  m.action = 0; // 0 = add/modify
+  m.scale.x = size * viz_scale_ * 0.05;
+  m.color = getRosColor(color);
+  m.points.reserve(points.size());
+  for (size_t i = 0u; i < points.size(); ++i)
+  {
+    m.points.push_back(getRosPoint(points[i]));
+  }
+  pub_marker_->publish(m);
+}
+
 } // namespace ze

@@ -68,6 +68,13 @@ public:
       const TransformationVector& poses,
       const FloatType size = 0.02) = 0;
 
+  virtual void drawTrajectory(
+      const std::string& topic,
+      const size_t id,
+      const std::vector<Position>& points,
+      const Color& color,
+      const FloatType size = 0.02) = 0;
+
 };
 
 } // namespace ze
