@@ -7,15 +7,18 @@ import os
 import logging
 import argparse
 import numpy as np
+import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import FuncFormatter
 import ze_py.plot_utils as plot_utils
 import ze_trajectory_analysis.utils as utils
 #from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Cardo']})
-rc('text', usetex=True)
+#from matplotlib import rc
+#rc('font',**{'family':'serif','serif':['Cardo']})
+#rc('text', usetex=True)
 
 FORMAT = '.pdf'
 
