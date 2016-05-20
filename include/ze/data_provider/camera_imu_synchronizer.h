@@ -10,8 +10,6 @@ namespace ze {
 // fwd
 class DataProviderBase;
 
-using StampedImage = std::pair<int64_t, ImageBase::Ptr>;
-using StampedImages = std::vector<StampedImage>;
 using ImuStampsVector = std::vector<ImuStamps>;
 using ImuAccGyrVector = std::vector<ImuAccGyr>;
 using ImuBufferVector = std::vector<Buffer<FloatType, 6> >;
