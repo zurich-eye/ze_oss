@@ -15,15 +15,13 @@ af_dtype pixelTypeToAF(ze::PixelType type)
 
 template<typename Pixel>
 ImageAF<Pixel>::ImageAF(const Image<Pixel>& from)
-  : Image<Pixel>(from),
-    arr_(from.width(), from.height(), pixelTypeToAF(pixel_type<Pixel>::type))
+  : Image<Pixel>(from)
 {
-  if(AF_SUCCESS != af_write_array(arr_.get(), from.data(), from.bytes(), afHost))
-  {
-    IMP_THROW_EXCEPTION("af_write_array failed");
-  }
+  arr_ = af::createStridedArray(
+        from.data(), 0, af::dim4(from.width(),from.height(), 1, 1),
+        af::dim4(1, from.stride(), 1, 1),
+        pixelTypeToAF(pixel_type<Pixel>::type), afHost);
   arr_ = arr_.T();
-  // af_print_array(arr_.get());
 }
 
 template<typename Pixel>
