@@ -8,6 +8,7 @@
 
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
+#include <ze/common/macros.h>
 
 namespace ze {
 namespace cu {
@@ -16,22 +17,22 @@ template<typename Pixel>
 class RofDenoising  : public ze::cu::VariationalDenoising
 {
 public:
+  ZE_POINTER_TYPEDEFS(RofDenoising);
   using Base = VariationalDenoising;
   using ImageGpu = ze::cu::ImageGpu<Pixel>;
-  using Ptr = std::shared_ptr<RofDenoising<Pixel>>;
 
 public:
   RofDenoising() = default;
   virtual ~RofDenoising() = default;
   using Base::Base;
 
-  virtual void init(const Size2u& size) override;
-  virtual void denoise(const std::shared_ptr<ze::ImageBase>& dst,
-                       const std::shared_ptr<ze::ImageBase>& src) override;
+  virtual void denoise(const ze::ImageBase::Ptr& dst,
+                       const ze::ImageBase::Ptr& src) override;
 
   void primalDualEnergy(double& primal_energy, double& dual_energy);
 
 protected:
+  virtual void init(const Size2u& size) override;
   virtual void print(std::ostream &os) const override;
 
 private:
@@ -40,7 +41,6 @@ private:
   // pixel-wise primal and dual energies to avoid allocation of memory for every check
   std::unique_ptr<ImageGpu32fC1> primal_energies_;
   std::unique_ptr<ImageGpu32fC1> dual_energies_;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -48,6 +48,9 @@ private:
 // (sync with explicit template class instantiations at the end of the cpp file)
 typedef RofDenoising<ze::Pixel8uC1> RofDenoising8uC1;
 typedef RofDenoising<ze::Pixel32fC1> RofDenoising32fC1;
+
+template <typename Pixel>
+using RofDenoisingPtr = typename std::shared_ptr<RofDenoising<Pixel>>;
 
 } // namespace cu
 } // namespace ze

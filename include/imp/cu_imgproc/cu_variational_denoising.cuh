@@ -34,9 +34,8 @@ public:
   VariationalDenoising();
   virtual ~VariationalDenoising();
 
-  virtual void init(const Size2u& size);
-  virtual void  __host__  denoise(const std::shared_ptr<ze::ImageBase>& dst,
-                                  const std::shared_ptr<ze::ImageBase>& src) = 0;
+  virtual void  __host__  denoise(const ze::ImageBase::Ptr& dst,
+                                  const ze::ImageBase::Ptr& src) = 0;
 
   inline dim3 dimGrid() {return fragmentation_->dimGrid;}
   inline dim3 dimBlock() {return fragmentation_->dimBlock;}
@@ -47,7 +46,7 @@ public:
                                   const VariationalDenoising& rhs);
 
 protected:
-
+  virtual void init(const Size2u& size);
   inline virtual void print(std::ostream& os) const
   {
     //os << "  size: " << this->size_ << std::endl
@@ -74,7 +73,6 @@ protected:
 
   // algorithm parameters
   VariationalDenoisingParams params_;
-
 };
 
 inline std::ostream& operator<<(std::ostream& os,

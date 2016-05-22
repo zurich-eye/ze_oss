@@ -10,13 +10,15 @@
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_core/cu_k_derivative.cuh>
 #include <imp/cu_core/cu_math.cuh>
+#include <ze/common/logging.hpp>
 
 
 namespace ze {
 namespace cu {
 
 //-----------------------------------------------------------------------------
-__global__ void k_initRofSolver(Pixel32fC1* d_u, Pixel32fC1* d_u_prev, size_t stride_u,
+__global__ void k_initRofSolver(Pixel32fC1* d_u, Pixel32fC1* d_u_prev,
+                                size_t stride_u,
                                 Pixel32fC2* d_p, size_t stride_p,
                                 ze::cu::Texture2D f_tex,
                                 size_t width, size_t height)
@@ -124,7 +126,6 @@ __global__ void k_rofDualEnergy(Pixel32fC1* d_ed,  size_t stride,
 }
 
 
-
 //#############################################################################
 
 //-----------------------------------------------------------------------------
@@ -135,9 +136,7 @@ void RofDenoising<Pixel>::init(const Size2u& size)
   IMP_CUDA_CHECK();
 
   // setup textures
-  f_tex_ = f_->genTexture(false, cudaFilterModeLinear, cudaAddressModeClamp,
-                          (f_->bitDepth()==8) ? cudaReadModeNormalizedFloat :
-                                                cudaReadModeElementType);
+
   u_tex_ = u_->genTexture(false, cudaFilterModeLinear, cudaAddressModeClamp,
                           cudaReadModeElementType);
   u_prev_tex_ = u_prev_->genTexture(false, cudaFilterModeLinear,
@@ -157,18 +156,18 @@ void RofDenoising<Pixel>::init(const Size2u& size)
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
-                                              const std::shared_ptr<ImageBase>& src)
+                                  const std::shared_ptr<ImageBase>& src)
 {
-    VLOG(100) << "[Solver @gpu] RofDenoising::denoise:";
+  VLOG(100) << "[Solver @gpu] RofDenoising::denoise:";
+  CHECK(src);
+  CHECK(dst);
+  CHECK_EQ(src->size(), dst->size());
 
-  if (src->size() != dst->size())
-  {
-    throw ze::cu::Exception("Input and output image are not of the same size.",
-                             __FILE__, __FUNCTION__, __LINE__);
-  }
-
-  f_ = std::dynamic_pointer_cast<ImageGpu>(src);
-  //! @todo (MWE) we could use dst for u_ if pixel_type is consistent
+  f_ = src->as<ImageGpu>();
+  CHECK(f_);
+  f_tex_ = f_->genTexture(false, cudaFilterModeLinear, cudaAddressModeClamp,
+                          (f_->bitDepth()==8) ? cudaReadModeNormalizedFloat :
+                                                cudaReadModeElementType);
 
   if (size_ != f_->size())
   {
@@ -184,9 +183,13 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
   for(int iter = 0; iter < this->params_.max_iter; ++iter)
   {
     if (sigma < 1000.0f)
+    {
       theta = 1.f/sqrtf(1.0f+0.7f*this->params_.lambda*tau);
+    }
     else
+    {
       theta = 1.0f;
+    }
 
     VLOG(101) << "(rof solver) iter: " << iter << "; tau: " << tau
               << "; sigma: " << sigma << "; theta: " << theta;
@@ -197,20 +200,22 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
     {
       double primal_energy = 0.0, dual_energy = 0.0;
       this->primalDualEnergy(primal_energy, dual_energy);
-      std::cout << "ENERGIES: primal: " << primal_energy <<
-                   "; dual: " << dual_energy << std::endl;
+      VLOG(102) << "ENERGIES: primal: " << primal_energy <<
+                   "; dual: " << dual_energy;
     }
 
     k_rofDualUpdate
-        <<< dimGrid(), dimBlock() >>> (p_->data(), p_->stride(),
-                                       *p_tex_, *u_prev_tex_,
-                                       sigma, size_.width(), size_.height());
+        <<<
+          dimGrid(), dimBlock()
+        >>> (p_->data(), p_->stride(), *p_tex_, *u_prev_tex_,
+             sigma, size_.width(), size_.height());
 
     k_rofPrimalUpdate
-        <<< dimGrid(), dimBlock() >>> (u_->data(), u_prev_->data(), u_->stride(),
-                                       *f_tex_, *u_tex_, *p_tex_,
-                                       params_.lambda, tau, theta,
-                                       size_.width(), size_.height());
+        <<<
+          dimGrid(), dimBlock()
+        >>> (u_->data(), u_prev_->data(), u_->stride(),
+             *f_tex_, *u_tex_, *p_tex_, params_.lambda, tau, theta,
+             size_.width(), size_.height());
 
     sigma /= theta;
     tau *= theta;
@@ -223,19 +228,21 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
   {
     std::shared_ptr<ImageGpu8uC1> u(std::dynamic_pointer_cast<ImageGpu8uC1>(dst));
     k_convertResult8uC1
-        <<< dimGrid(), dimBlock() >>> (u->data(), u->stride(),
-                                       *u_tex_, size_.width(), size_.height());
+        <<<
+          dimGrid(), dimBlock()
+        >>> (u->data(), u->stride(),
+             *u_tex_, size_.width(), size_.height());
   }
-  break;
+    break;
   case PixelType::i32fC1:
   {
     std::shared_ptr<ImageGpu32fC1> u(std::dynamic_pointer_cast<ImageGpu32fC1>(dst));
     u_->copyTo(*u);
   }
-  break;
+    break;
   default:
     throw ze::cu::Exception("Unsupported PixelType.",
-                             __FILE__, __FUNCTION__, __LINE__);
+                            __FILE__, __FUNCTION__, __LINE__);
   }
   IMP_CUDA_CHECK();
 }
@@ -255,7 +262,7 @@ void RofDenoising<Pixel>::primalDualEnergy(
 
   k_rofPrimalEnergy
       <<<
-         this->dimGrid(), this->dimBlock()
+        this->dimGrid(), this->dimBlock()
       >>> (primal_energies_->data(), primal_energies_->stride(),
            size_.width(), size_.height(), params_.lambda,
            *f_tex_, *u_tex_);
@@ -267,15 +274,12 @@ void RofDenoising<Pixel>::primalDualEnergy(
 
   k_rofDualEnergy
       <<<
-         this->dimGrid(), this->dimBlock()
+        this->dimGrid(), this->dimBlock()
       >>> (dual_energies_->data(), dual_energies_->stride(),
            size_.width(), size_.height(), params_.lambda,
            *f_tex_, *p_tex_);
   dual_energy = 20.0;
   ze::cu::minMax(*dual_energies_, ed_min, ed_max);
-
-  std::cout << "!!! primal: min: " << ep_min << "; max: " << ep_max << std::endl;
-  std::cout << "!!! dual  : min: " << ed_min << "; max: " << ed_max << std::endl;
 
   IMP_CUDA_CHECK();
 }

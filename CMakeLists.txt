@@ -53,6 +53,8 @@ cs_cuda_add_library(${PROJECT_NAME}
 catkin_add_gtest(test_cu_image_pyramid test/test_cu_image_pyramid.cpp)
 target_link_libraries(test_cu_image_pyramid ${PROJECT_NAME})
 
+catkin_add_gtest(test_cu_rof test/test_cu_rof.cpp)
+target_link_libraries(test_cu_rof ${PROJECT_NAME})
 
 ##########
 # EXPORT #
