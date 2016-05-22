@@ -2,13 +2,14 @@
 
 namespace ze {
 
-af_dtype pixelTypeToAF(ze::PixelType type)
+template<typename Pixel>
+af_dtype ImageAF<Pixel>::pixelTypeToAF(ze::PixelType type)
 {
   switch (type)
   {
-  case ze::PixelType::i8uC1: return u8;
-  case ze::PixelType::i32sC1: return s32;
-  case ze::PixelType::i32fC1: return f32;
+  case PixelType::i8uC1: return u8;
+  case PixelType::i32sC1: return s32;
+  case PixelType::i32fC1: return f32;
   default: IMP_THROW_EXCEPTION("pixel type not supported");
   }
 }
@@ -27,24 +28,36 @@ ImageAF<Pixel>::ImageAF(const Image<Pixel>& from)
 template<typename Pixel>
 Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
 {
-  CHECK_LT(ox, this->width());
-  CHECK_LT(oy, this->height());
-
-  return nullptr;
-  //Pixel* buffer = (Pixel*)mat_.data;
-  //return &buffer[oy*this->stride() + ox];
+  CHECK_EQ(ox, 0);
+  CHECK_EQ(oy, 0);
+  switch(pixel_type<Pixel>::type)
+  {
+  case PixelType::i8uC1:
+    return reinterpret_cast<Pixel*>(arr_.device<uint8_t>());
+  case PixelType::i32sC1:
+    return reinterpret_cast<Pixel*>(arr_.device<int>());;
+  case PixelType::i32fC1:
+    return reinterpret_cast<Pixel*>(arr_.device<float>());;
+  default: IMP_THROW_EXCEPTION("pixel type not supported");
+  }
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
-  CHECK_LT(ox, this->width());
-  CHECK_LT(oy, this->height());
-
-  return nullptr;
-  //Pixel* buffer = (Pixel*)mat_.data;
-  //return reinterpret_cast<const Pixel*>(&buffer[oy*this->stride() + ox]);
+  CHECK_EQ(ox, 0);
+  CHECK_EQ(oy, 0);
+  switch(pixel_type<Pixel>::type)
+  {
+  case PixelType::i8uC1:
+    return reinterpret_cast<const Pixel*>(arr_.device<uint8_t>());
+  case PixelType::i32sC1:
+    return reinterpret_cast<const Pixel*>(arr_.device<int>());;
+  case PixelType::i32fC1:
+    return reinterpret_cast<const Pixel*>(arr_.device<float>());;
+  default: IMP_THROW_EXCEPTION("pixel type not supported");
+  }
 }
 
 template class ImageAF<ze::Pixel8uC1>;

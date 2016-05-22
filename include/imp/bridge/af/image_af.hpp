@@ -35,11 +35,14 @@ public:
 
     // Previews color image with green crosshairs
     while(!wnd.close())
-        wnd.image(arr_);
+      wnd.image(arr_);
   }
 
 protected:
   af::array arr_;
+
+private:
+  static af_dtype pixelTypeToAF(ze::PixelType type);
 };
 
 typedef ImageAF<ze::Pixel8uC1> ImageAF8uC1;
