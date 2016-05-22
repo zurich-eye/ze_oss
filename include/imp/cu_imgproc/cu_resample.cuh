@@ -1,5 +1,4 @@
-#ifndef IMP_CU_RESAMPLE_CUH
-#define IMP_CU_RESAMPLE_CUH
+#pragma once
 
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>
@@ -20,5 +19,3 @@ void resample(ImageGpu<Pixel>& dst,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_RESAMPLE_CUH

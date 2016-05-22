@@ -136,7 +136,7 @@ void RofDenoising<Pixel>::init(const Size2u& size)
   IMP_CUDA_CHECK();
 
   // setup textures
-
+  // (except input image which is set when f_ is set from the input image)
   u_tex_ = u_->genTexture(false, cudaFilterModeLinear, cudaAddressModeClamp,
                           cudaReadModeElementType);
   u_prev_tex_ = u_prev_->genTexture(false, cudaFilterModeLinear,
@@ -174,7 +174,7 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
     this->init(f_->size());
   }
 
-  // internal params
+  // internal algorithm params
   float L = sqrtf(8.0f);
   float tau = 1/L;
   float sigma = 1/L;

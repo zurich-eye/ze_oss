@@ -1,5 +1,4 @@
-#ifndef IMP_CU_IMAGE_FILTER_CUH
-#define IMP_CU_IMAGE_FILTER_CUH
+#pragma once
 
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>
@@ -40,5 +39,3 @@ void filterGauss(ImageGpu<Pixel>& dst,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_IMAGE_FILTER_CUH

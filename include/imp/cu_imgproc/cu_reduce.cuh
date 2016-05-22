@@ -1,5 +1,4 @@
-#ifndef IMP_CU_REDUCE_CUH
-#define IMP_CU_REDUCE_CUH
+#pragma once
 
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>
@@ -30,5 +29,3 @@ void reduce(ImageGpu<Pixel>& dst,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_REDUCE_CUH

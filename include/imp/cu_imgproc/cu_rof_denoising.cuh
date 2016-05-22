@@ -1,5 +1,4 @@
-#ifndef IMP_CU_ROF_DENOISING_CUH
-#define IMP_CU_ROF_DENOISING_CUH
+#pragma once
 
 #include <imp/cu_imgproc/cu_variational_denoising.cuh>
 
@@ -54,5 +53,3 @@ using RofDenoisingPtr = typename std::shared_ptr<RofDenoising<Pixel>>;
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_ROF_DENOISING_CUH

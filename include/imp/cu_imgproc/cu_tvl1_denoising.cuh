@@ -1,5 +1,4 @@
-#ifndef IMP_CU_ROF_DENOISING_CUH
-#define IMP_CU_ROF_DENOISING_CUH
+#pragma once
 
 #include <imp/cu_imgproc/cu_variational_denoising.cuh>
 
@@ -48,5 +47,3 @@ using TvL1DenoisingPtr = typename std::shared_ptr<TvL1Denoising<Pixel>>;
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_ROF_DENOISING_CUH

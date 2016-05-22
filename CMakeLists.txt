@@ -27,6 +27,7 @@ set(CU_HDRS
   include/imp/cu_imgproc/cu_variational_denoising.cuh
   include/imp/cu_imgproc/cu_rof_denoising.cuh
   include/imp/cu_imgproc/cu_tvl1_denoising.cuh
+  include/imp/cu_imgproc/str_tex_decomposer.hpp
   )
 
 set(CU_SRCS
@@ -38,6 +39,7 @@ set(CU_SRCS
   src/cu_variational_denoising.cu
   src/cu_rof_denoising.cu
   src/cu_tvl1_denoising.cu
+  src/str_tex_decomposer.cpp
   )
 
 #cuda_compile(CU_OBJ ${CU_SRCS} ${CU_HDRS})
