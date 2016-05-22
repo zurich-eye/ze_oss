@@ -1,11 +1,11 @@
-#ifndef IMP_CU_VARIATIONAL_DENOISING_CUH
-#define IMP_CU_VARIATIONAL_DENOISING_CUH
+#pragma once
 
 #include <memory>
 #include <cuda_runtime_api.h>
 #include <imp/core/image_base.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
+#include <ze/common/macros.h>
 
 namespace ze {
 namespace cu {
@@ -27,6 +27,7 @@ struct VariationalDenoisingParams
 class VariationalDenoising
 {
 public:
+  ZE_POINTER_TYPEDEFS(VariationalDenoising);
   typedef ze::cu::Fragmentation<16> Fragmentation;
   typedef std::shared_ptr<Fragmentation> FragmentationPtr;
 
@@ -85,6 +86,3 @@ inline std::ostream& operator<<(std::ostream& os,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_VARIATIONAL_DENOISING_CUH
-

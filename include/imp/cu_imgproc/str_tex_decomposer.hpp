@@ -22,20 +22,21 @@ public:
   using ImageGpu = ze::cu::ImageGpu<Pixel>;
 
 public:
-  StrTexDecomposer() = default;
+  StrTexDecomposer();
   ~StrTexDecomposer() = default;
 
-  void solve(const ze::ImageBase::Ptr& src,
-             const ze::cu::ImageGpuPtr<Pixel> tex_image,
-             const ze::cu::ImageGpuPtr<Pixel> structure_image = NULL);
+  void solve(const ze::cu::ImageGpuPtr<Pixel>& src,
+             const ze::cu::ImageGpuPtr<Pixel>& tex_image,
+             const ze::cu::ImageGpuPtr<Pixel>& structure_image = NULL);
 
 protected:
   void init(const Size2u& size);
-  void print(std::ostream &os) const;
+//  void print(std::ostream &os) const;
 
 private:
-  typename ImageGpu::Ptr f_;
-  ze::cu::VariationalDenoising denoiser_;
+  ImageGpuPtr<Pixel> src_;
+  ImageGpuPtr<Pixel> denoised_;
+  ze::cu::VariationalDenoising::Ptr denoiser_;
 };
 
 //-----------------------------------------------------------------------------
@@ -45,9 +46,7 @@ typedef StrTexDecomposer<ze::Pixel8uC1> StrTexDecomposer8uC1;
 typedef StrTexDecomposer<ze::Pixel32fC1> StrTexDecomposer32fC1;
 
 template <typename Pixel>
-using StrTexDecomposer = typename std::shared_ptr<StrTexDecomposer<Pixel>>;
+using StrTexDecomposerPtr = typename std::shared_ptr<StrTexDecomposer<Pixel>>;
 
 } // namespace cu
 } // namespace ze
-
-#endif // IMP_CU_ROF_DENOISING_CUH

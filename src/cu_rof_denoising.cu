@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include <cuda_runtime.h>
-#include <glog/logging.h>
 
 #include <imp/cuda_toolkit/helper_math.h>
 #include <imp/core/pixel.hpp>

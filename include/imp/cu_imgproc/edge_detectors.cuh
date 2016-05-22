@@ -1,5 +1,4 @@
-#ifndef IM_CU_EDGE_DETECTORS_CUH
-#define IM_CU_EDGE_DETECTORS_CUH
+#pragma once
 
 #include <imp/core/types.hpp>
 #include <imp/core/pixel_enums.hpp>
@@ -25,5 +24,3 @@ void naturalEdges(ImageGpu<Pixel>& dst,
 
 } // namespace cu
 } // namespace ze
-
-#endif // IM_CU_EDGE_DETECTORS_CUH
