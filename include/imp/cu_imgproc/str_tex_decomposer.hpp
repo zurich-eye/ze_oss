@@ -34,9 +34,13 @@ protected:
 //  void print(std::ostream &os) const;
 
 private:
+  ze::Size2u size_;
   ImageGpuPtr<Pixel> src_;
   ImageGpuPtr<Pixel> denoised_;
+  ImageGpuPtr<Pixel> str_;
+  ImageGpuPtr<Pixel> tex_;
   ze::cu::VariationalDenoising::Ptr denoiser_;
+  float weight_ = 0.8; //!< weighting of denoised towards original image during decomposition
 };
 
 //-----------------------------------------------------------------------------
