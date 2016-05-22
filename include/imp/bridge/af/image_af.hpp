@@ -2,11 +2,11 @@
 
 #include <arrayfire.h>
 #include <af/internal.h>
-#include <imp/core/image_raw.hpp>
+#include <imp/core/image.hpp>
 
 namespace ze {
 
-class ImageAF32fC1 : public ze::ImageRaw32fC1
+class ImageAF32fC1 : public ImageBase
 {
 public:
   ImageAF32fC1() = delete;

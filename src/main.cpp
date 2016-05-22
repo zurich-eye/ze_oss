@@ -1,10 +1,8 @@
 #include <arrayfire.h>
 #include <glog/logging.h>
 #include <gflags/gflags.h>
-#include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/bridge/opencv/cv_bridge.hpp>
+// #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/bridge/af/feature_detection.hpp>
-
 #include <imp/bridge/af/image_af.hpp>
 
 constexpr const char* img_file_path = "/home/mpi/workspace/zurich_eye_ws/src/ze_test_data/data/ze_feature_detection/752x480/pyr_0.png";
