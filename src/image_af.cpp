@@ -42,7 +42,6 @@ Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
   }
 }
 
-//-----------------------------------------------------------------------------
 template<typename Pixel>
 const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
@@ -58,6 +57,12 @@ const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
     return reinterpret_cast<const Pixel*>(arr_.device<float>());;
   default: IMP_THROW_EXCEPTION("pixel type not supported");
   }
+}
+
+template<typename Pixel>
+const af::array& ImageAF<Pixel>::afArray() const
+{
+  return arr_;
 }
 
 template class ImageAF<ze::Pixel8uC1>;

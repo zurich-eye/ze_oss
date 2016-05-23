@@ -36,7 +36,7 @@ target_link_libraries(main ${PROJECT_NAME})
 ###
 
 catkin_add_gtest(${PROJECT_NAME}-test
-    test/bridge_feature_detection.cpp
+    test/imp_bridge_af_test.cpp
  )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 

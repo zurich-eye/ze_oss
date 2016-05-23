@@ -57,10 +57,14 @@ int main(int argc, char** argv)
 #endif
 
   ze::ImageAF32fC1 im(*cv_img);
-  im.display();
+  af::Window wnd("AF array");
 
+  // Previews color image with green crosshairs
+  while(!wnd.close())
+    wnd.image(im.afArray());
 
-  im.fast();
+  af::features feat = af::fast(im.afArray()*255.f, 20.0f, 9, true, 0.05);
+  printf("Features found: %lu\n", feat.getNumFeatures());
 
   return 0;
 }

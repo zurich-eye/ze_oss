@@ -23,20 +23,7 @@ public:
   virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) override;
   virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const override;
 
-  void fast()
-  {
-    af::features feat = af::fast(arr_*255.f, 20.0f, 9, true, 0.05);
-    printf("Features found: %lu\n", feat.getNumFeatures());
-  }
-
-  void display()
-  {
-    af::Window wnd("AF array");
-
-    // Previews color image with green crosshairs
-    while(!wnd.close())
-      wnd.image(arr_);
-  }
+  const af::array& afArray() const;
 
 protected:
   af::array arr_;
