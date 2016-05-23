@@ -19,6 +19,7 @@ public:
   virtual ~ImageAF() = default;
 
   ImageAF(const Image<Pixel>& from);
+  ImageAF(const af::array& from);
 
   virtual Pixel* data(uint32_t ox = 0, uint32_t oy = 0) override;
   virtual const Pixel* data(uint32_t ox = 0, uint32_t oy = 0) const override;

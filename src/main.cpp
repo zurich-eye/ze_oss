@@ -4,6 +4,8 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/bridge/af/feature_detection.hpp>
 #include <imp/bridge/af/image_af.hpp>
+//#include <imp/imgproc/image_pyramid.h>
+#include <imp/bridge/af/pyramid_af.hpp>
 
 constexpr const char* img_file_path = "/home/mpi/workspace/arrayfire/assets/examples/images/man.jpg";
 
@@ -15,7 +17,7 @@ int main(int argc, char** argv)
   FLAGS_colorlogtostderr = true;
 
 
-  ze::ImageCv32fC1::Ptr cv_img;
+  ze::ImageCv8uC1::Ptr cv_img;
   ze::cvBridgeLoad(
         cv_img,
         img_file_path,
@@ -56,15 +58,24 @@ int main(int argc, char** argv)
   //! TODO (MPI): who takes care of freeing gpu memory?
 #endif
 
-  ze::ImageAF32fC1 im(*cv_img);
+  ze::ImageAF8uC1::Ptr im = std::make_shared<ze::ImageAF8uC1>(*cv_img);
+  ze::ImagePyramid8uC1::Ptr pyr = ze::createAFImagePyramid<ze::Pixel8uC1>(im, 0.5, 5, 8);
+
+  //ze::ImagePyramid8uC1 pyr(ze::Size2u(im->width(), im->height()));
+  //pyr.emplace_back(im);
+
+  const af::array& lvl0 = dynamic_cast<ze::ImageAF8uC1&>(pyr->at(0)).afArray();
+  const af::array& half_sampled = dynamic_cast<ze::ImageAF8uC1&>(pyr->at(1)).afArray();
+
+  printf("Printing level one of image pyramid dims: [%llu, %llu]\n", half_sampled.dims()[0], half_sampled.dims()[1]);
+
   af::Window wnd("AF array");
-
-  // Previews color image with green crosshairs
   while(!wnd.close())
-    wnd.image(im.afArray());
+    wnd.image(lvl0);
 
-  af::features feat = af::fast(im.afArray()*255.f, 20.0f, 9, true, 0.05);
+  af::features feat = af::fast(lvl0, 20.0f, 9, true, 0.05);
   printf("Features found: %lu\n", feat.getNumFeatures());
+
 
   return 0;
 }

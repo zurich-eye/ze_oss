@@ -14,15 +14,37 @@ af_dtype ImageAF<Pixel>::pixelTypeToAF(ze::PixelType type)
   }
 }
 
+ze::PixelType afToPixelType(af_dtype type)
+{
+  switch (type)
+  {
+  case u8: return PixelType::i8uC1;
+  case s32: return PixelType::i32sC1;
+  case f32: return PixelType::i32fC1;
+  default: IMP_THROW_EXCEPTION("ArrayFire type not supported");
+  }
+}
+
 template<typename Pixel>
 ImageAF<Pixel>::ImageAF(const Image<Pixel>& from)
   : Image<Pixel>(from)
 {
-  arr_ = af::createStridedArray(
+  arr_ = af::array(from.height(), from.width(), pixelTypeToAF(pixel_type<Pixel>::type));
+      /*
+      af::createStridedArray(
         from.data(), 0, af::dim4(from.width(),from.height(), 1, 1),
         af::dim4(1, from.stride(), 1, 1),
         pixelTypeToAF(pixel_type<Pixel>::type), afHost);
-  arr_ = arr_.T();
+            */
+  //arr_ = arr_.T();
+}
+
+template<typename Pixel>
+ImageAF<Pixel>::ImageAF(const af::array& from)
+  : Image<Pixel>(ze::Size2u(from.dims()[1], from.dims()[0])),
+    arr_(from)
+{
+  printf("ImageAF constructor called, size (%i, %i)\n", this->width(), this->height());
 }
 
 template<typename Pixel>
