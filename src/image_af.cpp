@@ -1,51 +1,48 @@
 #include <imp/bridge/af/image_af.hpp>
+#include <imp/cu_core/cu_image_gpu.cuh>
 
 namespace ze {
 
 template<typename Pixel>
-af_dtype ImageAF<Pixel>::pixelTypeToAF(ze::PixelType type)
+class ImpAfConversionBuffer
 {
-  switch (type)
+private:
+  std::unique_ptr<Pixel[]> data_;
+public:
+  ImpAfConversionBuffer(const Image<Pixel>& from)
   {
-  case PixelType::i8uC1: return u8;
-  case PixelType::i32sC1: return s32;
-  case PixelType::i32fC1: return f32;
-  default: IMP_THROW_EXCEPTION("pixel type not supported");
+    data_.reset(new Pixel[from.width()*from.height()]);
+    for(size_t r=0; r < from.height(); ++r)
+    {
+      for(size_t c=0; c < from.width(); ++c)
+      {
+        data_.get()[c*from.height()+r] = from.pixel(c, r);
+      }
+    }
   }
-}
-
-ze::PixelType afToPixelType(af_dtype type)
-{
-  switch (type)
+  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data_.get()))
   {
-  case u8: return PixelType::i8uC1;
-  case s32: return PixelType::i32sC1;
-  case f32: return PixelType::i32fC1;
-  default: IMP_THROW_EXCEPTION("ArrayFire type not supported");
+    return ze::cu::toCudaVectorType(this->data_.get());
   }
-}
+  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data_.get()))
+  {
+    return ze::cu::toConstCudaVectorType(this->data_.get());
+  }
+};
 
 template<typename Pixel>
 ImageAF<Pixel>::ImageAF(const Image<Pixel>& from)
   : Image<Pixel>(from)
 {
-  arr_ = af::array(from.height(), from.width(), pixelTypeToAF(pixel_type<Pixel>::type));
-      /*
-      af::createStridedArray(
-        from.data(), 0, af::dim4(from.width(),from.height(), 1, 1),
-        af::dim4(1, from.stride(), 1, 1),
-        pixelTypeToAF(pixel_type<Pixel>::type), afHost);
-            */
-  //arr_ = arr_.T();
+  ImpAfConversionBuffer<Pixel> buffer(from);
+  arr_ = af::array(from.height(), from.width(), buffer.cuData());
 }
 
 template<typename Pixel>
 ImageAF<Pixel>::ImageAF(const af::array& from)
   : Image<Pixel>(ze::Size2u(from.dims()[1], from.dims()[0])),
     arr_(from)
-{
-  printf("ImageAF constructor called, size (%i, %i)\n", this->width(), this->height());
-}
+{ }
 
 template<typename Pixel>
 Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
@@ -55,7 +52,7 @@ Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
   switch(pixel_type<Pixel>::type)
   {
   case PixelType::i8uC1:
-    return reinterpret_cast<Pixel*>(arr_.device<uint8_t>());
+    return reinterpret_cast<Pixel*>(arr_.device<unsigned char>());
   case PixelType::i32sC1:
     return reinterpret_cast<Pixel*>(arr_.device<int>());;
   case PixelType::i32fC1:
@@ -72,7 +69,7 @@ const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
   switch(pixel_type<Pixel>::type)
   {
   case PixelType::i8uC1:
-    return reinterpret_cast<const Pixel*>(arr_.device<uint8_t>());
+    return reinterpret_cast<const Pixel*>(arr_.device<unsigned char>());
   case PixelType::i32sC1:
     return reinterpret_cast<const Pixel*>(arr_.device<int>());;
   case PixelType::i32fC1:
