@@ -50,6 +50,15 @@ void CameraImuSynchronizer::initBuffers(FloatType imu_buffer_length_seconds)
 void CameraImuSynchronizer::addImgData(
     int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx)
 {
+  if (sync_frame_count_ < FLAGS_data_sync_init_skip_n_frames)
+  {
+    if (camera_idx == 0)
+    {
+      ++sync_frame_count_;
+    }
+    return;
+  }
+
   CHECK_LT(camera_idx, camera_rig_size_);
   if(img_buffer_.at(camera_idx).first != -1)
   {
@@ -76,15 +85,6 @@ void CameraImuSynchronizer::addImgData(
       // invalidate old data
       img_buffer_.at(i).first = -1;
       LOG(WARNING) << "Invalidated image of older frame.";
-    }
-  }
-
-  if (camera_idx == 0)
-  {
-    ++sync_frame_count_;
-    if (sync_frame_count_ < FLAGS_data_sync_init_skip_n_frames)
-    {
-      return;
     }
   }
 
