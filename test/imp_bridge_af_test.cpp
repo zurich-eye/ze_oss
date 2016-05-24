@@ -8,7 +8,7 @@ namespace ze {
 constexpr const char* g_test_data_name =
     "ze_feature_detection";
 constexpr const char* g_predefined_img_data_file_name =
-    "640x480/pyr_0.png";
+    "752x480/pyr_0.png";
 } // ze namespace
 
 TEST(impBridgeAFTest, constructFromImpImage_32fC1)
@@ -31,10 +31,6 @@ TEST(impBridgeAFTest, constructFromImpImage_32fC1)
   double cv_sum = cv::sum(cv_img->cvMat())[0];
   printf("OpenCV sum: %f\n", cv_sum);
   EXPECT_NEAR(cv_sum, af_sum, 0.01);
-
-  af::Window wnd("AF array");
-  while(!wnd.close())
-    wnd.image(af_img.afArray());
 }
 
 TEST(impBridgeAFTest, constructFromImpImage_8uC1)
@@ -57,10 +53,6 @@ TEST(impBridgeAFTest, constructFromImpImage_8uC1)
   double cv_sum = cv::sum(cv_img->cvMat())[0];
   printf("OpenCV sum: %f\n", cv_sum);
   EXPECT_NEAR(cv_sum, af_sum, 0.01);
-
-  af::Window wnd("AF array");
-  while(!wnd.close())
-    wnd.image(af_img.afArray());
 }
 
 TEST(impBridgeAFTest, constructFromAFArray_32fC1)
@@ -90,12 +82,7 @@ TEST(impBridgeAFTest, constructFromAFArray_32fC1)
   double cv_sum = cv::sum(cv_img->cvMat())[0];
   printf("OpenCV sum: %f\n", cv_sum);
   EXPECT_NEAR(cv_sum, af_sum, 0.01);
-
-  af::Window wnd("AF array");
-  while(!wnd.close())
-    wnd.image(af_img.afArray());
 }
-
 
 TEST(impBridgeAFTest, constructFromAFArray_8uC1)
 {
@@ -124,10 +111,6 @@ TEST(impBridgeAFTest, constructFromAFArray_8uC1)
   double cv_sum = cv::sum(cv_img->cvMat())[0];
   printf("OpenCV sum: %f\n", cv_sum);
   EXPECT_NEAR(cv_sum, af_sum, 0.01);
-
-  af::Window wnd("AF array");
-  while(!wnd.close())
-    wnd.image(af_img.afArray());
 }
 
 ZE_UNITTEST_ENTRYPOINT

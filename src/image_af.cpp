@@ -4,29 +4,27 @@
 namespace ze {
 
 template<typename Pixel>
-class ImpAfConversionBuffer
+struct ImpAfConversionBuffer
 {
-private:
-  std::unique_ptr<Pixel[]> data_;
-public:
+  std::unique_ptr<Pixel[]> data;
   ImpAfConversionBuffer(const Image<Pixel>& from)
   {
-    data_.reset(new Pixel[from.width()*from.height()]);
-    for(size_t r=0; r < from.height(); ++r)
+    data.reset(new Pixel[from.width()*from.height()]);
+    for(size_t r=0; r<from.height(); ++r)
     {
-      for(size_t c=0; c < from.width(); ++c)
+      for(size_t c=0; c<from.width(); ++c)
       {
-        data_.get()[c*from.height()+r] = from.pixel(c, r);
+        data.get()[c*from.height()+r] = from.pixel(c, r);
       }
     }
   }
-  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data_.get()))
+  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data.get()))
   {
-    return ze::cu::toCudaVectorType(this->data_.get());
+    return ze::cu::toCudaVectorType(this->data.get());
   }
-  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data_.get()))
+  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data.get()))
   {
-    return ze::cu::toConstCudaVectorType(this->data_.get());
+    return ze::cu::toConstCudaVectorType(this->data.get());
   }
 };
 
