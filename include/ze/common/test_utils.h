@@ -38,10 +38,12 @@ template<class T>
 typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
-  std::default_random_engine generator;
-  std::uniform_real_distribution<T> distribution(FLT_MIN,
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  //std::default_random_engine generator;
+  std::uniform_real_distribution<T> distribution(std::numeric_limits<T>::lowest(),
                                                  std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
+  auto random_val = std::bind(distribution, std::ref(generator));
   return random_val;
 }
 
