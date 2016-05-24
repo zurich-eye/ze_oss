@@ -1,5 +1,7 @@
 #pragma once
 
+#include <float.h>
+#include <limits>
 #include <map>
 #include <string>
 #include <ze/common/transformation.h>
@@ -17,5 +19,30 @@ std::map<int64_t, Transformation> loadIndexedPosesFromCsv(const std::string& fil
 //! because ze_common does not depend on imp_core. data must be preallocated!
 void loadDepthmapFromFile(
     const std::string& filename, const size_t data_size, float* data);
+
+// ############################################################################
+// RANDOM NUMBER GENERATORS
+
+template<class T>
+typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
+getRandomGenerator()
+{
+  std::default_random_engine generator;
+  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
+                                                std::numeric_limits<T>::max());
+  auto random_val = std::bind(distribution, generator);
+  return random_val;
+}
+
+template<class T>
+typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
+getRandomGenerator()
+{
+  std::default_random_engine generator;
+  std::uniform_real_distribution<T> distribution(FLT_MIN,
+                                                 std::numeric_limits<T>::max());
+  auto random_val = std::bind(distribution, generator);
+  return random_val;
+}
 
 } // namespace ze
