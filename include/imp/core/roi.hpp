@@ -98,6 +98,21 @@ struct RoiBase
 
 };
 
+template<typename T, std::uint8_t DIM, typename Derived>
+inline std::ostream& operator<<(std::ostream &os, const RoiBase<T, DIM, Derived>& rhs)
+{
+  auto it = rhs.lu().begin();
+  os << "(" << *it;
+  ++it;
+  for (; it != rhs.lu().end(); ++it)
+  {
+    os << "," << *it;
+  }
+  os << ")";
+  os << rhs.size();
+  return os;
+}
+
 //------------------------------------------------------------------------------
 // relational operators
 
