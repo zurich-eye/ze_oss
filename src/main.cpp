@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 #include <imp/bridge/opencv/cv_bridge.hpp>
-#include <imp/bridge/af/feature_detection.hpp>
+#include <imp/bridge/af/fast_detector_af.hpp>
 #include <imp/bridge/af/image_af.hpp>
 #include <imp/bridge/af/pyramid_af.hpp>
 
@@ -31,5 +31,10 @@ int main(int argc, char** argv)
     while(!wnd.close())
       wnd.image(lvl.afArray());
   }
+
+  ze::FastDetectorOptions fast_options;
+  ze::FastDetectorAF detector(fast_options, im->size());
+
+
   return 0;
 }
