@@ -13,12 +13,14 @@ uint32_t SiftDetectorAF::detect(const ImagePyramid8uC1 &pyr, KeypointsWrapper &k
   return 0;
 }
 
-uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, KeypointsWrapper& keypoints)
+uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, SiftKeypointWrapper::Ptr& keypoints)
 {
   af::features feat;
   af::array desc;
   af::sift(
-        feat, desc, im.afArray(),
+        feat,
+        desc,
+        im.afArray(),
         options_.num_layers,
         options_.contrast_thr,
         options_.edge_thr,
@@ -27,7 +29,16 @@ uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, KeypointsWrapper& keypoi
         options_.intensity_scale,
         options_.feature_ratio);
 
-  return 0;
+  const size_t num_detected = feat.getNumFeatures();
+  keypoints.reset(new SiftKeypointWrapper(num_detected));
+  feat.getX().host(keypoints->x.get());
+  feat.getY().host(keypoints->y.get());
+  feat.getScore().host(keypoints->score.get());
+  feat.getOrientation().host(keypoints->orient.get());
+  feat.getSize().host(keypoints->size.get());
+  desc.host(keypoints->descr.get());
+
+  return num_detected;
 }
 
 } // ze namespace

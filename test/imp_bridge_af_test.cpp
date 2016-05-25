@@ -261,25 +261,14 @@ TEST(impBridgeAFTest, siftDetectorAF32fC1)
 
   ze::SiftDetectorOptions options;
   ze::SiftDetectorAF detector(options, im->size());
-
-  uint32_t max_fts = 6000u;
-  ze::Keypoints px_vec(2, max_fts);
-  ze::KeypointScores score_vec(max_fts);
-  ze::KeypointLevels level_vec(max_fts);
-  ze::KeypointAngles angle_vec(max_fts);
-  ze::KeypointTypes type_vec(max_fts);
-  ze::Descriptors descriptors;
-  uint32_t num_detected = 0u;
-  ze::KeypointsWrapper features(
-        px_vec, score_vec, level_vec, angle_vec, type_vec,
-        descriptors, num_detected);
-
+  ze::SiftKeypointWrapper::Ptr features;
   detector.detect(*im, features); // GPU warm-up
   auto detectLambda = [&](){
-    features.num_detected = 0u; // Reset.
     detector.detect(*im, features);
   };
   ze::runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
+  ze::SiftKeypointWrapper::Descriptors descr = features->getDescriptors();
+  std::cout << "Descriptors:\n" << descr.cols();
 }
 
 ZE_UNITTEST_ENTRYPOINT

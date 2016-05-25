@@ -27,20 +27,8 @@ int main(int argc, char** argv)
 
   ze::SiftDetectorOptions options;
   ze::SiftDetectorAF detector(options, im->size());
-
-  uint32_t max_fts = 6000u;
-  ze::Keypoints px_vec(2, max_fts);
-  ze::KeypointScores score_vec(max_fts);
-  ze::KeypointLevels level_vec(max_fts);
-  ze::KeypointAngles angle_vec(max_fts);
-  ze::KeypointTypes type_vec(max_fts);
-  ze::Descriptors descriptors;
-  uint32_t num_detected = 0u;
-  ze::KeypointsWrapper features(
-        px_vec, score_vec, level_vec, angle_vec, type_vec,
-        descriptors, num_detected);
-
+  ze::SiftKeypointWrapper::Ptr features;
   detector.detect(*im, features);
-
+  ze::SiftKeypointWrapper::Descriptors descr = features->getDescriptors();
   return 0;
 }
