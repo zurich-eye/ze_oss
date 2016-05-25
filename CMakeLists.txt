@@ -18,11 +18,13 @@ include_directories(${ArrayFire_INCLUDE_DIRS})
 set(HEADERS
   include/imp/bridge/af/image_af.hpp
   include/imp/bridge/af/fast_detector_af.hpp
+  include/imp/bridge/af/sift_detector_af.hpp
   )
 
 set(SOURCES
   src/image_af.cpp
   src/fast_detector_af.cpp
+  src/sift_detector_af.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

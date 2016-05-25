@@ -197,9 +197,9 @@ TEST(impBridgeAFTest, fastDetectorAF8uC1)
 
   detector.detect(*pyr, features); // GPU warm-up
   auto detectLambda = [&](){
-      features.num_detected = 0u; // Reset.
-      detector.detect(*pyr, features);
-    };
+    features.num_detected = 0u; // Reset.
+    detector.detect(*pyr, features);
+  };
   ze::runTimingBenchmark(detectLambda, 10, 20, "AF FAST Detector", true);
 
 #define ZE_TEST_FAST_AF_SHOW 0
