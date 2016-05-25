@@ -28,6 +28,7 @@ void loadDepthmapFromFile(
 //! Random number generator for integral types.
 //! @return Random number in interval [lowest, highest]
 template<class T>
+inline
 typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
@@ -42,6 +43,7 @@ getRandomGenerator()
 //! Random number generator for real types.
 //! @return Random number in interval [0.0, 1.0]
 template<class T>
+inline
 typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
@@ -56,13 +58,11 @@ getRandomGenerator()
 
 // ----------------------------------------------------------------------------
 //! Random number generator that returns a FloatType between 0.0 and 1.0.
-template<class T>
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator01()
+inline std::function<FloatType()> getRandomGenerator01()
 {
   std::mt19937 generator(std::random_device{}());
   std::uniform_real_distribution<FloatType> distribution(FloatType{0.0}, FloatType{1.0});
-  auto random_val = std::bind(distribution, generator);
+  std::function<FloatType()> random_val = std::bind(distribution, generator);
   return random_val;
 }
 
