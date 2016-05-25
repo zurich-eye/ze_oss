@@ -16,7 +16,7 @@ public:
   virtual ~SiftDetectorAF() = default;
   SiftDetectorAF(const SiftDetectorOptions& options, const Size2u& image_size);
   virtual uint32_t detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& keypoints) override;
-  virtual uint32_t detect(const ImageAF8uC1& pyr, KeypointsWrapper& keypoints);
+  virtual uint32_t detect(const ImageAF32fC1& im, KeypointsWrapper& keypoints);
 
 private:
   SiftDetectorOptions options_;

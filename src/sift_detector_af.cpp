@@ -13,11 +13,14 @@ uint32_t SiftDetectorAF::detect(const ImagePyramid8uC1 &pyr, KeypointsWrapper &k
   return 0;
 }
 
-uint32_t SiftDetectorAF::detect(const ImageAF8uC1& pyr, KeypointsWrapper& keypoints)
+uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, KeypointsWrapper& keypoints)
 {
   af::features feat;
   af::array desc;
-  af::sift(feat, desc, pyr.afArray(), 3, 0.04f, 10.0f, 1.6f, true, 1.f/256.f, 0.05f);
+  af::sift(feat, desc, im.afArray(), 3, 0.04f, 10.0f, 1.6f, true, 1.f, 0.05f);
+
+
+
   return 0;
 }
 

@@ -1,6 +1,6 @@
-#include <imp/bridge/af/image_af.hpp>
-#include <imp/bridge/af/pyramid_af.hpp>
 #include <imp/bridge/af/fast_detector_af.hpp>
+#include <imp/bridge/af/sift_detector_af.hpp>
+
 #include <imp/bridge/opencv/cv_bridge.hpp>
 
 #include <ze/common/benchmark.h>
@@ -241,6 +241,42 @@ TEST(impBridgeAFTest, fastDetectorAF8uC1)
     }
 #endif
   }
+}
+
+TEST(impBridgeAFTest, siftDetectorAF32fC1)
+{
+  std::string path(
+        ze::joinPath(
+          ze::getTestDataDir(ze::g_test_data_name),
+          ze::g_predefined_img_data_file_name));
+
+  ze::ImageCv32fC1::Ptr cv_img;
+  ze::cvBridgeLoad(
+        cv_img,
+        path,
+        ze::PixelOrder::gray);
+
+  ze::ImageAF32fC1::Ptr im =
+      std::make_shared<ze::ImageAF32fC1>(*cv_img);
+
+  ze::SiftDetectorOptions options;
+  ze::SiftDetectorAF detector(options, im->size());
+
+  uint32_t max_fts = 6000u;
+  ze::Keypoints px_vec(2, max_fts);
+  ze::KeypointScores score_vec(max_fts);
+  ze::KeypointLevels level_vec(max_fts);
+  ze::KeypointAngles angle_vec(max_fts);
+  ze::KeypointTypes type_vec(max_fts);
+  ze::Descriptors descriptors;
+  uint32_t num_detected = 0u;
+  ze::KeypointsWrapper features(
+        px_vec, score_vec, level_vec, angle_vec, type_vec,
+        descriptors, num_detected);
+
+  detector.detect(*im, features);
+
+
 }
 
 ZE_UNITTEST_ENTRYPOINT

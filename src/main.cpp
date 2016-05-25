@@ -16,14 +16,14 @@ int main(int argc, char** argv)
   FLAGS_alsologtostderr = true;
   FLAGS_colorlogtostderr = true;
 
-  ze::ImageCv8uC1::Ptr cv_img;
+  ze::ImageCv32fC1::Ptr cv_img;
   ze::cvBridgeLoad(
         cv_img,
         img_file_path,
         ze::PixelOrder::gray);
 
-  ze::ImageAF8uC1::Ptr im =
-      std::make_shared<ze::ImageAF8uC1>(*cv_img);
+  ze::ImageAF32fC1::Ptr im =
+      std::make_shared<ze::ImageAF32fC1>(*cv_img);
 
   ze::SiftDetectorOptions options;
   ze::SiftDetectorAF detector(options, im->size());
