@@ -1,6 +1,9 @@
 #include <imp/bridge/af/image_af.hpp>
 #include <imp/bridge/af/pyramid_af.hpp>
+#include <imp/bridge/af/fast_detector_af.hpp>
 #include <imp/bridge/opencv/cv_bridge.hpp>
+
+#include <ze/common/benchmark.h>
 #include <ze/common/file_utils.h>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
@@ -156,6 +159,87 @@ TEST(impBridgeAFTest, createAFImagePyramid8uC1)
     double nel = lvl.numel();
     printf("level %lu SAD: %f, SAD/nel: %f\n", l, sad, sad/nel);
     EXPECT_LT(sad/nel, 0.1);
+  }
+}
+
+TEST(impBridgeAFTest, fastDetectorAF8uC1)
+{
+  std::string path(
+        ze::joinPath(
+          ze::getTestDataDir(ze::g_test_data_name),
+          ze::g_predefined_img_data_file_name));
+  ze::ImageCv8uC1::Ptr cv_img;
+  ze::cvBridgeLoad(
+        cv_img,
+        path,
+        ze::PixelOrder::gray);
+
+  // Create AF pyramid
+  ze::ImageAF8uC1::Ptr af_im =
+      std::make_shared<ze::ImageAF8uC1>(*cv_img);
+  ze::ImagePyramid8uC1::Ptr pyr =
+      ze::createAFImagePyramid<ze::Pixel8uC1>(af_im, 0.5, 5, 8);
+
+  uint32_t max_fts = 6000u;
+  ze::Keypoints px_vec(2, max_fts);
+  ze::KeypointScores score_vec(max_fts);
+  ze::KeypointLevels level_vec(max_fts);
+  ze::KeypointAngles angle_vec(max_fts);
+  ze::KeypointTypes type_vec(max_fts);
+  ze::Descriptors descriptors;
+  uint32_t num_detected = 0u;
+  ze::KeypointsWrapper features(
+        px_vec, score_vec, level_vec, angle_vec, type_vec,
+        descriptors, num_detected);
+  ze::FastDetectorOptions fast_options;
+  fast_options.threshold = 20.0f;
+  ze::FastDetectorAF detector(fast_options, af_im->size());
+
+  detector.detect(*pyr, features); // GPU warm-up
+  auto detectLambda = [&](){
+      features.num_detected = 0u; // Reset.
+      detector.detect(*pyr, features);
+    };
+  ze::runTimingBenchmark(detectLambda, 10, 20, "AF FAST Detector", true);
+
+#define ZE_TEST_FAST_AF_SHOW 0
+
+#if ZE_TEST_FAST_AF_SHOW
+  const int draw_len = 3;
+#endif
+  for (int8_t l=0; l<static_cast<int8_t>(pyr->numLevels()); ++l)
+  {
+    const auto& lvl = dynamic_cast<ze::ImageAF8uC1&>(pyr->at(l));
+#if ZE_TEST_FAST_AF_SHOW
+    af::array display_arr = af::colorSpace(lvl.afArray(), AF_RGB, AF_GRAY)/255.f;
+#endif
+    for (size_t f=0; f<features.num_detected; ++f)
+    {
+      if (l == features.levels(f))
+      {
+        const int x = features.px(0, f) * pyr->scaleFactor(l);
+        const int y = features.px(1, f) * pyr->scaleFactor(l);
+        EXPECT_LT(x, lvl.width());
+        EXPECT_GT(x, 0);
+        EXPECT_LT(y, lvl.height());
+        EXPECT_GT(y, 0);
+#if ZE_TEST_FAST_AF_SHOW
+        display_arr(y, af::seq(x-draw_len, x+draw_len), 0) = 0.f;
+        display_arr(y, af::seq(x-draw_len, x+draw_len), 1) = 1.f;
+        display_arr(y, af::seq(x-draw_len, x+draw_len), 2) = 0.f;
+        display_arr(af::seq(y-draw_len, y+draw_len), x, 0) = 0.f;
+        display_arr(af::seq(y-draw_len, y+draw_len), x, 1) = 1.f;
+        display_arr(af::seq(y-draw_len, y+draw_len), x, 2) = 0.f;
+#endif
+      }
+    }
+#if ZE_TEST_FAST_AF_SHOW
+    af::Window wnd("AF array");
+    while(!wnd.close())
+    {
+      wnd.image(display_arr);
+    }
+#endif
   }
 }
 
