@@ -1,5 +1,6 @@
 #include <imp/cu_imgproc/str_tex_decomposer.hpp>
 
+#include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_imgproc/cu_rof_denoising.cuh>
 #include <ze/common/logging.hpp>
 
@@ -13,20 +14,20 @@ StrTexDecomposer<Pixel>::StrTexDecomposer()
 
 }
 
-//-----------------------------------------------------------------------------
-template<typename Pixel>
-void StrTexDecomposer<Pixel>::init(const Size2u& size)
-{
-  size_ = size;
-  denoised_ = std::make_shared<ze::cu::ImageGpu<Pixel>>(size_);
-}
+////-----------------------------------------------------------------------------
+//template<typename Pixel>
+//void StrTexDecomposer<Pixel>::init(const Size2u& size)
+//{
+//  size_ = size;
+//  denoised_ = std::make_shared<ze::cu::ImageGpu<Pixel>>(size_);
+//}
 
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void StrTexDecomposer<Pixel>::solve(
-    const ze::cu::ImageGpuPtr<Pixel>& src,
     const ze::cu::ImageGpuPtr<Pixel>& tex_image,
+    const ze::cu::ImageGpuPtr<Pixel>& src,
     const ze::cu::ImageGpuPtr<Pixel>& structure_image)
 {
   CHECK(src);
@@ -38,21 +39,20 @@ void StrTexDecomposer<Pixel>::solve(
     CHECK_EQ(src->size(), structure_image->size());
   }
 
-  if (src->size() != size_ || !denoised_)
-  {
-    this->init(src->size());
-  }
+//  if (src->size() != size_ || !denoised_)
+//  {
+//    this->init(src->size());
+//  }
 
   src_ = src;
   tex_ = tex_image;
-  str_ = (structure_image) ? structure_image :
-                             std::make_shared<ze::cu::ImageGpu<Pixel>>(size_);
+  // in-place denoising if no structure image desired for an output
+  str_ = structure_image ? structure_image : tex_image;
 
   denoiser_->params().lambda = 1.0f;
   denoiser_->params().max_iter = 100;
-  denoiser_->denoise(denoised_, src_);
-
-  //! @todo (MWE) implement addWeighted!
+  denoiser_->denoise(str_, src_);
+  ze::cu::addWeighted(*tex_, *src_, weight_, *str_, 1.f-2.f*weight_);
 }
 
 

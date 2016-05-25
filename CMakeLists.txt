@@ -58,6 +58,9 @@ target_link_libraries(test_cu_image_pyramid ${PROJECT_NAME})
 catkin_add_gtest(test_cu_rof test/test_cu_rof.cpp)
 target_link_libraries(test_cu_rof ${PROJECT_NAME})
 
+catkin_add_gtest(test_cu_str_tex_decomp test/test_cu_str_tex_decomp.cpp)
+target_link_libraries(test_cu_str_tex_decomp ${PROJECT_NAME})
+
 ##########
 # EXPORT #
 ##########

@@ -25,16 +25,16 @@ public:
   StrTexDecomposer();
   ~StrTexDecomposer() = default;
 
-  void solve(const ze::cu::ImageGpuPtr<Pixel>& src,
-             const ze::cu::ImageGpuPtr<Pixel>& tex_image,
+  void solve(const ze::cu::ImageGpuPtr<Pixel>& tex_image,
+             const ze::cu::ImageGpuPtr<Pixel>& src,
              const ze::cu::ImageGpuPtr<Pixel>& structure_image = NULL);
 
 protected:
-  void init(const Size2u& size);
+//  void init(const Size2u& size);
 //  void print(std::ostream &os) const;
 
 private:
-  ze::Size2u size_;
+//  ze::Size2u size_;
   ImageGpuPtr<Pixel> src_;
   ImageGpuPtr<Pixel> denoised_;
   ImageGpuPtr<Pixel> str_;
