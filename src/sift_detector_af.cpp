@@ -17,9 +17,15 @@ uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, KeypointsWrapper& keypoi
 {
   af::features feat;
   af::array desc;
-  af::sift(feat, desc, im.afArray(), 3, 0.04f, 10.0f, 1.6f, true, 1.f, 0.05f);
-
-
+  af::sift(
+        feat, desc, im.afArray(),
+        options_.num_layers,
+        options_.contrast_thr,
+        options_.edge_thr,
+        options_.init_sigma,
+        options_.double_input,
+        options_.intensity_scale,
+        options_.feature_ratio);
 
   return 0;
 }

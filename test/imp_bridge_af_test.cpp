@@ -274,9 +274,12 @@ TEST(impBridgeAFTest, siftDetectorAF32fC1)
         px_vec, score_vec, level_vec, angle_vec, type_vec,
         descriptors, num_detected);
 
-  detector.detect(*im, features);
-
-
+  detector.detect(*im, features); // GPU warm-up
+  auto detectLambda = [&](){
+    features.num_detected = 0u; // Reset.
+    detector.detect(*im, features);
+  };
+  ze::runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
 }
 
 ZE_UNITTEST_ENTRYPOINT
