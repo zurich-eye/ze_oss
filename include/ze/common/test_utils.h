@@ -46,6 +46,7 @@ typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
   std::mt19937 generator(std::random_device{}());
+  //! @todo (MWE) enable a min/max rnd generator - not working yet so using [0.0,1.0] for now
   std::uniform_real_distribution<T> distribution(0.0, 1.0);
 //  std::numeric_limits<T>::lowest(),
 //      std::numeric_limits<T>::max());
