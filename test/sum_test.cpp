@@ -11,31 +11,12 @@
 #include <imp/core/image_raw.hpp>
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
-
-template<class T>
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator;
-  std::uniform_int_distribution<T> distribution(0, 255);
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-template<class T>
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator;
-  std::uniform_real_distribution<T> distribution(0, 1);
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
+#include <ze/common/test_utils.h>
 
 TEST(IMPCuCoreTestSuite,sumTest_32fC1)
 {
   // setup random number generator
-  auto random_val = getRandomGenerator<float>();
+  auto random_val = ze::getRandomGenerator<float>();
 
   const size_t width = 752;
   const size_t height = 480;
