@@ -30,12 +30,12 @@ __global__ void k_weightedSum(Pixel* dst, uint32_t dst_stride,
     if (std::is_integral<typename Pixel::T>::value)
     {
       dst[(y+dst_roi_y)*dst_stride + (x+dst_roi_x)] =
-          static_cast<Pixel>(weight1*src1_val + weight2*src2_val + 0.5f);
+          static_cast<Pixel>(weight1 * src1_val + weight2 * src2_val + 0.5f);
     }
     else
     {
       dst[(y+dst_roi_y)*dst_stride + (x+dst_roi_x)] =
-          weight1*src1_val + weight2*src2_val;
+          weight1 * src1_val + weight2 * src2_val;
     }
   }
 }
