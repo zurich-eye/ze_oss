@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <ze/common/transformation.h>
+#include <ze/common/types.h>
 
 namespace ze {
 
@@ -23,26 +24,43 @@ void loadDepthmapFromFile(
 // ############################################################################
 // RANDOM NUMBER GENERATORS
 
+// ----------------------------------------------------------------------------
+//! Random number generator for integral types.
+//! @return Random number in interval [lowest, highest]
 template<class T>
 typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
-  std::default_random_engine generator;
+  std::mt19937 generator(std::random_device{}());
   std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
                                                 std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
+  auto random_val = std::bind(distribution, std::ref(generator));
   return random_val;
 }
 
+// ----------------------------------------------------------------------------
+//! Random number generator for real types.
+//! @return Random number in interval [0.0, 1.0]
 template<class T>
 typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
 getRandomGenerator()
 {
-  std::random_device rd;
-  std::mt19937 generator(rd());
-  //std::default_random_engine generator;
-  std::uniform_real_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                 std::numeric_limits<T>::max());
+  std::mt19937 generator(std::random_device{}());
+  std::uniform_real_distribution<T> distribution(0.0, 1.0);
+//  std::numeric_limits<T>::lowest(),
+//      std::numeric_limits<T>::max());
+  auto random_val = std::bind(distribution, std::ref(generator));
+  return random_val;
+}
+
+// ----------------------------------------------------------------------------
+//! Random number generator that returns a FloatType between 0.0 and 1.0.
+template<class T>
+typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
+getRandomGenerator01()
+{
+  std::mt19937 generator(std::random_device{}());
+  std::uniform_real_distribution<FloatType> distribution(FloatType{0.0}, FloatType{1.0});
   auto random_val = std::bind(distribution, std::ref(generator));
   return random_val;
 }
