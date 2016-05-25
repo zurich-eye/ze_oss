@@ -37,7 +37,7 @@ Pixel sum(const Texture2D& img_tex, const ze::Roi2u& roi);
  * \note supported gpu: 8uC1, 32f_C1
  */
 template<typename Pixel>
-void addWeighted(ImageGpu<Pixel>& dst,
+void weightedSum(ImageGpu<Pixel>& dst,
                  const ImageGpu<Pixel>& src1, const float& weight1,
                  const ImageGpu<Pixel>& src2, const float& weight2);
 
@@ -51,7 +51,7 @@ void addWeighted(ImageGpu<Pixel>& dst,
  * \note supported gpu: 8uC1, 32f_C1
  */
 template<typename Pixel>
-ImageGpuPtr<Pixel> addWeighted(const ImageGpu<Pixel>& src1, const float& weight1,
+ImageGpuPtr<Pixel> weightedSum(const ImageGpu<Pixel>& src1, const float& weight1,
                                const ImageGpu<Pixel>& src2, const float& weight2);
 
 } // namespace cu

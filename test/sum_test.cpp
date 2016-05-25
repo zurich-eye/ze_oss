@@ -32,9 +32,7 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
       gt_sum += im.pixel(x, y);
     }
   }
-  IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
-  IMP_CUDA_CHECK();
   double cu_sum = ze::cu::sum(cu_im);
   EXPECT_NEAR(gt_sum, cu_sum, 0.1);
   printf("GT sum: %f\n", gt_sum);

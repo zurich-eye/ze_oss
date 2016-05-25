@@ -11,10 +11,10 @@
 #include <imp/core/image_raw.hpp>
 
 template <typename Pixel>
-class CuAddWeightedTestFixture : public ::testing::Test
+class CuWeightedSumTestFixture : public ::testing::Test
 {
 protected:
-  CuAddWeightedTestFixture()
+  CuWeightedSumTestFixture()
     : image1_(size_)
     , image2_(size_)
     , dst_(size_)
@@ -66,9 +66,9 @@ protected:
   }
 
 
-  void addWeighted()
+  void weightedSum()
   {
-    ze::cu::addWeighted(cu_dst_, cu_image1_, weight1_, cu_image2_, weight2_);
+    ze::cu::weightedSum(cu_dst_, cu_image1_, weight1_, cu_image2_, weight2_);
     cu_dst_.copyTo(dst_);
     VLOG(1) << "dst | size: " << dst_.size() << ", roi: " << dst_.roi()
             << " value(10,10): " << dst_.pixel(10,10);
@@ -97,13 +97,13 @@ typedef testing::Types<
 ze::Pixel8uC1, ze::Pixel32fC1
 > PixelTypes;
 
-TYPED_TEST_CASE(CuAddWeightedTestFixture, PixelTypes);
+TYPED_TEST_CASE(CuWeightedSumTestFixture, PixelTypes);
 
-TYPED_TEST(CuAddWeightedTestFixture, testAddWeighted)
+TYPED_TEST(CuWeightedSumTestFixture, testweightedSum)
 {
   using namespace ze::cu;
 
-  this->addWeighted();
+  this->weightedSum();
   for (uint32_t y=0; y<this->dst_.height(); ++y)
   {
     for (uint32_t x=0; x<this->dst_.width(); ++x)
@@ -113,12 +113,12 @@ TYPED_TEST(CuAddWeightedTestFixture, testAddWeighted)
   }
 }
 
-TYPED_TEST(CuAddWeightedTestFixture, testAddWeightedRoi)
+TYPED_TEST(CuWeightedSumTestFixture, testweightedSumRoi)
 {
   using namespace ze::cu;
 
   this->setRoi();
-  this->addWeighted();
+  this->weightedSum();
   for (uint32_t y=this->roi_.y(); y<this->roi_.y()+this->roi_.height(); ++y)
   {
     for (uint32_t x=this->roi_.x(); x<this->roi_.x()+this->roi_.width(); ++x)

@@ -11,7 +11,7 @@ namespace cu {
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-__global__ void k_addWeighted(Pixel* dst, uint32_t dst_stride,
+__global__ void k_weightedSum(Pixel* dst, uint32_t dst_stride,
                               uint32_t dst_roi_x, uint32_t dst_roi_y,
                               Texture2D src1, const float weight1,
                               Texture2D src2, const float weight2,
@@ -42,7 +42,7 @@ __global__ void k_addWeighted(Pixel* dst, uint32_t dst_stride,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void addWeighted(ImageGpu<Pixel>& dst,
+void weightedSum(ImageGpu<Pixel>& dst,
                  const Texture2D& src1_tex, const Roi2u src1_roi, const float& weight1,
                  const Texture2D& src2_tex, const Roi2u src2_roi, const float& weight2)
 {
@@ -52,7 +52,7 @@ void addWeighted(ImageGpu<Pixel>& dst,
   Roi2u dst_roi = dst.roi();
   Fragmentation<> frag(dst_roi);
 
-  k_addWeighted
+  k_weightedSum
       <<<
         frag.dimGrid, frag.dimBlock
       >>> (dst.data(), dst.stride(),
@@ -65,13 +65,13 @@ void addWeighted(ImageGpu<Pixel>& dst,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-void addWeighted(ImageGpu<Pixel>& dst,
+void weightedSum(ImageGpu<Pixel>& dst,
                  const ImageGpu<Pixel>& src1, const float& weight1,
                  const ImageGpu<Pixel>& src2, const float& weight2)
 {
   std::shared_ptr<Texture2D> src1_tex = src1.genTexture(false, cudaFilterModePoint);
   std::shared_ptr<Texture2D> src2_tex = src2.genTexture(false, cudaFilterModePoint);
-  addWeighted(dst,
+  weightedSum(dst,
               *src1_tex, src1.roi(), weight1,
               *src2_tex, src2.roi(), weight2);
   IMP_CUDA_CHECK();
@@ -79,14 +79,14 @@ void addWeighted(ImageGpu<Pixel>& dst,
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-ImageGpuPtr<Pixel> addWeighted(const ImageGpu<Pixel>& src1, const float& weight1,
+ImageGpuPtr<Pixel> weightedSum(const ImageGpu<Pixel>& src1, const float& weight1,
                                const ImageGpu<Pixel>& src2, const float& weight2)
 {
   ImageGpuPtr<Pixel> dst = std::make_shared<ImageGpu<Pixel>>(src1.size());
   dst->setRoi(src1.roi());
   std::shared_ptr<Texture2D> src1_tex = src1.genTexture(false, cudaFilterModePoint);
   std::shared_ptr<Texture2D> src2_tex = src2.genTexture(false, cudaFilterModePoint);
-  ze::cu::addWeighted(*dst,
+  ze::cu::weightedSum(*dst,
                       *src1_tex, src1.roi(), weight1,
                       *src2_tex, src2.roi(), weight2);
   IMP_CUDA_CHECK();
@@ -94,24 +94,24 @@ ImageGpuPtr<Pixel> addWeighted(const ImageGpu<Pixel>& src1, const float& weight1
 }
 
 // template instantiations for all our image types
-template void addWeighted(ImageGpu8uC1& dst,
+template void weightedSum(ImageGpu8uC1& dst,
                           const Texture2D& src1_tex, const Roi2u src1_roi, const float& weight1,
                           const Texture2D& src2_tex, const Roi2u src2_roi, const float& weight2);
-template void addWeighted(ImageGpu32fC1& dst,
+template void weightedSum(ImageGpu32fC1& dst,
                           const Texture2D& src1_tex, const Roi2u src1_roi, const float& weight1,
                           const Texture2D& src2_tex, const Roi2u src2_roi, const float& weight2);
 
-template void addWeighted(ImageGpu8uC1& dst,
+template void weightedSum(ImageGpu8uC1& dst,
                           const ImageGpu8uC1& src1, const float& weight1,
                           const ImageGpu8uC1& src2, const float& weight2);
-template void addWeighted(ImageGpu32fC1& dst,
+template void weightedSum(ImageGpu32fC1& dst,
                           const ImageGpu32fC1& src1, const float& weight1,
                           const ImageGpu32fC1& src2, const float& weight2);
 
-template ImageGpu8uC1::Ptr addWeighted(
+template ImageGpu8uC1::Ptr weightedSum(
     const ImageGpu8uC1& src1, const float& weight1,
     const ImageGpu8uC1& src2, const float& weight2);
-template ImageGpu32fC1::Ptr addWeighted(
+template ImageGpu32fC1::Ptr weightedSum(
     const ImageGpu32fC1& src1, const float& weight1,
     const ImageGpu32fC1& src2, const float& weight2);
 
