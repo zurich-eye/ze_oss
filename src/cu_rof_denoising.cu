@@ -240,8 +240,8 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
   }
     break;
   default:
-    throw ze::cu::Exception("Unsupported PixelType.",
-                            __FILE__, __FUNCTION__, __LINE__);
+    LOG(FATAL) << "Unsupported pixel type.";
+    break;
   }
   IMP_CUDA_CHECK();
 }

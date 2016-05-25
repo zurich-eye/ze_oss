@@ -38,9 +38,8 @@ void StrTexDecomposer<Pixel>::solve(
   denoiser_->params().lambda = 1.0f;
   denoiser_->params().max_iter = 100;
   denoiser_->denoise(str_, src_);
-  ze::cu::addWeighted(*tex_, *src_, weight_, *str_, 1.f-2.f*weight_);
+  ze::cu::weightedSum(*tex_, *src_, weight_, *str_, 1.f-2.f*weight_);
 }
-
 
 //=============================================================================
 // Explicitely instantiate the desired classes
