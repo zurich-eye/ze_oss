@@ -26,7 +26,6 @@ uint32_t FastDetectorAF::detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& f
     float* h_y = feat.getY().host<float>();
     float* h_score = feat.getScore().host<float>();
     const size_t num_detected_l = feat.getNumFeatures();
-    printf("Level %i, number of features %lu\n", level, num_detected_l);
     for (size_t f=0; f<num_detected_l; ++f)
     {
       const FloatType x = h_x[f] * scale;
