@@ -11,30 +11,7 @@
 
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_linearmemory.cuh>
-
-
-template<class T>
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator(std::random_device{}());
-  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-template<class T>
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator(std::random_device{}());
-  std::uniform_real_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                 std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
+#include <ze/common/test_utils.h>
 
 template <typename Pixel>
 class CuLinearMemoryTest : public ::testing::Test
@@ -52,7 +29,7 @@ class CuLinearMemoryTest : public ::testing::Test
     , roi_linmem_copy_(roi_.length())
   {
     using T = typename Pixel::T;
-    auto random_val_generator = getRandomGenerator<T>();
+    auto random_val_generator = ze::getRandomGenerator<T>();
 
     for (size_t i=0; i<this->numel_; ++i)
     {
