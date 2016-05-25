@@ -146,9 +146,11 @@ void RofDenoising<Pixel>::init(const Size2u& size)
 
   // init internal vars
   k_initRofSolver
-      <<< dimGrid(), dimBlock() >>> (u_->data(), u_prev_->data(), u_->stride(),
-                                     p_->data(), p_->stride(),
-                                     *f_tex_, size_.width(), size_.height());
+      <<<
+        dimGrid(), dimBlock()
+      >>> (u_->data(), u_prev_->data(), u_->stride(),
+           p_->data(), p_->stride(),
+           *f_tex_, size_.width(), size_.height());
   IMP_CUDA_CHECK();
 }
 
@@ -174,16 +176,16 @@ void RofDenoising<Pixel>::denoise(const std::shared_ptr<ImageBase>& dst,
   }
 
   // internal algorithm params
-  float L = sqrtf(8.0f);
-  float tau = 1/L;
-  float sigma = 1/L;
-  float theta = 1.0f;
+  float L = sqrtf(8.f);
+  float tau = 1.f/L;
+  float sigma = 1.f/L;
+  float theta = 1.f;
 
   for(int iter = 0; iter < this->params_.max_iter; ++iter)
   {
     if (sigma < 1000.0f)
     {
-      theta = 1.f/sqrtf(1.0f+0.7f*this->params_.lambda*tau);
+      theta = 1.f/sqrtf(1.0f + 0.7f * this->params_.lambda * tau);
     }
     else
     {
