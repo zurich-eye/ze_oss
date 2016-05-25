@@ -25,7 +25,7 @@ set(SOURCES
   src/fast_detector_af.cpp
   )
 
-cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${IMPL_FILES})
+cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES} ${ArrayFire_LIBRARIES})
 
 cs_add_executable(main src/main.cpp)

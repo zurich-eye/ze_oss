@@ -33,8 +33,21 @@ int main(int argc, char** argv)
   }
 
   ze::FastDetectorOptions fast_options;
-  ze::FastDetectorAF detector(fast_options, im->size());
 
+  // Detect:
+  uint32_t max_fts = 300u;
+  ze::Keypoints px_vec(2, max_fts);
+  ze::KeypointScores score_vec(max_fts);
+  ze::KeypointLevels level_vec(max_fts);
+  ze::KeypointAngles angle_vec(max_fts);
+  ze::KeypointTypes type_vec(max_fts);
+  ze::Descriptors descriptors;
+  uint32_t num_detected = 0u;
+  ze::KeypointsWrapper features(px_vec, score_vec, level_vec, angle_vec, type_vec,
+                            descriptors, num_detected);
+
+  ze::FastDetectorAF detector(fast_options, im->size());
+  detector.detect(*pyr, features);
 
   return 0;
 }
