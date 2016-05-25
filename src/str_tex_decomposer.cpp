@@ -14,15 +14,6 @@ StrTexDecomposer<Pixel>::StrTexDecomposer()
 
 }
 
-////-----------------------------------------------------------------------------
-//template<typename Pixel>
-//void StrTexDecomposer<Pixel>::init(const Size2u& size)
-//{
-//  size_ = size;
-//  denoised_ = std::make_shared<ze::cu::ImageGpu<Pixel>>(size_);
-//}
-
-
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void StrTexDecomposer<Pixel>::solve(
@@ -38,11 +29,6 @@ void StrTexDecomposer<Pixel>::solve(
   {
     CHECK_EQ(src->size(), structure_image->size());
   }
-
-//  if (src->size() != size_ || !denoised_)
-//  {
-//    this->init(src->size());
-//  }
 
   src_ = src;
   tex_ = tex_image;
