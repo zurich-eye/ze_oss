@@ -34,7 +34,7 @@ getRandomGenerator()
   std::mt19937 generator(std::random_device{}());
   std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
                                                 std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, std::ref(generator));
+  auto random_val = std::bind(distribution, generator);
   return random_val;
 }
 
@@ -50,7 +50,7 @@ getRandomGenerator()
   std::uniform_real_distribution<T> distribution(0.0, 1.0);
 //  std::numeric_limits<T>::lowest(),
 //      std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, std::ref(generator));
+  auto random_val = std::bind(distribution, generator);
   return random_val;
 }
 
@@ -62,7 +62,7 @@ getRandomGenerator01()
 {
   std::mt19937 generator(std::random_device{}());
   std::uniform_real_distribution<FloatType> distribution(FloatType{0.0}, FloatType{1.0});
-  auto random_val = std::bind(distribution, std::ref(generator));
+  auto random_val = std::bind(distribution, generator);
   return random_val;
 }
 
