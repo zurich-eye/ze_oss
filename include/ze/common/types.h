@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <Eigen/Core>
 #include <Eigen/StdVector>
+#include <ze/common/config.hpp>
 
 namespace ze {
 
@@ -14,9 +15,13 @@ using int16_t   = std::int16_t;
 using int64_t   = std::int64_t;
 using uint8_t   = std::uint8_t;
 using uint16_t  = std::uint16_t;
-using uint32_t  = std::uint32_t;
+using uint32_t  = uint32_t;
 using uint64_t  = std::uint64_t;
+#ifdef ZE_SINGLE_PRECISION_FLOAT
+using FloatType = float;
+#else
 using FloatType = double;
+#endif
 
 //------------------------------------------------------------------------------
 // Typedefs of commonly used Eigen matrices and vectors.

@@ -147,7 +147,7 @@ StampedTransformationVector PoseSeries::getStampedTransformationVector()
 Transformation PoseSeries::getTransformationFromVec7(const Vector7& data)
 {
   Vector3 p = data.head<3>();
-  Eigen::Quaterniond q(data(6), data(3), data(4), data(5));
+  Eigen::Quaternion<FloatType> q(data(6), data(3), data(4), data(5));
   CHECK_NEAR(q.squaredNorm(), 1.0, 1e-4);
   q.normalize();
   return Transformation(q, p);

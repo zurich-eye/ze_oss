@@ -4,28 +4,38 @@
 #include <ze/common/test_manifold.h>
 #include <ze/common/transformation.h>
 
+#ifndef ZE_SINGLE_PRECISION_FLOAT
+constexpr ze::FloatType tol = 1e-9;
+#else
+constexpr ze::FloatType tol = 1e-7;
+#endif
+
 TEST(TransformationTests, testManifoldSO3)
 {
   EXPECT_EQ(ze::traits<ze::Quaternion>::dimension, 3);
   ze::testManifoldInvariants<ze::Quaternion>(
-        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
-        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+        ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
+        ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)), tol);
+#ifndef ZE_SINGLE_PRECISION_FLOAT
   ze::testRetractJacobians<ze::Quaternion>(
-        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
-        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+        ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
+        ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)));
   ze::testLocalJacobians<ze::Quaternion>(
-        ze::Quaternion(Eigen::Vector3d(0.1, 0.2, 0.3)),
-        ze::Quaternion(Eigen::Vector3d(0.2, 0.3, 0.4)));
+        ze::Quaternion(ze::Vector3(0.1, 0.2, 0.3)),
+        ze::Quaternion(ze::Vector3(0.2, 0.3, 0.4)));
+#else
+  LOG(WARNING) << "Test ignored for single precision float.";
+#endif
 }
 
 TEST(TransformationTests, testSetRandom)
 {
   ze::Transformation T;
   T.setRandom();
-  Eigen::Matrix3d R = T.getRotation().getRotationMatrix();
+  ze::Matrix3 R = T.getRotation().getRotationMatrix();
 
   // Check if orthonormal
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(R*R.transpose(), Eigen::Matrix3d::Identity(), 1e-6));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(R*R.transpose(), ze::I_3x3, 1e-6));
 }
 
 TEST(TransformationTests, testExpLog)
@@ -36,8 +46,8 @@ TEST(TransformationTests, testExpLog)
     T1.setRandom();
     ze::Transformation::Vector6 v = T1.log();
     ze::Transformation T2 = ze::Transformation::exp(v);
-    Eigen::Matrix4d TT1 = T1.getTransformationMatrix();
-    Eigen::Matrix4d TT2 = T2.getTransformationMatrix();
+    ze::Matrix4 TT1 = T1.getTransformationMatrix();
+    ze::Matrix4 TT2 = T2.getTransformationMatrix();
     for(int r = 0; r < 4; ++r)
     {
       for(int c = 0; c < 4; ++c)

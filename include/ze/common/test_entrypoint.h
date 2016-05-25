@@ -1,3 +1,4 @@
+// Mo
 // Copyright (c) 2015, Autonomous Systems Lab, ETH Zurich
 // All rights reserved.
 //
@@ -29,26 +30,34 @@
 #include <gflags/gflags.h>
 #include <ze/common/logging.hpp>
 #include <eigen-checks/gtest.h>
+#include <ze/common/types.h>
+
+// Floating-point precision checks.
+#ifdef ZE_SINGLE_PRECISION_FLOAT
+# define EXPECT_FLOATTYPE_EQ(a, b) EXPECT_FLOAT_EQ(a, b)
+#else
+# define EXPECT_FLOATTYPE_EQ(a, b) EXPECT_DOUBLE_EQ(a, b)
+#endif
 
 // Let the Eclipse parser see the macro.
 #ifndef TEST
-#define TEST(a, b) int Test_##a##_##b()
+# define TEST(a, b) int Test_##a##_##b()
 #endif
 
 #ifndef TEST_F
-#define TEST_F(a, b) int Test_##a##_##b()
+# define TEST_F(a, b) int Test_##a##_##b()
 #endif
 
 #ifndef TEST_P
-#define TEST_P(a, b) int Test_##a##_##b()
+# define TEST_P(a, b) int Test_##a##_##b()
 #endif
 
 #ifndef TYPED_TEST_CASE
-#define TYPED_TEST_CASE(a, b) int Test_##a##_##b()
+# define TYPED_TEST_CASE(a, b) int Test_##a##_##b()
 #endif
 
 #ifndef TYPED_TEST
-#define TYPED_TEST(a, b) int Test_##a##_##b()
+# define TYPED_TEST(a, b) int Test_##a##_##b()
 #endif
 
 #define ZE_UNITTEST_ENTRYPOINT\

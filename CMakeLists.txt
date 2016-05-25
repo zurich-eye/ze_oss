@@ -7,6 +7,16 @@ catkin_simple(ALL_DEPS_REQUIRED)
 include(ze_setup)
 
 
+############
+# SETTINGS #
+############
+include(ze_options)
+message(STATUS "ZE_USE_BRISK: ${ZE_USE_BRISK}")
+message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
+message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
+configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
+
+
 #############
 # LIBRARIES #
 #############
@@ -14,6 +24,7 @@ set(HEADERS
   include/ze/common/benchmark.h
   include/ze/common/buffer.h
   include/ze/common/buffer-inl.h
+  include/ze/common/config.hpp
   include/ze/common/combinatorics.h
   include/ze/common/csv_trajectory.h
   include/ze/common/file_utils.h
@@ -53,12 +64,10 @@ set(HEADERS
 set(SOURCES
   src/csv_trajectory.cpp
   src/matrix.cpp
-  src/running_statistics_collection.cpp
   src/sample.cpp
   src/signal_handler.cpp
   src/test_utils.cpp
   src/thread_pool.cpp
-  src/timer_collection.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
