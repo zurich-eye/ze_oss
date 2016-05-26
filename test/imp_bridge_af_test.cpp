@@ -267,8 +267,6 @@ TEST(impBridgeAFTest, siftDetectorAF32fC1)
     detector.detect(*im, features);
   };
   ze::runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
-  ze::SiftKeypointWrapper::Descriptors descr = features->getDescriptors();
-  std::cout << "Descriptors:\n" << descr.cols();
 }
 
 ZE_UNITTEST_ENTRYPOINT
