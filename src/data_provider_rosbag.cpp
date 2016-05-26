@@ -28,6 +28,7 @@ DataProviderRosbag::DataProviderRosbag(
   //! @todo: Display number of messages per topic in the beginning.
 
   CHECK(fileExists(bag_filename)) << "File does not exist: " << bag_filename;
+  VLOG(1) << "Opening rosbag: " << bag_filename << " ...";
   bag_.reset(new rosbag::Bag);
   try
   {
