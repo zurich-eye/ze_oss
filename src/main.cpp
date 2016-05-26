@@ -29,6 +29,15 @@ int main(int argc, char** argv)
   ze::SiftDetectorAF detector(options, im->size());
   ze::SiftKeypointWrapper::Ptr features;
   detector.detect(*im, features);
-  ze::SiftKeypointWrapper::Descriptors descr = features->getDescriptors();
+  for (uint32_t f=0; f<features->num_detected; ++f)
+  {
+    printf("[");
+    for (size_t i=0; i<features->kDescrLength; ++i)
+    {
+      printf("%f, ", features->descr.get()[f][i]);
+    }
+    printf("]\n");
+  }
+  printf("Detected features: %i\n", features->num_detected);
   return 0;
 }

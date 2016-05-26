@@ -12,7 +12,7 @@ struct SiftDetectorOptions
   float edge_thr{10.0f};
   float init_sigma{1.6f};
   bool double_input{true};
-  float intensity_scale{0.00390625f};
+  float intensity_scale{1.0f};
   float feature_ratio{0.05f};
 };
 
@@ -20,7 +20,7 @@ struct SiftKeypointWrapper
 {
   static constexpr uint8_t kDescrLength{128};
   using Ptr = typename std::shared_ptr<SiftKeypointWrapper>;
-  using Descriptors = Eigen::Matrix<float, kDescrLength, Eigen::Dynamic, Eigen::ColMajor>;
+  using Descriptors = std::vector<float[kDescrLength]>; //! TODO (MPI) what container do we want for the descriptors?
   SiftKeypointWrapper(uint32_t num)
     : num_detected(num)
   {
@@ -30,18 +30,6 @@ struct SiftKeypointWrapper
     orient.reset(new float[num]);
     size.reset(new float[num]);
     descr.reset(new float[num][kDescrLength]);
-  }
-  Descriptors getDescriptors()
-  {
-    Descriptors res;
-    for (uint32_t d=0; d<num_detected; ++d)
-    {
-      for (uint8_t i=0; i<kDescrLength; ++i)
-      {
-        res(i, d) = descr.get()[d][i];
-      }
-    }
-    return res;
   }
   uint32_t num_detected{0};
   std::unique_ptr<float[]> x;
