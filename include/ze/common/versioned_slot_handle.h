@@ -17,7 +17,9 @@ union VersionedSlotHandle
 
   struct
   {
-    T slot : NumSlotBits;
+    // The first NumSlotBits in this bit-field store the slot, the next
+    // NumVersionBits store the version number of the handle.
+    T slot    : NumSlotBits;
     T version : NumVersionBits;
   };
   T handle;
@@ -29,6 +31,8 @@ union VersionedSlotHandle
 
   static constexpr T maxSlot() { return (1 << NumSlotBits) - 1; }
   static constexpr T maxVersion() { return (1 << NumVersionBits) - 1; }
+
+  void reset() { handle = T{0}; }
 };
 
 template <typename T, int NumSlotBits, int NumVersionBits>
