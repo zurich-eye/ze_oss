@@ -20,16 +20,21 @@ struct SiftKeypointWrapper
 {
   static constexpr uint8_t kDescrLength{128};
   using Ptr = typename std::shared_ptr<SiftKeypointWrapper>;
-  using Descriptors = std::vector<float[kDescrLength]>; //! TODO (MPI) what container do we want for the descriptors?
+  using SiftDescriptors = Eigen::Matrix<float, kDescrLength, Eigen::Dynamic, Eigen::RowMajor>;
   SiftKeypointWrapper(uint32_t num)
     : num_detected(num)
   {
-    x.reset(new float[num]);
-    y.reset(new float[num]);
-    score.reset(new float[num]);
-    orient.reset(new float[num]);
-    size.reset(new float[num]);
-    descr.reset(new float[num][kDescrLength]);
+    x.reset(new float[num_detected]);
+    y.reset(new float[num_detected]);
+    score.reset(new float[num_detected]);
+    orient.reset(new float[num_detected]);
+    size.reset(new float[num_detected]);
+    descr.reset(new float[kDescrLength*num_detected]);
+  }
+  SiftDescriptors getDescriptors()
+  {
+    return Eigen::Map<SiftDescriptors>(
+          descr.get(), kDescrLength, num_detected);
   }
   uint32_t num_detected{0};
   std::unique_ptr<float[]> x;
@@ -37,7 +42,7 @@ struct SiftKeypointWrapper
   std::unique_ptr<float[]> score;
   std::unique_ptr<float[]> orient;
   std::unique_ptr<float[]> size;
-  std::unique_ptr<float[kDescrLength]> descr;
+  std::unique_ptr<float[]> descr;
 };
 
 class SiftDetectorAF : public AbstractDetector
