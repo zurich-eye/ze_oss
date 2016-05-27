@@ -61,7 +61,7 @@ StampedImage RosbagImageQuery::getStampedImageAtTime(
   time_min.fromNSec(stamp_ns - search_range_ns);
   time_max.fromNSec(stamp_ns + search_range_ns);
   rosbag::View view(
-      bag_, rosbag::TopicQuery({img_topic}), time_min, time_max);
+      bag_, rosbag::TopicQuery(img_topic), time_min, time_max);
 
   VLOG(100) << "Found messages that fit = " << view.size();
   int64_t best_time_diff = std::numeric_limits<int64_t>::max();
