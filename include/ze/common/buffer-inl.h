@@ -178,7 +178,7 @@ Buffer<Scalar,Dim>::getBetweenValuesInterpolated(int64_t stamp_from, int64_t sta
 template <typename Scalar, int Dim>
 typename Buffer<Scalar,Dim>::VectorBuffer::iterator Buffer<Scalar,Dim>::iterator_equal_or_before(int64_t stamp)
 {
-  CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
+  DEBUG_CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
   auto it = buffer_.lower_bound(stamp);
 
   if(it->first == stamp)
@@ -200,7 +200,7 @@ typename Buffer<Scalar,Dim>::VectorBuffer::iterator Buffer<Scalar,Dim>::iterator
 template <typename Scalar, int Dim>
 typename Buffer<Scalar,Dim>::VectorBuffer::iterator Buffer<Scalar,Dim>::iterator_equal_or_after(int64_t stamp)
 {
-  CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
+  DEBUG_CHECK(!mutex_.try_lock()) << "Call lock() before accessing data.";
   return buffer_.lower_bound(stamp);
 }
 

@@ -36,6 +36,9 @@ set(HEADERS
   include/ze/common/noncopyable.hpp
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
+  include/ze/common/ringbuffer.h
+  include/ze/common/ringbuffer-inl.h
+  include/ze/common/ring_view.h
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
   include/ze/common/sample.h
@@ -111,6 +114,12 @@ target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
 catkin_add_gtest(test_versioned_slot_handle test/test_versioned_slot_handle.cpp)
 target_link_libraries(test_versioned_slot_handle ${PROJECT_NAME})
+
+catkin_add_gtest(test_ring_view test/test_ring_view.cpp)
+target_link_libraries(test_ring_view ${PROJECT_NAME})
+
+catkin_add_gtest(test_ringbuffer test/test_ringbuffer.cpp)
+target_link_libraries(test_ringbuffer ${PROJECT_NAME})
 
 ##########
 # EXPORT #
