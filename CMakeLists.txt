@@ -31,9 +31,6 @@ set(SOURCES
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES} ${ArrayFire_LIBRARIES})
 
-cs_add_executable(main src/main.cpp)
-target_link_libraries(main ${PROJECT_NAME})
-
 ###
 ### GTESTS
 ###
