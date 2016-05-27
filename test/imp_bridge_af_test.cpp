@@ -9,27 +9,27 @@
 #include <ze/common/test_utils.h>
 
 namespace ze {
-constexpr const char* g_test_data_name =
-    "ze_feature_detection";
-constexpr const char* g_predefined_img_data_file_name =
-    "752x480/pyr_0.png";
+const std::string g_test_data_name{"ze_feature_detection"};
+const std::string g_predefined_img_data_file_name{"752x480/pyr_0.png"};
 } // ze namespace
+
+using namespace ze;
 
 TEST(impBridgeAFTest, constructFromImpImage_32fC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
 
-  ze::ImageCv32fC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+  ImageCv32fC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
-  ze::ImageAF32fC1 af_img(*cv_img);
+  ImageAF32fC1 af_img(*cv_img);
   double af_sum = af::sum<double>(af_img.afArray());
   printf("AF sum: %f\n", af_sum);
   double cv_sum = cv::sum(cv_img->cvMat())[0];
@@ -40,18 +40,18 @@ TEST(impBridgeAFTest, constructFromImpImage_32fC1)
 TEST(impBridgeAFTest, constructFromImpImage_8uC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
 
-  ze::ImageCv8uC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+  ImageCv8uC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
-  ze::ImageAF8uC1 af_img(*cv_img);
+  ImageAF8uC1 af_img(*cv_img);
   double af_sum = af::sum<double>(af_img.afArray());
   printf("AF sum: %f\n", af_sum);
   double cv_sum = cv::sum(cv_img->cvMat())[0];
@@ -62,15 +62,15 @@ TEST(impBridgeAFTest, constructFromImpImage_8uC1)
 TEST(impBridgeAFTest, constructFromAFArray_32fC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
 
-  ze::ImageCv32fC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+  ImageCv32fC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
 
   std::unique_ptr<float[]> h_buffer(
         new float[cv_img->width()*cv_img->height()]);
@@ -81,7 +81,7 @@ TEST(impBridgeAFTest, constructFromAFArray_32fC1)
       h_buffer.get()[c*cv_img->height()+r] = cv_img->pixel(c, r);
     }
   }
-  ze::ImageAF32fC1 af_img(
+  ImageAF32fC1 af_img(
         af::array(
           cv_img->height(),
           cv_img->width(),
@@ -96,15 +96,15 @@ TEST(impBridgeAFTest, constructFromAFArray_32fC1)
 TEST(impBridgeAFTest, constructFromAFArray_8uC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
 
-  ze::ImageCv8uC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+  ImageCv8uC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
 
   std::unique_ptr<unsigned char[]> h_buffer(
         new unsigned char[cv_img->width()*cv_img->height()]);
@@ -115,7 +115,7 @@ TEST(impBridgeAFTest, constructFromAFArray_8uC1)
       h_buffer.get()[c*cv_img->height()+r] = cv_img->pixel(c, r);
     }
   }
-  ze::ImageAF8uC1 af_img(
+  ImageAF8uC1 af_img(
         af::array(
           cv_img->height(),
           cv_img->width(),
@@ -130,29 +130,29 @@ TEST(impBridgeAFTest, constructFromAFArray_8uC1)
 TEST(impBridgeAFTest, createAFImagePyramid8uC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
-  ze::ImageCv8uC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
+  ImageCv8uC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
 
   // Create AF pyramid
-  ze::ImageAF8uC1::Ptr af_im =
-      std::make_shared<ze::ImageAF8uC1>(*cv_img);
-  ze::ImagePyramid8uC1::Ptr af_pyr =
-      ze::createAFImagePyramid<ze::Pixel8uC1>(af_im, 0.5, 5, 8);
+  ImageAF8uC1::Ptr af_im =
+      std::make_shared<ImageAF8uC1>(*cv_img);
+  ImagePyramid8uC1::Ptr af_pyr =
+      createAFImagePyramid<Pixel8uC1>(af_im, 0.5, 5, 8);
   // Create IMP pyramid
-  auto pyr = ze::createImagePyramidCpu<ze::Pixel8uC1>(cv_img, 0.5, 5, 8);
+  auto pyr = createImagePyramidCpu<Pixel8uC1>(cv_img, 0.5, 5, 8);
 
   // Compare
   for (size_t l=0; l<pyr->numLevels(); ++l)
   {
-    ze::ImageAF8uC1 af_img_l(pyr->at(l));
+    ImageAF8uC1 af_img_l(pyr->at(l));
     // Compare AF arrays
-    const auto& lvl = dynamic_cast<ze::ImageAF8uC1&>(af_pyr->at(l));
+    const auto& lvl = dynamic_cast<ImageAF8uC1&>(af_pyr->at(l));
     af::array test = lvl.afArray() / 255.0f;
     af::array gt = af_img_l.afArray() / 255.0f;
     double sad = af::sum<double>(af::abs(test - gt));
@@ -165,42 +165,42 @@ TEST(impBridgeAFTest, createAFImagePyramid8uC1)
 TEST(impBridgeAFTest, fastDetectorAF8uC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
-  ze::ImageCv8uC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
+  ImageCv8uC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
 
   // Create AF pyramid
-  ze::ImageAF8uC1::Ptr af_im =
-      std::make_shared<ze::ImageAF8uC1>(*cv_img);
-  ze::ImagePyramid8uC1::Ptr pyr =
-      ze::createAFImagePyramid<ze::Pixel8uC1>(af_im, 0.5, 5, 8);
+  ImageAF8uC1::Ptr af_im =
+      std::make_shared<ImageAF8uC1>(*cv_img);
+  ImagePyramid8uC1::Ptr pyr =
+      createAFImagePyramid<Pixel8uC1>(af_im, 0.5, 5, 8);
 
   uint32_t max_fts = 6000u;
-  ze::Keypoints px_vec(2, max_fts);
-  ze::KeypointScores score_vec(max_fts);
-  ze::KeypointLevels level_vec(max_fts);
-  ze::KeypointAngles angle_vec(max_fts);
-  ze::KeypointTypes type_vec(max_fts);
-  ze::Descriptors descriptors;
+  Keypoints px_vec(2, max_fts);
+  KeypointScores score_vec(max_fts);
+  KeypointLevels level_vec(max_fts);
+  KeypointAngles angle_vec(max_fts);
+  KeypointTypes type_vec(max_fts);
+  Descriptors descriptors;
   uint32_t num_detected = 0u;
-  ze::KeypointsWrapper features(
+  KeypointsWrapper features(
         px_vec, score_vec, level_vec, angle_vec, type_vec,
         descriptors, num_detected);
-  ze::FastDetectorOptions fast_options;
+  FastDetectorOptions fast_options;
   fast_options.threshold = 20.0f;
-  ze::FastDetectorAF detector(fast_options, af_im->size());
+  FastDetectorAF detector(fast_options, af_im->size());
 
   detector.detect(*pyr, features); // GPU warm-up
   auto detectLambda = [&](){
     features.num_detected = 0u; // Reset.
     detector.detect(*pyr, features);
   };
-  ze::runTimingBenchmark(detectLambda, 10, 20, "AF FAST Detector", true);
+  runTimingBenchmark(detectLambda, 10, 20, "AF FAST Detector", true);
 
 #define ZE_TEST_FAST_AF_SHOW 0
 
@@ -209,7 +209,7 @@ TEST(impBridgeAFTest, fastDetectorAF8uC1)
 #endif
   for (int8_t l=0; l<static_cast<int8_t>(pyr->numLevels()); ++l)
   {
-    const auto& lvl = dynamic_cast<ze::ImageAF8uC1&>(pyr->at(l));
+    const auto& lvl = dynamic_cast<ImageAF8uC1&>(pyr->at(l));
 #if ZE_TEST_FAST_AF_SHOW
     af::array display_arr = af::colorSpace(lvl.afArray(), AF_RGB, AF_GRAY)/255.f;
 #endif
@@ -246,27 +246,27 @@ TEST(impBridgeAFTest, fastDetectorAF8uC1)
 TEST(impBridgeAFTest, siftDetectorAF32fC1)
 {
   std::string path(
-        ze::joinPath(
-          ze::getTestDataDir(ze::g_test_data_name),
-          ze::g_predefined_img_data_file_name));
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
 
-  ze::ImageCv32fC1::Ptr cv_img;
-  ze::cvBridgeLoad(
+  ImageCv32fC1::Ptr cv_img;
+  cvBridgeLoad(
         cv_img,
         path,
-        ze::PixelOrder::gray);
+        PixelOrder::gray);
 
-  ze::ImageAF32fC1::Ptr im =
-      std::make_shared<ze::ImageAF32fC1>(*cv_img);
+  ImageAF32fC1::Ptr im =
+      std::make_shared<ImageAF32fC1>(*cv_img);
 
-  ze::SiftDetectorOptions options;
-  ze::SiftDetectorAF detector(options, im->size());
-  ze::SiftKeypointWrapper::Ptr features;
+  SiftDetectorOptions options;
+  SiftDetectorAF detector(options, im->size());
+  SiftKeypointWrapper::Ptr features;
   detector.detect(*im, features); // GPU warm-up
   auto detectLambda = [&](){
     detector.detect(*im, features);
   };
-  ze::runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
+  runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
 }
 
 ZE_UNITTEST_ENTRYPOINT

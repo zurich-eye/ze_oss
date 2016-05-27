@@ -10,11 +10,11 @@ struct ImpAfConversionBuffer
   ImpAfConversionBuffer(const Image<Pixel>& from)
   {
     data.reset(new Pixel[from.width()*from.height()]);
-    for(size_t r=0; r<from.height(); ++r)
+    for(size_t y=0; y<from.height(); ++y)
     {
-      for(size_t c=0; c<from.width(); ++c)
+      for(size_t x=0; x<from.width(); ++x)
       {
-        data.get()[c*from.height()+r] = from.pixel(c, r);
+        data.get()[x*from.height()+y] = from.pixel(x, y);  //! AF array is column-major
       }
     }
   }
@@ -45,8 +45,8 @@ ImageAF<Pixel>::ImageAF(const af::array& from)
 template<typename Pixel>
 Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
 {
-  CHECK_EQ(ox, 0);
-  CHECK_EQ(oy, 0);
+  DEBUG_CHECK(ox == 0);
+  DEBUG_CHECK(oy == 0);
   switch(pixel_type<Pixel>::type)
   {
   case PixelType::i8uC1:
@@ -55,15 +55,15 @@ Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
     return reinterpret_cast<Pixel*>(arr_.device<int>());;
   case PixelType::i32fC1:
     return reinterpret_cast<Pixel*>(arr_.device<float>());;
-  default: IMP_THROW_EXCEPTION("pixel type not supported");
+  default: LOG(FATAL) << "pixel type not supported";
   }
 }
 
 template<typename Pixel>
 const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
-  CHECK_EQ(ox, 0);
-  CHECK_EQ(oy, 0);
+  DEBUG_CHECK(ox == 0);
+  DEBUG_CHECK(oy == 0);
   switch(pixel_type<Pixel>::type)
   {
   case PixelType::i8uC1:
@@ -72,7 +72,7 @@ const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
     return reinterpret_cast<const Pixel*>(arr_.device<int>());;
   case PixelType::i32fC1:
     return reinterpret_cast<const Pixel*>(arr_.device<float>());;
-  default: IMP_THROW_EXCEPTION("pixel type not supported");
+  default: LOG(FATAL) << "pixel type not supported";
   }
 }
 

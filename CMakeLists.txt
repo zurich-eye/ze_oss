@@ -17,6 +17,7 @@ include_directories(${ArrayFire_INCLUDE_DIRS})
 
 set(HEADERS
   include/imp/bridge/af/image_af.hpp
+  include/imp/bridge/af/pyramid_af.hpp
   include/imp/bridge/af/fast_detector_af.hpp
   include/imp/bridge/af/sift_detector_af.hpp
   )

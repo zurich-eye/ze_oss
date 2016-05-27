@@ -8,7 +8,7 @@ FastDetectorAF::FastDetectorAF(const FastDetectorOptions &options, const Size2u&
 
 uint32_t FastDetectorAF::detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& features)
 {
-  //! TODO (MPI) grid is not currently supported
+  //! @todo (MPI) grid is not currently supported
   int capacity = features.px.cols() - features.num_detected;
   if (capacity <= 0)
   {

@@ -30,7 +30,7 @@ protected:
   af::array arr_;
 
 private:
-  static af_dtype pixelTypeToAF(ze::PixelType type);
+  static af::dtype pixelTypeToAF(ze::PixelType type);
 };
 
 typedef ImageAF<ze::Pixel8uC1> ImageAF8uC1;

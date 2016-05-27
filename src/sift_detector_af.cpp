@@ -9,8 +9,7 @@ SiftDetectorAF::SiftDetectorAF(const SiftDetectorOptions& options, const Size2u&
 
 uint32_t SiftDetectorAF::detect(const ImagePyramid8uC1 &pyr, KeypointsWrapper &keypoints)
 {
-  // Not implemented
-  return 0;
+  LOG(FATAL) << "Not implemented";
 }
 
 uint32_t SiftDetectorAF::detect(const ImageAF32fC1& im, SiftKeypointWrapper::Ptr& keypoints)

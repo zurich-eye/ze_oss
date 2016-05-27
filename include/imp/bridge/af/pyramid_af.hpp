@@ -30,7 +30,7 @@ std::shared_ptr<ImagePyramid<Pixel>> createAFImagePyramid(
     const typename Pyr::Image& prev = pyr->at(i-1);
     af::array half_sampled =
         af::resize(
-          0.5f,
+          scale_factor,
           dynamic_cast<const ze::ImageAF8uC1&>(prev).afArray());
     pyr->emplace_back(std::make_shared<ImageAF<Pixel>>(half_sampled));
   }
