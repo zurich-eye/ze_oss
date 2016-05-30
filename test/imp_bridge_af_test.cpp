@@ -287,6 +287,7 @@ TEST(impBridgeAFTest, orbDetectorAF32fC1)
       std::make_shared<ImageAF32fC1>(*cv_img);
 
   OrbDetectorOptions options;
+  options.fast_thr /= 255.f;
   OrbDetectorAF detector(options, im->size());
   OrbKeypointWrapper::Ptr features;
   detector.detect(*im, features); // GPU warm-up
