@@ -121,6 +121,12 @@ class BSplinePoseMinimal : public BSpline
                          int numSegments,
                          FloatType lambda);
 
+    //! initialize a bspline given a vector of poses
+    void initPoseSplinePoses(const VectorX& times,
+                            const std::vector<Matrix4> & poses,
+                            int numSegments,
+                            FloatType lambda);
+
     void addPoseSegment(FloatType tk, const Matrix4& T_n_tk);
     void addPoseSegment2(FloatType tk,
                          const Matrix4& T_n_tk,

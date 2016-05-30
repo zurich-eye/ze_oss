@@ -436,4 +436,21 @@ void BSplinePoseMinimal<RP>::initPoseSpline3(
 {
   initSpline3(times, poses, numSegments, lambda);
 }
+
+template<class RP>
+void BSplinePoseMinimal<RP>::initPoseSplinePoses(const VectorX& times,
+                         const std::vector<Matrix4>& poses,
+                         int numSegments,
+                         FloatType lambda)
+{
+  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
+  parameters.resize(6, poses.size());
+  for (size_t i = 0; i < poses.size(); ++i)
+  {
+    parameters.col(i) = transformationToCurveValue(poses[i]);
+  }
+
+  initPoseSpline3(times, parameters, numSegments, lambda);
+}
+
 } // namespace ze

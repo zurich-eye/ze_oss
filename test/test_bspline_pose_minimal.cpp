@@ -280,7 +280,8 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
+    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1)
+    {
       MatrixX J;
       bs.angularVelocityBodyFrameAndJacobian(t, &J, NULL);
 
@@ -299,6 +300,39 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
 
     }
   }
+}
+
+TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
+{
+  BSplinePoseMinimal<ze::kinematics::RotationVector> bs(3);
+  bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
+                    bs.curveValueToTransformation(VectorX::Random(6)));
+  bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
+
+  // get a vector matrice
+  std::vector<Matrix4> poses;
+  Eigen::Matrix<FloatType, 1, 20> times;
+  size_t i = 0;
+  for (FloatType t = bs.t_min(); t <= bs.t_max(); t += 0.1)
+  {
+    times(i) = t;
+    poses.push_back(bs.transformation(t));
+    ++i;
+  }
+
+  // init another spline
+  BSplinePoseMinimal<ze::kinematics::RotationVector> bs2(3);
+  bs2.initPoseSplinePoses(times, poses, 8, 1e-6);
+
+  // compare
+  for (FloatType t = bs.t_min(); t <= bs.t_max(); t += 0.1)
+  {
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+                  bs.transformation(t),
+                  bs2.transformation(t),
+                  1e-2));
+  }
+
 }
 
 ZE_UNITTEST_ENTRYPOINT

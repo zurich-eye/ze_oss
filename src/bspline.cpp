@@ -1032,7 +1032,7 @@ void BSpline::addCurveSegment2(FloatType t,
 
 MatrixX BSpline::Vi(int segmentIndex) const
 {
-  CHECK_GE(segmentIndex, numValidTimeSegments())
+  CHECK_LT(segmentIndex, numValidTimeSegments())
       << "Segment index out of bounds";
   CHECK_LT(0, numValidTimeSegments())
       << "Segment index out of bounds";
