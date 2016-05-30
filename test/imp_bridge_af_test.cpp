@@ -1,4 +1,5 @@
 #include <imp/bridge/af/fast_detector_af.hpp>
+#include <imp/bridge/af/orb_detector_af.hpp>
 #include <imp/bridge/af/sift_detector_af.hpp>
 
 #include <imp/bridge/opencv/cv_bridge.hpp>
@@ -267,6 +268,32 @@ TEST(impBridgeAFTest, siftDetectorAF32fC1)
     detector.detect(*im, features);
   };
   runTimingBenchmark(detectLambda, 10, 20, "AF SIFT Detector", true);
+}
+
+TEST(impBridgeAFTest, orbDetectorAF32fC1)
+{
+  std::string path(
+        joinPath(
+          getTestDataDir(g_test_data_name),
+          g_predefined_img_data_file_name));
+
+  ImageCv32fC1::Ptr cv_img;
+  cvBridgeLoad(
+        cv_img,
+        path,
+        PixelOrder::gray);
+
+  ImageAF32fC1::Ptr im =
+      std::make_shared<ImageAF32fC1>(*cv_img);
+
+  OrbDetectorOptions options;
+  OrbDetectorAF detector(options, im->size());
+  OrbKeypointWrapper::Ptr features;
+  detector.detect(*im, features); // GPU warm-up
+  auto detectLambda = [&](){
+    detector.detect(*im, features);
+  };
+  runTimingBenchmark(detectLambda, 10, 20, "AF ORB Detector", true);
 }
 
 ZE_UNITTEST_ENTRYPOINT
