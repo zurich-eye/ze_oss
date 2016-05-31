@@ -17,6 +17,15 @@ inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
            w(2),  0.0f, -w(0),
           -w(1),  w(0),  0.0f).finished();
 }
+inline Matrix3 skewSymmetric(const FloatType w1,
+                             const FloatType w2,
+                             const FloatType w3)
+{
+  return (Matrix3() <<
+           0.0f, -w3,  w2,
+           w3,  0.0f, -w1,
+          -w2,  w1,  0.0f).finished();
+}
 
 // ----------------------------------------------------------------------------
 //! Normalize a block of bearing vectors.
