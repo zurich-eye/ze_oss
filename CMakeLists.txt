@@ -10,10 +10,10 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-    include/ze/splines/bspline.hpp
-    include/ze/splines/bspline_pose_minimal.hpp
-    include/ze/splines/operators.hpp
-    include/ze/splines/rotation_vector.hpp
+    include/ze/splines/bspline.h
+    include/ze/splines/bspline_pose_minimal.h
+    include/ze/splines/operators.h
+    include/ze/splines/rotation_vector.h
   )
 
 set(SOURCES

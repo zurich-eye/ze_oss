@@ -1,5 +1,4 @@
-#include <ze/splines/bspline_pose_minimal.hpp>
-#include <boost/tuple/tuple.hpp>
+#include <ze/splines/bspline_pose_minimal.h>
 
 namespace ze {
 

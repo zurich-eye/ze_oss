@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include "bspline.hpp"
+#include "bspline.h"
 #include <ze/common/transformation.h>
-#include <ze/splines/rotation_vector.hpp>
-#include <ze/splines/operators.hpp>
+#include <ze/splines/rotation_vector.h>
+#include <ze/splines/operators.h>
 
 namespace ze {
 
@@ -139,5 +139,7 @@ class BSplinePoseMinimal : public BSpline
         const VectorX& c,
         MatrixX * J) const;
 };
+
+typedef BSplinePoseMinimal<ze::sm::RotationVector> BSplinePoseMinimalRotationVector;
 
 }  // namespace ze
