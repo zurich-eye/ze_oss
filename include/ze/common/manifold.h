@@ -23,6 +23,11 @@ struct ScalarTraits
   typedef Eigen::Matrix<Scalar, 1, 1> TangentVector;
   typedef Eigen::Matrix<Scalar, 1, 1> Jacobian;
 
+  static int getDimension(const Scalar /*v*/)
+  {
+    return 1;
+  }
+
   static bool equals(Scalar v1, Scalar v2, Scalar tol = 1e-8)
   {
     return std::abs(v1 - v2) < tol;
@@ -75,6 +80,11 @@ struct traits<Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> >
   typedef Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> Matrix;
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+
+  static int getDimension(const Matrix& /*v*/)
+  {
+    return M * N;
+  }
 
   static bool equals(const Matrix& v1, const Matrix& v2, FloatType tol = 1e-8)
   {
