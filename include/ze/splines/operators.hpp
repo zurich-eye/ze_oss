@@ -12,7 +12,9 @@
 #include <ze/common/matrix.h>
 
 namespace ze {
-namespace kinematics {
+// imported from Schweizer-Messer Kinematics. Not intended to be used outside
+// of the spline package.
+namespace sm {
 
 inline Matrix4 boxPlus(const Vector6 & dt)
 {

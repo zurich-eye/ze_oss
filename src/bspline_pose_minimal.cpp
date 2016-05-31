@@ -4,11 +4,11 @@
 namespace ze {
 
 // explicit specialization
-template class BSplinePoseMinimal<ze::kinematics::RotationVector>;
+template class BSplinePoseMinimal<ze::sm::RotationVector>;
 
 template<class RP>
-BSplinePoseMinimal<RP>::BSplinePoseMinimal(int splineOrder)
-  : BSpline(splineOrder)
+BSplinePoseMinimal<RP>::BSplinePoseMinimal(int spline_order)
+  : BSpline(spline_order)
 {
 }
 
@@ -27,11 +27,11 @@ template<class RP>
 Matrix4 BSplinePoseMinimal<RP>::transformationAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   MatrixX JS;
   VectorX p;
-  p = evalDAndJacobian(tk, 0, &JS, coefficientIndices);
+  p = evalDAndJacobian(tk, 0, &JS, coefficient_indices);
 
   MatrixX JT;
   Matrix4 T = curveValueToTransformationAndJacobian(p, &JT);
@@ -48,12 +48,12 @@ template<class RP>
 Matrix3 BSplinePoseMinimal<RP>::orientationAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   Matrix3 C;
   MatrixX JS;
   VectorX p;
-  p = evalDAndJacobian(tk,0,&JS, coefficientIndices);
+  p = evalDAndJacobian(tk,0,&JS, coefficient_indices);
 
   Matrix3 S;
 
@@ -75,12 +75,12 @@ template<class RP>
 Matrix3 BSplinePoseMinimal<RP>::inverseOrientationAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   Matrix3 C;
   MatrixX JS;
   VectorX p;
-  p = evalDAndJacobian(tk, 0, &JS, coefficientIndices);
+  p = evalDAndJacobian(tk, 0, &JS, coefficient_indices);
 
   Matrix3 S;
   RP rp(Vector3(p.tail<3>()));
@@ -101,11 +101,11 @@ template<class RP>
 Matrix4 BSplinePoseMinimal<RP>::inverseTransformationAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   MatrixX JS;
   VectorX p;
-  p = evalDAndJacobian(tk,0,&JS, coefficientIndices);
+  p = evalDAndJacobian(tk,0,&JS, coefficient_indices);
 
   MatrixX JT;
   Matrix4 T = curveValueToTransformationAndJacobian( p, &JT );
@@ -118,12 +118,12 @@ Matrix4 BSplinePoseMinimal<RP>::inverseTransformationAndJacobian(
   {
     // The "box times" is the linearized transformation way of
     // inverting the jacobian.
-     *J = -ze::kinematics::boxTimes(T) * JT * JS;
+     *J = -ze::sm::boxTimes(T) * JT * JS;
   }
 
-  if(coefficientIndices)
+  if(coefficient_indices)
   {
-    *coefficientIndices = localCoefficientVectorIndices(tk);
+    *coefficient_indices = localCoefficientVectorIndices(tk);
   }
 
   return T;
@@ -143,15 +143,15 @@ Vector4 BSplinePoseMinimal<RP>::transformVectorAndJacobian(
     FloatType tk,
     const Vector4& v_tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   MatrixX JT;
-  Matrix4 T_n_vk = transformationAndJacobian(tk, &JT, coefficientIndices);
+  Matrix4 T_n_vk = transformationAndJacobian(tk, &JT, coefficient_indices);
   Vector4 v_n = T_n_vk * v_tk;
 
   if(J)
   {
-     *J = ze::kinematics::boxMinus(v_n) * JT;
+     *J = ze::sm::boxMinus(v_n) * JT;
   }
 
   return v_n;
@@ -214,10 +214,10 @@ template<class RP>
 Vector3 BSplinePoseMinimal<RP>::linearAccelerationAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
 
-  Matrix61 v = evalDAndJacobian(tk, 2, J, coefficientIndices);
+  Matrix61 v = evalDAndJacobian(tk, 2, J, coefficient_indices);
   Vector3 a = v.head<3>();
   if(J)
   {
@@ -268,7 +268,7 @@ template<class RP>
 Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrameAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
   Vector3 omega;
   Vector3 p;
@@ -276,7 +276,7 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrameAndJacobian(
   MatrixX Jp;
   MatrixX Jpdot;
   Matrix61 v = evalDAndJacobian(tk, 0, &Jp, NULL);
-  Matrix61 vdot = evalDAndJacobian(tk, 1, &Jpdot, coefficientIndices);
+  Matrix61 vdot = evalDAndJacobian(tk, 1, &Jpdot, coefficient_indices);
   p = v.tail<3>();
   pdot = vdot.tail<3>();
 
@@ -307,7 +307,7 @@ template<class RP>
 Vector3 BSplinePoseMinimal<RP>::angularVelocityAndJacobian(
     FloatType tk,
     MatrixX* J,
-    VectorXi* coefficientIndices) const
+    VectorXi* coefficient_indices) const
 {
 
   Vector3 omega;
@@ -316,7 +316,7 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocityAndJacobian(
   MatrixX Jp;
   MatrixX Jpdot;
   Matrix61 v = evalDAndJacobian(tk, 0, &Jp, NULL);
-  Matrix61 vdot = evalDAndJacobian(tk, 1, &Jpdot, coefficientIndices);
+  Matrix61 vdot = evalDAndJacobian(tk, 1, &Jpdot, coefficient_indices);
   p = v.tail<3>();
   pdot = vdot.tail<3>();
 
@@ -344,7 +344,7 @@ void BSplinePoseMinimal<RP>::initPoseSpline(
     FloatType t0,
     FloatType t1,
     const Matrix4& T_n_t0,
-    const Matrix4 & T_n_t1)
+    const Matrix4& T_n_t1)
 {
   VectorX v0 = transformationToCurveValue(T_n_t0);
   VectorX v1 = transformationToCurveValue(T_n_t1);
@@ -353,7 +353,7 @@ void BSplinePoseMinimal<RP>::initPoseSpline(
 }
 
 template<class RP>
-void BSplinePoseMinimal<RP>::addPoseSegment(FloatType tk, const Matrix4 & T_n_tk)
+void BSplinePoseMinimal<RP>::addPoseSegment(FloatType tk, const Matrix4& T_n_tk)
 {
   VectorX vk = transformationToCurveValue(T_n_tk);
 
@@ -384,7 +384,7 @@ Matrix4 BSplinePoseMinimal<RP>::curveValueToTransformation(const VectorX& c) con
 
 template<class RP>
 Matrix4 BSplinePoseMinimal<RP>::curveValueToTransformationAndJacobian(
-    const VectorX & p, MatrixX * J) const
+    const VectorX& p, MatrixX * J) const
 {
   CHECK_EQ(p.size(), 6) << "The curve value is an unexpected size!";
   Matrix4 T = Matrix4::Identity();
@@ -421,26 +421,26 @@ template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSpline2(
     const VectorX& times,
     const Eigen::Matrix<FloatType,6,Eigen::Dynamic>& poses,
-    int numSegments,
+    int num_segments,
     FloatType lambda)
 {
-  initSpline2(times, poses, numSegments, lambda);
+  initSpline2(times, poses, num_segments, lambda);
 }
 
 template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSpline3(
     const VectorX& times,
     const Eigen::Matrix<FloatType,6,Eigen::Dynamic>& poses,
-    int numSegments,
+    int num_segments,
     FloatType lambda)
 {
-  initSpline3(times, poses, numSegments, lambda);
+  initSpline3(times, poses, num_segments, lambda);
 }
 
 template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSplinePoses(const VectorX& times,
                          const std::vector<Matrix4>& poses,
-                         int numSegments,
+                         int num_segments,
                          FloatType lambda)
 {
   Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
@@ -450,7 +450,7 @@ void BSplinePoseMinimal<RP>::initPoseSplinePoses(const VectorX& times,
     parameters.col(i) = transformationToCurveValue(poses[i]);
   }
 
-  initPoseSpline3(times, parameters, numSegments, lambda);
+  initPoseSpline3(times, parameters, num_segments, lambda);
 }
 
 } // namespace ze

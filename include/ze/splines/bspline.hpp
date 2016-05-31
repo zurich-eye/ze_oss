@@ -12,6 +12,11 @@
 //    initialization)
 //
 // WARNING: Do NOT use as-is in production code.
+// @todo The code itself was initially designed purely for research and before
+//       actually using it in production code, we should properly verify its
+//       capabilities. One major part is the efficiency which isn't perfect at
+//       all (pure Eigen::Dynamic implementations, a bunch of duplicate
+//       evaluations for readability and some debuggng stuff)
 
 #pragma once
 
@@ -21,12 +26,20 @@
 #include <ze/common/types.h>
 
 namespace ze_splines {
+
+// Define a generic expression of a matrix where all coefficients
+// are defined by a functor.
+// A BiVector is a vector that holds the values of cumulative basis functions
+// and extends the definition to the outside of its definition:
+// if before the segment where it is defined: 0
+// after the segment: fixed to end_value
 class BiVector;
-}  // namespace pose_splines
+}  // namespace ze_splines
 
 namespace Eigen {
 namespace internal {
 template<>
+
 struct functor_traits<ze_splines::BiVector>
 {
   enum { Cost = 1, PacketAccess = false, IsRepeatable = true };
@@ -44,7 +57,7 @@ private:
   const ze::VectorX localBi_;
 
 public:
-  BiVector(int startIndex, const ze::VectorX & localBi, ze::FloatType endValue)
+  BiVector(int startIndex, const ze::VectorX& localBi, ze::FloatType endValue)
     : startIndex_(startIndex)
     , endValue_(endValue)
     , localBi_(localBi)
@@ -84,7 +97,7 @@ public:
    *
    * @param splineOrder The order of the spline.
    */
-  BSpline(int splineOrder);
+  BSpline(int spline_order);
 
   /**
    * A destructor.
@@ -96,7 +109,7 @@ public:
    *
    * @return The order of the spline
    */
-  int splineOrder() const;
+  int spline_order() const;
 
   /**
    *
@@ -116,21 +129,21 @@ public:
    * @return the number of coefficients required for a specified number of
    * valid time segments.
    */
-  int numCoefficientsRequired(int numTimeSegments) const;
+  int numCoefficientsRequired(int num_time_segments) const;
 
   /**
    * @param numTimeSegments the number of time segments required
    * @return the number of knots required for a specified number of valid
    * time segments.
    */
-  int numKnotsRequired(int numTimeSegments) const;
+  int numKnotsRequired(int num_time_segments) const;
 
   /**
    *
    * @param numKnots the number of knots.
    * @return the number of valid time segments for a given number of knots.
    */
-  int numValidTimeSegments(int numKnots) const;
+  int numValidTimeSegments(int num_knots) const;
 
   /**
    *
@@ -146,7 +159,7 @@ public:
    *
    * @return The basis matrix active on the time segment.
    */
-  const MatrixX & basisMatrix(int i) const;
+  const MatrixX& basisMatrix(int i) const;
 
   /**
    *
@@ -172,8 +185,8 @@ public:
    * @param knots        A non-decreasing knot sequence.
    * @param coefficients A set of spline coefficients.
    */
-  void setKnotsAndCoefficients(const std::vector<FloatType> & knots,
-                               const MatrixX & coefficients);
+  void setKnotsAndCoefficients(const std::vector<FloatType>& knots,
+                               const MatrixX& coefficients);
 
   /**
    * Set the knots and coefficients of the spline. Each column of the
@@ -183,15 +196,15 @@ public:
    * @param knots        A non-decreasing knot sequence.
    * @param coefficients A set of spline coefficients.
    */
-  void setKnotVectorAndCoefficients(const VectorX & knots,
-                                    const MatrixX & coefficients);
+  void setKnotVectorAndCoefficients(const VectorX& knots,
+                                    const MatrixX& coefficients);
 
   /**
    * Sets the coefficient matrix from the stacked vector of coefficients.
    *
    * @param coefficients The stacked vector of coefficients.
    */
-  void setCoefficientVector(const VectorX & coefficients);
+  void setCoefficientVector(const VectorX& coefficients);
 
   /**
    *
@@ -204,7 +217,7 @@ public:
    *
    * @param coefficients
    */
-  void setCoefficientMatrix(const MatrixX & coefficients);
+  void setCoefficientMatrix(const MatrixX& coefficients);
 
   /**
    * @return the current knot vector.
@@ -221,7 +234,7 @@ public:
    * the coefficient matrix is interpreted as a single, vector-valued
    * spline coefficient.
    */
-  const MatrixX & coefficients() const;
+  const MatrixX& coefficients() const;
 
   /**
    *
@@ -268,7 +281,7 @@ public:
    *
    * @return The value of the derivative of the spline curve evaluated at t.
    */
-  VectorX evalD(FloatType t, int derivativeOrder) const;
+  VectorX evalD(FloatType t, int derivative_order) const;
 
   /**
    * Evaluate the derivative of the spline curve at time t and retrieve the Jacobian
@@ -282,7 +295,7 @@ public:
    * @return The value of the derivative of the spline curve evaluated at t and the Jacobian.
    */
   std::pair<VectorX, MatrixX> evalDAndJacobian(FloatType t,
-                                               int derivativeOrder) const;
+                                               int derivative_order) const;
 
   /**
    * Evaluate the derivative of the spline curve at time t and retrieve the Jacobian
@@ -297,9 +310,9 @@ public:
    * @return The value of the derivative of the spline curve evaluated at t.
    */
   VectorX evalDAndJacobian(FloatType t,
-                           int derivativeOrder,
+                           int derivative_order,
                            MatrixX * Jacobian,
-                           VectorXi * coefficientIndices) const;
+                           VectorXi * coefficient_indices) const;
 
    /**
    * Get the local basis matrix evaluated at the time \f$ t \f$.
@@ -311,7 +324,7 @@ public:
    *
    * @return The local basis matrix evaluated at time \f$ t \f$
    */
-  MatrixX Phi(FloatType t, int derivativeOrder = 0) const;
+  MatrixX Phi(FloatType t, int derivative_order = 0) const;
 
   /**
    * Get the local basis matrix evaluated at the time \f$ t \f$.
@@ -323,7 +336,7 @@ public:
    *
    * @return The local basis matrix evaluated at time \f$ t \f$
    */
-  MatrixX localBasisMatrix(FloatType t, int derivativeOrder = 0) const;
+  MatrixX localBasisMatrix(FloatType t, int derivative_order = 0) const;
 
   /**
    * Get the local coefficient matrix evaluated at the time \f$ t \f$.
@@ -398,7 +411,7 @@ public:
     CHECK_LE(i, coefficients_.cols()) << "Index out of range";
 
     return Eigen::Map< const Eigen::Matrix<FloatType, D, 1> >(
-          &coefficients_(0,i),coefficients_.rows());
+          &coefficients_(0,i), coefficients_.rows());
   }
 
   /**
@@ -420,7 +433,7 @@ public:
    * @param t The time used to select the local coefficients.
    * @param c The local coefficient vector.
    */
-  void setLocalCoefficientVector(FloatType t, const VectorX & c);
+  void setLocalCoefficientVector(FloatType t, const VectorX& c);
 
   /**
    * Get the indices of the local coefficients active at time t.
@@ -460,13 +473,13 @@ public:
                   const VectorX& p_1);
 
   void initSpline2(const VectorX& times,
-                   const MatrixX& interpolationPoints,
-                   int numSegments,
+                   const MatrixX& interpolation_points,
+                   int num_segments,
                    FloatType lambda);
 
   void initSpline3(const VectorX& times,
-                   const MatrixX& interpolationPoints,
-                   int numSegments,
+                   const MatrixX& interpolation_points,
+                   int num_segments,
                    FloatType lambda);
 
   /**
@@ -521,24 +534,25 @@ public:
     return evalIntegral(t1, t2);
   }
 
-  MatrixX Mi(int segmentIndex) const;
-  MatrixX Bij(int segmentIndex, int columnIndex) const;
-  MatrixX U(FloatType t, int derivativeOrder) const;
-  VectorX u(FloatType t, int derivativeOrder) const;
+  MatrixX Mi(int segment_index) const;
+  MatrixX Bij(int segment_index, int column_index) const;
+  MatrixX U(FloatType t, int derivative_order) const;
+  VectorX u(FloatType t, int derivative_order) const;
   int segmentIndex(FloatType t) const;
-  MatrixX Dii(int segmentIndex) const;
-  MatrixX Di(int segmentIndex) const;
+  MatrixX Dii(int segment_index) const;
+  MatrixX Di(int segment_index) const;
 
   /**
-   * Get the b_i(t) for i in localVvCoefficientVectorIndices (@see #localVvCoefficientVectorIndices).
+   * Get the b_i(t) for i in localVvCoefficientVectorIndices
+   * (@see #localVvCoefficientVectorIndices).
    *
    * @param t The time being queried.
    *
    * @return [b_i(t) for i in localVvCoefficientVectorIndices].
    *
    */
-  VectorX getLocalBiVector(FloatType t, int derivativeOrder = 0) const;
-  void getLocalBiInto(FloatType t, VectorX & ret, int derivativeOrder = 0) const;
+  VectorX getLocalBiVector(FloatType t, int derivative_order = 0) const;
+  void getLocalBiInto(FloatType t, VectorX& ret, int derivative_order = 0) const;
 
   /**
    * Get the cumulative (tilde) b_i(t) for i in localVvCoefficientVectorIndices
@@ -549,33 +563,34 @@ public:
    * @return [tilde b_i(t) for i in localVvCoefficientVectorIndices].
    *
    */
-  VectorX getLocalCumulativeBiVector(FloatType t, int derivativeOrder = 0) const;
-
+  VectorX getLocalCumulativeBiVector(FloatType t, int derivative_order = 0) const;
 
   Eigen::CwiseNullaryOp<ze_splines::BiVector, VectorX>
-  getBiVector(FloatType t) const {
+  getBiVector(FloatType t) const
+  {
     return Eigen::CwiseNullaryOp<ze_splines::BiVector, VectorX>(
           numValidTimeSegments(), 1,
           ze_splines::BiVector(segmentIndex(t), getLocalBiVector(t), 0));
   }
   Eigen::CwiseNullaryOp<ze_splines::BiVector, VectorX>
-  getCumulativeBiVector(FloatType t) const {
+  getCumulativeBiVector(FloatType t) const
+  {
     return Eigen::CwiseNullaryOp<ze_splines::BiVector, VectorX>(
           numValidTimeSegments(), 1,
           ze_splines::BiVector(segmentIndex(t),getLocalCumulativeBiVector(t), 1));
   }
 
   MatrixX segmentQuadraticIntegral(const MatrixX& W,
-                                   int segmentIdx,
-                                   int derivativeOrder) const;
+                                   int segment_index,
+                                   int derivative_order) const;
   MatrixX segmentQuadraticIntegralDiag(const VectorX& Wdiag,
-                                       int segmentIdx,
-                                       int derivativeOrder) const;
-  MatrixX curveQuadraticIntegral(const MatrixX& W,int derivativeOrder) const;
-  MatrixX curveQuadraticIntegralDiag(const VectorX & Wdiag, int derivativeOrder) const;
+                                       int segment_index,
+                                       int derivative_order) const;
+  MatrixX curveQuadraticIntegral(const MatrixX& W,int derivative_order) const;
+  MatrixX curveQuadraticIntegralDiag(const VectorX& Wdiag, int derivative_order) const;
 
   void initConstantSpline(FloatType t_min, FloatType t_max,
-                          int numSegments, const VectorX& constant);
+                          int num_segments, const VectorX& constant);
 
 protected:
   /**
@@ -618,18 +633,18 @@ protected:
    *
    * @return
    */
-  VectorX computeU(FloatType uval, int segmentIndex, int derivativeOrder) const;
+  VectorX computeU(FloatType uval, int segment_index, int derivative_order) const;
 
-  int basisMatrixIndexFromStartingKnotIndex(int startingKnotIndex) const;
-  int startingKnotIndexFromBasisMatrixIndex(int basisMatrixIndex) const;
-  const MatrixX & basisMatrixFromKnotIndex(int knotIndex) const;
+  int basisMatrixIndexFromStartingKnotIndex(int starting_knot_index) const;
+  int startingKnotIndexFromBasisMatrixIndex(int basis_matrix_index) const;
+  const MatrixX& basisMatrixFromKnotIndex(int knot_index) const;
 
   /**
    * Throws an exception if the knot sequence is not non-decreasing.
    *
    * @param knots The knot sequence to verify.
    */
-  void verifyKnotSequence(const std::vector<FloatType> & knots);
+  void verifyKnotSequence(const std::vector<FloatType>& knots);
 
   /**
    * Initialize the basis matrices based on the current knot sequence.
@@ -671,7 +686,7 @@ protected:
   FloatType d_1(int k, int i, int j);
 
   /// The order of the spline.
-  int splineOrder_;
+  int spline_order_;
 
   /// The knot sequence used by the B-spline.
   std::vector<FloatType> knots_;
@@ -684,6 +699,6 @@ protected:
   Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> coefficients_;
 
   /// The basis matrices for each time segment the B-spline is defined over.
-  std::vector<MatrixX> basisMatrices_;
+  std::vector<MatrixX> basis_matrices_;
 };
 } // namespace ze

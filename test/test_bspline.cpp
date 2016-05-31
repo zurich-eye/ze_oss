@@ -2,11 +2,8 @@
 
 // Bring in gtest
 #include <ze/common/test_entrypoint.h>
-#include <boost/tuple/tuple.hpp>
 #include <ze/common/numerical_derivative.h>
 #include <ze/common/manifold.h>
-
-using namespace ze;
 
 namespace ze {
 
@@ -55,25 +52,27 @@ private:
 // Check that the Jacobian calculation is correct.
 TEST(SplineTestSuite, testBSplineJacobian)
 {
+  using namespace ze;
+
   const int segments = 2;
   for(int order = 2; order < 10; order++)
   {
     BSpline bs(order);
     int nk = bs.numKnotsRequired(segments);
     std::vector<FloatType> knots;
-    for(int i = 0; i < nk; i++)
+    for (int i = 0; i < nk; ++i)
     {
       knots.push_back(i);
     }
 
-    for(int dim = 1; dim < 4; dim++)
+    for (int dim = 1; dim < 4; ++dim)
     {
       int nc = bs.numCoefficientsRequired(segments);
       MatrixX C = MatrixX::Random(dim,nc);
       bs.setKnotsAndCoefficients(knots, C);
-      for(int derivative = 0; derivative < order; derivative++)
+      for (int derivative = 0; derivative < order; ++derivative)
       {
-        for(FloatType t = bs.t_min(); t < bs.t_max(); t += 0.1)
+        for (FloatType t = bs.t_min(); t < bs.t_max(); t += 0.1)
         {
 
           FixedTimeBSpline fixed_bs(&bs, t, derivative);
@@ -87,7 +86,7 @@ TEST(SplineTestSuite, testBSplineJacobian)
 
           MatrixX J;
           VectorX v;
-          boost::tie(v,J) = bs.evalDAndJacobian(t, derivative);
+          std::tie(v,J) = bs.evalDAndJacobian(t, derivative);
 
           EXPECT_TRUE(EIGEN_MATRIX_NEAR(J, estJ, 1e-5));
         }
@@ -98,6 +97,8 @@ TEST(SplineTestSuite, testBSplineJacobian)
 
 TEST(SplineTestSuite, testCoefficientMap)
 {
+  using namespace ze;
+
   const int order = 4;
   const int segments = 10;
   const int dim = 5;
@@ -106,7 +107,7 @@ TEST(SplineTestSuite, testCoefficientMap)
   int nc = bs.numCoefficientsRequired(segments);
 
   std::vector<FloatType> knots;
-  for(int i = 0; i < nk; i++)
+  for (int i = 0; i < nk; ++i)
   {
     knots.push_back(i);
   }
@@ -115,13 +116,13 @@ TEST(SplineTestSuite, testCoefficientMap)
   bs.setKnotsAndCoefficients(knots, C);
 
   const MatrixX & CC = bs.coefficients();
-  for(int i = 0; i < bs.numVvCoefficients(); i++)
+  for (int i = 0; i < bs.numVvCoefficients(); ++i)
   {
     Eigen::Map<VectorX> m = bs.vvCoefficientVector(i);
     // Test pass by value...
     Eigen::Map<Eigen::Matrix<FloatType, 5, 1> > m2=
         bs.fixedSizeVvCoefficientVector<dim>(i);
-    for(int r = 0; r < m.size(); ++r)
+    for (int r = 0; r < m.size(); ++r)
     {
       ASSERT_TRUE( &m[r] == &CC(r,i) );
       ASSERT_TRUE( &m[r] == &m2[r] );
@@ -134,6 +135,8 @@ TEST(SplineTestSuite, testCoefficientMap)
 
 TEST(SplineTestSuite, testGetBi)
 {
+  using namespace ze;
+
   const int order = 4;
   const int segments = 10;
   const FloatType startTime = 0;
@@ -142,7 +145,7 @@ TEST(SplineTestSuite, testGetBi)
   BSpline bs(order);
   bs.initConstantSpline(startTime, endTime, segments, VectorX::Zero(1));
 
-  for(int i = 0; i <= numTimeSteps; i ++)
+  for (int i = 0; i <= numTimeSteps; ++i)
   {
     FloatType t = startTime + (endTime - startTime) * ((FloatType) i / numTimeSteps);
     VectorX localBiVector = bs.getLocalBiVector(t);
@@ -163,14 +166,15 @@ TEST(SplineTestSuite, testGetBi)
     EXPECT_EQ(localCoefficientVectorIndices.size(), order)
         << "localCoefficientVectorIndices has to have exactly " << order << " entries";
 
-    for(int j = 0; j < order; j ++){
+    for (int j = 0; j < order; ++j)
+    {
       EXPECT_EQ(localCoefficientVectorIndices[j], firstIndex + j)
           << "localCoefficientVectorIndices have to be successive";
     }
 
-    for(int j = 0, n = biVector.size(); j < n; j++)
+    for (int j = 0, n = biVector.size(); j < n; ++j)
     {
-      if(j < firstIndex)
+      if (j < firstIndex)
       {
         EXPECT_EQ(biVector[j], 0);
         EXPECT_EQ(cumulativeBiVector[j], 1);
@@ -196,6 +200,5 @@ TEST(SplineTestSuite, testGetBi)
     }
   }
 }
-
 
 ZE_UNITTEST_ENTRYPOINT

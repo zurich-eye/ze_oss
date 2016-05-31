@@ -44,7 +44,7 @@ class BSplinePoseMinimal : public BSpline
      *
      * @param splineOrder The order of the spline.
      */
-    BSplinePoseMinimal(int splineOrder);
+    BSplinePoseMinimal(int spline_order);
 
     ~BSplinePoseMinimal();
 
@@ -52,12 +52,12 @@ class BSplinePoseMinimal : public BSpline
     Matrix4 transformationAndJacobian(
         FloatType tk,
         MatrixX* J = NULL,
-        VectorXi* coefficientIndices = NULL) const;
+        VectorXi* coefficient_indices = NULL) const;
 
     Matrix4 inverseTransformationAndJacobian(
         FloatType tk,
         MatrixX* J = NULL,
-        VectorXi* coefficientIndices = NULL) const;
+        VectorXi* coefficient_indices = NULL) const;
 
     Matrix4 inverseTransformation(FloatType tk) const;
 
@@ -66,7 +66,7 @@ class BSplinePoseMinimal : public BSpline
         FloatType tk,
         const Vector4& v,
         MatrixX* J = NULL,
-        VectorXi* coefficientIndices = NULL) const;
+        VectorXi* coefficient_indices = NULL) const;
 
     Vector3 position(FloatType tk) const;
 
@@ -74,13 +74,13 @@ class BSplinePoseMinimal : public BSpline
     Matrix3 orientationAndJacobian(
         FloatType tk,
         MatrixX* J,
-        VectorXi* coefficientIndices) const;
+        VectorXi* coefficient_indices) const;
 
     Matrix3 inverseOrientation(FloatType tk) const;
     Matrix3 inverseOrientationAndJacobian(
         FloatType tk,
         MatrixX* J,
-        VectorXi* coefficientIndices) const;
+        VectorXi* coefficient_indices) const;
 
     Vector3 linearVelocity(FloatType tk) const;
     Vector3 linearVelocityBodyFrame(FloatType tk) const;
@@ -90,41 +90,41 @@ class BSplinePoseMinimal : public BSpline
     Vector3 linearAccelerationAndJacobian(
         FloatType tk,
         MatrixX* J,
-        VectorXi* coefficientIndices) const;
+        VectorXi* coefficient_indices) const;
 
     Vector3 angularVelocity(FloatType tk) const;
     Vector3 angularVelocityBodyFrame(FloatType tk) const;
     Vector3 angularVelocityBodyFrameAndJacobian(
         FloatType tk,
         MatrixX* J,
-        VectorXi* coefficientIndices) const;
+        VectorXi* coefficient_indices) const;
 
     Vector3 angularVelocityAndJacobian(
         FloatType tk,
         MatrixX* J,
-        VectorXi* coefficientIndices) const;
+        VectorXi* coefficient_indices) const;
 
     //! takes the two transformation matrices at two points in time
     //! to construct a pose spline
     void initPoseSpline(FloatType t0,
                         FloatType t1,
                         const Matrix4& T_n_t0,
-                        const Matrix4 & T_n_t);
+                        const Matrix4& T_n_t);
 
     //! take the pose in the minimal parametrization to initializ the spline
     void initPoseSpline2(const VectorX& times,
-                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic> & poses,
-                         int numSegments,
+                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+                         int num_segments,
                          FloatType lambda);
     void initPoseSpline3(const VectorX& times,
-                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic> & poses,
-                         int numSegments,
+                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+                         int num_segments,
                          FloatType lambda);
 
     //! initialize a bspline given a vector of poses
     void initPoseSplinePoses(const VectorX& times,
-                            const std::vector<Matrix4> & poses,
-                            int numSegments,
+                            const std::vector<Matrix4>& poses,
+                            int num_segments,
                             FloatType lambda);
 
     void addPoseSegment(FloatType tk, const Matrix4& T_n_tk);
@@ -132,8 +132,8 @@ class BSplinePoseMinimal : public BSpline
                          const Matrix4& T_n_tk,
                          FloatType lambda);
 
-    Matrix4 curveValueToTransformation(const VectorX & c) const;
-    VectorX transformationToCurveValue(const Matrix4 & T) const;
+    Matrix4 curveValueToTransformation(const VectorX& c) const;
+    VectorX transformationToCurveValue(const Matrix4& T) const;
 
     Matrix4 curveValueToTransformationAndJacobian(
         const VectorX& c,

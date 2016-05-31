@@ -2,14 +2,9 @@
 
 // Bring in gtest
 #include <ze/common/test_entrypoint.h>
-#include <boost/tuple/tuple.hpp>
 #include <ze/common/numerical_derivative.h>
 #include <ze/common/transformation.h>
 #include <ze/splines/operators.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-
-using namespace ze;
 
 namespace ze {
 
@@ -119,7 +114,9 @@ private:
 
 TEST(BSplinePoseMinimalTestSuite, testCurveValueToTransformation)
 {
-  BSplinePoseMinimal<ze::kinematics::RotationVector> bs(3);
+  using namespace ze;
+
+  BSplinePoseMinimal<ze::sm::RotationVector> bs(3);
 
   Vector6 point = Vector6::Random();
   Matrix4 T = bs.curveValueToTransformation(point);
@@ -133,10 +130,12 @@ TEST(BSplinePoseMinimalTestSuite, testCurveValueToTransformation)
 // Check that the Jacobian calculation is correct.
 TEST(BSplinePoseMinimalTestSuite, testBSplineTransformationJacobian)
 {
-  for(int order = 2; order < 10; order++)
+  using namespace ze;
+
+  for (int order = 2; order < 10; ++order)
   {
     // Create a two segment spline.
-    BSplinePoseMinimal<ze::kinematics::RotationVector> bs(order);
+    BSplinePoseMinimal<ze::sm::RotationVector> bs(order);
     bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
@@ -144,9 +143,9 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineTransformationJacobian)
     // Create a random homogeneous vector.
     Vector4 v = Vector4::Random() * 10.0;
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413)
+    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413)
     {
-      FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector> fixed_bs(
+      FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0, v);
 
       Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
@@ -154,13 +153,13 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineTransformationJacobian)
       MatrixX estJ =
           numericalDerivative<MatrixX, VectorX>(
             std::bind(
-              &FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector>::transformation,
+              &FixedTimeBSplinePoseMinimal<ze::sm::RotationVector>::transformation,
               &fixed_bs, std::placeholders::_1), point);
 
       MatrixX JT;
       Matrix4 T = bs.transformationAndJacobian(t, &JT);
 
-      MatrixX J = ze::kinematics::boxMinus(T*v) * JT;
+      MatrixX J = ze::sm::boxMinus(T*v) * JT;
 
       EXPECT_TRUE(EIGEN_MATRIX_NEAR(J, estJ, 1e-6));
 
@@ -177,9 +176,11 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineTransformationJacobian)
 // Check that the Jacobian calculation is correct.
 TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
 {
-  for(int order = 2; order < 10; order++) {
+  using namespace ze;
+
+  for (int order = 2; order < 10; ++order) {
     // Create a two segment spline.
-    BSplinePoseMinimal<ze::kinematics::RotationVector> bs(order);
+    BSplinePoseMinimal<ze::sm::RotationVector> bs(order);
     bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
@@ -187,8 +188,8 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
     // Create a random homogeneous vector.
     Vector4 v = Vector4::Random() * 10.0;
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413) {
-      FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector> fixed_bs(
+    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413) {
+      FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0, v);
 
       Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
@@ -196,7 +197,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
       MatrixX estJ =
           numericalDerivative<MatrixX, VectorX>(
             std::bind(
-              &FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector>::inverseTransformation,
+              &FixedTimeBSplinePoseMinimal<ze::sm::RotationVector>::inverseTransformation,
               &fixed_bs, std::placeholders::_1), point);
 
       MatrixX JT;
@@ -204,7 +205,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
 
       Matrix4 T = bs.inverseTransformationAndJacobian(t, &JT);
 
-      J = ze::kinematics::boxMinus(T*v) * JT;
+      J = ze::sm::boxMinus(T*v) * JT;
       EXPECT_TRUE(EIGEN_MATRIX_NEAR(J, estJ, 1e-6));
     }
   }
@@ -212,18 +213,20 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
 
 TEST(BSplinePoseMinimalTestSuite, testBSplineAccelerationJacobian)
 {
-  for(int order = 2; order < 10; order++) {
+  using namespace ze;
+
+  for (int order = 2; order < 10; ++order) {
     // Create a two segment spline.
-    BSplinePoseMinimal<ze::kinematics::RotationVector> bs(order);
+    BSplinePoseMinimal<ze::sm::RotationVector> bs(order);
     bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
+    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
       MatrixX J;
       bs.linearAccelerationAndJacobian(t, &J, NULL);
 
-      FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector> fixed_bs(
+      FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
       Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
@@ -231,7 +234,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAccelerationJacobian)
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
             std::bind(
-              &FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector>::linearAcceleration,
+              &FixedTimeBSplinePoseMinimal<ze::sm::RotationVector>::linearAcceleration,
               &fixed_bs, std::placeholders::_1), point);
 
       EXPECT_TRUE(EIGEN_MATRIX_NEAR(J, estJ, 1e-6));
@@ -242,18 +245,21 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAccelerationJacobian)
 
 TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityJacobian)
 {
-  for(int order = 2; order < 10; order++) {
+  using namespace ze;
+
+  for (int order = 2; order < 10; ++order)
+  {
     // Create a two segment spline.
-    BSplinePoseMinimal<ze::kinematics::RotationVector> bs(order);
+    BSplinePoseMinimal<ze::sm::RotationVector> bs(order);
     bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
+    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
       MatrixX J;
       bs.angularVelocityAndJacobian(t, &J, NULL);
 
-      FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector> fixed_bs(
+      FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
       Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
@@ -261,7 +267,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityJacobian)
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
             std::bind(
-              &FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector>::angularVelocity,
+              &FixedTimeBSplinePoseMinimal<ze::sm::RotationVector>::angularVelocity,
               &fixed_bs, std::placeholders::_1), point);
 
       // opposite sign due to perturbation choice
@@ -273,19 +279,21 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityJacobian)
 
 TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
 {
-  for(int order = 2; order < 10; order++) {
+  using namespace ze;
+
+  for (int order = 2; order < 10; ++order) {
     // Create a two segment spline.
-    BSplinePoseMinimal<ze::kinematics::RotationVector> bs(order);
+    BSplinePoseMinimal<ze::sm::RotationVector> bs(order);
     bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for(FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1)
+    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1)
     {
       MatrixX J;
       bs.angularVelocityBodyFrameAndJacobian(t, &J, NULL);
 
-      FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector> fixed_bs(
+      FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
       Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
@@ -293,7 +301,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
             std::bind(
-              &FixedTimeBSplinePoseMinimal<ze::kinematics::RotationVector>::angularVelocityBodyFrame,
+              &FixedTimeBSplinePoseMinimal<ze::sm::RotationVector>::angularVelocityBodyFrame,
               &fixed_bs, std::placeholders::_1), point);
 
       EXPECT_TRUE(EIGEN_MATRIX_NEAR(J, estJ, 1e-6));
@@ -304,7 +312,9 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
 
 TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
 {
-  BSplinePoseMinimal<ze::kinematics::RotationVector> bs(3);
+  using namespace ze;
+
+  BSplinePoseMinimal<ze::sm::RotationVector> bs(3);
   bs.initPoseSpline(0.0, 1.0, bs.curveValueToTransformation(VectorX::Random(6)),
                     bs.curveValueToTransformation(VectorX::Random(6)));
   bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
@@ -321,7 +331,7 @@ TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
   }
 
   // init another spline
-  BSplinePoseMinimal<ze::kinematics::RotationVector> bs2(3);
+  BSplinePoseMinimal<ze::sm::RotationVector> bs2(3);
   bs2.initPoseSplinePoses(times, poses, 8, 1e-6);
 
   // compare
@@ -332,7 +342,6 @@ TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
                   bs2.transformation(t),
                   1e-2));
   }
-
 }
 
 ZE_UNITTEST_ENTRYPOINT

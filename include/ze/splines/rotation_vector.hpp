@@ -12,7 +12,8 @@
 #include <ze/common/matrix.h>
 
 namespace ze {
-namespace kinematics {
+// not intended for use in other packages but the ze_splines.
+namespace sm {
 
 class RotationVector {
 public:
