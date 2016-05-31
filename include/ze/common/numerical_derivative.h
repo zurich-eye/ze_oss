@@ -12,21 +12,30 @@ template<class Y, class X>
 typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension>
 numericalDerivative(std::function<Y(const X&)> h, const X& x, FloatType delta = 1e-5)
 {
-  static constexpr int N = traits<X>::dimension;
   typedef typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension> Jacobian;
   typedef typename traits<Y>::TangentVector TangentY;
   typedef typename traits<X>::TangentVector TangentX;
 
+  const int N_X = traits<X>::getDimension(x);
+
   // Get value at x.
   Y hx = h(x);
 
+  const int N_Y = traits<Y>::getDimension(hx);
+
   // Prepare a tangent vector to perturb x.
-  TangentX dx = TangentX::Zero();
+  TangentX dx;
+  dx.resize(N_X, 1);
+  dx.setZero();
 
   // Compute numerical Jacobian column by column.
-  Jacobian H = Jacobian::Zero();
+  Jacobian H;
+  H.resize(N_Y, N_X);
+  H.setZero();
+
   FloatType factor = 1.0 / (2.0 * delta);
-  for(int i = 0; i < N; ++i)
+
+  for(int i = 0; i < N_X; ++i)
   {
     dx(i) = delta;
     TangentY dy1 = traits<Y>::local(hx, h(traits<X>::retract(x, dx)));
