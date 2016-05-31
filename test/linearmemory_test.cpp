@@ -10,29 +10,7 @@
 #include <type_traits>
 
 #include <imp/core/linearmemory.hpp>
-
-template<class T>
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator(std::random_device{}());
-  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-template<class T>
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator(std::random_device{}());
-  std::uniform_real_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                 std::numeric_limits<T>::max());
-
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
+#include <ze/common/test_utils.h>
 
 
 template <typename Pixel>
@@ -43,7 +21,7 @@ class LinearMemoryTest : public ::testing::Test
     linmem_(numel_)
   {
     using T = typename Pixel::T;
-    auto random_val_generator = getRandomGenerator<T>();
+    auto random_val_generator = ze::getRandomGenerator<T>();
 
     T val1 = random_val_generator();
     T val2;
