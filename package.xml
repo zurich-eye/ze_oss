@@ -17,7 +17,6 @@
   <depend>imp_cu_core</depend>
   <depend>imp_bridge_opencv</depend>
   <depend>imp_3rdparty_cuda_toolkit</depend>
-  <depend>imp_imgproc</depend>
   <depend>imp_features</depend>
 
   <test_depend>gtest</test_depend>

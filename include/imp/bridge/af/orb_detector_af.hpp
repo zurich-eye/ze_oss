@@ -5,6 +5,8 @@
 
 namespace ze {
 
+using OrbDescriptors = Eigen::Matrix<unsigned, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+
 struct OrbDetectorOptions
 {
   float fast_thr{20.0f};
@@ -18,7 +20,6 @@ struct OrbKeypointWrapper
 {
   static constexpr uint8_t kDescrLength{8};
   using Ptr = typename std::shared_ptr<OrbKeypointWrapper>;
-  using OrbDescriptors = Eigen::Matrix<unsigned, kDescrLength, Eigen::Dynamic, Eigen::RowMajor>;
   OrbKeypointWrapper(uint32_t num)
     : num_detected(num)
   {
@@ -29,11 +30,61 @@ struct OrbKeypointWrapper
     size.reset(new float[num_detected]);
     descr.reset(new unsigned[kDescrLength*num_detected]);
   }
-  OrbDescriptors getDescriptors()
+
+  inline Keypoints getKeypoints() const
   {
-    return Eigen::Map<OrbDescriptors>(
-          descr.get(), kDescrLength, num_detected);
+    Keypoints keypoints(2, num_detected);
+    for(size_t k=0; k<num_detected; ++k)
+    {
+      keypoints(0, k) = x.get()[k];
+      keypoints(1, k) = y.get()[k];
+    }
+    return keypoints;
   }
+
+  inline KeypointScores getKeypointScores() const
+  {
+    KeypointScores scores(num_detected);
+    for(size_t k=0; k<num_detected; ++k)
+    {
+      scores(k) = score.get()[k];
+    }
+    return scores;
+  }
+
+  inline KeypointSizes getKeypointSizes() const
+  {
+    KeypointSizes sizes(num_detected);
+    for(size_t k=0; k<num_detected; ++k)
+    {
+      sizes(k) = size.get()[k];
+    }
+    return sizes;
+  }
+
+  inline KeypointAngles getKeypointAngles() const
+  {
+    KeypointAngles angles(num_detected);
+    for(size_t k=0; k<num_detected; ++k)
+    {
+      angles(k) = orient.get()[k];
+    }
+    return angles;
+  }
+
+  inline OrbDescriptors getDescriptors() const
+  {
+    OrbDescriptors descriptors(kDescrLength, num_detected);
+    for(size_t k=0; k<num_detected; ++k)
+    {
+      for(uint8_t d=0; d<kDescrLength; ++d)
+      {
+        descriptors(d, k) = descr.get()[k*kDescrLength+d];
+      }
+    }
+    return descriptors;
+  }
+
   uint32_t num_detected{0};
   std::unique_ptr<float[]> x;
   std::unique_ptr<float[]> y;
