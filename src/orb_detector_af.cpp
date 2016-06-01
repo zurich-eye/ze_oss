@@ -7,7 +7,7 @@ OrbDetectorAF::OrbDetectorAF(const OrbDetectorOptions& options, const Size2u& im
     options_(options)
 { }
 
-uint32_t OrbDetectorAF::detect(const ImagePyramid8uC1 &pyr, KeypointsWrapper &keypoints)
+uint32_t OrbDetectorAF::detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& keypoints)
 {
   LOG(FATAL) << "Not implemented";
   return 0;
@@ -21,11 +21,11 @@ uint32_t OrbDetectorAF::detect(const ImageAF32fC1& im, OrbKeypointWrapper::Ptr& 
         feat,
         desc,
         im.afArray(),
-        options_.fast_thr,
-        options_.max_feat,
+        options_.fast_threshold,
+        options_.max_num_features,
         options_.scale_factor,
-        options_.levels,
-        options_.blur_img);
+        options_.pyramid_levels,
+        options_.blur_input_image);
 
   const size_t num_detected = feat.getNumFeatures();
   keypoints.reset(new OrbKeypointWrapper(num_detected));

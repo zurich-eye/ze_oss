@@ -9,16 +9,24 @@ using OrbDescriptors = Eigen::Matrix<unsigned, Eigen::Dynamic, Eigen::Dynamic, E
 
 struct OrbDetectorOptions
 {
-  float fast_thr{20.0f};
-  uint16_t max_feat{400};
+  //! FAST threshold for which a pixel of the circle around the
+  //! central pixel is considered to be brighter or darker
+  float fast_threshold{20.0f};
+  //! Maximum number of features to hold
+  //! (will only keep the max_feat features with higher Harris responses)
+  uint16_t max_num_features{400};
+  //! Image downsample factor in interval (1, 2].
+  //! A value of 2 corresponds to half-sampling the input image
   float scale_factor{1.5};
-  uint8_t levels{4};
-  bool blur_img{false};
+  //! Number of pyramid levels for feature esxtraction
+  uint8_t pyramid_levels{4};
+  //! Gaussian blur input image with sigma=2
+  bool blur_input_image{false};
 };
 
 struct OrbKeypointWrapper
 {
-  static constexpr uint8_t kDescrLength{8};
+  static constexpr uint8_t c_descriptor_length{8};
   using Ptr = typename std::shared_ptr<OrbKeypointWrapper>;
   OrbKeypointWrapper(uint32_t num)
     : num_detected(num)
@@ -28,13 +36,13 @@ struct OrbKeypointWrapper
     score.reset(new float[num_detected]);
     orient.reset(new float[num_detected]);
     size.reset(new float[num_detected]);
-    descr.reset(new unsigned[kDescrLength*num_detected]);
+    descr.reset(new unsigned[c_descriptor_length*num_detected]);
   }
 
   inline Keypoints getKeypoints() const
   {
     Keypoints keypoints(2, num_detected);
-    for(size_t k=0; k<num_detected; ++k)
+    for (size_t k = 0; k < num_detected; ++k)
     {
       keypoints(0, k) = x.get()[k];
       keypoints(1, k) = y.get()[k];
@@ -45,7 +53,7 @@ struct OrbKeypointWrapper
   inline KeypointScores getKeypointScores() const
   {
     KeypointScores scores(num_detected);
-    for(size_t k=0; k<num_detected; ++k)
+    for (size_t k = 0; k < num_detected; ++k)
     {
       scores(k) = score.get()[k];
     }
@@ -55,7 +63,7 @@ struct OrbKeypointWrapper
   inline KeypointSizes getKeypointSizes() const
   {
     KeypointSizes sizes(num_detected);
-    for(size_t k=0; k<num_detected; ++k)
+    for (size_t k = 0; k < num_detected; ++k)
     {
       sizes(k) = size.get()[k];
     }
@@ -65,7 +73,7 @@ struct OrbKeypointWrapper
   inline KeypointAngles getKeypointAngles() const
   {
     KeypointAngles angles(num_detected);
-    for(size_t k=0; k<num_detected; ++k)
+    for (size_t k = 0; k < num_detected; ++k)
     {
       angles(k) = orient.get()[k];
     }
@@ -74,12 +82,12 @@ struct OrbKeypointWrapper
 
   inline OrbDescriptors getDescriptors() const
   {
-    OrbDescriptors descriptors(kDescrLength, num_detected);
-    for(size_t k=0; k<num_detected; ++k)
+    OrbDescriptors descriptors(c_descriptor_length, num_detected);
+    for (size_t k = 0; k < num_detected; ++k)
     {
-      for(uint8_t d=0; d<kDescrLength; ++d)
+      for (uint8_t d = 0; d < c_descriptor_length; ++d)
       {
-        descriptors(d, k) = descr.get()[k*kDescrLength+d];
+        descriptors(d, k) = descr.get()[k*c_descriptor_length+d];
       }
     }
     return descriptors;
