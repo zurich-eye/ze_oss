@@ -6,7 +6,7 @@
 
 namespace ze {
 
-//! a sampler for uncorrelated noise vectors
+//! A sampler for uncorrelated noise vectors.
 template<size_t DIM>
 class GaussianSampler
 {
@@ -17,7 +17,7 @@ public:
   typedef Eigen::Matrix<FloatType, DIM, 1> covariance_vector_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> noise_vector_t;
 
-  //! given a diagonal covariance matrix
+  //! Takes a diagonal covariance matrix.
   GaussianSampler(const covariance_matrix_t& Sigma) : Sigma_(Sigma.diagonal())
   {
     // ensure a diagonal matrix
@@ -33,13 +33,13 @@ public:
     }
   }
 
-  //! given a covariance vector
+  //! Takes a vector containig the diagonal elements of a covariance matrix.
   GaussianSampler(const covariance_vector_t& Sigma_vector)
     : Sigma_(Sigma_vector)
   {
   }
 
-  //! get a noise sample
+  //! Get a noise sample.
   noise_vector_t sample()
   {
     noise_vector_t noise;

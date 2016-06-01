@@ -42,7 +42,7 @@ set(HEADERS
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
   include/ze/common/sample.h
-  include/ze/common/sampler.h
+  include/ze/common/sampler.hpp
   include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
