@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>ze_imu_evaluation</name>
-  <version>0.1.4</version>
+  <version>0.0.1</version>
   <description>
     Tools to evaluate imu models.
   </description>
@@ -14,7 +14,6 @@
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
   <depend>ze_splines</depend>
-  <depend>rospy</depend>
 
   <export></export>
 </package>

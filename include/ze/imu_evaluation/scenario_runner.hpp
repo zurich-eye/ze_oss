@@ -19,7 +19,7 @@ public:
                  GaussianSampler<3>::Ptr accelerometer_noise,
                  GaussianSampler<3>::Ptr gyro_noise,
                  const Vector3& gravity,
-                 double imu_sample_time = 1.0 / 100.0)
+                 FloatType imu_sample_time = 1.0 / 100.0)
       : scenario_(scenario)
       , bias_(bias)
       , accelerometer_noise_(accelerometer_noise)
@@ -36,33 +36,33 @@ public:
   }
 
   //! Get the angular velocity in the body frame.
-  Vector3 angular_velocity_actual(double t) const
+  Vector3 angular_velocity_actual(FloatType t) const
   {
     return scenario_->angular_velocity_B(t);
   }
 
   //! An accelerometer measures acceleration in the body frame, but not gravity.
-  Vector3 acceleration_actual(double t) const
+  Vector3 acceleration_actual(FloatType t) const
   {
     Quaternion Rbw(scenario_->R_W_B(t).inverse());
     return scenario_->acceleration_B(t) - Rbw.rotate(gravity());
   }
 
   //! The angular velocity corrupted by noise and bias.
-  Vector3 angular_velocity_corrupted(double t) const
+  Vector3 angular_velocity_corrupted(FloatType t) const
   {
     return angular_velocity_actual(t) + bias_->gyroscope(t) +
            gyro_noise_->sample() / sqrt_dt_;
   }
 
   //! The acceleration corrupted by noise and bias.
-  Vector3 acceleration_corrupted(double t) const
+  Vector3 acceleration_corrupted(FloatType t) const
   {
     return acceleration_actual(t) + bias_->accelerometer(t) +
            accelerometer_noise_->sample() / sqrt_dt_;
   }
 
-  const double& imu_sample_time() const
+  const FloatType& imu_sample_time() const
   {
     return imu_sample_time_;
   }
