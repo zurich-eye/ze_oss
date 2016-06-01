@@ -1,4 +1,4 @@
-#include <ze/splines/bspline_pose_minimal.h>
+#include <ze/splines/bspline_pose_minimal.hpp>
 
 namespace ze {
 

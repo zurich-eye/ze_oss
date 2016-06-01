@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include "bspline.h"
+#include <ze/splines/bspline.hpp>
 #include <ze/common/transformation.h>
-#include <ze/splines/rotation_vector.h>
-#include <ze/splines/operators.h>
+#include <ze/splines/rotation_vector.hpp>
+#include <ze/splines/operators.hpp>
 
 namespace ze {
 

@@ -1,4 +1,4 @@
-#include <ze/splines/bspline.h>
+#include <ze/splines/bspline.hpp>
 #include <Eigen/Cholesky>
 #include <Eigen/LU>
 #include <Eigen/QR>
