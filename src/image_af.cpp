@@ -1,4 +1,5 @@
 #include <imp/bridge/af/image_af.hpp>
+#include <imp/core/linearmemory.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 
 namespace ze {
@@ -6,25 +7,25 @@ namespace ze {
 template<typename Pixel>
 struct ImpAfConversionBuffer
 {
-  std::unique_ptr<Pixel[]> data;
+  ze::LinearMemory<Pixel> h_buff;
   ImpAfConversionBuffer(const Image<Pixel>& from)
+    : h_buff(from.numel())
   {
-    data.reset(new Pixel[from.width()*from.height()]);
     for(size_t y=0; y<from.height(); ++y)
     {
       for(size_t x=0; x<from.width(); ++x)
       {
-        data.get()[x*from.height()+y] = from.pixel(x, y);  //! AF array is column-major
+        h_buff(x*from.height()+y) = from.pixel(x, y);  //! AF array is column-major
       }
     }
   }
-  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->data.get()))
+  auto cuData() -> decltype(ze::cu::toCudaVectorType(this->h_buff.data()))
   {
-    return ze::cu::toCudaVectorType(this->data.get());
+    return ze::cu::toCudaVectorType(this->h_buff.data());
   }
-  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->data.get()))
+  auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->h_buff.data()))
   {
-    return ze::cu::toConstCudaVectorType(this->data.get());
+    return ze::cu::toConstCudaVectorType(this->h_buff.data());
   }
 };
 

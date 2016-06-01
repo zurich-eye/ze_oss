@@ -165,7 +165,6 @@ TEST(impBridgeAFTest, orbDetectorAF32fC1)
     EXPECT_GT(keypoints(1, k), 0);
     EXPECT_LT(keypoints(1, k), im->height());
   }
-  std::cout << descriptors << std::endl;
 }
 
 ZE_UNITTEST_ENTRYPOINT
