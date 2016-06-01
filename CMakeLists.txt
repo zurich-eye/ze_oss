@@ -42,6 +42,7 @@ set(HEADERS
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
   include/ze/common/sample.h
+  include/ze/common/sampler.h
   include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
@@ -120,6 +121,9 @@ target_link_libraries(test_ring_view ${PROJECT_NAME})
 
 catkin_add_gtest(test_ringbuffer test/test_ringbuffer.cpp)
 target_link_libraries(test_ringbuffer ${PROJECT_NAME})
+
+catkin_add_gtest(test_sampler test/test_sampler.cpp)
+target_link_libraries(test_sampler ${PROJECT_NAME})
 
 ##########
 # EXPORT #
