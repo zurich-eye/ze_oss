@@ -1,4 +1,4 @@
-#include <ze/common/sample.h>
+#include <ze/common/random.hpp>
 
 namespace ze {
 

@@ -26,16 +26,16 @@ private:
 };
 
 
-template<class T>
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-sampleFromUniformDistribution(
+template<class T, typename = typename std::enable_if<(std::is_integral<T>::value)>::type>
+T sampleFromUniformDistribution(
+    bool deterministic = false,
     T from = std::numeric_limits<T>::lowest(),
-    T to   = std::numeric_limits<T>::max(),
-    bool deterministic = false)
+    T to   = std::numeric_limits<T>::max())
 {
   auto gen = RandomGenerator::generatorInt(deterministic);
   auto dist = std::uniform_int_distribution<T>(from, to);
-  return dist(gen);
+  T random_number = dist(gen);
+  return random_number;
 }
 
 /*
