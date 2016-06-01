@@ -26,15 +26,29 @@ private:
 };
 
 
-template<class T, typename = typename std::enable_if<(std::is_integral<T>::value)>::type>
+template<class T, typename = typename std::enable_if<std::is_integral<T>::value>::type>
 T sampleFromUniformDistribution(
     bool deterministic = false,
     T from = std::numeric_limits<T>::lowest(),
     T to   = std::numeric_limits<T>::max())
 {
-  auto gen = RandomGenerator::generatorInt(deterministic);
+  static std::mt19937 gen_nondeterministic(std::random_device{}());
+  static std::mt19937 gen_deterministic(0);
   auto dist = std::uniform_int_distribution<T>(from, to);
-  T random_number = dist(gen);
+  T random_number = deterministic ? dist(gen_deterministic) : dist(gen_nondeterministic);
+  return random_number;
+}
+
+template<class T, typename = typename std::enable_if<!std::is_integral<T>::value>::type>
+T sampleFromUniformDistribution(
+    bool deterministic = false,
+    T from = T{0.0},
+    T to   = T{1.0})
+{
+  static std::ranlux24 gen_nondeterministic(std::random_device{}());
+  static std::ranlux24 gen_deterministic(0);
+  auto dist = std::uniform_real_distribution<T>(from, to);
+  T random_number = deterministic ? dist(gen_deterministic) : dist(gen_nondeterministic);
   return random_number;
 }
 
