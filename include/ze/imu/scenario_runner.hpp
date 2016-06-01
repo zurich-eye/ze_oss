@@ -38,14 +38,14 @@ public:
   //! Get the angular velocity in the body frame.
   Vector3 angular_velocity_actual(double t) const
   {
-    return scenario_->angular_velocity_body(t);
+    return scenario_->angular_velocity_B(t);
   }
 
   //! An accelerometer measures acceleration in the body frame, but not gravity.
   Vector3 acceleration_actual(double t) const
   {
-    Matrix3 Rbn(scenario_->orientation(t).transpose());
-    return scenario_->acceleration_body(t) - Rbn * gravity();
+    Quaternion Rbw(scenario_->R_W_B(t).inverse());
+    return scenario_->acceleration_B(t) - Rbw.rotate(gravity());
   }
 
   //! The angular velocity corrupted by noise and bias.

@@ -5,6 +5,7 @@
 
 #include <ze/common/macros.h>
 #include <ze/splines/bspline_pose_minimal.hpp>
+#include <ze/common/transformation.h>
 
 namespace ze {
 
@@ -15,35 +16,35 @@ public:
   ZE_POINTER_TYPEDEFS(Scenario);
 
   //! Get the pose at a given time.
-  virtual Matrix4 pose(double t) const = 0;
+  virtual Transformation T_W_B(double t) const = 0;
 
   //! Get the rotational velocity in the body frame.
-  virtual Vector3 angular_velocity_body(double t) const = 0;
+  virtual Vector3 angular_velocity_B(double t) const = 0;
 
   //! Get the velocity in the inertial frame.
-  virtual Vector3 velocity(double t) const = 0;
+  virtual Vector3 velocity_W(double t) const = 0;
 
   //! Get the acceleration in the inertial frame.
-  virtual Vector3 acceleration(double t) const = 0;
+  virtual Vector3 acceleration_W(double t) const = 0;
 
   //! Get the orientation in the inertial frame.
-  Matrix3 orientation(double t) const
+  Quaternion R_W_B(double t) const
   {
-    return pose(t).block<3, 3>(0, 0);
+    return T_W_B(t).getRotation();
   }
 
   //! The linear velocity in the body frame.
-  Vector3 velocity_body(double t) const
+  Vector3 velocity_B(double t) const
   {
-    const Matrix3 Rib = orientation(t);
-    return Rib.transpose() * velocity(t);
+    const Quaternion Rwb = R_W_B(t);
+    return Rwb.inverse().rotate(velocity_W(t));
   }
 
   //! The linear acceleration in the body frame.
-  Vector3 acceleration_body(double t) const
+  Vector3 acceleration_B(double t) const
   {
-    const Matrix3 Rib = orientation(t);
-    return Rib.transpose() * acceleration(t);
+    const Quaternion Rwb = R_W_B(t);
+    return Rwb.inverse().rotate(acceleration_W(t));
   }
 };
 
@@ -55,22 +56,22 @@ public:
     : bs_(bs)
   {}
 
-  Matrix4 pose(double t) const
+  Transformation T_W_B(double t) const
   {
-    return bs_.transformation(t);
+    return Transformation(bs_.transformation(t));
   }
 
-  Vector3 angular_velocity_body(double t) const
+  Vector3 angular_velocity_B(double t) const
   {
     return bs_.angularVelocityBodyFrame(t);
   }
 
-  Vector3 velocity(double t) const
+  Vector3 velocity_W(double t) const
   {
     return bs_.linearVelocity(t);
   }
 
-  Vector3 acceleration(double t) const
+  Vector3 acceleration_W(double t) const
   {
     return bs_.linearAcceleration(t);
   }
