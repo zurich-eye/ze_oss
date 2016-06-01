@@ -90,6 +90,7 @@ using KeypointLevels = Eigen::Matrix<KeypointLevel, Eigen::Dynamic, 1>;
 using KeypointTypes  = Eigen::Matrix<KeypointType, Eigen::Dynamic, 1>;
 using KeypointAngles = VectorX;
 using KeypointScores = VectorX;
+using KeypointSizes  = VectorX;
 using KeypointIndices  = Eigen::Matrix<KeypointIndex, Eigen::Dynamic, 1>;
 using Descriptors = Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 
