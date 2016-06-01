@@ -52,7 +52,7 @@ inline FloatType getInitSigma2FromMuRange(FloatType mu_range)
 
 inline void increaseOutlierProbability(Eigen::Ref<Seed> mu_sigma2_a_b)
 {
-  mu_sigma2_a_b(3) += 1;
+  mu_sigma2_a_b(3) += FloatType{1.0};
 }
 
 inline bool isConverged(
@@ -68,7 +68,7 @@ inline bool isConverged(
 inline FloatType getSigma2FromDepthSigma(FloatType depth, FloatType depth_sigma)
 {
   const FloatType sigma =
-      FloatType{0.5} * (FloatType{1.0} / std::max(0.000000000001, depth - depth_sigma)
+      FloatType{0.5} * (FloatType{1.0} / std::max(FloatType{1.0e-8}, depth - depth_sigma)
                       - FloatType{1.0} / (depth + depth_sigma));
   return sigma * sigma;
 }
@@ -92,32 +92,34 @@ inline bool updateFilterVogiatzis(
   }
 
   const FloatType oldsigma2 = sigma2;
-  const FloatType s2 = 1.0/(1.0/sigma2 + 1.0/tau2);
-  const FloatType m = s2*(mu/sigma2 + z/tau2);
-  const FloatType uniform_x = 1.0/mu_range;
+  const FloatType s2 = FloatType{1.0} / (FloatType{1.0} / sigma2 + FloatType{1.0} / tau2);
+  const FloatType m = s2 * (mu / sigma2 + z / tau2);
+  const FloatType uniform_x = FloatType{1.0} / mu_range;
   FloatType C1 = a / (a + b) * normPdf<FloatType>(z, mu, norm_scale);
   FloatType C2 = b / (a + b) * uniform_x;
   const FloatType normalization_constant = C1 + C2;
   C1 /= normalization_constant;
   C2 /= normalization_constant;
-  const FloatType f = C1 * (a+1.0) / (a+b+1.0) + C2 * a/(a+b+1.0);
-  const FloatType e = C1 * (a+1.0) * (a+2.0) / ((a+b+1.0) * (a+b+2.0))
-                    + C2 * a * (a+1.0) / ((a+b+1.0)*(a+b+2.0));
+  const FloatType f =
+      C1 * (a+FloatType{1.0}) / (a+b+FloatType{1.0}) + C2 * a/(a+b+FloatType{1.0});
+  const FloatType e =
+      C1 * (a+FloatType{1.0}) * (a+FloatType{2.0}) / ((a+b+FloatType{1.0}) * (a+b+FloatType{2.0}))
+    + C2 * a * (a+FloatType{1.0}) / ((a+b+FloatType{1.0})*(a+b+FloatType{2.0}));
 
   // update parameters
   const FloatType mu_new = C1 * m + C2 * mu;
   sigma2 = C1 * (s2 + m * m) + C2 * (sigma2 + mu * mu) - mu_new * mu_new;
   mu = mu_new;
   a = (e - f) / (f - e / f);
-  b = a * (1.0 - f) / f;
+  b = a * (FloatType{1.0} - f) / f;
 
   //! @todo Check if this happens sometimes.
-  if(sigma2 < 0.0)
+  if(sigma2 < FloatType{0.0})
   {
     LOG(WARNING) << "Seed sigma2 is negative!";
     sigma2 = oldsigma2;
   }
-  if(mu < 0.0)
+  if(mu < FloatType{0.0})
   {
     LOG(WARNING) << "Seed diverged! mu is negative!!";
     mu = 1.0;
@@ -138,8 +140,6 @@ inline bool updateFilterGaussian(
 {
   FloatType& mu = mu_sigma2_a_b(0);
   FloatType& sigma2 = mu_sigma2_a_b(1);
-  FloatType& a = mu_sigma2_a_b(2);
-  FloatType& b = mu_sigma2_a_b(3);
 
   const FloatType norm_scale = std::sqrt(sigma2 + tau2);
   if(std::isnan(norm_scale))

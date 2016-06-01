@@ -11,6 +11,7 @@
 
 TEST(AlignPosesTest, testJacobian)
 {
+#ifndef ZE_SINGLE_PRECISION_FLOAT
   using namespace ze;
 
   Transformation T_A0_B0, T_Ai_A0, T_B0_Bi;
@@ -25,6 +26,9 @@ TEST(AlignPosesTest, testJacobian)
   Matrix6 J_analytic = dRelpose_dTransformation(T_A0_B0, T_Ai_A0, T_B0_Bi);
 
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(J_numeric, J_analytic));
+#else
+  LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
+#endif
 }
 
 TEST(AlignPosesTest, testOptimization)
@@ -68,7 +72,7 @@ TEST(AlignPosesTest, testOptimization)
 
   // Compute error.
   Transformation T_err = T_A0_B0.inverse() * T_A0_B0_estimate;
-  EXPECT_LT(T_err.log().norm(), 1e-5);
+  EXPECT_LT(T_err.log().norm(), 1.5e-5);
 }
 
 ZE_UNITTEST_ENTRYPOINT

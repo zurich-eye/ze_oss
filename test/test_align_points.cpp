@@ -9,8 +9,15 @@
 #include <ze/common/types.h>
 #include <ze/geometry/align_points.h>
 
+#ifndef ZE_SINGLE_PRECISION_FLOAT
+  ze::FloatType tol = 1e-10;
+#else
+  ze::FloatType tol = 1e-6;
+#endif
+
 TEST(AlignPointsTest, testJacobian)
 {
+#ifndef ZE_SINGLE_PRECISION_FLOAT
   using namespace ze;
 
   Vector3 p_A = Vector3::Random();
@@ -25,9 +32,10 @@ TEST(AlignPointsTest, testJacobian)
   Matrix36 J_numeric = numericalDerivative<Vector3, Transformation>(residualLambda, T_A_B);
   Matrix36 J_analytic = dPointdistance_dRelpose(T_A_B, p_A, p_B);
 
-  std::cout << "J_numeric: \n" << J_numeric << std::endl;
-
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(J_numeric, J_analytic));
+#else
+  LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
+#endif
 }
 
 TEST(AlignPosesTest, testOptimization)
@@ -58,7 +66,7 @@ TEST(AlignPosesTest, testOptimization)
 
   // Compute error.
   Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
-  EXPECT_LT(T_err.log().norm(), 1e-10);
+  EXPECT_LT(T_err.log().norm(), tol);
 }
 
 ZE_UNITTEST_ENTRYPOINT
