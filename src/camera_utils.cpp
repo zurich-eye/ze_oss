@@ -8,7 +8,8 @@
 namespace ze {
 
 Keypoints generateRandomKeypoints(
-    const uint32_t image_width, const uint32_t image_height, const uint32_t margin, const size_t count)
+    const uint32_t image_width, const uint32_t image_height,
+    const uint32_t margin, const uint32_t count)
 {
   CHECK_GT(image_width, margin);
   CHECK_GT(image_height, margin);
@@ -18,7 +19,7 @@ Keypoints generateRandomKeypoints(
   std::uniform_real_distribution<FloatType> dist_y(margin, image_height - 1 - margin);
 
   Keypoints kp(2, count);
-  for(size_t i = 0; i < count; ++i)
+  for(uint32_t i = 0u; i < count; ++i)
   {
     kp(0,i) = dist_x(gen);
     kp(1,i) = dist_y(gen);
