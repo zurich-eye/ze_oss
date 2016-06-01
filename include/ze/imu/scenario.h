@@ -14,6 +14,7 @@ class Scenario
 public:
   ZE_POINTER_TYPEDEFS(Scenario);
 
+  //! pose at given time
   virtual Matrix4 pose(double t) const = 0;
 
   //! rotational velocity in body frame
@@ -34,15 +35,15 @@ public:
   //! linear velocity in body frame
   Vector3 velocity_body(double t) const
   {
-    const Matrix3 Rbi = orientation(t);
-    return Rbi.transpose() * velocity(t);
+    const Matrix3 Rib = orientation(t);
+    return Rib.transpose() * velocity(t);
   }
 
   //! linear acceleration in body frame
   Vector3 acceleration_body(double t) const
   {
-    const Matrix3 Rbi = orientation(t);
-    return Rbi.transpose() * acceleration(t);
+    const Matrix3 Rib = orientation(t);
+    return Rib.transpose() * acceleration(t);
   }
 };
 

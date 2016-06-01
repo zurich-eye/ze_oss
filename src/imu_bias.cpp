@@ -22,6 +22,7 @@ ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise,
 {
   if (spline_segments_ == 0)
   {
+    // this is usually a good setting
     spline_segments_ = samples / 2;
   }
   initialize();
