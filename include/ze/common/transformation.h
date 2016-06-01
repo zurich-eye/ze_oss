@@ -60,6 +60,11 @@ template<> struct traits<Quaternion>
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
 
+  static int getDimension(const Quaternion& /*v*/)
+  {
+    return 3;
+  }
+
   static bool equals(
       const Quaternion& q1, const Quaternion& q2, FloatType tol = 1e-8)
   {
@@ -118,6 +123,11 @@ template<> struct traits<Transformation>
 
   typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
   typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+
+  static int getDimension(const Transformation& /*v*/)
+  {
+    return 6;
+  }
 
   static bool equals(
       const Transformation& T1, const Transformation& T2, FloatType tol = 1e-8)
