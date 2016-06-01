@@ -9,6 +9,9 @@ namespace ze {
 //! base class for Imu Bias simulations
 class ImuBias
 {
+public:
+  ZE_POINTER_TYPEDEFS(ImuBias);
+
   //! access accelerometer bias at given timestamp
   virtual const Vector3 accelerometer(FloatType t) const = 0;
   //! access gyroscope bias at given timestamp
