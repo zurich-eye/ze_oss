@@ -4,7 +4,6 @@
 #include <Eigen/QR>
 #include <boost/tuple/tuple.hpp>
 
-
 namespace ze {
 
 BSpline::BSpline(int spline_order)
