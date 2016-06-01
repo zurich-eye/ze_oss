@@ -2,6 +2,7 @@
 
 #include <ze/common/sample.h>
 #include <ze/common/types.h>
+#include <ze/common/macros.h>
 
 namespace ze {
 
@@ -10,6 +11,8 @@ template<size_t DIM>
 class GaussianSampler
 {
 public:
+  ZE_POINTER_TYPEDEFS(GaussianSampler);
+
   typedef Eigen::Matrix<FloatType, DIM, DIM> covariance_matrix_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> covariance_vector_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> noise_vector_t;
