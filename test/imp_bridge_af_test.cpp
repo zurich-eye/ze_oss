@@ -165,6 +165,7 @@ TEST(impBridgeAFTest, orbDetectorAF32fC1)
     EXPECT_GT(keypoints(1, k), 0);
     EXPECT_LT(keypoints(1, k), im->height());
   }
+  VLOG(2) << "number of computed descriptors: " << descriptors.cols();
 }
 
 ZE_UNITTEST_ENTRYPOINT
