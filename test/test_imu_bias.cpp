@@ -1,4 +1,4 @@
-#include <ze/imu/imu_bias.h>
+#include <ze/imu/imu_bias.hpp>
 #include <ze/common/test_entrypoint.h>
 
 TEST(ImuBiasTest, testConstantImuBias)

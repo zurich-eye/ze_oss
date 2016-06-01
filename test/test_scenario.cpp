@@ -1,6 +1,6 @@
-#include <ze/imu/scenario.h>
+#include <ze/imu/scenario.hpp>
 #include <ze/common/test_entrypoint.h>
-#include <ze/splines/bspline_pose_minimal.h>
+#include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/types.h>
 
 TEST(ScenarioTest, testSplineScenario)

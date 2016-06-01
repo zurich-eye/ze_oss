@@ -1,9 +1,9 @@
-#include <ze/imu/scenario_runner.h>
+#include <ze/imu/scenario_runner.hpp>
 #include <ze/common/test_entrypoint.h>
-#include <ze/splines/bspline_pose_minimal.h>
+#include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/types.h>
-#include <ze/imu/imu_bias.h>
-#include <ze/common/sampler.h>
+#include <ze/imu/imu_bias.hpp>
+#include <ze/common/sampler.hpp>
 
 TEST(ScenarioTest, testSplineScenario)
 {

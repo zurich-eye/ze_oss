@@ -4,42 +4,42 @@
 // navigation/Scenario.h and ScenarioRunner.h
 
 #include <ze/common/macros.h>
-#include <ze/splines/bspline_pose_minimal.h>
+#include <ze/splines/bspline_pose_minimal.hpp>
 
 namespace ze {
 
-//! represents a test scenario with a given trajectory
+//! Represents a test scenario that describes a trajectory.
 class Scenario
 {
 public:
   ZE_POINTER_TYPEDEFS(Scenario);
 
-  //! pose at given time
+  //! Get the pose at a given time.
   virtual Matrix4 pose(double t) const = 0;
 
-  //! rotational velocity in body frame
+  //! Get the rotational velocity in the body frame.
   virtual Vector3 angular_velocity_body(double t) const = 0;
 
-  //! velocity in the inertial frame
+  //! Get the velocity in the inertial frame.
   virtual Vector3 velocity(double t) const = 0;
 
-  //! acceleration in the inertial frame
+  //! Get the acceleration in the inertial frame.
   virtual Vector3 acceleration(double t) const = 0;
 
-  //! orientation in inertial frame
+  //! Get the orientation in the inertial frame.
   Matrix3 orientation(double t) const
   {
     return pose(t).block<3, 3>(0, 0);
   }
 
-  //! linear velocity in body frame
+  //! The linear velocity in the body frame.
   Vector3 velocity_body(double t) const
   {
     const Matrix3 Rib = orientation(t);
     return Rib.transpose() * velocity(t);
   }
 
-  //! linear acceleration in body frame
+  //! The linear acceleration in the body frame.
   Vector3 acceleration_body(double t) const
   {
     const Matrix3 Rib = orientation(t);
@@ -47,11 +47,10 @@ public:
   }
 };
 
-//! a scenario that is based upon a bspline fitted trajectory
+//! A scenario that is based upon a bspline fitted trajectory.
 class SplineScenario: public Scenario
 {
 public:
-  //! construct with an initialized pose spline
   SplineScenario(const BSplinePoseMinimalRotationVector& bs)
     : bs_(bs)
   {}

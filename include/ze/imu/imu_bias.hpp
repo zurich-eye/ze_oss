@@ -1,28 +1,27 @@
 #pragma once
 
 #include <ze/common/types.h>
-#include <ze/common/sampler.h>
-#include <ze/splines/bspline.h>
+#include <ze/common/sampler.hpp>
+#include <ze/splines/bspline.hpp>
 
 namespace ze {
 
-//! base class for Imu Bias simulations
+//! The base class for Imu Bias simulations.
 class ImuBias
 {
 public:
   ZE_POINTER_TYPEDEFS(ImuBias);
 
-  //! access accelerometer bias at given timestamp
+  //! Access the accelerometer bias at given timestamp.
   virtual const Vector3 accelerometer(FloatType t) const = 0;
-  //! access gyroscope bias at given timestamp
+  //! Access the gyroscope bias at given timestamp.
   virtual const Vector3 gyroscope(FloatType t) const = 0;
 
-  //! reset/regenerate bias
+  //! Regenerate the bias .
   virtual void reset() = 0;
 };
 
-//! simple constant bias assumption
-//! time unconstrained
+//! A simple constant bias defined at all timestamps.
 class ConstantBias : public ImuBias
 {
 public:
@@ -55,11 +54,12 @@ private:
   Vector3 bias_gyro_;
 };
 
-//! random walk bias with spline fitting for continuity
+//! A continous-time bias curve seeded from a discrete random walk.
 class ContinuousBias : public ImuBias
 {
 public:
-  //! given process noise and start/end times and number of samples to take
+  //! Given the process noise, start/end times and number of samples to take
+  //! initializes a spline from a discrete random walk.
   ContinuousBias(const Vector3& gyr_bias_noise,
                  const Vector3 acc_bias_noise,
                  FloatType start,
@@ -100,7 +100,8 @@ private:
   size_t spline_segments_;
   FloatType spline_smoothing_lambda_;
 
-  //! head<3>: accelerometer, tail<3> gyroscope
+  //! The first three elements are the accelerometer bias, last 3 elements are
+  //! the gyrocope bias.
   BSpline bs_;
 
 };

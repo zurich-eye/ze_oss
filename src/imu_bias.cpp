@@ -1,4 +1,4 @@
-#include <ze/imu/imu_bias.h>
+#include <ze/imu/imu_bias.hpp>
 
 namespace ze {
 
@@ -38,6 +38,7 @@ void ContinuousBias::initialize()
 
   // sampling interval
   FloatType dt = (end_ - start_) / samples_;
+  FloatType dt_sqrt = sqrt(dt);
   CHECK_LE(0, dt);
 
   // simulate the white noise process
@@ -48,7 +49,7 @@ void ContinuousBias::initialize()
   for (size_t i = 1; i <= samples_; ++i)
   {
     times(i) = start_ + dt * i;
-    points.block<6, 1>(0, i) = points.block<6, 1>(0, i - 1) + dt * sampler.sample();
+    points.block<6, 1>(0, i) = points.block<6, 1>(0, i - 1) + dt_sqrt * sampler.sample();
   }
 
   // initialize spline

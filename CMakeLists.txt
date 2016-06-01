@@ -14,13 +14,14 @@ catkin_python_setup()
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/imu/scenario.h
-  include/ze/imu/imu_bias.h
-  include/ze/imu/scenario_runner.h
-  )
+    include/ze/imu/scenario.hpp
+    include/ze/imu/imu_bias.hpp
+    include/ze/imu/scenario_runner.hpp
+    )
+
 set(SOURCES
     src/imu_bias.cpp
-  )
+    )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

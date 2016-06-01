@@ -3,17 +3,17 @@
 // The below code and structure is heavily inspired by gtsam's
 // navigation/Scenario.h and ScenarioRunner.h
 
-#include <ze/imu/scenario.h>
-#include <ze/imu/imu_bias.h>
-#include <ze/common/sampler.h>
+#include <ze/imu/scenario.hpp>
+#include <ze/imu/imu_bias.hpp>
+#include <ze/common/sampler.hpp>
 
 namespace ze {
 
-//! given a trajectory scenario generates imu measurements
+//! Given the trajectory defined by a Scenario, the runner generates
+//! the corresondping corrupted and actual imu measurements.
 class ScenarioRunner
 {
 public:
-  //! construct a running given a scenario itself
   ScenarioRunner(const Scenario::Ptr scenario,
                  const ImuBias::Ptr bias,
                  GaussianSampler<3>::Ptr accelerometer_noise,
@@ -29,32 +29,33 @@ public:
       , sqrt_dt_(std::sqrt(imu_sample_time))
   {}
 
-  //! Gravity fixed along Z axis
+  //! The gravity vector is fixed along Z axis.
   const Vector3& gravity() const
   {
     return gravity_;
   }
 
-  //! angular velocity in body frame
+  //! Get the angular velocity in the body frame.
   Vector3 angular_velocity_actual(double t) const
   {
     return scenario_->angular_velocity_body(t);
   }
 
-  //! An accelerometer measures acceleration in body, but not gravity
+  //! An accelerometer measures acceleration in the body frame, but not gravity.
   Vector3 acceleration_actual(double t) const
   {
     Matrix3 Rbn(scenario_->orientation(t).transpose());
     return scenario_->acceleration_body(t) - Rbn * gravity();
   }
 
-  // versions corrupted by bias and noise
+  //! The angular velocity corrupted by noise and bias.
   Vector3 angular_velocity_corrupted(double t) const
   {
     return angular_velocity_actual(t) + bias_->gyroscope(t) +
            gyro_noise_->sample() / sqrt_dt_;
   }
 
+  //! The acceleration corrupted by noise and bias.
   Vector3 acceleration_corrupted(double t) const
   {
     return acceleration_actual(t) + bias_->accelerometer(t) +
@@ -70,7 +71,6 @@ private:
   const Scenario::Ptr scenario_;
   const ImuBias::Ptr bias_;
 
-  // Create two samplers for acceleration and omega noise
   mutable GaussianSampler<3>::Ptr accelerometer_noise_;
   mutable GaussianSampler<3>::Ptr gyro_noise_;
 
