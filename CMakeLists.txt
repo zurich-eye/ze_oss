@@ -14,10 +14,12 @@ catkin_python_setup()
 # LIBRARIES #
 #############
 set(HEADERS
+  include/ze/imu/scenario.h
   include/ze/imu/imu_bias.h
   )
 set(SOURCES
     src/imu_bias.cpp
+    src/scenario.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -28,6 +30,9 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 catkin_add_gtest(test_imu_bias test/test_imu_bias.cpp)
 target_link_libraries(test_imu_bias ${PROJECT_NAME})
+
+catkin_add_gtest(test_scenario test/test_scenario.cpp)
+target_link_libraries(test_scenario ${PROJECT_NAME})
 
 ##########
 # EXPORT #

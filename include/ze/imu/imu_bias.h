@@ -88,10 +88,6 @@ public:
 private:
   void initialize();
 
-  // others: pass sampler to scenario for noise sampling;
-  // pass imu bias to sampler and properly use
-  // whats next?
-
   Vector3 gyr_bias_noise_;
   Vector3 acc_bias_noise_;
   FloatType start_;
