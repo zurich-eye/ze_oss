@@ -20,10 +20,7 @@ TEST(impBridgeAFTest, constructFromImpImage_32fC1)
           predefined_img_data_file_name));
 
   ImageCv32fC1::Ptr cv_img;
-  cvBridgeLoad(
-        cv_img,
-        path,
-        PixelOrder::gray);
+  cvBridgeLoad(cv_img, path, PixelOrder::gray);
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
   ImageAF32fC1 af_img(*cv_img);
@@ -45,10 +42,7 @@ TEST(impBridgeAFTest, constructFromImpImage_8uC1)
           predefined_img_data_file_name));
 
   ImageCv8uC1::Ptr cv_img;
-  cvBridgeLoad(
-        cv_img,
-        path,
-        PixelOrder::gray);
+  cvBridgeLoad(cv_img, path, PixelOrder::gray);
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
   ImageAF8uC1 af_img(*cv_img);
@@ -70,18 +64,15 @@ TEST(impBridgeAFTest, constructFromAFArray_32fC1)
           predefined_img_data_file_name));
 
   ImageCv32fC1::Ptr cv_img;
-  cvBridgeLoad(
-        cv_img,
-        path,
-        PixelOrder::gray);
+  cvBridgeLoad(cv_img, path, PixelOrder::gray);
 
   std::unique_ptr<float[]> h_buffer(
         new float[cv_img->width()*cv_img->height()]);
-  for(size_t r=0; r < cv_img->height(); ++r)
+  for (size_t y = 0; y < cv_img->height(); ++y)
   {
-    for(size_t c=0; c < cv_img->width(); ++c)
+    for (size_t x = 0; x < cv_img->width(); ++x)
     {
-      h_buffer.get()[c*cv_img->height()+r] = cv_img->pixel(c, r);
+      h_buffer.get()[x*cv_img->height()+y] = cv_img->pixel(x, y);
     }
   }
   ImageAF32fC1 af_img(
@@ -107,16 +98,13 @@ TEST(impBridgeAFTest, constructFromAFArray_8uC1)
           predefined_img_data_file_name));
 
   ImageCv8uC1::Ptr cv_img;
-  cvBridgeLoad(
-        cv_img,
-        path,
-        PixelOrder::gray);
+  cvBridgeLoad(cv_img, path, PixelOrder::gray);
 
   std::unique_ptr<unsigned char[]> h_buffer(
         new unsigned char[cv_img->width()*cv_img->height()]);
-  for(size_t y=0; y < cv_img->height(); ++y)
+  for (size_t y = 0; y < cv_img->height(); ++y)
   {
-    for(size_t x=0; x < cv_img->width(); ++x)
+    for (size_t x = 0; x < cv_img->width(); ++x)
     {
       h_buffer.get()[x*cv_img->height()+y] = cv_img->pixel(x, y);
     }
@@ -138,16 +126,11 @@ TEST(impBridgeAFTest, orbDetectorAF32fC1)
   const std::string test_data_name{"ze_feature_detection"};
   const std::string predefined_img_data_file_name{"752x480/pyr_0.png"};
 
-  std::string path(
-        joinPath(
-          getTestDataDir(test_data_name),
-          predefined_img_data_file_name));
+  std::string path(joinPath(getTestDataDir(test_data_name),
+                            predefined_img_data_file_name));
 
   ImageCv32fC1::Ptr cv_img;
-  cvBridgeLoad(
-        cv_img,
-        path,
-        PixelOrder::gray);
+  cvBridgeLoad(cv_img, path, PixelOrder::gray);
 
   ImageAF32fC1::Ptr im =
       std::make_shared<ImageAF32fC1>(*cv_img);
