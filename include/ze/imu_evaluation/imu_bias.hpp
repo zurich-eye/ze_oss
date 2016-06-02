@@ -60,8 +60,8 @@ class ContinuousBias : public ImuBias
 public:
   //! Given the process noise, start/end times and number of samples to take
   //! initializes a spline from a discrete random walk.
-  ContinuousBias(const Vector3& gyr_bias_noise,
-                 const Vector3 acc_bias_noise,
+  ContinuousBias(const Vector3& gyr_bias_noise_density,
+                 const Vector3 acc_bias_noise_density,
                  FloatType start,
                  FloatType end,
                  size_t samples,
@@ -91,10 +91,14 @@ public:
 private:
   void initialize();
 
-  Vector3 gyr_bias_noise_;
-  Vector3 acc_bias_noise_;
+  //! The noise density of the gyro / accelerometer brownian motion.
+  Vector3 gyr_bias_noise_density_;
+  Vector3 acc_bias_noise_density_;
+
+  //! Start and End-Time of the modelled continous bias.
   FloatType start_;
   FloatType end_;
+
   size_t samples_;
   size_t spline_order_;
   size_t spline_segments_;

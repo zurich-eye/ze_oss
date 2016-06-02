@@ -21,13 +21,13 @@ public:
   //! Get the rotational velocity in the body frame.
   virtual Vector3 angular_velocity_B(FloatType t) const = 0;
 
-  //! Get the velocity in the inertial frame.
+  //! Get the velocity in the world frame.
   virtual Vector3 velocity_W(FloatType t) const = 0;
 
-  //! Get the acceleration in the inertial frame.
+  //! Get the acceleration in the world frame (excl. gravity).
   virtual Vector3 acceleration_W(FloatType t) const = 0;
 
-  //! Get the orientation in the inertial frame.
+  //! Get the orientation in the world frame.
   Quaternion R_W_B(FloatType t) const
   {
     return T_W_B(t).getRotation();

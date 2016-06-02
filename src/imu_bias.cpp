@@ -2,16 +2,16 @@
 
 namespace ze {
 
-ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise,
-               const Vector3 acc_bias_noise,
+ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise_density,
+               const Vector3 acc_bias_noise_density,
                FloatType start,
                FloatType end,
                size_t samples,
                size_t spline_order,
                size_t spline_segments,
                size_t spline_smoothing_lambda)
-  : gyr_bias_noise_(gyr_bias_noise)
-  , acc_bias_noise_(acc_bias_noise)
+  : gyr_bias_noise_density_(gyr_bias_noise_density)
+  , acc_bias_noise_density_(acc_bias_noise_density)
   , start_(start)
   , end_(end)
   , samples_(samples)
@@ -31,10 +31,10 @@ ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise,
 void ContinuousBias::initialize()
 {
   Vector6 noise;
-  noise.head<3>() = acc_bias_noise_;
-  noise.tail<3>() = gyr_bias_noise_;
+  noise.head<3>() = acc_bias_noise_density_;
+  noise.tail<3>() = gyr_bias_noise_density_;
   // merge acc and bias noise
-  GaussianSampler<6> sampler(noise);
+  GaussianSampler<6>::Ptr sampler = GaussianSampler<6>::sigmas(noise);
 
   // sampling interval
   FloatType dt = (end_ - start_) / samples_;
@@ -49,7 +49,8 @@ void ContinuousBias::initialize()
   for (size_t i = 1; i <= samples_; ++i)
   {
     times(i) = start_ + dt * i;
-    points.block<6, 1>(0, i) = points.block<6, 1>(0, i - 1) + dt_sqrt * sampler.sample();
+    points.block<6, 1>(0, i) = points.block<6, 1>(0, i - 1) +
+        dt_sqrt * sampler->sample();
   }
 
   // initialize spline
