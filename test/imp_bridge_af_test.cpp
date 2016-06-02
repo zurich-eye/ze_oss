@@ -114,11 +114,11 @@ TEST(impBridgeAFTest, constructFromAFArray_8uC1)
 
   std::unique_ptr<unsigned char[]> h_buffer(
         new unsigned char[cv_img->width()*cv_img->height()]);
-  for(size_t r=0; r < cv_img->height(); ++r)
+  for(size_t y=0; y < cv_img->height(); ++y)
   {
-    for(size_t c=0; c < cv_img->width(); ++c)
+    for(size_t x=0; x < cv_img->width(); ++x)
     {
-      h_buffer.get()[c*cv_img->height()+r] = cv_img->pixel(c, r);
+      h_buffer.get()[x*cv_img->height()+y] = cv_img->pixel(x, y);
     }
   }
   ImageAF8uC1 af_img(
@@ -155,18 +155,18 @@ TEST(impBridgeAFTest, orbDetectorAF32fC1)
   OrbDetectorOptions options;
   options.fast_threshold /= 255.f;
   OrbDetectorAF detector(options, im->size());
-  OrbKeypointWrapper::Ptr features;
+  OrbKeypointWrapper features;
   detector.detect(*im, features); // GPU warm-up
   auto detectLambda = [&](){
     detector.detect(*im, features);
   };
   runTimingBenchmark(detectLambda, 10, 20, "AF ORB Detector", true);
 
-  Keypoints keypoints = features->getKeypoints();
-  KeypointScores scores = features->getKeypointScores();
-  KeypointSizes sizes = features->getKeypointSizes();
-  KeypointAngles angles = features->getKeypointAngles();
-  OrbDescriptors descriptors = features->getDescriptors();
+  Keypoints keypoints = features.getKeypoints();
+  KeypointScores scores = features.getKeypointScores();
+  KeypointSizes sizes = features.getKeypointSizes();
+  KeypointAngles angles = features.getKeypointAngles();
+  OrbDescriptors descriptors = features.getDescriptors();
 
   for (int k = 0; k < keypoints.cols(); ++k)
   {

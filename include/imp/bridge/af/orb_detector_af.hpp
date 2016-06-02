@@ -28,9 +28,10 @@ struct OrbKeypointWrapper
 {
   static constexpr uint8_t c_descriptor_length{8};
   using Ptr = typename std::shared_ptr<OrbKeypointWrapper>;
-  OrbKeypointWrapper(uint32_t num)
-    : num_detected(num)
+
+  void allocate(uint32_t num)
   {
+    num_detected = num;
     x.reset(new float[num_detected]);
     y.reset(new float[num_detected]);
     score.reset(new float[num_detected]);
@@ -108,7 +109,7 @@ public:
   virtual ~OrbDetectorAF() = default;
   OrbDetectorAF(const OrbDetectorOptions& options, const Size2u& image_size);
   virtual uint32_t detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& keypoints) override;
-  virtual uint32_t detect(const ImageAF32fC1& im, OrbKeypointWrapper::Ptr& keypoints);
+  virtual uint32_t detect(const ImageAF32fC1& im, OrbKeypointWrapper& keypoints);
 
 private:
   OrbDetectorOptions options_;

@@ -8,6 +8,7 @@ template<typename Pixel>
 struct ImpAfConversionBuffer
 {
   ze::LinearMemory<Pixel> h_buff;
+
   ImpAfConversionBuffer(const Image<Pixel>& from)
     : h_buff(from.numel())
   {
@@ -19,10 +20,12 @@ struct ImpAfConversionBuffer
       }
     }
   }
+
   auto cuData() -> decltype(ze::cu::toCudaVectorType(this->h_buff.data()))
   {
     return ze::cu::toCudaVectorType(this->h_buff.data());
   }
+
   auto cuData() const -> decltype(ze::cu::toConstCudaVectorType(this->h_buff.data()))
   {
     return ze::cu::toConstCudaVectorType(this->h_buff.data());
@@ -56,7 +59,9 @@ Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy)
     return reinterpret_cast<Pixel*>(arr_.device<int>());
   case PixelType::i32fC1:
     return reinterpret_cast<Pixel*>(arr_.device<float>());
-  default: LOG(FATAL) << "pixel type not supported";
+  default:
+    LOG(FATAL) << "pixel type not supported";
+    break;
   }
 }
 
@@ -73,7 +78,9 @@ const Pixel* ImageAF<Pixel>::data(uint32_t ox, uint32_t oy) const
     return reinterpret_cast<const Pixel*>(arr_.device<int>());
   case PixelType::i32fC1:
     return reinterpret_cast<const Pixel*>(arr_.device<float>());
-  default: LOG(FATAL) << "pixel type not supported";
+  default:
+    LOG(FATAL) << "pixel type not supported";
+    break;
   }
 }
 

@@ -13,7 +13,7 @@ uint32_t OrbDetectorAF::detect(const ImagePyramid8uC1& pyr, KeypointsWrapper& ke
   return 0;
 }
 
-uint32_t OrbDetectorAF::detect(const ImageAF32fC1& im, OrbKeypointWrapper::Ptr& keypoints)
+uint32_t OrbDetectorAF::detect(const ImageAF32fC1& im, OrbKeypointWrapper& keypoints)
 {
   af::features feat;
   af::array desc;
@@ -28,13 +28,13 @@ uint32_t OrbDetectorAF::detect(const ImageAF32fC1& im, OrbKeypointWrapper::Ptr& 
         options_.blur_input_image);
 
   const size_t num_detected = feat.getNumFeatures();
-  keypoints.reset(new OrbKeypointWrapper(num_detected));
-  feat.getX().host(keypoints->x.get());
-  feat.getY().host(keypoints->y.get());
-  feat.getScore().host(keypoints->score.get());
-  feat.getOrientation().host(keypoints->orient.get());
-  feat.getSize().host(keypoints->size.get());
-  desc.host(keypoints->descr.get());
+  keypoints.allocate(num_detected);
+  feat.getX().host(keypoints.x.get());
+  feat.getY().host(keypoints.y.get());
+  feat.getScore().host(keypoints.score.get());
+  feat.getOrientation().host(keypoints.orient.get());
+  feat.getSize().host(keypoints.size.get());
+  desc.host(keypoints.descr.get());
 
   return num_detected;
 }
