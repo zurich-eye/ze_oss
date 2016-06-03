@@ -13,6 +13,10 @@ set(HEADERS
     include/ze/imu_evaluation/scenario.hpp
     include/ze/imu_evaluation/imu_bias.hpp
     include/ze/imu_evaluation/scenario_runner.hpp
+    include/ze/imu_evaluation/pre_integrator_base.hpp
+    include/ze/imu_evaluation/pre_integration_runner.hpp
+    include/ze/imu_evaluation/pre_integration_mc_runner.hpp
+    include/ze/imu_evaluation/manifold_pre_integrator.hpp
     )
 
 set(SOURCES
@@ -33,6 +37,9 @@ target_link_libraries(test_scenario ${PROJECT_NAME})
 
 catkin_add_gtest(test_scenario_runner test/test_scenario_runner.cpp)
 target_link_libraries(test_scenario_runner ${PROJECT_NAME})
+
+catkin_add_gtest(test_manifold_pre_integrator test/test_manifold_pre_integrator.cpp)
+target_link_libraries(test_manifold_pre_integrator ${PROJECT_NAME})
 
 ##########
 # EXPORT #
