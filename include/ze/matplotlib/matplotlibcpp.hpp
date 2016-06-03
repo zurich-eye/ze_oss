@@ -490,11 +490,20 @@ inline void grid(bool flag)
   // if PyDeCRFF, the function doesn't work on Mac OS
 }
 
-inline void show()
+inline void show(bool block = true)
 {
-  PyObject* res = PyObject_CallObject(
+  PyObject* pyflag = block ? Py_True : Py_False;
+
+  PyObject* kwargs = PyDict_New();
+
+  PyDict_SetItemString(kwargs,
+                       "block",
+                       pyflag);
+
+  PyObject* res = PyObject_Call(
                     detail::_interpreter::get().s_python_function_show,
-                    detail::_interpreter::get().s_python_empty_tuple);
+                    detail::_interpreter::get().s_python_empty_tuple,
+                    kwargs);
   if (!res)
   {
     throw std::runtime_error("Call to show() failed.");
