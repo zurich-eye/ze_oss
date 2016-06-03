@@ -12,8 +12,12 @@ include(ze_setup)
 include(ze_macros_cuda)
 find_cuda()
 
-find_package(ArrayFire REQUIRED)
-include_directories(${ArrayFire_INCLUDE_DIRS})
+FIND_LIBRARY(CUDA_NVVM_LIBRARY
+  NAMES "nvvm"
+  PATH_SUFFIXES "nvvm/lib64" "nvvm/lib"
+  PATHS ${CUDA_TOOLKIT_ROOT_DIR}
+  DOC "CUDA NVVM Library"
+)
 
 set(HEADERS
   include/imp/bridge/af/image_af.hpp
@@ -26,7 +30,11 @@ set(SOURCES
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES} ${ArrayFire_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}
+  ${CUDA_LIBRARIES}
+  ${catkin_LIBRARIES}
+  ${CUDA_NVVM_LIBRARY}
+)
 
 ###
 ### GTESTS
@@ -36,6 +44,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
     test/imp_bridge_af_test.cpp
  )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
+
 
 cs_install()
 cs_export()

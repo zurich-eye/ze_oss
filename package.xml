@@ -18,6 +18,7 @@
   <depend>imp_bridge_opencv</depend>
   <depend>imp_3rdparty_cuda_toolkit</depend>
   <depend>imp_features</depend>
+  <depend>arrayfire_catkin</depend>
 
   <test_depend>gtest</test_depend>
 </package>
