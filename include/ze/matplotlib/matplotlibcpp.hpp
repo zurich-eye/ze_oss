@@ -160,7 +160,7 @@ bool plot(const Eigen::MatrixBase<DerivedX> &x,
           const Eigen::MatrixBase<DerivedY> &y,
           const std::map<std::string, std::string>& keywords)
 {
-  assert(x.size() == y.size());
+  CHECK_EQ(x.size(), y.size());
 
   // using python lists
   PyObject* xlist = PyList_New(x.size());
