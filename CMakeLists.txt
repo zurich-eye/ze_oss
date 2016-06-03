@@ -15,6 +15,7 @@ set(HEADERS
   include/ze/visualization/viz_interface.h
   include/ze/visualization/viz_ros.h
   include/ze/visualization/viz_ros_utils.h
+  include/ze/visualization/matplotlibcpp.hpp
   )
 
 set(SOURCES
@@ -34,6 +35,9 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ###############
 cs_add_executable(viz_example_node src/viz_example_node.cpp)
 target_link_libraries(viz_example_node ${PROJECT_NAME})
+
+cs_add_executable(mpl_example_node src/mpl_example_node.cpp)
+target_link_libraries(mpl_example_node ${PROJECT_NAME} python2.7)
 
 ##########
 # EXPORT #
