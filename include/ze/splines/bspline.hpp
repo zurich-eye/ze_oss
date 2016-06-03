@@ -125,6 +125,12 @@ public:
   int minimumKnotsRequired() const;
 
   /**
+   *
+   * @return the dimension of the bspline (only valid after initialization)
+   */
+  int dimension() const;
+
+  /**
    * @param numTimeSegments the number of time segments required
    * @return the number of coefficients required for a specified number of
    * valid time segments.

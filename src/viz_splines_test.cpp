@@ -38,6 +38,7 @@ int main(int argc, char** argv)
   pbs.initPoseSpline3(times, poses, 100, 1e-5);
 
   sv.displaySpline(pbs, "poses", 0);
+<<<<<<< HEAD
 
   // 2d Plots
   sv.plotSpline(bs, 0);
@@ -45,4 +46,6 @@ int main(int argc, char** argv)
   // plot a pose spline as 6 dimensions
   sv.plotSpline(pbs);
 
+=======
+>>>>>>> 2bf7ce8... Basic plotting of spatial splines (no time axis)
 }

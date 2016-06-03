@@ -22,6 +22,11 @@ int BSpline::spline_order() const
   return spline_order_;
 }
 
+int BSpline::dimension() const
+{
+  return coefficients_.rows();
+}
+
 int BSpline::polynomialDegree() const
 {
   return spline_order_ - 1;

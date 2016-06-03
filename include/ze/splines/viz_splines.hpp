@@ -12,7 +12,6 @@ class SplinesVisualizer
 public:
   SplinesVisualizer(const std::shared_ptr<Visualizer>& viz);
 
-
   //! Plot a single dimension of a spline.
   void plotSpline(const BSpline& bs,
                   const size_t dimension,

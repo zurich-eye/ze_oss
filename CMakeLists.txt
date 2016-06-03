@@ -18,11 +18,13 @@ set(HEADERS
     include/ze/splines/bspline_pose_minimal.hpp
     include/ze/splines/operators.hpp
     include/ze/splines/rotation_vector.hpp
+    include/ze/splines/viz_splines.hpp
     )
 
 set(SOURCES
     src/bspline.cpp
     src/bspline_pose_minimal.cpp
+    src/viz_splines.cpp
     )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
