@@ -1,16 +1,17 @@
 #pragma once
 
 #include <sys/stat.h>
-
 #include <string>
+#include <fstream>
+
 #include <ze/common/string_utils.h>
 
 namespace ze {
 
 inline bool fileExists(const std::string& filename)
 {
-  struct stat buf;
-  return stat(filename.c_str(), &buf) != -1;
+  std::ifstream infile(filename);
+  return infile.good();
 }
 
 inline bool isDir(const std::string& filename)
