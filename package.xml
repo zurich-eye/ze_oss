@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_matplotlib</name>
+  <version>0.1.4</version>
+  <description>The ze_matplotlib package</description>
+
+  <maintainer email="luc.oth@WyssZurich.ch">Luc Oth</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>eigen_catkin</depend>
+  <depend>ze_cmake</depend>
+  <depend>ze_common</depend>
+
+<test_depend>gtest</test_depend>
+</package>
