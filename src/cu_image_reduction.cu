@@ -251,7 +251,6 @@ size_t ImageReducer<ze::Pixel32sC1>::countEqual(
   return static_cast<size_t>(h_count);
 }
 
-
 template class ImageReducer<ze::Pixel32sC1>;
 template class ImageReducer<ze::Pixel32fC1>;
 
