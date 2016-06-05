@@ -86,7 +86,7 @@ void reductionSumKernel(
     __syncthreads();
   }
   // Thread 0 writes the result for the block
-  if(0 == tid)
+  if (0 == tid)
   {
     out_dev_ptr[blockIdx.y*out_stride+blockIdx.x] = s_partial[0];
   }
