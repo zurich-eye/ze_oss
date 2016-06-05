@@ -2,6 +2,7 @@
 #define IMP_CU_TEXTURE_CUH
 
 #include <cuda_runtime.h>
+#include <imp/cu_core/cu_pixel_conversion.hpp>
 #include <imp/cu_core/cu_texture2d.cuh>
 
 namespace ze {
@@ -118,7 +119,8 @@ T tex2DFetch(
     const Texture2D& tex, float x, float y,
     float mul_x=1.f, float mul_y=1.f, float add_x=0.f, float add_y=0.f)
 {
-  return ::tex2D<T>(tex.tex_object, x*mul_x+add_x+0.5f, y*mul_y+add_y+.5f);
+  return ::tex2D<T>(
+        tex.tex_object, x*mul_x+add_x+0.5f, y*mul_y+add_y+.5f);
 }
 
 ////-----------------------------------------------------------------------------

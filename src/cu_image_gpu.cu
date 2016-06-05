@@ -129,8 +129,8 @@ template<typename Pixel>
 Pixel* ImageGpu<Pixel>::data(
     uint32_t ox, uint32_t oy)
 {
-  CHECK_EQ(0u, ox);
-  CHECK_EQ(0u, oy);
+  CHECK_EQ(0u, ox) << "getting datapointer with offset not allowed for GPU memory";
+  CHECK_EQ(0u, oy) << "getting datapointer with offset not allowed for GPU memory";
   return data_.get();
 }
 

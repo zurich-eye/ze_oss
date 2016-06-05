@@ -1,7 +1,6 @@
 #include <imp/core/linearmemory.hpp>
 #include <imp/core/image.hpp>
 #include <imp/cu_core/cu_math.cuh>
-#include <imp/cu_core/cu_exception.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_core/cu_utils.hpp>

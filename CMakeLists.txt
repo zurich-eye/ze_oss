@@ -43,6 +43,7 @@ set(CU_SRCS
   src/min_max.cu
   src/sum.cu
   src/cu_image_reduction.cu
+  src/weighted_sum.cu
   )
 
 #cuda_compile(CU_OBJ ${CU_SRC})
@@ -67,6 +68,8 @@ catkin_add_gtest(${PROJECT_NAME}-test
 )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
+catkin_add_gtest(test_weighted_sum test/test_weighted_sum.cpp)
+target_link_libraries(test_weighted_sum ${PROJECT_NAME})
 
 cs_install()
 cs_export()

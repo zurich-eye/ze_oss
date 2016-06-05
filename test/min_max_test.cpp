@@ -12,34 +12,12 @@
 #include <imp/core/image_raw.hpp>
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
-
-
-template<class T>
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator;
-  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-template<class T>
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::default_random_engine generator;
-  std::uniform_real_distribution<T> distribution(FLT_MIN,
-                                                 std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
+#include <ze/common/test_utils.h>
 
 
 TEST(IMPCuCoreTestSuite,minMaxTest_8uC1)
 {
-  auto random_val = getRandomGenerator<std::uint8_t>();
+  auto random_val = ze::getRandomGenerator<std::uint8_t>();
 
   size_t width = 123;
   size_t height = 324;
@@ -73,7 +51,7 @@ TEST(IMPCuCoreTestSuite,minMaxTest_8uC1)
 TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
 {
   // setup random number generator
-  auto random_val = getRandomGenerator<float>();
+  auto random_val = ze::getRandomGenerator<float>();
 
   size_t width = 1250;
   size_t height = 325;
