@@ -74,15 +74,8 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestConstImg_32fC1)
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
-  dim3 num_threads_per_block;
-  dim3 num_blocks_per_grid;
-  num_threads_per_block.x = 16;
-  num_threads_per_block.y = 16;
-  num_blocks_per_grid.x = 4;
-  num_blocks_per_grid.y = 4;
-  ze::cu::ImageReducer<float> reducer(
-        num_threads_per_block,
-        num_blocks_per_grid);
+
+  ze::cu::ImageReducer<float> reducer;
   double cu_sum;
   auto sumReductionLambda = [&](){
     cu_sum = reducer.sum(
@@ -115,15 +108,8 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestRndImg_32fC1)
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
-  dim3 num_threads_per_block;
-  dim3 num_blocks_per_grid;
-  num_threads_per_block.x = 16;
-  num_threads_per_block.y = 16;
-  num_blocks_per_grid.x = 4;
-  num_blocks_per_grid.y = 4;
-  ze::cu::ImageReducer<float> reducer(
-        num_threads_per_block,
-        num_blocks_per_grid);
+
+  ze::cu::ImageReducer<float> reducer;
   double cu_sum;
   auto sumReductionLambda = [&](){
     cu_sum = reducer.sum(
@@ -161,15 +147,8 @@ TEST(IMPCuCoreTestSuite, countEqualByReductionTestConstImg_32sC1)
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32sC1 cu_im(im);
   IMP_CUDA_CHECK();
-  dim3 num_threads_per_block;
-  dim3 num_blocks_per_grid;
-  num_threads_per_block.x = 16;
-  num_threads_per_block.y = 16;
-  num_blocks_per_grid.x = 4;
-  num_blocks_per_grid.y = 4;
-  ze::cu::ImageReducer<int> reducer(
-        num_threads_per_block,
-        num_blocks_per_grid);
+
+  ze::cu::ImageReducer<int> reducer;
   size_t cu_res;
   auto countEqualReductionLambda = [&](){
     cu_res = reducer.countEqual(

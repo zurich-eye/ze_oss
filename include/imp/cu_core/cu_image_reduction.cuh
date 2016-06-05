@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imp/cu_core/cu_utils.hpp>
+
 namespace ze {
 namespace cu {
 
@@ -7,8 +9,7 @@ template<typename T>
 class ImageReducer
 {
 public:
-  ImageReducer(dim3 num_threads_per_block,
-               dim3 num_blocks_per_grid);
+  ImageReducer();
   ~ImageReducer();
 
   // Sum image by reduction
@@ -25,8 +26,7 @@ public:
                     int value);
 
 private:
-  dim3 block_dim_;
-  dim3 grid_dim_;
+  ze::cu::Fragmentation<> fragm_;
   unsigned int sh_mem_size_;
   T* dev_final_;
   T* dev_partial_;

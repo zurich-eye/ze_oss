@@ -147,22 +147,20 @@ void reductionCountEqKernel(
 }
 
 template<typename T>
-ImageReducer<T>::ImageReducer(dim3 num_threads_per_block,
-                              dim3 num_blocks_per_grid)
-  : block_dim_(num_threads_per_block)
-  , grid_dim_(num_blocks_per_grid)
+ImageReducer<T>::ImageReducer()
+  : fragm_(dim3(4, 4, 1), dim3(16, 16, 1))
   , is_dev_part_alloc_(false)
   , is_dev_fin_alloc_(false)
 {
   // Compute required amount of shared memory
-  sh_mem_size_ = block_dim_.x * block_dim_.y * sizeof(T);
+  sh_mem_size_ = fragm_.dimBlock.x * fragm_.dimBlock.y * sizeof(T);
 
   // Allocate intermediate result
   const cudaError part_alloc_err = cudaMallocPitch(
         &dev_partial_,
         &dev_partial_pitch_,
-        grid_dim_.x*sizeof(T),
-        grid_dim_.y);
+        fragm_.dimGrid.x*sizeof(T),
+        fragm_.dimGrid.y);
   if(cudaSuccess != part_alloc_err)
   {
     IMP_THROW_EXCEPTION("ImageReducer: unable to allocate pitched device memory for partial results");
@@ -215,22 +213,22 @@ T ImageReducer<T>::sum(
   if(is_dev_fin_alloc_ && is_dev_part_alloc_)
   {
     reductionSumKernel<T>
-        <<<grid_dim_, block_dim_, sh_mem_size_>>>
-                                                (dev_partial_,
-                                                 dev_partial_stride_,
-                                                 in_img_data,
-                                                 in_img_stride,
-                                                 in_img_width,
-                                                 in_img_height);
+        <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
+                                                          (dev_partial_,
+                                                           dev_partial_stride_,
+                                                           in_img_data,
+                                                           in_img_stride,
+                                                           in_img_width,
+                                                           in_img_height);
 
     reductionSumKernel<T>
-        <<<1, block_dim_, sh_mem_size_>>>
-                                        (dev_final_,
-                                         0,
-                                         dev_partial_,
-                                         dev_partial_stride_,
-                                         grid_dim_.x,
-                                         grid_dim_.y);
+        <<<1, fragm_.dimBlock, sh_mem_size_>>>
+                                             (dev_final_,
+                                              0,
+                                              dev_partial_,
+                                              dev_partial_stride_,
+                                              fragm_.dimGrid.x,
+                                              fragm_.dimGrid.y);
 
     // download sum
     T h_count;
@@ -266,23 +264,23 @@ size_t ImageReducer<int>::countEqual(
   if(is_dev_fin_alloc_ && is_dev_part_alloc_)
   {
     reductionCountEqKernel<int>
-        <<<grid_dim_, block_dim_, sh_mem_size_>>>
-                                                (dev_partial_,
-                                                 dev_partial_stride_,
-                                                 in_img_data,
-                                                 in_img_stride,
-                                                 in_img_width,
-                                                 in_img_height,
-                                                 value);
+        <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
+                                                          (dev_partial_,
+                                                           dev_partial_stride_,
+                                                           in_img_data,
+                                                           in_img_stride,
+                                                           in_img_width,
+                                                           in_img_height,
+                                                           value);
 
     reductionSumKernel<int>
-        <<<1, block_dim_, sh_mem_size_>>>
-                                        (dev_final_,
-                                         0,
-                                         dev_partial_,
-                                         dev_partial_stride_,
-                                         grid_dim_.x,
-                                         grid_dim_.y);
+        <<<1, fragm_.dimBlock, sh_mem_size_>>>
+                                             (dev_final_,
+                                              0,
+                                              dev_partial_,
+                                              dev_partial_stride_,
+                                              fragm_.dimGrid.x,
+                                              fragm_.dimGrid.y);
 
     // download sum
     int h_count;
