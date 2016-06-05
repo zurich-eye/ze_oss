@@ -67,13 +67,13 @@ TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
       min_val = ze::cu::min(min_val, random_value);
       max_val = ze::cu::max(max_val, random_value);
 
-//      std::cout << "random: [" << x << "][" << y << "]: " << random_value << std::endl;
+//      VLOG(1) << "random: [" << x << "][" << y << "]: " << random_value;
     }
   }
 
-  std::cout << "numeric:  min, max: " << std::numeric_limits<float>::lowest() << " " << std::numeric_limits<float>::max() << std::endl;
-  std::cout << "numeric2: min, max: " << FLT_MIN << " " << FLT_MAX << std::endl;
-  std::cout << "CPU min, max: " << min_val << " " << max_val << std::endl;
+  VLOG(1) << "numeric:  min, max: " << std::numeric_limits<float>::lowest() << " " << std::numeric_limits<float>::max();
+  VLOG(1) << "numeric2: min, max: " << FLT_MIN << " " << FLT_MAX;
+  VLOG(1) << "CPU min, max: " << min_val << " " << max_val;
 
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
@@ -83,7 +83,7 @@ TEST(IMPCuCoreTestSuite,minMaxTest_32fC1)
   ze::cu::minMax(cu_im, min_pixel, max_pixel);
   IMP_CUDA_CHECK();
 
-  std::cout << "GPU min, max: " << min_pixel << " " << max_pixel << std::endl;
+  VLOG(1) << "GPU min, max: " << min_pixel << " " << max_pixel;
 
 
   ASSERT_EQ(min_val, min_pixel.x);

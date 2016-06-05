@@ -11,6 +11,7 @@
 #include <imp/core/image_raw.hpp>
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
+#include <ze/common/benchmark.h>
 #include <ze/common/test_utils.h>
 
 TEST(IMPCuCoreTestSuite,sumTest_32fC1)
@@ -48,4 +49,5 @@ TEST(IMPCuCoreTestSuite,sumTest_32fC1)
   EXPECT_NEAR(gt_sum, cu_sum, tolerance);
   VLOG(1) << "GT sum: " << std::fixed << gt_sum;
   VLOG(1) << "GPU sum: " << std::fixed << cu_sum;
+  VLOG(1) << "Test tolerance: " << std::fixed << tolerance;
 }
