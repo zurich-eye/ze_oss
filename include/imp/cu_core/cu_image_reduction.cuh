@@ -1,11 +1,12 @@
 #pragma once
 
+#include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
 
 namespace ze {
 namespace cu {
 
-template<typename T>
+template<typename Pixel>
 class ImageReducer
 {
 public:
@@ -13,27 +14,18 @@ public:
   ~ImageReducer();
 
   // Sum image by reduction
-  T sum(const T *in_img_data,
-        size_t in_img_stride,
-        size_t in_img_width,
-        size_t in_img_height);
+  Pixel sum(const ze::cu::ImageGpu<Pixel>& in_img);
 
   // Count elements equal to 'value'
-  size_t countEqual(const int *in_img_data,
-                    size_t in_img_stride,
-                    size_t in_img_width,
-                    size_t in_img_height,
-                    int value);
+  size_t countEqual(
+      const ze::cu::ImageGpu32sC1& in_img,
+      int32_t value);
 
 private:
   ze::cu::Fragmentation<> fragm_;
   unsigned int sh_mem_size_;
-  T* dev_final_;
-  T* dev_partial_;
-  size_t dev_partial_pitch_;
-  size_t dev_partial_stride_;
-  bool is_dev_part_alloc_;
-  bool is_dev_fin_alloc_;
+  Pixel* dev_final_;
+  ze::cu::ImageGpu<Pixel> partial_;
 };
 
 } // cu namespace

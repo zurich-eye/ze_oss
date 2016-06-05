@@ -7,10 +7,10 @@ namespace cu {
 // From Reduction SDK sample:
 // Prevent instantiation of the generic struct using an undefined symbol
 // in the function body (so it won't compile)
-template<typename T>
+template<typename Pixel>
 struct SharedMemory
 {
-  __device__ T *getPointer()
+  __device__ Pixel *getPointer()
   {
     extern __device__ void error(void);
     error();
@@ -20,49 +20,49 @@ struct SharedMemory
 
 // Required specializations
 template<>
-struct SharedMemory<int>
+struct SharedMemory<ze::Pixel32sC1>
 {
-  __device__ int *getPointer()
+  __device__ ze::Pixel32sC1 *getPointer()
   {
-    extern __shared__ int s_int[];
+    extern __shared__ ze::Pixel32sC1 s_int[];
     return s_int;
   }
 };
 
 template<>
-struct SharedMemory<float>
+struct SharedMemory<ze::Pixel32fC1>
 {
-  __device__ float *getPointer()
+  __device__ Pixel32fC1 *getPointer()
   {
-    extern __shared__ float s_float[];
+    extern __shared__ Pixel32fC1 s_float[];
     return s_float;
   }
 };
 
 // Templated kernels
-template<typename T>
+template<typename Pixel>
 __global__
 void reductionSumKernel(
-    T *out_dev_ptr,
-    size_t out_stride,
-    const T *in_dev_ptr,
-    size_t in_stride,
-    size_t n,
-    size_t m)
+    Pixel* out_dev_ptr,
+    ze::size_t out_stride,
+    const Pixel* in_dev_ptr,
+    ze::size_t in_stride,
+    ze::uint32_t width,
+    ze::uint32_t height)
 {
-  SharedMemory<T> smem;
-  T *s_partial = smem.getPointer();
+  SharedMemory<Pixel> smem;
+  Pixel* s_partial = smem.getPointer();
 
-  T sum = 0;
+  Pixel sum = 0;
 
   // Sum over 2D thread grid, use (x,y) indices
-  for(int x = blockIdx.x * blockDim.x + threadIdx.x;
-      x < n;
-      x += blockDim.x*gridDim.x)
+  for (int x = blockIdx.x * blockDim.x + threadIdx.x;
+       x < width;
+       x += blockDim.x * gridDim.x)
   {
-    for(int y = blockIdx.y * blockDim.y + threadIdx.y;
-        y < m;
-        y += blockDim.y*gridDim.y)
+    for (int y = blockIdx.y * blockDim.y + threadIdx.y;
+         y < height;
+         y += blockDim.y * gridDim.y)
     {
       sum += in_dev_ptr[y*in_stride+x];
     }
@@ -75,64 +75,10 @@ void reductionSumKernel(
   // Start using half the block threads,
   // halve the active threads at each iteration
   const int tid = threadIdx.y*blockDim.x+threadIdx.x;
-  for (int num_active_threads = (blockDim.x*blockDim.y)>>1;
+  for (int num_active_threads = (blockDim.x*blockDim.y) >> 1;
        num_active_threads;
-       num_active_threads >>= 1 ) {
-    if ( tid < num_active_threads)
-    {
-      s_partial[tid] += s_partial[tid+num_active_threads];
-    }
-    __syncthreads();
-  }
-  // Thread 0 writes the result for the block
-  if(0 == tid)
+       num_active_threads >>= 1)
   {
-    out_dev_ptr[blockIdx.y*out_stride+blockIdx.x] = s_partial[0];
-  }
-}
-
-template<typename T>
-__global__
-void reductionCountEqKernel(
-    int *out_dev_ptr,
-    size_t out_stride,
-    const T *in_dev_ptr,
-    size_t in_stride,
-    size_t n,
-    size_t m,
-    T value)
-{
-  SharedMemory<int> smem;
-  int *s_partial = smem.getPointer();
-
-  int count = 0;
-
-  // Sum over 2D thread grid, use (x,y) indices
-  for(int x = blockIdx.x * blockDim.x + threadIdx.x;
-      x < n;
-      x += blockDim.x*gridDim.x)
-  {
-    for(int y = blockIdx.y * blockDim.y + threadIdx.y;
-        y < m;
-        y += blockDim.y*gridDim.y)
-    {
-      if(value == in_dev_ptr[y*in_stride+x])
-      {
-        count += 1;
-      }
-    }
-  }
-  // Sums are written to shared memory, single index
-  s_partial[threadIdx.y*blockDim.x+threadIdx.x] = count;
-  __syncthreads();
-
-  // Reduce over block sums stored in shared memory
-  // Start using half the block threads,
-  // halve the active threads at each iteration
-  const int tid = threadIdx.y*blockDim.x+threadIdx.x;
-  for (int num_active_threads = (blockDim.x*blockDim.y)>>1;
-       num_active_threads;
-       num_active_threads >>= 1 ) {
     if (tid < num_active_threads)
     {
       s_partial[tid] += s_partial[tid+num_active_threads];
@@ -146,163 +92,168 @@ void reductionCountEqKernel(
   }
 }
 
-template<typename T>
-ImageReducer<T>::ImageReducer()
-  : fragm_(dim3(4, 4, 1), dim3(16, 16, 1))
-  , is_dev_part_alloc_(false)
-  , is_dev_fin_alloc_(false)
+
+template<typename Pixel>
+__global__
+void reductionCountEqKernel(
+    Pixel* out_dev_ptr,
+    ze::size_t out_stride,
+    const Pixel* in_dev_ptr,
+    size_t in_stride,
+    ze::uint32_t width,
+    ze::uint32_t height,
+    Pixel value)
 {
-  // Compute required amount of shared memory
-  sh_mem_size_ = fragm_.dimBlock.x * fragm_.dimBlock.y * sizeof(T);
+  SharedMemory<Pixel> smem;
+  Pixel* s_partial = smem.getPointer();
 
-  // Allocate intermediate result
-  const cudaError part_alloc_err = cudaMallocPitch(
-        &dev_partial_,
-        &dev_partial_pitch_,
-        fragm_.dimGrid.x*sizeof(T),
-        fragm_.dimGrid.y);
-  if(cudaSuccess != part_alloc_err)
-  {
-    IMP_THROW_EXCEPTION("ImageReducer: unable to allocate pitched device memory for partial results");
-  }
-  else
-  {
-    dev_partial_stride_ = dev_partial_pitch_ / sizeof(T);
-    is_dev_part_alloc_ = true;
-  }
+  int32_t count = 0;
 
-  // Allocate final result
-  const cudaError fin_alloc_err = cudaMalloc(&dev_final_, sizeof(T));
-  if(cudaSuccess != fin_alloc_err)
+  // Sum over 2D thread grid, use (x,y) indices
+  for (int x = blockIdx.x * blockDim.x + threadIdx.x;
+       x < width;
+       x += blockDim.x * gridDim.x)
   {
-    IMP_THROW_EXCEPTION("ImageReducer: unable to allocate device memory for final result");
+    for (int y = blockIdx.y * blockDim.y + threadIdx.y;
+         y < height;
+         y += blockDim.y * gridDim.y)
+    {
+      if(static_cast<int32_t>(value) == in_dev_ptr[y*in_stride+x])
+      {
+        count += 1;
+      }
+    }
   }
-  else
+  // Sums are written to shared memory, single index
+  s_partial[threadIdx.y*blockDim.x+threadIdx.x] = count;
+  __syncthreads();
+
+  // Reduce over block sums stored in shared memory
+  // Start using half the block threads,
+  // halve the active threads at each iteration
+  const int tid = threadIdx.y*blockDim.x+threadIdx.x;
+  for (int num_active_threads = (blockDim.x*blockDim.y) >> 1;
+       num_active_threads;
+       num_active_threads >>= 1 )
   {
-    is_dev_fin_alloc_ = true;
+    if (tid < num_active_threads)
+    {
+      s_partial[tid] += s_partial[tid+num_active_threads];
+    }
+    __syncthreads();
+  }
+  // Thread 0 writes the result for the block
+  if(0 == tid)
+  {
+    out_dev_ptr[blockIdx.y*out_stride+blockIdx.x] = s_partial[0];
   }
 }
 
-template<typename T>
-ImageReducer<T>::~ImageReducer()
+
+template<typename Pixel>
+ImageReducer<Pixel>::ImageReducer()
+  : fragm_(dim3(4, 4, 1), dim3(16, 16, 1))
+  , partial_(fragm_.dimGrid.x, fragm_.dimGrid.y)
 {
-  // Free device memory
-  if(is_dev_fin_alloc_)
-  {
-    const cudaError err = cudaFree(dev_final_);
-    if(cudaSuccess != err)
-      IMP_THROW_EXCEPTION("ImageReducer: unable to free device memory");
-  }
-  if(is_dev_part_alloc_)
-  {
-    const cudaError err = cudaFree(dev_partial_);
-    if(cudaSuccess != err)
-      IMP_THROW_EXCEPTION("ImageReducer: unable to free device memory");
-  }
+  // Compute required amount of shared memory
+  sh_mem_size_ = fragm_.dimBlock.x * fragm_.dimBlock.y * sizeof(Pixel);
+
+  // Allocate final result
+  dev_final_ = ze::cu::MemoryStorage<Pixel>::alloc(1);
+}
+
+template<typename Pixel>
+ImageReducer<Pixel>::~ImageReducer()
+{
+  ze::cu::MemoryStorage<Pixel>::free(dev_final_);
 }
 
 // Sum image by reduction
 // Cfr. listing 12.1 by N. Wilt, "The CUDA Handbook"
-template<typename T>
-T ImageReducer<T>::sum(
-    const T *in_img_data,
-    size_t in_img_stride,
-    size_t in_img_width,
-    size_t in_img_height)
+template<typename Pixel>
+Pixel ImageReducer<Pixel>::sum(const ze::cu::ImageGpu<Pixel>& in_img)
 {
-  if(is_dev_fin_alloc_ && is_dev_part_alloc_)
-  {
-    reductionSumKernel<T>
-        <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
-                                                          (dev_partial_,
-                                                           dev_partial_stride_,
-                                                           in_img_data,
-                                                           in_img_stride,
-                                                           in_img_width,
-                                                           in_img_height);
+  //if(is_dev_fin_alloc_ && is_dev_part_alloc_)
 
-    reductionSumKernel<T>
-        <<<1, fragm_.dimBlock, sh_mem_size_>>>
-                                             (dev_final_,
-                                              0,
-                                              dev_partial_,
-                                              dev_partial_stride_,
-                                              fragm_.dimGrid.x,
-                                              fragm_.dimGrid.y);
+  reductionSumKernel<Pixel>
+      <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
+                                                        (partial_.data(),
+                                                         partial_.stride(),
+                                                         in_img.data(),
+                                                         in_img.stride(),
+                                                         in_img.width(),
+                                                         in_img.height());
 
-    // download sum
-    T h_count;
-    const cudaError err =
-        cudaMemcpy(
-          &h_count,
-          dev_final_,
-          sizeof(T),
-          cudaMemcpyDeviceToHost);
-    if(cudaSuccess != err)
-    {
-      IMP_THROW_EXCEPTION("sum: unable to copy result from device to host");
-    }
-    return h_count;
-  }
-  else
+  reductionSumKernel<Pixel>
+      <<<1, fragm_.dimBlock, sh_mem_size_>>>
+                                           (dev_final_,
+                                            0,
+                                            partial_.data(),
+                                            partial_.stride(),
+                                            fragm_.dimGrid.x,
+                                            fragm_.dimGrid.y);
+
+  // download sum
+  Pixel h_sum;
+  const cudaError err =
+      cudaMemcpy(
+        &h_sum,
+        dev_final_,
+        sizeof(Pixel),
+        cudaMemcpyDeviceToHost);
+  if(cudaSuccess != err)
   {
-    return 0;
+    LOG(FATAL) << "sum: unable to copy result from device to host";
   }
+  return h_sum;
 }
 
 // Count elements equal to 'value'
 // First count over the thread grid,
 // then perform a reduction sum on a single thread block
 template<>
-size_t ImageReducer<int>::countEqual(
-    const int *in_img_data,
-    size_t in_img_stride,
-    size_t in_img_width,
-    size_t in_img_height,
-    int value)
+size_t ImageReducer<ze::Pixel32sC1>::countEqual(
+    const ze::cu::ImageGpu32sC1& in_img,
+    int32_t value)
 {
-  if(is_dev_fin_alloc_ && is_dev_part_alloc_)
+
+  reductionCountEqKernel<ze::Pixel32sC1>
+      <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
+                                                        (partial_.data(),
+                                                         partial_.stride(),
+                                                         in_img.data(),
+                                                         in_img.stride(),
+                                                         in_img.width(),
+                                                         in_img.height(),
+                                                         value);
+
+  reductionSumKernel<ze::Pixel32sC1>
+      <<<1, fragm_.dimBlock, sh_mem_size_>>>
+                                           (dev_final_,
+                                            0,
+                                            partial_.data(),
+                                            partial_.stride(),
+                                            fragm_.dimGrid.x,
+                                            fragm_.dimGrid.y);
+
+  // download count
+  int32_t h_count;
+  const cudaError err =
+      cudaMemcpy(
+        &h_count,
+        dev_final_,
+        sizeof(int32_t),
+        cudaMemcpyDeviceToHost);
+  if(cudaSuccess != err)
   {
-    reductionCountEqKernel<int>
-        <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
-                                                          (dev_partial_,
-                                                           dev_partial_stride_,
-                                                           in_img_data,
-                                                           in_img_stride,
-                                                           in_img_width,
-                                                           in_img_height,
-                                                           value);
-
-    reductionSumKernel<int>
-        <<<1, fragm_.dimBlock, sh_mem_size_>>>
-                                             (dev_final_,
-                                              0,
-                                              dev_partial_,
-                                              dev_partial_stride_,
-                                              fragm_.dimGrid.x,
-                                              fragm_.dimGrid.y);
-
-    // download sum
-    int h_count;
-    const cudaError err =
-        cudaMemcpy(
-          &h_count,
-          dev_final_,
-          sizeof(int),
-          cudaMemcpyDeviceToHost);
-    if(cudaSuccess != err)
-      IMP_THROW_EXCEPTION("countEqual: unable to copy result from device to host");
-
-    return static_cast<size_t>(h_count);
+    LOG(FATAL) << "countEqual: unable to copy result from device to host";
   }
-  else
-  {
-    return 0;
-  }
+  return static_cast<size_t>(h_count);
 }
 
-template class ImageReducer<int>;
-template class ImageReducer<float>;
+
+template class ImageReducer<ze::Pixel32sC1>;
+template class ImageReducer<ze::Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace

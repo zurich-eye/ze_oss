@@ -68,23 +68,19 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestConstImg_32fC1)
   const float val = 0.1f;
   ze::ImageRaw32fC1 im =
       ze::generateConstantImage(width, height, val);
-  VLOG(1) << "test image has been filled with constant value " << val;
+  VLOG(1) << "test image has been filled with the constant value " << val;
   double gt_sum = static_cast<double>(width*height) * val;
 
   IMP_CUDA_CHECK();
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
 
-  ze::cu::ImageReducer<float> reducer;
+  ze::cu::ImageReducer<ze::Pixel32fC1> reducer;
   double cu_sum;
   auto sumReductionLambda = [&](){
-    cu_sum = reducer.sum(
-          cu_im.cuData(), cu_im.stride(),
-          cu_im.width(), cu_im.height());
+    cu_sum = reducer.sum(cu_im);
   };
-  reducer.sum(
-        cu_im.cuData(), cu_im.stride(),
-        cu_im.width(), cu_im.height()); //! Warm-up
+  reducer.sum(cu_im); //! Warm-up
   ze::runTimingBenchmark(
         sumReductionLambda,
         20, 40,
@@ -96,6 +92,7 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestConstImg_32fC1)
   VLOG(1) << "GPU sum: " << std::fixed << cu_sum;
   VLOG(1) << "Test tolerance: " << std::fixed << tolerance;
 }
+
 
 TEST(IMPCuCoreTestSuite, sumByReductionTestRndImg_32fC1)
 {
@@ -109,16 +106,12 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestRndImg_32fC1)
   ze::cu::ImageGpu32fC1 cu_im(im);
   IMP_CUDA_CHECK();
 
-  ze::cu::ImageReducer<float> reducer;
+  ze::cu::ImageReducer<ze::Pixel32fC1> reducer;
   double cu_sum;
   auto sumReductionLambda = [&](){
-    cu_sum = reducer.sum(
-          cu_im.cuData(), cu_im.stride(),
-          cu_im.width(), cu_im.height());
+    cu_sum = reducer.sum(cu_im);
   };
-  reducer.sum(
-        cu_im.cuData(), cu_im.stride(),
-        cu_im.width(), cu_im.height()); //! Warm-up
+  reducer.sum(cu_im); //! Warm-up
   ze::runTimingBenchmark(
         sumReductionLambda,
         20, 40,
@@ -148,16 +141,12 @@ TEST(IMPCuCoreTestSuite, countEqualByReductionTestConstImg_32sC1)
   ze::cu::ImageGpu32sC1 cu_im(im);
   IMP_CUDA_CHECK();
 
-  ze::cu::ImageReducer<int> reducer;
+  ze::cu::ImageReducer<ze::Pixel32sC1> reducer;
   size_t cu_res;
   auto countEqualReductionLambda = [&](){
-    cu_res = reducer.countEqual(
-          cu_im.cuData(), cu_im.stride(),
-          cu_im.width(), cu_im.height(), probe_val);
+    cu_res = reducer.countEqual(cu_im, probe_val);
   };
-  reducer.countEqual(
-        cu_im.cuData(), cu_im.stride(),
-        cu_im.width(), cu_im.height(), probe_val); //! Warm-up
+  reducer.countEqual(cu_im, probe_val); //! Warm-up
   ze::runTimingBenchmark(
         countEqualReductionLambda,
         20, 40,
