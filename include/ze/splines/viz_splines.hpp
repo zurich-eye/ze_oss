@@ -75,22 +75,22 @@ public:
     }
 
     // translation
-    matplotlibcpp::subplot(3, 1, 1);
-    matplotlibcpp::plot(times, points.row(0));
-    matplotlibcpp::subplot(3, 1, 2);
-    matplotlibcpp::plot(times, points.row(1));
-    matplotlibcpp::subplot(3, 1, 3);
-    matplotlibcpp::plot(times, points.row(2));
-    matplotlibcpp::show();
+    plt::subplot(3, 1, 1);
+    plt::plot(times, points.row(0));
+    plt::subplot(3, 1, 2);
+    plt::plot(times, points.row(1));
+    plt::subplot(3, 1, 3);
+    plt::plot(times, points.row(2));
+    plt::show();
 
     // rotation
-    matplotlibcpp::subplot(3, 1, 1);
-    matplotlibcpp::plot(times, points.row(3));
-    matplotlibcpp::subplot(3, 1, 2);
-    matplotlibcpp::plot(times, points.row(4));
-    matplotlibcpp::subplot(3, 1, 3);
-    matplotlibcpp::plot(times, points.row(5));
-    matplotlibcpp::show();
+    plt::subplot(3, 1, 1);
+    plt::plot(times, points.row(3));
+    plt::subplot(3, 1, 2);
+    plt::plot(times, points.row(4));
+    plt::subplot(3, 1, 3);
+    plt::plot(times, points.row(5));
+    plt::show();
   }
 
 private:

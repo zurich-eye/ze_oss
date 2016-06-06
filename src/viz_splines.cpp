@@ -25,8 +25,8 @@ void SplinesVisualizer::plotSpline(const BSpline& bs,
     times(i) = start + i * step_size;
   }
 
-  matplotlibcpp::plot(times, points);
-  matplotlibcpp::show();
+  plt::plot(times, points);
+  plt::show();
 }
 
 void SplinesVisualizer::displaySplineTrajectory(const BSpline& bs,
