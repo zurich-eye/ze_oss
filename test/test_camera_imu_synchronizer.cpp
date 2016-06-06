@@ -38,7 +38,7 @@ TEST(CameraImuSynchronizerTest, testCsv)
   std::string data_dir = getTestDataDir("csv_dataset");
   EXPECT_FALSE(data_dir.empty());
 
-  DataProviderCsv dp(data_dir+"/data", "imu0", { {"cam0", 0} });
+  DataProviderCsv dp(data_dir+"/data", {{"imu0", 0}}, {{"cam0", 0}});
   CameraImuSynchronizer sync(dp, 1.0);
   sync.registerCameraImuCallback(
         [&](const StampedImages& images,

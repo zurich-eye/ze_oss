@@ -27,17 +27,18 @@ ImageBase::Ptr CameraMeasurement::loadImage() const
 
 DataProviderCsv::DataProviderCsv(
     const std::string& csv_directory,
-    const std::string& imu_topic,
+    const std::map<std::string, size_t>& imu_topics,
     const std::map<std::string, size_t>& camera_topics)
   : DataProviderBase(DataProviderType::Csv)
+  , imu_topics_(imu_topics)
   , camera_topics_(camera_topics)
 {
   VLOG(1) << "Loading .csv dataset from directory \"" << csv_directory << "\".";
 
-  if (!imu_topic.empty())
+  for (auto it : imu_topics)
   {
-    imu_count_ = 1u;
-    loadImuData(joinPath(csv_directory, imu_topic), 0u);
+    std::string dir = joinPath(csv_directory, it.first);
+    loadImuData(dir, it.second, 0u);
   }
 
   for (auto it : camera_topics)
@@ -71,9 +72,9 @@ bool DataProviderCsv::spinOnce()
         {
           dataset::CameraMeasurement::ConstPtr cam_data =
               std::dynamic_pointer_cast<const dataset::CameraMeasurement>(data);
-
-          ImageBase::Ptr img = cam_data->loadImage();
-          camera_callback_(cam_data->stamp_ns, img, cam_data->camera_index);
+          camera_callback_(cam_data->stamp_ns,
+                           cam_data->loadImage(),
+                           cam_data->camera_index);
         }
         else
         {
@@ -87,8 +88,10 @@ bool DataProviderCsv::spinOnce()
         {
           dataset::ImuMeasurement::ConstPtr imu_data =
                 std::dynamic_pointer_cast<const dataset::ImuMeasurement>(data);
-          // csv datasets only support a single imu.
-          imu_callback_(imu_data->stamp_ns, imu_data->acc, imu_data->gyr, 0);
+          imu_callback_(imu_data->stamp_ns,
+                        imu_data->acc,
+                        imu_data->gyr,
+                        imu_data->imu_index);
         }
         else
         {
@@ -130,11 +133,13 @@ size_t DataProviderCsv::cameraCount() const
 
 size_t DataProviderCsv::imuCount() const
 {
-  // Only a single imu is supported in csv files.
-  return imu_count_;
+  return imu_topics_.size();
 }
 
-void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t playback_delay)
+void DataProviderCsv::loadImuData(
+    const std::string data_dir,
+    const size_t imu_index,
+    const int64_t playback_delay)
 {
   const std::string kHeader = "#timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]";
   std::ifstream fs;
@@ -149,8 +154,9 @@ void DataProviderCsv::loadImuData(const std::string data_dir, const int64_t play
     acc << std::stod(items[4]), std::stod(items[5]), std::stod(items[6]);
     gyr << std::stod(items[1]), std::stod(items[2]), std::stod(items[3]);
     auto imu_measurement =
-        std::make_shared<dataset::ImuMeasurement>(std::stoll(items[0]),
-        acc.cast<FloatType>(), gyr.cast<FloatType>());
+        std::make_shared<dataset::ImuMeasurement>(
+          std::stoll(items[0]), imu_index,
+          acc.cast<FloatType>(), gyr.cast<FloatType>());
 
     buffer_.insert(std::make_pair(
                      imu_measurement->stamp_ns + playback_delay,

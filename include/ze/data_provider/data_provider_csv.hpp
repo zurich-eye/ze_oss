@@ -46,15 +46,18 @@ struct ImuMeasurement : public MeasurementBase
   ZE_POINTER_TYPEDEFS(ImuMeasurement);
 
   ImuMeasurement() = delete;
-  ImuMeasurement(int64_t stamp_ns, const Vector3& acc, const Vector3& gyr)
+  ImuMeasurement(int64_t stamp_ns, const size_t imu_idx,
+                 const Vector3& acc, const Vector3& gyr)
     : MeasurementBase(stamp_ns, MeasurementType::Imu)
     , acc(acc)
     , gyr(gyr)
+    , imu_index(imu_idx)
   {}
   virtual ~ImuMeasurement() = default;
 
   const Vector3 acc;
   const Vector3 gyr;
+  const size_t imu_index;
 };
 
 struct CameraMeasurement : public MeasurementBase
@@ -111,7 +114,7 @@ public:
 
   DataProviderCsv(
       const std::string& csv_directory,
-      const std::string& imu_topic,
+      const std::map<std::string, size_t>& imu_topics,
       const std::map<std::string, size_t>& camera_topics);
 
   virtual ~DataProviderCsv() = default;
@@ -135,6 +138,7 @@ private:
 
   void loadImuData(
       const std::string data_dir,
+      const size_t imu_index,
       const int64_t playback_delay);
 
   void loadCameraData(
@@ -148,6 +152,7 @@ private:
   //! Points to the next published buffer value. Buffer can't change once loaded!
   DataBuffer::const_iterator buffer_it_;
 
+  std::map<std::string, size_t> imu_topics_;
   std::map<std::string, size_t> camera_topics_;
 
   size_t imu_count_ = 0u;

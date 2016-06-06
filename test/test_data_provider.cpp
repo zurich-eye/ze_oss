@@ -15,7 +15,7 @@ TEST(DataProviderTests, testCsv)
   std::string data_dir = getTestDataDir("csv_dataset");
   EXPECT_FALSE(data_dir.empty());
 
-  DataProviderCsv dp(joinPath(data_dir, "data"), "imu0", { {"cam0", 0} });
+  DataProviderCsv dp(joinPath(data_dir, "data"), {{"imu0", 0}}, {{"cam0", 0}});
 
   size_t num_imu_measurements = 0u;
   int64_t expect_imu_stamp = 1403636579758555392;
