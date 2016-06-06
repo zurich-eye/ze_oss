@@ -18,6 +18,9 @@
   <depend>minkindr</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
+  <depend>ze_visualization</depend>
+  <depend>PythonLibs</depend>
+  <depend>ze_matplotlib</depend>
 
   <test_depend>gtest</test_depend>
 </package>

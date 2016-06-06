@@ -6,6 +6,10 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
+# The matplotlib-cpp headers are linked against
+find_package(PythonLibs)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 #############
 # LIBRARIES #
 #############
@@ -22,6 +26,12 @@ set(SOURCES
     )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+###############
+# EXECUTABLES #
+###############
+cs_add_executable(viz_splines_test src/viz_splines_test.cpp)
+target_link_libraries(viz_splines_test ${PROJECT_NAME} ${PYTHON_LIBRARIES})
 
 ##########
 # GTESTS #
