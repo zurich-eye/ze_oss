@@ -1,6 +1,5 @@
 #include <ze/matplotlib/matplotlibcpp.hpp>
 
-namespace plt = matplotlibcpp;
 int main()
 {
   using namespace ze;

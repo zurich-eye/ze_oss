@@ -38,7 +38,8 @@
 
 #include <Python.h>
 
-namespace matplotlibcpp {
+namespace ze {
+namespace plt {
 
 namespace detail {
 struct _interpreter
@@ -721,4 +722,5 @@ bool plot()
 
 #endif
 
-}
+} // namespace plt
+} // namespace ze
