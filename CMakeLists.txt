@@ -28,6 +28,7 @@ set(HEADERS
   include/ze/common/combinatorics.h
   include/ze/common/csv_trajectory.h
   include/ze/common/file_utils.h
+  include/ze/common/line.hpp
   include/ze/common/logging.hpp
   include/ze/common/macros.h
   include/ze/common/manifold.h
@@ -63,6 +64,7 @@ set(HEADERS
 
 set(SOURCES
   src/csv_trajectory.cpp
+  src/line.cpp
   src/matrix.cpp
   src/sample.cpp
   src/signal_handler.cpp
@@ -120,6 +122,9 @@ target_link_libraries(test_ring_view ${PROJECT_NAME})
 
 catkin_add_gtest(test_ringbuffer test/test_ringbuffer.cpp)
 target_link_libraries(test_ringbuffer ${PROJECT_NAME})
+
+catkin_add_gtest(test_line test/test_line.cpp)
+target_link_libraries(test_line ${PROJECT_NAME})
 
 ##########
 # EXPORT #
