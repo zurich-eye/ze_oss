@@ -1,6 +1,7 @@
 #include <random>
 #include <ze/common/benchmark.h>
 #include <ze/common/test_entrypoint.h>
+#include <ze/common/line.hpp>
 #include <ze/common/matrix.h>
 #include <ze/common/timer.h>
 #include <ze/common/types.h>
@@ -36,8 +37,8 @@ void testPoseOptimizer(
   Transformation T_err = T_B_W * T_B_W_estimate.inverse();
   FloatType pos_error = T_err.getPosition().norm();
   FloatType ang_error = T_err.getRotation().log().norm();
-  CHECK_LT(pos_error, 0.005);
-  CHECK_LT(ang_error, 0.005);
+  EXPECT_LT(pos_error, 0.005);
+  EXPECT_LT(ang_error, 0.005);
   VLOG(1) << "ang error = " << ang_error;
   VLOG(1) << "pos error = " << pos_error;
 }
@@ -113,5 +114,81 @@ TEST(PoseOptimizerTests, testSolver)
         10.0, 10.0, T_B_W, T_B_W_perturbed, data, "Bearing, Rotation and Position Prior");
 }
 
+TEST(PoseOptimizerTests, testSolver_withLines)
+{
+  using namespace ze;
+
+  Transformation T_C_B, T_B_W;
+  T_C_B.setRandom(); // Random camera to imu/body transformation.
+  T_B_W.setRandom(); // Random body transformation.
+
+  const size_t n = 120;
+  PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
+  Keypoints endpoints_image = generateRandomKeypoints(640, 480, 10, 2 * n);
+  Positions endpoints_C = cam.backProjectVectorized(endpoints_image);
+  // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
+  std::ranlux24 gen;
+  std::uniform_real_distribution<double> scale(1.0, 3.0);
+  for(size_t i = 0; i < 2 * n; ++i)
+  {
+    endpoints_C.col(i) *= scale(gen);
+  }
+  Positions endpoints_W =
+      (T_B_W.inverse() * T_C_B.inverse()).transformVectorized(endpoints_C);
+
+  std::vector<Line> lines;
+  Line::generateLinesFromEndpoints(endpoints_W.block(0, 0, 3, n),
+                                   endpoints_W.block(0, n, 3, n),
+                                   lines);
+
+  // Apply some noise to the endpoints to simulate measurements.
+  Keypoints endpoints_noisy = endpoints_image;
+  const double stddev = 1.0;
+  std::normal_distribution<double> endpoints_noise(0.0, stddev);
+  for (size_t i = 0; i < 2 * n; ++i)
+  {
+    endpoints_noisy(0, i) += endpoints_noise(gen);
+    endpoints_noisy(1, i) += endpoints_noise(gen);
+  }
+  Bearings bearings_noisy = cam.backProjectVectorized(endpoints_noisy);
+  Bearings bearings_truth = cam.backProjectVectorized(endpoints_image);
+  Matrix3X line_measurements_noisy(3, n);
+  Matrix3X line_measurements_truth(3, n);
+  for (size_t i = 0; i < n; ++i)
+  {
+    line_measurements_noisy.col(i) =
+        (bearings_noisy.col(i).cross(bearings_noisy.col(n + i))).normalized();
+    line_measurements_truth.col(i) =
+        (bearings_truth.col(i).cross(bearings_truth.col(n + 1))).normalized();
+  }
+
+  // Check if error for truth is zero.
+  PoseOptimizerFrameData data;
+  data.line_measurements_C = line_measurements_truth;
+  data.lines_W = lines;
+  data.type = PoseOptimizerResidualType::Line;
+
+  PoseOptimizerFrameDataVec data_vec = { data };
+  PoseOptimizer optimizer(
+        PoseOptimizer::getDefaultSolverOptions(),
+        data_vec, T_B_W, 0.0, 0.0);
+  LeastSquaresSolver<Transformation, PoseOptimizer>::HessianMatrix H;
+  LeastSquaresSolver<Transformation, PoseOptimizer>::GradientVector g;
+  FloatType error = optimizer.evaluateError(T_B_W, &H, &g);
+  EXPECT_NEAR(error, 0.0, 1e-3);
+
+  // Perturb pose:
+  Transformation T_B_W_perturbed =
+      T_B_W * Transformation::exp((Vector6() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished());
+
+  // Optimize using noisy lines:
+  data.line_measurements_C = line_measurements_noisy;
+  testPoseOptimizer(
+        0.0, 0.0, T_B_W, T_B_W_perturbed, data, "Line, No Prior");
+  testPoseOptimizer(
+        10.0, 0.0, T_B_W, T_B_W_perturbed, data, "Line, Rotation Prior");
+  testPoseOptimizer(
+        10.0, 10.0, T_B_W, T_B_W_perturbed, data, "Line, Rotation and Position Prior");
+}
 
 ZE_UNITTEST_ENTRYPOINT
