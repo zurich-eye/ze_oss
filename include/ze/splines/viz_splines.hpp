@@ -18,28 +18,27 @@ public:
                   FloatType step_size = 0.05);
 
   //! Display a spline (max 3 dimensions) as point curve in space.
-  void displaySpline(const BSpline& bs,
-                              const std::string& topic,
-                              const size_t id,
-                              const Color& color,
-                              FloatType step_size = 0.05);
+  void displaySplineTrajectory(const BSpline& bs,
+                               const std::string& topic,
+                               const size_t id,
+                               const Color& color,
+                               FloatType step_size = 0.05);
 
   //! Display a spline (max 3 dimensions) as point curve specifying the dimensions
   //! of the spline to plot.
-  void displaySpline(const BSpline& bs,
-                              const std::string& topic,
-                              const size_t id,
-                              const Color& color,
-                              const std::vector<size_t>& draw_dimensions,
-                              FloatType step_size = 0.05);
-
+  void displaySplineTrajectory(const BSpline& bs,
+                               const std::string& topic,
+                               const size_t id,
+                               const Color& color,
+                               const std::vector<size_t>& draw_dimensions,
+                               FloatType step_size = 0.05);
 
   //! Display a pose spline as pose-curve.
   template<class ROTATION>
-  void displaySpline(const BSplinePoseMinimal<ROTATION>& bs,
-                     const std::string& topic,
-                     const size_t id,
-                     FloatType step_size = 0.05)
+  void displaySplineTrajectory(const BSplinePoseMinimal<ROTATION>& bs,
+                               const std::string& topic,
+                               const size_t id,
+                               FloatType step_size = 0.05)
   {
     ze::TransformationVector poses;
 

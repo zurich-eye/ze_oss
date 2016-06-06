@@ -6,7 +6,6 @@ SplinesVisualizer::SplinesVisualizer(const std::shared_ptr<Visualizer>& viz)
   : viz_(viz)
 {}
 
-<<<<<<< HEAD
 void SplinesVisualizer::plotSpline(const BSpline& bs,
                                    const size_t dimension,
                                    FloatType step_size)
@@ -30,35 +29,34 @@ void SplinesVisualizer::plotSpline(const BSpline& bs,
   matplotlibcpp::show();
 }
 
-=======
->>>>>>> 2bf7ce8... Basic plotting of spatial splines (no time axis)
-void SplinesVisualizer::displaySpline(const BSpline& bs,
-                                      const std::string& topic,
-                                      const size_t id,
-                                      const Color& color,
-                                      FloatType step_size)
+void SplinesVisualizer::displaySplineTrajectory(const BSpline& bs,
+                                                const std::string& topic,
+                                                const size_t id,
+                                                const Color& color,
+                                                FloatType step_size)
 {
   CHECK_LE(bs.dimension(), 3) << "For splines with more than 3 dimensions specify"
-                          << "which dimenions to draw.";
+                              << "which dimenions to draw.";
 
   switch (bs.dimension())
   {
     case 1:
-      return displaySpline(bs, topic, id, color, {0}, step_size);
+      return displaySplineTrajectory(bs, topic, id, color, {0}, step_size);
     case 2:
-      return displaySpline(bs, topic, id, color, {0, 1}, step_size);
+      return displaySplineTrajectory(bs, topic, id, color, {0, 1}, step_size);
     case 3:
-      return displaySpline(bs, topic, id, color, {0, 1, 2}, step_size);
+      return displaySplineTrajectory(bs, topic, id, color, {0, 1, 2}, step_size);
   }
 
 }
 
-void SplinesVisualizer::displaySpline(const BSpline& bs,
-                                      const std::string& topic,
-                                      const size_t id,
-                                      const Color& color,
-                                      const std::vector<size_t>& draw_dimensions,
-                                      FloatType step_size)
+void SplinesVisualizer::displaySplineTrajectory(
+    const BSpline& bs,
+    const std::string& topic,
+    const size_t id,
+    const Color& color,
+    const std::vector<size_t>& draw_dimensions,
+    FloatType step_size)
 {
   FloatType start = bs.t_min();
   FloatType end = bs.t_max();
@@ -69,11 +67,7 @@ void SplinesVisualizer::displaySpline(const BSpline& bs,
   points.setZero();
 
   //! @todo: this is terribly inefficient.
-<<<<<<< HEAD
   for (size_t i = 0; i < samples; ++i)
-=======
-  for (size_t i = 0; i <= samples; ++i)
->>>>>>> 2bf7ce8... Basic plotting of spatial splines (no time axis)
   {
     VectorX v = bs.eval(start + i * step_size);
     for (size_t j = 0; j < draw_dimensions.size(); ++j)

@@ -28,6 +28,7 @@ set(SOURCES
     )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES})
 
 ###############
 # EXECUTABLES #
@@ -42,7 +43,7 @@ catkin_add_gtest(test_bspline test/test_bspline.cpp)
 target_link_libraries(test_bspline ${PROJECT_NAME})
 
 catkin_add_gtest(test_bspline_pose_minimal test/test_bspline_pose_minimal.cpp)
-target_link_libraries(test_bspline_pose_minimal ${PROJECT_NAME})
+target_link_libraries(test_bspline_pose_minimal ${PROJECT_NAME} ${PYTHON_LIBRARIES})
 
 ##########
 # EXPORT #
