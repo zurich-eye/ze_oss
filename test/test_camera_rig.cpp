@@ -7,9 +7,10 @@
 
 TEST(CameraRigTests, testYamlLoading)
 {
-  std::string data_dir = ze::getTestDataDir("camera_models");
-  std::string yaml_file = ze::joinPath(data_dir, "camera_rig_1.yaml");
-  ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(yaml_file);
+  using namespace ze;
+  CameraRig::Ptr rig =
+      CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
+                                       "camera_rig_1.yaml"));
 
   EXPECT_EQ(rig->size(), 2);
   EXPECT_NEAR(rig->at(0).projectionParameters()(0), 458.654, 1e-3);
@@ -19,6 +20,28 @@ TEST(CameraRigTests, testYamlLoading)
   EXPECT_STREQ(rig->label().c_str(), "Euroc");
   EXPECT_STREQ(rig->at(0).label().c_str(), "cam0");
   EXPECT_STREQ(rig->at(1).label().c_str(), "cam1");
+}
+
+TEST(CameraRigTests, testStereoPairIdentification)
+{
+  using namespace ze;
+
+  {
+    CameraRig::Ptr rig =
+        CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
+                                         "camera_rig_1.yaml"));
+    StereoIndexPairs pairs = identifyStereoPairsInRig(*rig, 0.7, 0.1);
+    EXPECT_EQ(pairs.size(), 1u);
+  }
+
+  {
+    CameraRig::Ptr rig =
+        CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
+                                         "camera_rig_2.yaml"));
+    StereoIndexPairs pairs = identifyStereoPairsInRig(*rig, 0.7, 0.1);
+    EXPECT_EQ(pairs.size(), 1u);
+  }
+
 }
 
 ZE_UNITTEST_ENTRYPOINT
