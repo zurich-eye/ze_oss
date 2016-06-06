@@ -47,6 +47,7 @@ struct _interpreter
   PyObject *s_python_function_save;
   PyObject *s_python_function_figure;
   PyObject *s_python_function_plot;
+  PyObject *s_python_function_subplot;
   PyObject *s_python_function_legend;
   PyObject *s_python_function_xlim;
   PyObject *s_python_function_ylim;
@@ -73,7 +74,7 @@ struct _interpreter
 private:
   _interpreter()
   {
-    char name[] = "plotting"; // silence compiler warning abount const strings
+    char name[] = "plotting"; // silence compiler warning about const strings
     Py_SetProgramName(name);  // optional but recommended
     Py_Initialize();
 
@@ -100,6 +101,7 @@ private:
     s_python_function_show = PyObject_GetAttrString(pymod, "show");
     s_python_function_figure = PyObject_GetAttrString(pymod, "figure");
     s_python_function_plot = PyObject_GetAttrString(pymod, "plot");
+    s_python_function_subplot = PyObject_GetAttrString(pymod, "subplot");
     s_python_function_legend = PyObject_GetAttrString(pymod, "legend");
     s_python_function_ylim = PyObject_GetAttrString(pymod, "ylim");
     s_python_function_title = PyObject_GetAttrString(pymod, "title");
@@ -115,6 +117,7 @@ private:
        || !s_python_function_save
        || !s_python_function_figure
        || !s_python_function_plot
+       || !s_python_function_subplot
        || !s_python_function_legend
        || !s_python_function_xlim
        || !s_python_function_ylim
@@ -132,6 +135,7 @@ private:
        || !PyFunction_Check(s_python_function_save)
        || !PyFunction_Check(s_python_function_figure)
        || !PyFunction_Check(s_python_function_plot)
+       || !PyFunction_Check(s_python_function_subplot)
        || !PyFunction_Check(s_python_function_legend)
        || !PyFunction_Check(s_python_function_xlim)
        || !PyFunction_Check(s_python_function_ylim)
@@ -153,6 +157,31 @@ private:
     Py_Finalize();
   }
 };
+}
+
+bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number)
+{
+  PyObject* nrows_py = PyFloat_FromDouble(nrows);
+  PyObject* ncols_py = PyFloat_FromDouble(ncols);
+  PyObject* plot_number_py = PyFloat_FromDouble(plot_number);
+  PyObject* subplot_args = PyTuple_New(3);
+  PyTuple_SetItem(subplot_args, 0, nrows_py);
+  PyTuple_SetItem(subplot_args, 1, ncols_py);
+  PyTuple_SetItem(subplot_args, 2, plot_number_py);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_subplot,
+                    subplot_args);
+
+  Py_DECREF(nrows_py);
+  Py_DECREF(ncols_py);
+  Py_DECREF(plot_number_py);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
 }
 
 template<typename DerivedX, typename DerivedY>

@@ -13,6 +13,7 @@
   <depend>eigen_catkin</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
+  <depend>PythonLibs</depend>
 
 <test_depend>gtest</test_depend>
 </package>

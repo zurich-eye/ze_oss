@@ -22,4 +22,12 @@ int main()
   plt::named_plot("A Name", times, points);
   plt::show();
 
+  // subplots
+  plt::subplot(3, 1, 1);
+  plt::plot(v);
+  plt::subplot(3, 1, 2);
+  plt::plot(v);
+  plt::subplot(3, 1, 3);
+  plt::plot(v);
+  plt::show();
 }
