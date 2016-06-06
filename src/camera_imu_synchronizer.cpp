@@ -1,5 +1,5 @@
-#include <ze/data_provider/camera_imu_synchronizer.h>
-#include <ze/data_provider/data_provider_base.h>
+#include <ze/data_provider/camera_imu_synchronizer.hpp>
+#include <ze/data_provider/data_provider_base.hpp>
 
 #include <functional>
 
