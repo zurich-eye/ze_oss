@@ -38,10 +38,10 @@ public:
 private:
 
   //! Num images to synchronize.
-  uint32_t camera_rig_size_;
+  uint32_t num_cameras_;
 
-  //! Num imus to synchronize.
-  uint32_t imu_count_;
+  //! Num IMUs to synchronize.
+  uint32_t num_imus_;
 
   //! Max time difference of images in a bundle
   int64_t img_bundle_max_dt_nsec_ = millisecToNanosec(2.0);

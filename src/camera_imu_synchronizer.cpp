@@ -17,8 +17,8 @@ namespace ze {
 CameraImuSynchronizer::CameraImuSynchronizer(
     DataProviderBase& data_provider,
     FloatType imu_buffer_length_seconds)
-  : camera_rig_size_(data_provider.cameraCount())
-  , imu_count_(data_provider.imuCount())
+  : num_cameras_(data_provider.cameraCount())
+  , num_imus_(data_provider.imuCount())
 {
   subscribeDataProvider(data_provider);
   initBuffers(imu_buffer_length_seconds);
@@ -27,14 +27,14 @@ CameraImuSynchronizer::CameraImuSynchronizer(
 void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provider)
 {
   using namespace std::placeholders;
-  if (camera_rig_size_ == 0u)
+  if (num_cameras_ == 0u)
   {
     LOG(ERROR) << "DataProvider must at least expose a single camera topic.";
   }
   data_provider.registerCameraCallback(
         std::bind(&CameraImuSynchronizer::addImgData, this, _1, _2, _3));
 
-  if (imu_count_ > 0u)
+  if (num_imus_ > 0u)
   {
     data_provider.registerImuCallback(
           std::bind(&CameraImuSynchronizer::addImuData, this, _1, _2, _3, _4));
@@ -43,8 +43,8 @@ void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provide
 
 void CameraImuSynchronizer::initBuffers(FloatType imu_buffer_length_seconds)
 {
-  img_buffer_ = StampedImages(camera_rig_size_, std::make_pair(-1, nullptr));
-  imu_buffers_ = ImuBufferVector(imu_count_, Buffer<FloatType, 6>(imu_buffer_length_seconds));
+  img_buffer_ = StampedImages(num_cameras_, std::make_pair(-1, nullptr));
+  imu_buffers_ = ImuBufferVector(num_imus_, Buffer<FloatType, 6>(imu_buffer_length_seconds));
 }
 
 void CameraImuSynchronizer::addImgData(
@@ -59,7 +59,7 @@ void CameraImuSynchronizer::addImgData(
     return;
   }
 
-  CHECK_LT(camera_idx, camera_rig_size_);
+  CHECK_LT(camera_idx, num_cameras_);
   if(img_buffer_.at(camera_idx).first != -1)
   {
     LOG(WARNING) << "Received new camera image before the previous set was complete."
@@ -194,7 +194,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
   ImuStampsVector imu_timestamps(imu_buffers_.size());
   ImuAccGyrVector imu_measurements(imu_buffers_.size());
 
-  if (imu_count_ != 0)
+  if (num_imus_ != 0)
   {
     // get oldest / newest stamp for all imu buffers
     std::vector<std::tuple<int64_t, int64_t, bool> > oldest_newest_stamp_vector(imu_buffers_.size());
