@@ -27,7 +27,7 @@ public:
     , sample_size_(sample_size)
     , test_name_(test_name)
   {
-    px_ = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
+    px_ = generateRandomKeypoints(cam_.size(), 10u, sample_size_);
     f_ = cam.backProjectVectorized(px_);
   }
 
@@ -118,7 +118,7 @@ public:
   void testProjection()
   {
     uint32_t N = 300;
-    Keypoints px1 = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
+    Keypoints px1 = generateRandomKeypoints(cam_.size(), 10u, sample_size_);
     Bearings f1 = cam_.backProjectVectorized(px1);
     Keypoints px2 = cam_.projectVectorized(f1);
     Keypoints px_error = px1 - px2;

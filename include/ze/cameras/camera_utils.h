@@ -9,22 +9,43 @@ namespace ze {
 
 // fwd
 class Camera;
+class CameraRig;
+
+// -----------------------------------------------------------------------------
+// Generate visible keypoints and landmarks.
+
+//! Generate random visible keypoints.
+Keypoints generateRandomKeypoints(
+    const Size2u image_size,
+    const uint32_t margin,
+    const uint32_t num_keypoints);
 
 //! Generate count random visible keypoints.
-Keypoints generateRandomKeypoints(
-    const uint32_t image_width, const uint32_t image_height,
-    const uint32_t margin, const uint32_t count);
-
-inline Keypoints generateRandomKeypoints(
-    const Size2u image_size, const uint32_t margin, const uint32_t count)
-{
-  return generateRandomKeypoints(image_size.width(), image_size.height(), margin, count);
-}
+Keypoints generateUniformKeypoints(
+    const Size2u image_size,
+    const uint32_t margin,
+    const uint32_t num_keypoints);
 
 //! Generate random visible 3d points.
 std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(
-    const Camera& cam, const size_t count,
-    const int margin = 10, const FloatType min_depth = 1.0, const FloatType max_depth = 3.0);
+    const Camera& cam,
+    const uint32_t num_points,
+    const uint32_t margin = 10u,
+    const FloatType min_depth = 1.0,
+    const FloatType max_depth = 3.0);
+
+// -----------------------------------------------------------------------------
+// Check overlapping field of view.
+
+//! Check if two cameras in a rig have an overlapping field of view.
+//! @return Approximate percentage of overlapping field of view between cameras.
+FloatType overlappingFieldOfView(
+    const CameraRig& rig,
+    const uint32_t cam_a,
+    const uint32_t cam_b);
+
+// -----------------------------------------------------------------------------
+// Check landmark visiblity.
 
 //! Return if pixel u is within image boundaries.
 template<typename DerivedKeyPoint>

@@ -10,7 +10,9 @@
 
 namespace ze {
 
-using CameraVector = std::vector<Camera::Ptr>;
+using CameraVector     = std::vector<Camera::Ptr>;
+using StereoIndexPair  = std::pair<uint8_t, uint8_t>;
+using StereoIndexPairs = std::vector<StereoIndexPair>;
 
 class CameraRig
 {
@@ -69,6 +71,8 @@ public:
 
   inline const std::string& label() const { return label_; }
 
+  inline const StereoIndexPairs& stereoPairs() const { return stereo_pairs_; }
+
   //! @name Camera iteration.
   //! @{
   typedef CameraVector::value_type value_type;
@@ -93,6 +97,9 @@ private:
 
   //! The camera geometries.
   CameraVector cameras_;
+
+  //! Unique pairs of camera indices with overlapping field of view.
+  StereoIndexPairs stereo_pairs_;
 
   //! A label for this camera rig, a name.
   std::string label_;

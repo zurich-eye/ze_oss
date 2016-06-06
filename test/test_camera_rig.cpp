@@ -8,8 +8,7 @@
 TEST(CameraRigTests, testYamlLoading)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
-  std::string yaml_file = data_dir + "/camera_rig_1.yaml";
-  ASSERT_TRUE(ze::fileExists(yaml_file));
+  std::string yaml_file = ze::joinPath(data_dir, "camera_rig_1.yaml");
   ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(yaml_file);
 
   EXPECT_EQ(rig->size(), 2);

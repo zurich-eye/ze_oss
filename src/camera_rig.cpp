@@ -1,5 +1,6 @@
 #include <ze/cameras/camera_rig.h>
 #include <ze/cameras/camera_yaml_serialization.h>
+#include <ze/common/path_utils.h>
 
 namespace ze {
 
@@ -20,6 +21,7 @@ CameraRig::CameraRig(
 
 CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
 {
+  CHECK(fileExists(yaml_file)) << "File does not exist: " << yaml_file;
   try
   {
     YAML::Node doc = YAML::LoadFile(yaml_file.c_str());
