@@ -29,6 +29,7 @@ public:
     std::vector<std::vector<Matrix3>> D_R_mc;
     for (size_t i = 0; i < num_rounds; ++i)
     {
+      VLOG(1) << "Monte-Carlo run #" << i;
       D_R_mc.push_back(preintegrate_corrupted(start, end));
     }
 
@@ -62,7 +63,7 @@ public:
           std::make_shared<pre_integrator_t>(gyroscope_noise_covariance_));
 
     preintegraton_runner_->process(pre_integrator,
-                                   false,
+                                   true,
                                    start,
                                    end);
 
@@ -85,20 +86,22 @@ private:
     //! Estimate the covariance matrix for every integration step.
     for (size_t step = 0; step < D_R_actual.size(); ++step)
     {
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 3> errors;
-      errors.resize(D_R_mc.size(), 3);
+      Eigen::Matrix<FloatType, 3, Eigen::Dynamic> errors;
+      errors.resize(3, D_R_mc.size());
 
       for (size_t run = 0; run < D_R_mc.size(); ++run)
       {
         Matrix3 delta = D_R_actual[step].transpose() * D_R_mc[run][step];
         Quaternion delta_q(delta);
-        errors.row(run) = Quaternion::log(delta_q).transpose();
+        errors.col(run) = Quaternion::log(delta_q);
       }
       Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic> zero_mean
-          = errors.rowwise() - errors.rowwise().mean().transpose();
+          = errors.colwise() - errors.rowwise().mean();
 
-      covariances.push_back((zero_mean.adjoint() * zero_mean)
-                            / (zero_mean.rows() - 1));
+      covariances.push_back((zero_mean * zero_mean.adjoint())
+                            / (zero_mean.cols() - 1));
+
+      std::cout << *covariances.rbegin() << "\n\n";
     }
 
     return covariances;

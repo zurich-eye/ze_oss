@@ -23,11 +23,11 @@ public:
   //! This assumes that every pushed batch corresponds to an interval between
   //! two images / keyframes.
   //! The input measurements should be bias corrected.
-  void pushD_R(times_container_t imu_stamps,
-               measurements_container_t imu_measurements);
+  virtual void pushD_R(times_container_t imu_stamps,
+                       measurements_container_t imu_measurements) = 0;
 
   //! Calculate the linearly propagated covariance for the last segment.
-  void propagate_covariance();
+  virtual void propagate_covariance() = 0;
 
   //! Get the result of the pre-integration process.
   preintegrated_orientation_container_t getD_R()

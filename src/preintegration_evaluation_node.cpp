@@ -18,9 +18,104 @@
 #include <ze/common/csv_trajectory.h>
 #include <ze/imu_evaluation/imu_bias.hpp>
 
-DEFINE_string(curve_source, "", "Path to file to load curve from, default: generate random curve");
+DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
+
+// For an empty curve_source parameters to generate a random trajectory:
+DEFINE_double(trajectory_length, 30.0, "The length of the curve in seconds");
+DEFINE_int32(trajectory_interpolation_points, 100, "Number of interpolation to randomize");
+DEFINE_int32(trajectory_num_segments, 100, "Number of spline segments to fit the interpolation points.");
+DEFINE_double(trajectory_lambda, 1e-5, "The regularizing smoothing factor used to fit the trajectory to the interpolation curve. Smaller values give more aggressive curves.");
+
+// Imu Simulation Parameters:
+DEFINE_double(imu_sampling_time, 0.005, "Sampling time of the IMU.");
+DEFINE_double(camera_sampling_time, 0.1, "Sampling time of the Camera, only used to split the pre-integration steps.");
+DEFINE_double(accelerometer_noise_bandwidth_hz, 200, "Bandwidth of accelerometer noise");
+DEFINE_double(gyroscope_noise_bandwidth_hz, 200, "Bandwith of gyroscope noise");
+DEFINE_double(accelerometer_noise_density, 0, "Noise density of accelerometer.");
+DEFINE_double(gyroscope_noise_density, 0, "Noise density of gyroscope");
+
+// Im u Bias Simulation
+DEFINE_string(imu_bias_type, "constant", "Bias model of the imu");
+DEFINE_double(imu_acc_bias_noise_density, 0, "Noise density of continuous-time accelerometer bias.");
+DEFINE_double(imu_gyr_bias_noise_density, 0, "Noise density of continuous-time gyroscope bias.");
+
+DEFINE_double(imu_acc_bias_const, 0, "Value of constant accelerometer bias.");
+DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
 
 namespace ze {
+
+//! A parameter structure to regroup all simulation parameters.
+struct ImuPreIntegrationParameters
+{
+  // The Imu Model and Noise Parameters:
+  FloatType imu_sampling_time;
+  FloatType camera_sampling_time;
+  FloatType accel_noise_bandwidth_hz;
+  FloatType gyro_noise_bandwidth_hz;
+  FloatType accel_noise_density;
+  FloatType gyro_noise_density;
+  Vector3 gravity;
+
+  // Imu Bias Model
+  std::string imu_bias_type;
+
+  // Parameters of continous-time bias model:
+  FloatType imu_acc_bias_noise_density;
+  FloatType imu_gyr_bias_noise_density;
+
+  // Parameters of constant bias model:
+  FloatType imu_acc_bias_const;
+  FloatType imu_gyr_bias_const;
+
+  // Trajectory Generation Parameters:
+  std::string trajectory_source;
+  FloatType trajectory_start_time;
+  FloatType trajectory_end_time;
+  int trajectory_num_interpolation_points;
+  int trajectory_num_segments;
+  FloatType trajectory_lambda;
+  int trajectory_spline_order = 3;
+
+  //! Initialize a parameter structure from gflags
+  static ImuPreIntegrationParameters fromGFlags()
+  {
+    ImuPreIntegrationParameters p;
+
+    p.imu_sampling_time = FLAGS_imu_sampling_time;
+    p.camera_sampling_time = FLAGS_camera_sampling_time;
+    p.accel_noise_bandwidth_hz = FLAGS_accelerometer_noise_bandwidth_hz;
+    p.gyro_noise_bandwidth_hz = FLAGS_gyroscope_noise_bandwidth_hz;
+    p.gravity = Vector3(0, 0, -9.81);
+
+    p.accel_noise_density = FLAGS_accelerometer_noise_density;
+    p.gyro_noise_density = FLAGS_gyroscope_noise_density;
+
+    p.trajectory_source = FLAGS_trajectory_source;
+    p.trajectory_start_time = 0.0;
+    p.trajectory_end_time = FLAGS_trajectory_length;
+    p.trajectory_num_interpolation_points = FLAGS_trajectory_interpolation_points;
+    p.trajectory_num_segments = FLAGS_trajectory_num_segments;
+    p.trajectory_lambda = FLAGS_trajectory_lambda;
+
+    p.imu_bias_type = FLAGS_imu_bias_type;
+
+    p.imu_acc_bias_noise_density = FLAGS_imu_acc_bias_noise_density;
+    p.imu_gyr_bias_noise_density = FLAGS_imu_gyr_bias_noise_density;
+
+    p.imu_acc_bias_const = FLAGS_imu_acc_bias_const;
+    p.imu_gyr_bias_const = FLAGS_imu_gyr_bias_const;
+
+    return p;
+  }
+
+  //! Initialize a parameter structure given an imu yaml file.
+  static /*ImuPreIntegrationParameters*/ void fromImuModel()
+  {
+    //! @todo
+  }
+};
+
+
 
 // -----------------------------------------------------------------------------
 class PreIntegrationEvaluationNode
@@ -39,72 +134,83 @@ public:
   void shutdown();
 
 private:
-
+  ImuPreIntegrationParameters parameters_;
 };
 
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 {
-  FloatType imu_sampling_time; // FLAGS
-  FloatType camera_sampling_time; // FLAGS
-  FloatType accel_noise_bandwidth_hz; // FLAGS
-  FloatType gyro_nois_bandwidth_hz; // FLAGS
-  Vector3 gravity(0, 0, -9.81);
-  Vector3 accel_covar; // FLAGS
-  Vector3 gyro_covar; // FLAGS
-  Matrix3 gyroscope_noise_covariance; // FLAGS
+  parameters_ = ImuPreIntegrationParameters::fromGFlags();
 
-  BSplinePoseMinimalRotationVector bspline = getBSpline();
+  Vector3 accel_covar = parameters_.accel_noise_density
+                        * parameters_.accel_noise_density
+                        * Vector3::Identity();
+  Vector3 gyro_covar = parameters_.gyro_noise_density
+                       * parameters_.gyro_noise_density
+                       * Vector3::Identity();
+  Matrix3 gyroscope_noise_covariance = gyro_covar.asDiagonal();
 
-  FloatType start = bspline.t_min();
-  FloatType end = bspline.t_max();
-
-  Scenario::Ptr scenario = std::make_shared<SplineScenario>(bspline);
-
+  VLOG(1) << "Initialize noise models with \n"
+          << " Accelerometer noise density: " << parameters_.accel_noise_density
+          << " Gyroscope noise density: " << parameters_.gyro_noise_density;
   GaussianSampler<3>::Ptr accel_noise = GaussianSampler<3>::sigmas(accel_covar);
   GaussianSampler<3>::Ptr gyro_noise = GaussianSampler<3>::sigmas(gyro_covar);
 
+  BSplinePoseMinimalRotationVector bspline = getBSpline();
+  FloatType start = bspline.t_min();
+  FloatType end = bspline.t_max();
+
+  VLOG(1) << "Initialize scenario";
+  Scenario::Ptr scenario = std::make_shared<SplineScenario>(bspline);
+
+  VLOG(1) << "Initialize scenario runner";
   ScenarioRunner::Ptr scenario_runner =
       std::make_shared<ScenarioRunner>(scenario,
                                        imuBias(start, end),
                                        accel_noise,
                                        gyro_noise,
-                                       accel_noise_bandwidth_hz,
-                                       gyro_nois_bandwidth_hz,
-                                       gravity);
+                                       parameters_.accel_noise_bandwidth_hz,
+                                       parameters_.gyro_noise_bandwidth_hz,
+                                       parameters_.gravity);
 
   PreIntegrationRunner::Ptr preintegraton_runner =
       std::make_shared<PreIntegrationRunner>(
-        scenario_runner, imu_sampling_time, camera_sampling_time);
+        scenario_runner,
+        parameters_.imu_sampling_time,
+        parameters_.camera_sampling_time);
 
+  VLOG(1) << "Initialize monte carlo runner";
   PreIntegratorMonteCarlo<ManifoldPreIntegrationState> mc(preintegraton_runner,
                                                           gyroscope_noise_covariance);
 
-  mc.simulate(100, scenario->start(), scenario->end());
+  VLOG(1) << "Monte Carlo Simulation";
+  mc.simulate(10, scenario->start(), scenario->end());
 }
 
 BSplinePoseMinimalRotationVector PreIntegrationEvaluationNode::getBSpline()
 {
   // A bspline fixed at 3rd order.
-  BSplinePoseMinimalRotationVector bspline(3);
+  BSplinePoseMinimalRotationVector bspline(parameters_.trajectory_spline_order);
   // generate random
-  if (FLAGS_curve_source == "")
+  if (parameters_.trajectory_source == "")
   {
-    FloatType start; // FLAGS
-    FloatType end; // FLAGS
-    size_t num_interpolation_points; // FLAGS
-    size_t num_segments; // FLAGS
-    FloatType lambda; // FLAGS
+    FloatType start = parameters_.trajectory_start_time;
+    FloatType end = parameters_.trajectory_end_time;
 
-    MatrixX points(6, num_interpolation_points);
+    VLOG(1) << "Generating random trajectory of " << (end - start) << "seconds";
+
+    MatrixX points(6, parameters_.trajectory_num_interpolation_points);
     points.setRandom();
     // make translations significanter
-    points.block(0, 0, 3, num_interpolation_points) *= 10;
+    points.block(0, 0, 3, parameters_.trajectory_num_interpolation_points) *= 10;
 
     VectorX times;
-    times.setLinSpaced(num_interpolation_points, start, end);
+    times.setLinSpaced(parameters_.trajectory_num_interpolation_points, start, end);
 
-    bspline.initPoseSpline3(times, points, num_segments, lambda);
+    bspline.initPoseSpline3(times,
+                            points,
+                            parameters_.trajectory_num_segments,
+                            parameters_.trajectory_lambda);
   }
   // load from file
   else
@@ -118,17 +224,13 @@ BSplinePoseMinimalRotationVector PreIntegrationEvaluationNode::getBSpline()
 ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
                                                    FloatType end)
 {
-  std::string imu_bias_type; // FLAGS
-
   //! continuous bias model
-  if (imu_bias_type == "continuous")
+  if (parameters_.imu_bias_type == "continuous")
   {
-    FloatType acc_bias_noise_density; // FLAGS
-    FloatType gyr_bias_noise_density; // FLAGS
 
     return std::make_shared<ContinuousBias>(
-          Vector3::Identity() * acc_bias_noise_density,
-          Vector3::Identity() * gyr_bias_noise_density,
+          Vector3::Identity() * parameters_.imu_acc_bias_noise_density,
+          Vector3::Identity() * parameters_.imu_gyr_bias_noise_density,
           start,
           end,
           1000); // This is an arbitrary value.
@@ -136,8 +238,8 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
   //! a simple constant bias
   else
   {
-    Vector3 accel_bias; // FLAGS
-    Vector3 gyro_bias; // FLAGS
+    Vector3 accel_bias = Vector3::Identity() * parameters_.imu_acc_bias_const;
+    Vector3 gyro_bias = Vector3::Identity() * parameters_.imu_gyr_bias_const;
 
     return std::make_shared<ConstantBias>(accel_bias, gyro_bias);
   }

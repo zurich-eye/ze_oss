@@ -20,7 +20,7 @@ public:
     , imu_sampling_time_(imu_sampling_time)
     , camera_sampling_time_(camera_sampling_time)
   {
-    CHECK_GE(imu_sampling_time_, camera_sampling_time_)
+    CHECK_LE(imu_sampling_time_, camera_sampling_time_)
         << "IMU Sampling time must be smaller than camera's";
   }
 
@@ -34,7 +34,7 @@ public:
     FloatType next_camera_sample = start + camera_sampling_time_;
     std::vector<FloatType> times;
     std::vector<Vector6> imu_measurements;
-    for (FloatType t = start; start <= end; t += imu_sampling_time_)
+    for (FloatType t = start; t <= end; t += imu_sampling_time_)
     {
       times.push_back(t);
       Vector6 measurement;
@@ -48,6 +48,7 @@ public:
         measurement.head<3>() = scenario_runner_->specific_force_actual(t);
         measurement.tail<3>() = scenario_runner_->angular_velocity_actual(t);
       }
+      imu_measurements.push_back(measurement);
 
       // Wait for the next camera sample and push the collected data to the
       // integrator.
