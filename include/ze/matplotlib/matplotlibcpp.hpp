@@ -49,6 +49,7 @@ struct _interpreter
   PyObject *s_python_function_figure;
   PyObject *s_python_function_plot;
   PyObject *s_python_function_subplot;
+  PyObject *s_python_function_hist;
   PyObject *s_python_function_legend;
   PyObject *s_python_function_xlim;
   PyObject *s_python_function_ylim;
@@ -103,6 +104,7 @@ private:
     s_python_function_figure = PyObject_GetAttrString(pymod, "figure");
     s_python_function_plot = PyObject_GetAttrString(pymod, "plot");
     s_python_function_subplot = PyObject_GetAttrString(pymod, "subplot");
+    s_python_function_hist = PyObject_GetAttrString(pymod, "hist");
     s_python_function_legend = PyObject_GetAttrString(pymod, "legend");
     s_python_function_ylim = PyObject_GetAttrString(pymod, "ylim");
     s_python_function_title = PyObject_GetAttrString(pymod, "title");
@@ -119,6 +121,7 @@ private:
        || !s_python_function_figure
        || !s_python_function_plot
        || !s_python_function_subplot
+       || !s_python_function_hist
        || !s_python_function_legend
        || !s_python_function_xlim
        || !s_python_function_ylim
@@ -137,6 +140,7 @@ private:
        || !PyFunction_Check(s_python_function_figure)
        || !PyFunction_Check(s_python_function_plot)
        || !PyFunction_Check(s_python_function_subplot)
+       || !PyFunction_Check(s_python_function_hist)
        || !PyFunction_Check(s_python_function_legend)
        || !PyFunction_Check(s_python_function_xlim)
        || !PyFunction_Check(s_python_function_ylim)
@@ -158,6 +162,48 @@ private:
     Py_Finalize();
   }
 };
+}
+
+template<typename DerivedX>
+bool hist(const Eigen::MatrixBase<DerivedX> &x,
+          const double bins = 10,
+          const std::string histtype = "bar")
+{
+  // using python lists
+  PyObject* xlist = PyList_New(x.size());
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
+  }
+
+  PyObject* bins_py = PyFloat_FromDouble(bins);
+  PyObject* histtype_py = PyString_FromString(histtype.c_str());
+
+  // construct positional args
+  PyObject* args = PyTuple_New(8);
+  PyTuple_SetItem(args, 0, xlist);
+  PyTuple_SetItem(args, 1, bins_py);
+  PyTuple_SetItem(args, 2, Py_None);
+  PyTuple_SetItem(args, 3, Py_False);
+  PyTuple_SetItem(args, 4, Py_None);
+  PyTuple_SetItem(args, 5, Py_False);
+  PyTuple_SetItem(args, 6, Py_None);
+  PyTuple_SetItem(args, 7, histtype_py);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_hist,
+                    args);
+
+  Py_DECREF(xlist);
+  Py_DECREF(bins_py);
+  Py_DECREF(histtype_py);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
 }
 
 bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number)
@@ -213,7 +259,7 @@ bool plot(const Eigen::MatrixBase<DerivedX> &x,
   // construct keyword args
   PyObject* kwargs = PyDict_New();
   for (std::map<std::string, std::string>::const_iterator it = keywords.begin();
-      it != keywords.end(); ++it)
+       it != keywords.end(); ++it)
   {
     PyDict_SetItemString(kwargs,
                          it->first.c_str(),

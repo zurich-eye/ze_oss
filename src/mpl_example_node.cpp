@@ -29,4 +29,15 @@ int main()
   plt::subplot(3, 1, 3);
   plt::plot(v);
   plt::show();
+
+  // plot multiple curves in a single graph
+  std::vector<double> w({4, 3, 2, 1});
+  plt::plot(v, "x");
+  plt::plot(w, "o");
+  plt::show();
+
+  // Histogram
+  plt::hist(points, 3);
+  plt::show();
+
 }
