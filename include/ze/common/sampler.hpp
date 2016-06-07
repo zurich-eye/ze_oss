@@ -29,6 +29,8 @@ public:
     return noise;
   }
 
+  //! Construct a gaussian sampler with a given covariance vector.
+  //! The vector represents the diagonal elements of a covariance matrix.
   static Ptr sigmas(const covariance_vector_t& sigmas)
   {
     Ptr noise(new GaussianSampler);
@@ -37,6 +39,7 @@ public:
     return noise;
   }
 
+  //! Construct a gaussian sampler with a given varaince vector.
   static Ptr variances(const covariance_vector_t& variances)
   {
     Ptr noise(new GaussianSampler);
