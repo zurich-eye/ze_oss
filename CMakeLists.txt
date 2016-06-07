@@ -6,6 +6,10 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
+# The matplotlib-cpp headers are linked against
+find_package(PythonLibs)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 #############
 # LIBRARIES #
 #############
@@ -29,7 +33,7 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # EXECUTABLES #
 ###############
 cs_add_executable(preintegration_evaluation_node src/preintegration_evaluation_node.cpp)
-target_link_libraries(preintegration_evaluation_node ${PROJECT_NAME})
+target_link_libraries(preintegration_evaluation_node ${PROJECT_NAME} ${PYTHON_LIBRARIES})
 
 ##########
 # GTESTS #

@@ -58,42 +58,42 @@ public:
 class SplineScenario: public Scenario
 {
 public:
-  SplineScenario(const BSplinePoseMinimalRotationVector& bs)
+  SplineScenario(const std::shared_ptr<BSplinePoseMinimalRotationVector> bs)
     : bs_(bs)
   {}
 
   Transformation T_W_B(FloatType t) const
   {
-    return Transformation(bs_.transformation(t));
+    return Transformation(bs_->transformation(t));
   }
 
   Vector3 angular_velocity_B(FloatType t) const
   {
-    return bs_.angularVelocityBodyFrame(t);
+    return bs_->angularVelocityBodyFrame(t);
   }
 
   Vector3 velocity_W(FloatType t) const
   {
-    return bs_.linearVelocity(t);
+    return bs_->linearVelocity(t);
   }
 
   Vector3 acceleration_W(FloatType t) const
   {
-    return bs_.linearAcceleration(t);
+    return bs_->linearAcceleration(t);
   }
 
   FloatType start() const
   {
-    return bs_.t_min();
+    return bs_->t_min();
   }
 
   FloatType end() const
   {
-    return bs_.t_max();
+    return bs_->t_max();
   }
 
 private:
-  const BSplinePoseMinimalRotationVector& bs_;
+  const std::shared_ptr<BSplinePoseMinimalRotationVector> bs_;
 };
 
 } // namespace ze

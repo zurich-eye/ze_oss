@@ -17,6 +17,8 @@
 #include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/csv_trajectory.h>
 #include <ze/imu_evaluation/imu_bias.hpp>
+#include <ze/splines/viz_splines.hpp>
+#include <ze/visualization/viz_ros.h>
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -41,6 +43,9 @@ DEFINE_double(imu_gyr_bias_noise_density, 0, "Noise density of continuous-time g
 
 DEFINE_double(imu_acc_bias_const, 0, "Value of constant accelerometer bias.");
 DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
+
+// A series of visualization controls:
+DEFINE_bool(show_trajectory, true, "Show the trajectory that was loaded / generated.");
 
 namespace ze {
 
@@ -115,8 +120,6 @@ struct ImuPreIntegrationParameters
   }
 };
 
-
-
 // -----------------------------------------------------------------------------
 class PreIntegrationEvaluationNode
 {
@@ -129,17 +132,28 @@ public:
 
   //! Given the GFLags configuration loads and returns a bspline representing
   //! a trajectory.
-  BSplinePoseMinimalRotationVector getBSpline();
+  void loadTrajectory();
+
+  //! Show the trajectory that was loaded or generated.
+  void showTrajectory();
 
   void shutdown();
 
 private:
   ImuPreIntegrationParameters parameters_;
+
+  std::shared_ptr<BSplinePoseMinimalRotationVector> trajectory_;
+
+  std::shared_ptr<Visualizer> visualizer_;
+  std::shared_ptr<SplinesVisualizer> splines_visualizer_;
 };
 
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 {
+  visualizer_ = std::make_shared<VisualizerRos>();
+  splines_visualizer_ = std::make_shared<SplinesVisualizer>(visualizer_);
+
   parameters_ = ImuPreIntegrationParameters::fromGFlags();
 
   Vector3 accel_covar = parameters_.accel_noise_density
@@ -156,12 +170,12 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   GaussianSampler<3>::Ptr accel_noise = GaussianSampler<3>::sigmas(accel_covar);
   GaussianSampler<3>::Ptr gyro_noise = GaussianSampler<3>::sigmas(gyro_covar);
 
-  BSplinePoseMinimalRotationVector bspline = getBSpline();
-  FloatType start = bspline.t_min();
-  FloatType end = bspline.t_max();
+  loadTrajectory();
+  FloatType start = trajectory_->t_min();
+  FloatType end = trajectory_->t_max();
 
   VLOG(1) << "Initialize scenario";
-  Scenario::Ptr scenario = std::make_shared<SplineScenario>(bspline);
+  Scenario::Ptr scenario = std::make_shared<SplineScenario>(trajectory_);
 
   VLOG(1) << "Initialize scenario runner";
   ScenarioRunner::Ptr scenario_runner =
@@ -187,10 +201,12 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   mc.simulate(10, scenario->start(), scenario->end());
 }
 
-BSplinePoseMinimalRotationVector PreIntegrationEvaluationNode::getBSpline()
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::loadTrajectory()
 {
   // A bspline fixed at 3rd order.
-  BSplinePoseMinimalRotationVector bspline(parameters_.trajectory_spline_order);
+  trajectory_ = std::make_shared<BSplinePoseMinimalRotationVector>(
+                  parameters_.trajectory_spline_order);
   // generate random
   if (parameters_.trajectory_source == "")
   {
@@ -207,10 +223,10 @@ BSplinePoseMinimalRotationVector PreIntegrationEvaluationNode::getBSpline()
     VectorX times;
     times.setLinSpaced(parameters_.trajectory_num_interpolation_points, start, end);
 
-    bspline.initPoseSpline3(times,
-                            points,
-                            parameters_.trajectory_num_segments,
-                            parameters_.trajectory_lambda);
+    trajectory_->initPoseSpline3(times,
+                                 points,
+                                 parameters_.trajectory_num_segments,
+                                 parameters_.trajectory_lambda);
   }
   // load from file
   else
@@ -218,9 +234,14 @@ BSplinePoseMinimalRotationVector PreIntegrationEvaluationNode::getBSpline()
     CHECK_EQ(false, true) << "Not implemented.";
   }
 
-  return bspline;
+  // Display the trajectory?
+  if (FLAGS_show_trajectory)
+  {
+    showTrajectory();
+  }
 }
 
+// -----------------------------------------------------------------------------
 ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
                                                    FloatType end)
 {
@@ -243,6 +264,12 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
 
     return std::make_shared<ConstantBias>(accel_bias, gyro_bias);
   }
+}
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::showTrajectory()
+{
+  splines_visualizer_->plotSpline(*trajectory_);
 }
 
 // -----------------------------------------------------------------------------

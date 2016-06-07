@@ -10,7 +10,7 @@ TEST(ManifoldPreIntegratorTest, testPushD_R)
   ManifoldPreIntegrationState state(covar_vector.asDiagonal());
 
   // Generate a set of random rotations.
-  std::vector<Vector3> measurements;
+  std::vector<Vector6> measurements;
   std::vector<FloatType> times;
   std::vector<FloatType> times2;
   int i;
@@ -18,7 +18,7 @@ TEST(ManifoldPreIntegratorTest, testPushD_R)
   {
     times.push_back(i);
     times2.push_back(i + 11);
-    measurements.push_back(Vector3::Random());
+    measurements.push_back(Vector6::Random());
   }
   times.push_back(i);
   times2.push_back(i + 11);

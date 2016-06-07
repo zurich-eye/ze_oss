@@ -9,11 +9,13 @@ TEST(ScenarioTest, testSplineScenario)
 {
   using namespace ze;
 
-  BSplinePoseMinimalRotationVector bs(3);
+  std::shared_ptr<BSplinePoseMinimalRotationVector> bs =
+      std::make_shared<BSplinePoseMinimalRotationVector>(3);
 
-  bs.initPoseSpline(10.0, 20.0,
-                    bs.curveValueToTransformation(Vector6::Random()),
-                    bs.curveValueToTransformation(Vector6::Random()));
+
+  bs->initPoseSpline(10.0, 20.0,
+                     bs->curveValueToTransformation(Vector6::Random()),
+                     bs->curveValueToTransformation(Vector6::Random()));
 
   SplineScenario::Ptr scenario(std::make_shared<SplineScenario>(bs));
 
