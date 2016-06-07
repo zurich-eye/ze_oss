@@ -22,6 +22,8 @@
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
+DEFINE_int32(monte_carlo_runs, 10, "Number of monte-carlo simulations.");
+
 // For an empty curve_source parameters to generate a random trajectory:
 DEFINE_double(trajectory_length, 30.0, "The length of the curve in seconds");
 DEFINE_int32(trajectory_interpolation_points, 100, "Number of interpolation to randomize");
@@ -46,6 +48,7 @@ DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
 
 // A series of visualization controls:
 DEFINE_bool(show_trajectory, true, "Show the trajectory that was loaded / generated.");
+
 
 namespace ze {
 
@@ -137,6 +140,10 @@ public:
   //! Show the trajectory that was loaded or generated.
   void showTrajectory();
 
+  //! Generate a series of plots that show the results
+  void plotResults(const std::vector<Matrix3>& covariances_mc,
+                   const std::vector<Matrix3>& covariances_est);
+
   void shutdown();
 
 private:
@@ -167,8 +174,8 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   VLOG(1) << "Initialize noise models with \n"
           << " Accelerometer noise density: " << parameters_.accel_noise_density
           << " Gyroscope noise density: " << parameters_.gyro_noise_density;
-  GaussianSampler<3>::Ptr accel_noise = GaussianSampler<3>::sigmas(accel_covar);
-  GaussianSampler<3>::Ptr gyro_noise = GaussianSampler<3>::sigmas(gyro_covar);
+  GaussianSampler<3>::Ptr accel_noise = GaussianSampler<3>::variances(accel_covar);
+  GaussianSampler<3>::Ptr gyro_noise = GaussianSampler<3>::variances(gyro_covar);
 
   loadTrajectory();
   FloatType start = trajectory_->t_min();
@@ -198,7 +205,15 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                                                           gyroscope_noise_covariance);
 
   VLOG(1) << "Monte Carlo Simulation";
-  mc.simulate(10, scenario->start(), scenario->end());
+  mc.simulate(FLAGS_monte_carlo_runs, scenario->start(), scenario->end());
+
+  VLOG(1) << "Reference Estimate";
+  ManifoldPreIntegrationState::Ptr est_integrator = mc.preintegrate_corrupted(
+                                                      start, end);
+
+  plotResults(mc.covariances(), est_integrator->getCovariance());
+
+  plotResults(mc.covariances_absolute(), est_integrator->getCovariance());
 }
 
 // -----------------------------------------------------------------------------
@@ -270,6 +285,35 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
 void PreIntegrationEvaluationNode::showTrajectory()
 {
   splines_visualizer_->plotSpline(*trajectory_);
+}
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::plotResults(
+    const std::vector<Matrix3>& covariances_mc,
+    const std::vector<Matrix3>& covariances_est)
+{
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> mc(3, covariances_mc.size());
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> est(3, covariances_est.size());
+
+  for (size_t i = 0; i < covariances_mc.size(); ++i)
+  {
+    mc.col(i) = covariances_mc[i].diagonal();
+    est.col(i) = covariances_est[i].diagonal();
+  }
+
+  plt::subplot(3, 1, 1);
+  plt::plot(mc.row(0), "r");
+  plt::plot(est.row(0), "b");
+
+  plt::subplot(3, 1, 2);
+  plt::plot(mc.row(1), "r");
+  plt::plot(est.row(1), "b");
+
+  plt::subplot(3, 1, 3);
+  plt::plot(mc.row(2), "r");
+  plt::plot(est.row(2), "b");
+
+  plt::show();
 }
 
 // -----------------------------------------------------------------------------

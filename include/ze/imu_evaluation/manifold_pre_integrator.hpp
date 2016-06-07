@@ -14,7 +14,8 @@ class ManifoldPreIntegrationState : public PreIntegrator
 public:
   ManifoldPreIntegrationState(Matrix3 gyro_noise_covariance)
     : PreIntegrator(gyro_noise_covariance)
-  {}
+  {
+  }
 
   void pushD_R(times_container_t stamps,
                measurements_container_t measurements)
@@ -27,7 +28,10 @@ public:
       D_R = Quaternion::exp(
               measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix()
           * D_R;
+
     }
+    // update the absolute orientation
+    R_i_.push_back(*R_i_.rbegin() * D_R);
 
     D_R_.push_back(D_R);
     times_.push_back(*stamps.rbegin());
@@ -37,13 +41,6 @@ public:
 
   void propagate_covariance()
   {
-    if (covariances_.size() == 0)
-    {
-      covariances_.push_back(Matrix3::Zero());
-
-      return;
-    }
-
     Vector3 psi = ((Quaternion(*D_R_.rbegin())).log());
     FloatType norm = psi.norm();
     FloatType norm_sqr = norm*norm;
@@ -55,8 +52,8 @@ public:
     FloatType dt = *(times_.end() - 1) - *(times_.end() - 2);
 
     covariances_.push_back(
-          (*D_R_.rbegin()) * (*covariances_.rbegin()) * D_R_.rbegin()->transpose()
-          + J_r * gyro_noise_covariance_ * dt * J_r.transpose());
+          (D_R_.rbegin()->transpose()) * (*covariances_.rbegin()) * (*D_R_.rbegin())
+          + J_r * gyro_noise_covariance_ * dt * dt * J_r.transpose());
   }
 };
 

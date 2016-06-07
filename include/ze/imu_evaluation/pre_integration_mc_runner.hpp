@@ -23,22 +23,28 @@ public:
   //! must be compatible with the underlying scenario.
   void simulate(size_t num_rounds, FloatType start, FloatType end)
   {
-    std::vector<Matrix3> D_R_actual = preintegrate_actual(start, end);
+    typename pre_integrator_t::Ptr pre_int_actual
+        = preintegrate_actual(start, end);
+    D_R_ref_ = pre_int_actual->getD_R();
+    R_ref_ = pre_int_actual->getR_i();
 
     // A vector of simulated results.
-    std::vector<std::vector<Matrix3>> D_R_mc;
     for (size_t i = 0; i < num_rounds; ++i)
     {
       VLOG(1) << "Monte-Carlo run #" << i;
-      D_R_mc.push_back(preintegrate_corrupted(start, end));
+      typename pre_integrator_t::Ptr pre_int_mc
+          = preintegrate_corrupted(start, end);
+      D_R_mc_.push_back(pre_int_mc->getD_R());
+      R_mc_.push_back(pre_int_mc->getR_i());
     }
 
     // estimate the variance / covariance
-    std::vector<Matrix3> covariance = covariance_estimate(D_R_actual, D_R_mc);
+    covariances_ = covariance_estimate(D_R_ref_, D_R_mc_);
+    covariances_absolute_ = covariance_estimate(R_ref_, R_mc_);
   }
 
   //! Perform a pre-integration of the actual (exact, noise-free) trajectory.
-  std::vector<Matrix3> preintegrate_actual(FloatType start, FloatType end)
+  typename pre_integrator_t::Ptr preintegrate_actual(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
     typename pre_integrator_t::Ptr pre_integrator(
@@ -49,14 +55,14 @@ public:
                                    start,
                                    end);
 
-    return pre_integrator->getD_R();
+    return pre_integrator;
   }
 
   //! Perform a pre-integration of the corrupted (bias, noisy) trajectory.
   //! Every call to this function will generate different results due to
   //! the repeated noise generation in the scenarios. The bias will not change
   //! between calls.
-  std::vector<Matrix3> preintegrate_corrupted(FloatType start, FloatType end)
+  typename pre_integrator_t::Ptr preintegrate_corrupted(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
     typename pre_integrator_t::Ptr pre_integrator(
@@ -67,19 +73,40 @@ public:
                                    start,
                                    end);
 
-    return pre_integrator->getD_R();
+    return pre_integrator;
+  }
+
+  const std::vector<Matrix3>& covariances()
+  {
+    return covariances_;
+  }
+
+  const std::vector<Matrix3>& covariances_absolute()
+  {
+    return covariances_absolute_;
+  }
+
+  const std::vector<std::vector<Matrix3>>& D_R_mc()
+  {
+    return D_R_mc_;
   }
 
 private:
   PreIntegrationRunner::Ptr preintegraton_runner_;
   Matrix3 gyroscope_noise_covariance_;
+  std::vector<std::vector<Matrix3>> D_R_mc_;
+  std::vector<Matrix3> covariances_;
+  std::vector<Matrix3> covariances_absolute_;
+  std::vector<Matrix3> D_R_ref_;
+  std::vector<Matrix3> R_ref_;
+  std::vector<std::vector<Matrix3>> R_mc_;
 
-  //! Estimate the covariance of the experiment set
+  //! Estimate the covariance of the experiment set (relative orientation).
   std::vector<Matrix3> covariance_estimate(std::vector<Matrix3> D_R_actual,
-                              std::vector<std::vector<Matrix3>> D_R_mc)
+                                           std::vector<std::vector<Matrix3>> D_R_mc)
   {
     CHECK_GT(D_R_mc.size(), 1u) << "Cannot estimate covariance for less than"
-                               << "2 runs.";
+                                << "2 runs.";
 
     std::vector<Matrix3> covariances;
 
@@ -100,8 +127,6 @@ private:
 
       covariances.push_back((zero_mean * zero_mean.adjoint())
                             / (zero_mean.cols() - 1));
-
-      std::cout << *covariances.rbegin() << "\n\n";
     }
 
     return covariances;

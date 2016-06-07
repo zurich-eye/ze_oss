@@ -18,7 +18,11 @@ public:
 
   PreIntegrator(Matrix3 gyro_noise_covariance)
     : gyro_noise_covariance_(gyro_noise_covariance)
-  {}
+  {
+    R_i_.push_back(Matrix3::Identity());
+    D_R_.push_back(Matrix3::Identity());
+    covariances_.push_back(Matrix3::Zero());
+  }
 
   //! This assumes that every pushed batch corresponds to an interval between
   //! two images / keyframes.
@@ -34,6 +38,13 @@ public:
   {
     return D_R_;
   }
+
+  //! Get the absolute orientation after pre-integration.
+  preintegrated_orientation_container_t getR_i()
+  {
+    return R_i_;
+  }
+
   //! Get the timestamps corresponding to the pre-integrated orientations,
   //! Where the i'th element in the orientation container refers to the
   //! time interval: [i, i+1].
@@ -54,6 +65,9 @@ protected:
 
   //! The relative rotation at a given image frame.
   preintegrated_orientation_container_t D_R_;
+
+  //! The absolute rotation at a given image frame.
+  preintegrated_orientation_container_t R_i_;
 
   //! The covariances at the pre-integration steps.
   covariance_container_t covariances_;
