@@ -25,7 +25,7 @@ public:
     {
       //! @todo revert loop for better efficiency D_R *= ...
       D_R = Quaternion::exp(
-              measurements[i] * (stamps[i+1] - stamps[i])).getRotationMatrix()
+              measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix()
           * D_R;
     }
 

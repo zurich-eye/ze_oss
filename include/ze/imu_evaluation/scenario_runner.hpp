@@ -16,7 +16,8 @@ namespace ze {
 class ScenarioRunner
 {
 public:
-  //!
+  ZE_POINTER_TYPEDEFS(ScenarioRunner);
+
   ScenarioRunner(const Scenario::Ptr scenario,
                  const ImuBias::Ptr bias,
                  GaussianSampler<3>::Ptr accelerometer_noise,

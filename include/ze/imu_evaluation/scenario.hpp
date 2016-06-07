@@ -27,6 +27,12 @@ public:
   //! Get the acceleration in the world frame (excl. gravity).
   virtual Vector3 acceleration_W(FloatType t) const = 0;
 
+  //! Start time of the scenario
+  virtual FloatType start() const = 0;
+
+  //! End time of the scenario
+  virtual FloatType end() const = 0;
+
   //! Get the orientation in the world frame.
   Quaternion R_W_B(FloatType t) const
   {
@@ -74,6 +80,16 @@ public:
   Vector3 acceleration_W(FloatType t) const
   {
     return bs_.linearAcceleration(t);
+  }
+
+  FloatType start() const
+  {
+    return bs_.t_min();
+  }
+
+  FloatType end() const
+  {
+    return bs_.t_max();
   }
 
 private:

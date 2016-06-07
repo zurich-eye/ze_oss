@@ -2,6 +2,7 @@
 
 #include <ze/common/types.h>
 #include <ze/imu_evaluation/scenario_runner.hpp>
+#include <ze/imu_evaluation/manifold_pre_integrator.hpp>
 
 namespace ze {
 
@@ -9,6 +10,9 @@ namespace ze {
 //! a given pre-integration state.
 class PreIntegrationRunner
 {
+public:
+  ZE_POINTER_TYPEDEFS(PreIntegrationRunner);
+
   PreIntegrationRunner(ScenarioRunner::Ptr scenario_runner,
                        FloatType imu_sampling_time,
                        FloatType camera_sampling_time)
@@ -21,7 +25,7 @@ class PreIntegrationRunner
   }
 
   //! Process the whole scenario given a start and end-time.
-  void process(PreIntegrationState::Ptr pre_integrator,
+  void process(PreIntegrator::Ptr pre_integrator,
                bool corrupted,
                FloatType start,
                FloatType end)
@@ -30,7 +34,7 @@ class PreIntegrationRunner
     FloatType next_camera_sample = start + camera_sampling_time_;
     std::vector<FloatType> times;
     std::vector<Vector6> imu_measurements;
-    for (FloatType t = start; start <= end; t += sampling_time_)
+    for (FloatType t = start; start <= end; t += imu_sampling_time_)
     {
       times.push_back(t);
       Vector6 measurement;

@@ -25,6 +25,12 @@ set(SOURCES
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+###############
+# EXECUTABLES #
+###############
+cs_add_executable(preintegration_evaluation_node src/preintegration_evaluation_node.cpp)
+target_link_libraries(preintegration_evaluation_node ${PROJECT_NAME})
+
 ##########
 # GTESTS #
 ##########
