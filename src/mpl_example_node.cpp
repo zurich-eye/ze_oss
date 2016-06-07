@@ -21,6 +21,16 @@ int main()
   plt::named_plot("A Name", times, points);
   plt::show();
 
+  // enable interactive mode as of now:
+  if (plt::ion())
+  {
+    std::cout << "Success" << "\n";
+  }
+  else
+  {
+    std::cout << "Not" << "\n";
+  }
+
   // subplots
   plt::subplot(3, 1, 1);
   plt::plot(v);
@@ -28,7 +38,9 @@ int main()
   plt::plot(v);
   plt::subplot(3, 1, 3);
   plt::plot(v);
-  plt::show();
+  plt::show(false);
+
+  plt::figure();
 
   // plot multiple curves in a single graph
   std::vector<double> w({4, 3, 2, 1});

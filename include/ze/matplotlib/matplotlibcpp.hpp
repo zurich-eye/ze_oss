@@ -57,6 +57,7 @@ struct _interpreter
   PyObject *s_python_function_axis;
   PyObject *s_python_function_xlabel;
   PyObject *s_python_function_ylabel;
+  PyObject *s_python_function_ion;
   PyObject *s_python_function_grid;
   PyObject *s_python_empty_tuple;
 
@@ -113,6 +114,7 @@ private:
     s_python_function_ylabel = PyObject_GetAttrString(pymod, "ylabel");
     s_python_function_grid = PyObject_GetAttrString(pymod, "grid");
     s_python_function_xlim = PyObject_GetAttrString(pymod, "xlim");
+    s_python_function_ion = PyObject_GetAttrString(pymod, "ion");
 
     s_python_function_save = PyObject_GetAttrString(pylabmod, "savefig");
 
@@ -129,6 +131,7 @@ private:
        || !s_python_function_axis
        || !s_python_function_xlabel
        || !s_python_function_ylabel
+       || !s_python_function_ion
        || !s_python_function_grid
        )
     {
@@ -148,6 +151,7 @@ private:
        || !PyFunction_Check(s_python_function_axis)
        || !PyFunction_Check(s_python_function_xlabel)
        || !PyFunction_Check(s_python_function_ylabel)
+       || !PyFunction_Check(s_python_function_ion)
        || !PyFunction_Check(s_python_function_grid)
        )
     {
@@ -162,6 +166,50 @@ private:
     Py_Finalize();
   }
 };
+}
+
+//! Enable interactive mode
+bool ion()
+{
+
+  PyObject* args = PyTuple_New(0);
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_ion,
+                    args);
+
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+//! Create a new figure
+bool figure(std::string i = "")
+{
+  PyObject* args;
+  if (i != "")
+  {
+    args = PyTuple_New(1);
+    PyObject* i_py = PyString_FromString(i.c_str());
+    PyTuple_SetItem(args, 0, i_py);
+  }
+  else
+  {
+    args = PyTuple_New(0);
+  }
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_figure,
+                    args);
+
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
 }
 
 template<typename DerivedX>
@@ -572,9 +620,7 @@ inline void show(bool block = true)
 
   PyObject* kwargs = PyDict_New();
 
-  PyDict_SetItemString(kwargs,
-                       "block",
-                       pyflag);
+  PyDict_SetItemString(kwargs, "block", pyflag);
 
   PyObject* res = PyObject_Call(
                     detail::_interpreter::get().s_python_function_show,
@@ -586,6 +632,7 @@ inline void show(bool block = true)
   }
 
   Py_DECREF(res);
+  Py_DECREF(kwargs);
 }
 
 inline void save(const std::string& filename)
