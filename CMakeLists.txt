@@ -97,6 +97,9 @@ target_link_libraries(test_running_statistics ${PROJECT_NAME})
 catkin_add_gtest(test_statistics test/test_statistics.cpp)
 target_link_libraries(test_statistics ${PROJECT_NAME})
 
+catkin_add_gtest(test_stl_utils test/test_stl_utils.cpp)
+target_link_libraries(test_stl_utils ${PROJECT_NAME})
+
 catkin_add_gtest(test_string_utils test/test_string_utils.cpp)
 target_link_libraries(test_string_utils ${PROJECT_NAME})
 
