@@ -28,6 +28,7 @@ set(CU_HDRS
   include/imp/cu_imgproc/cu_rof_denoising.cuh
   include/imp/cu_imgproc/cu_tvl1_denoising.cuh
   include/imp/cu_imgproc/str_tex_decomposer.hpp
+  include/imp/cu_imgproc/cu_undistortion.cuh
   )
 
 set(CU_SRCS
@@ -40,6 +41,7 @@ set(CU_SRCS
   src/cu_rof_denoising.cu
   src/cu_tvl1_denoising.cu
   src/str_tex_decomposer.cpp
+  src/cu_undistortion.cu
   )
 
 #cuda_compile(CU_OBJ ${CU_SRCS} ${CU_HDRS})
@@ -48,6 +50,9 @@ cs_cuda_add_library(${PROJECT_NAME}
    ${CU_SRCS} ${CU_HDRS} ${SOURCES} ${HEADERS}
    )
 #target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
+
+cs_add_executable(test_main src/test_main.cpp)
+target_link_libraries(test_main ${PROJECT_NAME})
 
 ##########
 # GTESTS #
