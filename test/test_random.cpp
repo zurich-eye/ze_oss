@@ -109,5 +109,4 @@ TEST(RandomTests, benchmark)
   runTimingBenchmark(lambda2, 10, 10, "sampleFromDistribution", true);
 }
 
-
 ZE_UNITTEST_ENTRYPOINT
