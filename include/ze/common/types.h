@@ -83,6 +83,7 @@ using Bearings    = Matrix3X;
 using Positions   = Matrix3X;
 using Gradients   = Matrix2X;
 using Seeds       = Matrix4X;
+using LineMeasurements = Matrix3X;
 using KeypointLevel = int8_t;
 using KeypointType  = int8_t;
 using KeypointIndex = uint16_t;

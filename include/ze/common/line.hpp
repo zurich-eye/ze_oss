@@ -5,45 +5,47 @@
 
 namespace ze {
 
-class Line {
+class Line;
+// Convenience typedefs:
+using Lines = std::vector<Line>;
+
+FloatType calculateDistanceToLine(const Position& pos,
+                                  const Position& line_anchor,
+                                  const Vector3& direction);
+
+void generateLinesFromEndpoints(const Positions& startpoints,
+                                const Positions& endpoints,
+                                Lines& lines);
+
+class Line
+{
 public:
 
-  Line()
-    : distance_(0.0) {}
+  Line() = default;
 
   Line(Quaternion orientation, FloatType distance)
   : orientation_(orientation)
   , distance_(distance) {}
 
-  static void generateLinesFromEndpoints(const Positions& startpoints,
-                                         const Positions& endpoints,
-                                         std::vector<Line>& lines);
 
-  static FloatType calculateDistanceToLine(const Position& pos,
-                                           const Position& line_anchor,
-                                           const Vector3& direction)
-  {
-    return (pos - line_anchor).cross(direction).norm();
-  }
-
-  Vector3 getDirection() const
+  Vector3 direction() const
   {
     return orientation_.rotate(Vector3(1.0, 0.0, 0.0));
   }
 
-  Position getAnchorPoint() const
+  Position anchorPoint() const
   {
     return distance_ * orientation_.rotate(Vector3(0.0, 0.0, 1.0));
   }
 
   FloatType calculateDistanceToLine(const Position& pos) const
   {
-    return calculateDistanceToLine(pos, getAnchorPoint(), getDirection());
+    return ze::calculateDistanceToLine(pos, anchorPoint(), direction());
   }
 
 private:
   Quaternion orientation_;
-  FloatType distance_;
+  FloatType distance_ = 0.0;
 };
 
 } // namespace ze

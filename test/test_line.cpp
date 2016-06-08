@@ -10,13 +10,13 @@ TEST(LineTest, testLineGeneration)
   end.setRandom(3, n);
 
   // Create lines.
-  std::vector<ze::Line> lines;
-  ze::Line::generateLinesFromEndpoints(start, end, lines);
+  ze::Lines lines;
+  ze::generateLinesFromEndpoints(start, end, lines);
 
   for (size_t i = 0; i < n; ++i)
   {
-    ze::Vector3 direction = lines[i].getDirection();
-    ze::Position anchor_point = lines[i].getAnchorPoint();
+    ze::Vector3 direction = lines[i].direction();
+    ze::Position anchor_point = lines[i].anchorPoint();
     // Check whether anchor point is really the closest point available.
     EXPECT_NEAR(direction.dot(anchor_point), 0.0, 1e-10);
     // Direction should be a normalized vector.

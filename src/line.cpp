@@ -2,9 +2,9 @@
 
 namespace ze {
 
-void Line::generateLinesFromEndpoints(const Positions& startpoints,
-                                             const Positions& endpoints,
-                                             std::vector<Line>& lines)
+void generateLinesFromEndpoints(const Positions& startpoints,
+                                const Positions& endpoints,
+                                Lines& lines)
 {
   CHECK_EQ(startpoints.cols(), endpoints.cols());
   const size_t n = startpoints.cols();
@@ -25,5 +25,13 @@ void Line::generateLinesFromEndpoints(const Positions& startpoints,
     lines.emplace_back(orientation, anchor_point.norm());
   }
 }
+
+FloatType calculateDistanceToLine(const Position& pos,
+                                  const Position& line_anchor,
+                                  const Vector3& direction)
+{
+  return (pos - line_anchor).cross(direction).norm();
+}
+
 
 } // namespace ze
