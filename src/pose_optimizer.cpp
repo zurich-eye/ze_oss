@@ -247,37 +247,21 @@ std::pair<FloatType, VectorX> evaluateLineErrors(
   }
 
   // Robust cost function.
-  VectorX weights = PoseOptimizer::WeightFunction::weightVectorized(
-                      error_norm.array() / data.measurement_sigma);
+  VectorX weights(n);
+  weights.setOnes();
 
   // Instead of whitening the error and the Jacobian, we apply sigma to the weights:
-  weights.array() /= (data.measurement_sigma * data.measurement_sigma);
+  // weights.array() /= (data.measurement_sigma * data.measurement_sigma);
 
   if (H && g)
   {
     for (size_t i = 0; i < n; ++i)
     {
       // Jacobian computation.
-      Matrix26 J;
-      J.block<1, 3>(0, 0) =
-          -line_measurements_W.col(i).transpose() *
-          skewSymmetric(data.lines_W[i].direction());
-      J.block<1, 3>(0, 3).setZero();
-
-      const Vector3 cam_to_anchor = camera_pos_W -
-                                       data.lines_W[i].anchorPoint();
-      const FloatType inverse_distance = 1.0 / cam_to_anchor.norm();
-      const Vector3 cam_to_anchor_normalized = cam_to_anchor * inverse_distance;
-        J.block<1, 3>(1, 0) =
-          -line_measurements_W.col(i).transpose() * (
-            inverse_distance *
-            (Matrix3::Identity() - (cam_to_anchor * cam_to_anchor.transpose())) *
-            (skewSymmetric(R_C_W.transpose() * data.T_C_B.getPosition()) +
-             skewSymmetric(T_B_W.getRotation().inverse().rotate(T_B_W.getPosition())))
-            + skewSymmetric(cam_to_anchor_normalized));
-      J.block<1, 3>(1, 3) =
-          -inverse_distance * line_measurements_W.col(i).transpose() * (
-            Matrix3::Identity() - cam_to_anchor * cam_to_anchor.transpose());
+      Matrix26 J = dLineMeasurement_dPose(T_B_W, data.T_C_B,
+                                          line_measurements_W.col(i),
+                                          data.lines_W[i].anchorPoint(),
+                                          data.lines_W[i].direction());
 
       // Compute Hessian and Gradient Vector.
       H->noalias() += J.transpose() * J * weights(i);

@@ -176,7 +176,7 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   LeastSquaresSolver<Transformation, PoseOptimizer>::HessianMatrix H;
   LeastSquaresSolver<Transformation, PoseOptimizer>::GradientVector g;
   FloatType error = optimizer.evaluateError(T_B_W, &H, &g);
-  EXPECT_NEAR(error, 0.0, 1e-3);
+  EXPECT_NEAR(error, 0.0, 1e-5);
 
   // Perturb pose:
   Transformation T_B_W_perturbed =
