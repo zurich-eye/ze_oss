@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ze/common/sample.h>
+#include <ze/common/random.hpp>
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
 
@@ -24,32 +24,32 @@ public:
     for (size_t i = 0; i < DIM; ++i)
     {
       // The gaussian takes a standard deviation as input.
-      noise(i) = Sample::gaussian(sigma_(i));
+      noise(i) = sampleFromNormalDistribution<FloatType>(deterministic_, 0.0, sigma_(i));
     }
     return noise;
   }
 
-  static Ptr sigmas(const covariance_vector_t& sigmas)
+  static Ptr sigmas(const covariance_vector_t& sigmas, bool deterministic = false)
   {
-    Ptr noise(new GaussianSampler);
+    Ptr noise(new GaussianSampler(deterministic));
     noise->sigma_ = sigmas;
-
     return noise;
   }
 
-  static Ptr variances(const covariance_vector_t& variances)
+  static Ptr variances(const covariance_vector_t& variances, bool deterministic = false)
   {
-    Ptr noise(new GaussianSampler);
+    Ptr noise(new GaussianSampler(deterministic));
     noise->sigma_ = variances.cwiseSqrt();
-
     return noise;
   }
 
 protected:
-  //! Takes a vector containig the diagonal elements of a covariance matrix.
-  GaussianSampler() {}
+  GaussianSampler(bool deteterministic)
+    : deterministic_(deteterministic)
+  {}
 
 private:
+  const bool deterministic_;
   covariance_vector_t sigma_;
 };
 
