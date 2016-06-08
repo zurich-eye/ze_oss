@@ -4,12 +4,12 @@
 #include <assert.h>
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <functional>
 #include <limits>
 #include <type_traits>
 
 #include <imp/core/linearmemory.hpp>
+#include <ze/common/random.hpp>
 #include <ze/common/test_utils.h>
 
 
@@ -21,7 +21,7 @@ class LinearMemoryTest : public ::testing::Test
     linmem_(numel_)
   {
     using T = typename Pixel::T;
-    auto random_val_generator = ze::getRandomGenerator<T>();
+    auto random_val_generator = ze::uniformDistribution<T>(ZE_DETERMINISTIC);
 
     T val1 = random_val_generator();
     T val2;

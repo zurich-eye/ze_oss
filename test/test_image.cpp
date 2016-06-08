@@ -8,6 +8,7 @@
 #include <functional>
 #include <type_traits>
 
+#include <ze/common/random.hpp>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
 #include <ze/common/types.h>
@@ -29,7 +30,7 @@ class ImageRawTest : public ::testing::Test
     , image_511_(size_511_)
   {
     using T = typename Pixel::T;
-    auto random_val_generator = ze::getRandomGenerator<T>();
+    auto random_val_generator = ze::uniformDistribution<T>(ZE_DETERMINISTIC);
 
     // initialize two random value and ensure that they are reasonably different
     T val1 = random_val_generator();
