@@ -14,6 +14,7 @@ include(ze_options)
 message(STATUS "ZE_USE_BRISK: ${ZE_USE_BRISK}")
 message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
 message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
+message(STATUS "ZE_DETERMINISTIC: ${ZE_DETERMINISTIC}")
 configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
 
