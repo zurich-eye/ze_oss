@@ -49,7 +49,7 @@ T sampleFromNormalDistribution(
 }
 
 //------------------------------------------------------------------------------
-//! @return true with given probability. Samples the Bernoulli distribution.
+//! @return Return true with given probability. Samples the Bernoulli distribution.
 inline bool flipCoin(
     bool deterministic = false,
     FloatType true_probability = FloatType{0.5})
@@ -72,7 +72,7 @@ Vector3 randomDirection3D();
 Vector2 randomDirection2D();
 
 // -----------------------------------------------------------------------------
-// Get distributions, slightly faster than the above functions when many
+// Get distributions, only slightly faster than the above functions when many
 // random numbers are desired.
 
 //! Usage: f = uniformDistribution<int>(); sample = f();
@@ -84,10 +84,12 @@ uniformDistribution(
     T from = std::numeric_limits<T>::lowest(),
     T to   = std::numeric_limits<T>::max())
 {
+  static std::mt19937 gen_nondeterministic(std::random_device{}());
+  static std::mt19937 gen_deterministic(0);
   std::uniform_int_distribution<T> distribution(from, to);
   auto fun = deterministic ?
-               std::bind(distribution, std::mt19937(0)) :
-               std::bind(distribution, std::mt19937(std::random_device{}()));
+               std::bind(distribution, gen_deterministic) :
+               std::bind(distribution, gen_nondeterministic);
   return fun;
 }
 
@@ -101,10 +103,12 @@ uniformDistribution(
     T from = T{0.0},
     T to   = T{1.0})
 {
+  static std::mt19937 gen_nondeterministic(std::random_device{}());
+  static std::mt19937 gen_deterministic(0);
   std::uniform_real_distribution<T> distribution(from, to);
   auto fun = deterministic ?
-               std::bind(distribution, std::mt19937(0)) :
-               std::bind(distribution, std::mt19937(std::random_device{}()));
+               std::bind(distribution, gen_deterministic) :
+               std::bind(distribution, gen_nondeterministic);
   return fun;
 }
 
@@ -118,10 +122,12 @@ normalDistribution(
     T mean  = T{0.0},
     T sigma = T{1.0})
 {
+  static std::mt19937 gen_nondeterministic(std::random_device{}());
+  static std::mt19937 gen_deterministic(0);
   std::normal_distribution<T> distribution(mean, sigma);
   auto fun = deterministic ?
-               std::bind(distribution, std::mt19937(0)) :
-               std::bind(distribution, std::mt19937(std::random_device{}()));
+               std::bind(distribution, gen_deterministic) :
+               std::bind(distribution, gen_nondeterministic);
   return fun;
 }
 
