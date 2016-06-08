@@ -43,6 +43,7 @@ set(HEADERS
   include/ze/common/ring_view.h
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
+  include/ze/common/sampler.hpp
   include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
@@ -83,8 +84,8 @@ target_link_libraries(test_benchmark ${PROJECT_NAME})
 catkin_add_gtest(test_buffer test/test_buffer.cpp)
 target_link_libraries(test_buffer ${PROJECT_NAME})
 
-#catkin_add_gtest(test_manifold test/test_manifold.cpp)
-#target_link_libraries(test_manifold ${PROJECT_NAME})
+catkin_add_gtest(test_manifold test/test_manifold.cpp)
+target_link_libraries(test_manifold ${PROJECT_NAME})
 
 catkin_add_gtest(test_matrix test/test_matrix.cpp)
 target_link_libraries(test_matrix ${PROJECT_NAME})
@@ -110,8 +111,8 @@ target_link_libraries(test_test_utils ${PROJECT_NAME})
 catkin_add_gtest(test_timer test/test_timer.cpp)
 target_link_libraries(test_timer ${PROJECT_NAME})
 
-#catkin_add_gtest(test_transformation test/test_transformation.cpp)
-#target_link_libraries(test_transformation ${PROJECT_NAME})
+catkin_add_gtest(test_transformation test/test_transformation.cpp)
+target_link_libraries(test_transformation ${PROJECT_NAME})
 
 catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
 target_link_libraries(test_thread_pool ${PROJECT_NAME})
@@ -124,6 +125,9 @@ target_link_libraries(test_ring_view ${PROJECT_NAME})
 
 catkin_add_gtest(test_ringbuffer test/test_ringbuffer.cpp)
 target_link_libraries(test_ringbuffer ${PROJECT_NAME})
+
+catkin_add_gtest(test_sampler test/test_sampler.cpp)
+target_link_libraries(test_sampler ${PROJECT_NAME})
 
 ##########
 # EXPORT #
