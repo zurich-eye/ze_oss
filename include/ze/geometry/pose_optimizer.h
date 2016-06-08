@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ze/common/line.hpp>
 #include <ze/common/transformation.h>
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_impl.h>
@@ -7,8 +8,6 @@
 #include <ze/geometry/lsq_solver.h>
 
 namespace ze {
-
-class Line;
 
 enum class PoseOptimizerResidualType
 {
@@ -36,8 +35,9 @@ struct PoseOptimizerFrameData
   //! At which level was the keypoint extracted.
   VectorX scale;
 
-  //! Line measurements.
-  Matrix3X line_measurements_C;
+  //! Line measurements. The normalized plane normals through the camera and
+  //! the measured endpoints.
+  LineMeasurements line_measurements_C;
 
   //! Measurements bookkeeping: Corresponding indices. (Not used by the actual algorithm).
   KeypointIndices kp_idx;
@@ -47,7 +47,7 @@ struct PoseOptimizerFrameData
   Positions p_W;
 
   //! Line. Each entry corresponds to a line measurement.
-  std::vector<Line> lines_W;
+  Lines lines_W;
 
   //! Extrinsic transformation between camera and body (i.e., imu) frame.
   Transformation T_C_B;

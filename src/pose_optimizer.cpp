@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include <ze/cameras/camera.h>
-#include <ze/common/line.hpp>
 #include <ze/common/logging.hpp>
 #include <ze/common/matrix.h>
 #include <ze/common/stl_utils.h>
@@ -225,18 +224,19 @@ std::pair<FloatType, VectorX> evaluateLineErrors(
 {
   const Transformation T_C_W = data.T_C_B * T_B_W;
   const Matrix3 R_C_W = T_C_W.getRotationMatrix();
+  const Vector3 camera_pos_W = T_C_W.inverse().getPosition();
   // Compute error.
-  const MatrixX3 line_measurements_W_transposed =
-      data.line_measurements_C.transpose() * R_C_W;
+  const Matrix3X line_measurements_W = R_C_W.transpose() * data.line_measurements_C;
   const size_t n = data.line_measurements_C.cols();
   Matrix2X error(2, n);
   for (size_t i = 0; i < n; ++i)
   {
-    const Vector3 direction_W = data.lines_W[i].getDirection();
-    error(0, i) = line_measurements_W_transposed.row(i) * direction_W;
+    const Vector3 direction_W = data.lines_W[i].direction();
+    error(0, i) = line_measurements_W.col(i).dot(direction_W);
+    const Vector3 camera_to_anchor = camera_pos_W - data.lines_W[i].anchorPoint();
     error(1, i) =
-        data.line_measurements_C.col(i).transpose() *
-        (data.lines_W[i].getAnchorPoint() - T_C_W.getPosition());
+        line_measurements_W.col(i).dot(camera_to_anchor) /
+        camera_to_anchor.norm();
   }
   VectorX error_norm = error.colwise().norm();
 
@@ -260,14 +260,24 @@ std::pair<FloatType, VectorX> evaluateLineErrors(
       // Jacobian computation.
       Matrix26 J;
       J.block<1, 3>(0, 0) =
-          -data.line_measurements_C.col(i).transpose() * R_C_W *
-          skewSymmetric(data.lines_W[i].getDirection());
+          -line_measurements_W.col(i).transpose() *
+          skewSymmetric(data.lines_W[i].direction());
       J.block<1, 3>(0, 3).setZero();
-      J.block<1, 3>(1, 0) =
-          -data.line_measurements_C.col(i).transpose() * R_C_W *
-          skewSymmetric(data.lines_W[i].getAnchorPoint());
+
+      const Vector3 cam_to_anchor = camera_pos_W -
+                                       data.lines_W[i].anchorPoint();
+      const FloatType inverse_distance = 1.0 / cam_to_anchor.norm();
+      const Vector3 cam_to_anchor_normalized = cam_to_anchor * inverse_distance;
+        J.block<1, 3>(1, 0) =
+          -line_measurements_W.col(i).transpose() * (
+            inverse_distance *
+            (Matrix3::Identity() - (cam_to_anchor * cam_to_anchor.transpose())) *
+            (skewSymmetric(R_C_W.transpose() * data.T_C_B.getPosition()) +
+             skewSymmetric(T_B_W.getRotation().inverse().rotate(T_B_W.getPosition())))
+            + skewSymmetric(cam_to_anchor_normalized));
       J.block<1, 3>(1, 3) =
-          -data.line_measurements_C.col(i).transpose() * R_C_W;
+          -inverse_distance * line_measurements_W.col(i).transpose() * (
+            Matrix3::Identity() - cam_to_anchor * cam_to_anchor.transpose());
 
       // Compute Hessian and Gradient Vector.
       H->noalias() += J.transpose() * J * weights(i);

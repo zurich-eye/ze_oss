@@ -136,10 +136,10 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   Positions endpoints_W =
       (T_B_W.inverse() * T_C_B.inverse()).transformVectorized(endpoints_C);
 
-  std::vector<Line> lines;
-  Line::generateLinesFromEndpoints(endpoints_W.block(0, 0, 3, n),
-                                   endpoints_W.block(0, n, 3, n),
-                                   lines);
+  Lines lines_W;
+  generateLinesFromEndpoints(endpoints_W.block(0, 0, 3, n),
+                             endpoints_W.block(0, n, 3, n),
+                             lines_W);
 
   // Apply some noise to the endpoints to simulate measurements.
   Keypoints endpoints_noisy = endpoints_image;
@@ -152,20 +152,21 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   }
   Bearings bearings_noisy = cam.backProjectVectorized(endpoints_noisy);
   Bearings bearings_truth = cam.backProjectVectorized(endpoints_image);
-  Matrix3X line_measurements_noisy(3, n);
-  Matrix3X line_measurements_truth(3, n);
+  LineMeasurements line_measurements_noisy(3, n);
+  LineMeasurements line_measurements_truth(3, n);
   for (size_t i = 0; i < n; ++i)
   {
     line_measurements_noisy.col(i) =
         (bearings_noisy.col(i).cross(bearings_noisy.col(n + i))).normalized();
     line_measurements_truth.col(i) =
-        (bearings_truth.col(i).cross(bearings_truth.col(n + 1))).normalized();
+        (bearings_truth.col(i).cross(bearings_truth.col(n + i))).normalized();
   }
 
   // Check if error for truth is zero.
   PoseOptimizerFrameData data;
   data.line_measurements_C = line_measurements_truth;
-  data.lines_W = lines;
+  data.lines_W = lines_W;
+  data.T_C_B = T_C_B;
   data.type = PoseOptimizerResidualType::Line;
 
   PoseOptimizerFrameDataVec data_vec = { data };
@@ -185,10 +186,6 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   data.line_measurements_C = line_measurements_noisy;
   testPoseOptimizer(
         0.0, 0.0, T_B_W, T_B_W_perturbed, data, "Line, No Prior");
-  testPoseOptimizer(
-        10.0, 0.0, T_B_W, T_B_W_perturbed, data, "Line, Rotation Prior");
-  testPoseOptimizer(
-        10.0, 10.0, T_B_W, T_B_W_perturbed, data, "Line, Rotation and Position Prior");
 }
 
 ZE_UNITTEST_ENTRYPOINT
