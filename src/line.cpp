@@ -2,6 +2,55 @@
 
 namespace ze {
 
+Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
+                                const Transformation& T_C_B,
+                                const LineMeasurement& measurement,
+                                const Position& line_anchor,
+                                const Vector3& line_direction)
+{
+  //! @todo Can be optimized.
+  const Transformation T_C_W = T_C_B * T_B_W;
+  const Matrix13 measurement_W_transpose =
+      T_C_W.getRotation().inverse().rotate(measurement).transpose();
+  const Vector3 cam_to_anchor = T_C_W.inverse().getPosition() - line_anchor;
+  const FloatType inverse_distance = 1.0 / cam_to_anchor.norm();
+  const Vector3 cam_to_anchor_normalized = cam_to_anchor * inverse_distance;
+  const Matrix3 d_cam_to_anchor_normalized_d_campos =
+      inverse_distance * (Matrix3::Identity() -
+                          cam_to_anchor_normalized *
+                          cam_to_anchor_normalized.transpose());
+
+  Matrix26 J;
+  J.block<1, 3>(0, 0).setZero();
+  J.block<1, 3>(0, 3) =
+      -measurement_W_transpose * skewSymmetric(line_direction);
+
+  J.block<1, 3>(1, 0) =
+      -measurement_W_transpose * d_cam_to_anchor_normalized_d_campos;
+  J.block<1, 3>(1, 3) =
+      -measurement_W_transpose * (
+        d_cam_to_anchor_normalized_d_campos *
+        skewSymmetric(T_C_W.getRotation().inverse().rotate(T_C_B.getPosition()) +
+         T_B_W.getRotation().inverse().rotate(T_B_W.getPosition()))
+        + skewSymmetric(cam_to_anchor_normalized));
+  return J;
+}
+
+void generateRandomLines(size_t num_lines, Lines& lines,
+                         Positions* startpoints,
+                         Positions* endpoints)
+{
+  ze::Positions start, end;
+  start.setRandom(3, num_lines);
+  end.setRandom(3, num_lines);
+  ze::generateLinesFromEndpoints(start, end, lines);
+  if (startpoints != nullptr && endpoints != nullptr)
+  {
+    *startpoints = start;
+    *endpoints = end;
+  }
+}
+
 void generateLinesFromEndpoints(const Positions& startpoints,
                                 const Positions& endpoints,
                                 Lines& lines)
@@ -25,13 +74,5 @@ void generateLinesFromEndpoints(const Positions& startpoints,
     lines.emplace_back(orientation, anchor_point.norm());
   }
 }
-
-FloatType calculateDistanceToLine(const Position& pos,
-                                  const Position& line_anchor,
-                                  const Vector3& direction)
-{
-  return (pos - line_anchor).cross(direction).norm();
-}
-
 
 } // namespace ze

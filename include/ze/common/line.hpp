@@ -6,12 +6,27 @@
 namespace ze {
 
 class Line;
+
 // Convenience typedefs:
 using Lines = std::vector<Line>;
 
-FloatType calculateDistanceToLine(const Position& pos,
-                                  const Position& line_anchor,
-                                  const Vector3& direction);
+inline FloatType calculateDistanceToLine(const Position& pos,
+                                         const Position& line_anchor,
+                                         const Vector3& direction)
+{
+  return (pos - line_anchor).cross(direction).norm();
+}
+
+Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
+                                const Transformation& T_C_B,
+                                const LineMeasurement& measurement,
+                                const Position& line_anchor,
+                                const Vector3& line_direction);
+
+
+void generateRandomLines(size_t num_lines, Lines& lines,
+                         Positions* startpoints = nullptr,
+                         Positions* endpoints = nullptr);
 
 void generateLinesFromEndpoints(const Positions& startpoints,
                                 const Positions& endpoints,
