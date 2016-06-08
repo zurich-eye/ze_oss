@@ -66,6 +66,12 @@ FloatType PoseOptimizer::evaluateError(
   for (auto& residual_block : data_)
   {
     VLOG(400) << "Process residual block " << residual_block.camera_idx;
+    if (residual_block.kp_idx.size() == 0)
+    {
+      VLOG(40) << "Residual block has no measurements.";
+      continue;
+    }
+
     switch (residual_block.type)
     {
       case PoseOptimizerResidualType::Bearing:
@@ -218,6 +224,12 @@ std::vector<KeypointIndex> getOutlierIndices(
     const Transformation& T_B_W,
     const FloatType pixel_threshold)
 {
+  if (data.kp_idx.size() == 0)
+  {
+    VLOG(40) << "Residual block has no measurements.";
+    return {};
+  }
+
   FloatType chi2;
   VectorX err_norm_vec;
   FloatType error_multiplier = 1.0;
