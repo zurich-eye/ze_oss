@@ -5,18 +5,18 @@
 #include <cstdint>
 #include <cfloat>
 #include <iostream>
-#include <random>
 #include <functional>
 #include <limits>
 #include <imp/core/image_raw.hpp>
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
+#include <ze/common/random.hpp>
 #include <ze/common/test_utils.h>
 
 TEST(IMPCuCoreTestSuite,sumTest_32fC1)
 {
   // setup random number generator
-  auto random_val = ze::getRandomGenerator<float>();
+  auto random_val = ze::uniformDistribution<float>(ZE_DETERMINISTIC);
 
   const size_t width = 752;
   const size_t height = 480;
