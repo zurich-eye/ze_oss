@@ -16,6 +16,7 @@ public:
 
   typedef Eigen::Matrix<FloatType, DIM, DIM> covariance_matrix_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> covariance_vector_t;
+  typedef Eigen::Matrix<FloatType, DIM, 1> sigma_vector_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> noise_vector_t;
 
   //! Get a noise sample.
@@ -30,7 +31,7 @@ public:
     return noise;
   }
 
-  static Ptr sigmas(const covariance_vector_t& sigmas, bool deterministic = false)
+  static Ptr sigmas(const sigma_vector_t& sigmas, bool deterministic = false)
   {
     Ptr noise(new RandomVectorSampler(deterministic));
     noise->sigma_ = sigmas;
@@ -51,7 +52,7 @@ protected:
 
 private:
   const bool deterministic_;
-  covariance_vector_t sigma_;
+  sigma_vector_t sigma_;
 };
 
 //------------------------------------------------------------------------------
