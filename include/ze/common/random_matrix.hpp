@@ -55,20 +55,67 @@ private:
 };
 
 //------------------------------------------------------------------------------
-template<int size>
-Eigen::Matrix<FloatType, size, 1>
-randomVectorUniformlyDistributed(
+template<int rows, int cols>
+Eigen::Matrix<FloatType, rows, cols>
+randomMatrixUniformDistributed(
     bool deterministic = false,
     FloatType from = 0.0,
     FloatType to   = 1.0)
 {
-  DEBUG_CHECK_GT(size, 0);
-  Eigen::Matrix<FloatType, size, 1> v;
-  for (int i = 0; i < size; ++i)
+  DEBUG_CHECK_GT(rows, 0);
+  DEBUG_CHECK_GT(cols, 0);
+  Eigen::Matrix<FloatType, rows, cols> m;
+  for (int x = 0; x < cols; ++x)
   {
-    v(i) = sampleFromUniformRealDistribution(deterministic, from, to);
+    for (int y = 0; y < rows; ++y)
+    {
+      m(y,x) = sampleFromUniformRealDistribution(deterministic, from, to);
+    }
   }
-  return v;
+  return m;
+}
+
+//------------------------------------------------------------------------------
+template<int size>
+Eigen::Matrix<FloatType, size, 1>
+randomVectorUniformDistributed(
+    bool deterministic = false,
+    FloatType from = 0.0,
+    FloatType to   = 1.0)
+{
+  return randomMatrixUniformDistributed<size, 1>(deterministic, from, to);
+}
+
+//------------------------------------------------------------------------------
+template<int rows, int cols>
+Eigen::Matrix<FloatType, rows, cols>
+randomMatrixNormalDistributed(
+    bool deterministic = false,
+    FloatType mean  = 0.0,
+    FloatType sigma = 1.0)
+{
+  DEBUG_CHECK_GT(rows, 0);
+  DEBUG_CHECK_GT(cols, 0);
+  Eigen::Matrix<FloatType, rows, cols> m;
+  for (int x = 0; x < cols; ++x)
+  {
+    for (int y = 0; y < rows; ++y)
+    {
+      m(y,x) = sampleFromNormalDistribution(deterministic, mean, sigma);
+    }
+  }
+  return m;
+}
+
+//------------------------------------------------------------------------------
+template<int size>
+Eigen::Matrix<FloatType, size, 1>
+randomVectorNormalDistributed(
+    bool deterministic = false,
+    FloatType mean  = 0.0,
+    FloatType sigma = 1.0)
+{
+  return randomMatrixNormalDistributed<size, 1>(deterministic, mean, sigma);
 }
 
 } // namespace ze
