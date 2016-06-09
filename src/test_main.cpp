@@ -27,7 +27,8 @@ int main(int argc, char** argv)
   cvBridgeLoad(cv_img, path, PixelOrder::gray);
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
-//  ze::cu::ImageGpu32fC1 cu_im(*cv_img);
+  ze::cu::ImageGpu32fC1 in(*cv_img);
+  ze::cu::ImageGpu32fC1 out(cv_img->size());
 
   // Load camera parameters
   std::string yaml_file_path = joinPath(test_data_name, "752x480/visensor_22030_swe_params.yaml");
@@ -37,5 +38,9 @@ int main(int argc, char** argv)
   float dists[4] = {0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139};
 
   cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, float> undistorter(752, 480, params, dists);
-  undistorter.undistort(*cv_img);
+  undistorter.undistort(in, out);
+
+  ze::ImageCv32fC1 cv_img_out(out);
+  cv::imshow("undistorted", cv_img_out.cvMat());
+  cv::waitKey(0);
 }
