@@ -32,15 +32,23 @@ int main(int argc, char** argv)
 
   // Load camera parameters
   std::string yaml_file_path = joinPath(test_data_name, "752x480/visensor_22030_swe_params.yaml");
-//  Camera::Ptr cam = Camera::loadFromYaml(yaml_file_path);
+  //  Camera::Ptr cam = Camera::loadFromYaml(yaml_file_path);
 
-  float params[4] = {471.690643292, 471.765601046, 371.087464172, 228.63874151};
-  float dists[4] = {0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139};
+  //float params[4] = {471.690643292, 471.765601046, 371.087464172, 228.63874151};
+  //float dists[4] = {0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139};
 
-  cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, float> undistorter(752, 480, params, dists);
+  Eigen::RowVectorXf cam_params(4);
+  cam_params << 471.690643292, 471.765601046, 371.087464172, 228.63874151;
+
+  Eigen::RowVectorXf dist_coeff(4);
+  dist_coeff << 0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139;
+
+  cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1> undistorter(
+        in.size(), cam_params, dist_coeff);
   undistorter.undistort(in, out);
 
   ze::ImageCv32fC1 cv_img_out(out);
+  cv::imshow("original", cv_img->cvMat());
   cv::imshow("undistorted", cv_img_out.cvMat());
   cv::waitKey(0);
 }
