@@ -1,21 +1,19 @@
 #include <imp/cu_imgproc/cu_undistortion.cuh>
-
 #include <imp/cu_core/cu_texture.cuh>
 
 namespace ze {
 namespace cu {
 
-template <typename CameraModel,
-          typename DistortionModel,
-          typename T>
+template<typename CameraModel,
+         typename DistortionModel>
 __global__
 void k_computeUndistortionMap(
     Pixel32fC2* dst,
     size_t dst_stride,
     std::uint32_t width,
     std::uint32_t height,
-    T* d_cam_params,
-    T* d_dist_coeffs)
+    float* d_cam_params,
+    float* d_dist_coeffs)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;
   const int y = blockIdx.y*blockDim.y + threadIdx.y;
@@ -23,9 +21,7 @@ void k_computeUndistortionMap(
   if (x < width && y < height)
   {
     float px[2];
-    px[0] = x;
-    px[1] = y;
-    // Pixel32fC2 const * px = dst + y*dst_stride + x;
+    px[0] = x; px[1] = y;
     CameraModel::backProject(d_cam_params, px);
     DistortionModel::distort(d_dist_coeffs, px);
     CameraModel::project(d_cam_params, px);
@@ -34,9 +30,10 @@ void k_computeUndistortionMap(
   }
 }
 
+template<typename T>
 __global__
 void k_undistort(
-    Pixel32fC1* dst,
+    Pixel1<T>* dst,
     size_t dst_stride,
     Pixel32fC2* map,
     size_t map_stride,
@@ -49,7 +46,7 @@ void k_undistort(
 
   if (x < width && y < height)
   {
-    Pixel32fC1 val;
+    Pixel1<T> val;
     const Pixel32fC2& px = map[y*map_stride+x];
     tex2DFetch(val, src, px[0], px[1]);
     dst[y*dst_stride+x] = val;
@@ -58,62 +55,68 @@ void k_undistort(
 
 template <typename CameraModel,
           typename DistortionModel,
-          typename T>
-ImageUndistorter<CameraModel, DistortionModel, T>::ImageUndistorter(
-    int32_t width, int32_t height,
-    T* camera_params, T* dist_coeffs)
-  : undistortion_map_(width, height),
-    fragm_(width, height)
+          typename Pixel>
+ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
+    Size2u img_size,
+    const Eigen::RowVectorXf& camera_params,
+    const Eigen::RowVectorXf& dist_coeffs)
+  : undistortion_map_(img_size),
+    fragm_(img_size)
 {
-  cudaMalloc(&d_cam_params_, 4*sizeof(T));
-  cudaMalloc(&d_dist_coeffs_, 4*sizeof(T));
-  cudaMemcpy(d_cam_params_, camera_params, 4*sizeof(T), cudaMemcpyHostToDevice);
-  cudaMemcpy(d_dist_coeffs_, dist_coeffs, 4*sizeof(T), cudaMemcpyHostToDevice);
-
-  k_computeUndistortionMap<CameraModel, DistortionModel, T>
+  float* d_cam_params;
+  float* d_dist_coeffs;
+  cudaMalloc(&d_cam_params, camera_params.cols()*sizeof(float));
+  cudaMalloc(&d_dist_coeffs, dist_coeffs.cols()*sizeof(float));
+  IMP_CUDA_CHECK();
+  cudaMemcpy(
+        d_cam_params, camera_params.data(),
+        camera_params.cols()*sizeof(float),
+        cudaMemcpyHostToDevice);
+  cudaMemcpy(
+        d_dist_coeffs, dist_coeffs.data(),
+        dist_coeffs.cols()*sizeof(float),
+        cudaMemcpyHostToDevice);
+  IMP_CUDA_CHECK();
+  k_computeUndistortionMap<CameraModel, DistortionModel>
       <<<
         fragm_.dimGrid, fragm_.dimBlock
       >>> (undistortion_map_.data(),
            undistortion_map_.stride(),
            undistortion_map_.width(),
            undistortion_map_.height(),
-           d_cam_params_,
-           d_dist_coeffs_);
+           d_cam_params,
+           d_dist_coeffs);
+  IMP_CUDA_CHECK();
+  cudaFree(d_cam_params);
+  cudaFree(d_dist_coeffs);
+  IMP_CUDA_CHECK();
 }
 
 template <typename CameraModel,
           typename DistortionModel,
-          typename T>
-ImageUndistorter<CameraModel, DistortionModel, T>::~ImageUndistorter()
+          typename Pixel>
+void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
+    const ImageGpu<Pixel>& src,
+    ImageGpu<Pixel>& dst)
 {
-  cudaFree(d_cam_params_);
-  cudaFree(d_dist_coeffs_);
-}
-
-template <typename CameraModel,
-          typename DistortionModel,
-          typename T>
-void ImageUndistorter<CameraModel, DistortionModel, T>::undistort(
-    const ImageGpu32fC1& in,
-    ImageGpu32fC1& out)
-{
-  // Add checks if map and out images have the same size
-
-
-  std::shared_ptr<Texture2D> src_tex = in.genTexture(false, cudaFilterModeLinear);
+  CHECK_EQ(src.size(), dst.size());
+  CHECK_EQ(src.size(), undistortion_map_.size());
+  std::shared_ptr<Texture2D> src_tex = src.genTexture(false, cudaFilterModeLinear);
+  IMP_CUDA_CHECK();
   k_undistort
       <<<
         fragm_.dimGrid, fragm_.dimBlock
-      >>> (out.data(),
-           out.stride(),
+      >>> (dst.data(),
+           dst.stride(),
            undistortion_map_.data(),
            undistortion_map_.stride(),
-           out.width(),
-           out.height(),
+           dst.width(),
+           dst.height(),
            *src_tex);
+  IMP_CUDA_CHECK();
 }
 
-template class ImageUndistorter<PinholeGeometry, EquidistantDistortion, float>;
+template class ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace
