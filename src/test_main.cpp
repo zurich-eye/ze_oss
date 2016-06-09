@@ -33,6 +33,9 @@ int main(int argc, char** argv)
   std::string yaml_file_path = joinPath(test_data_name, "752x480/visensor_22030_swe_params.yaml");
 //  Camera::Ptr cam = Camera::loadFromYaml(yaml_file_path);
 
-  cu::ImageUndistorter undistorter;
+  float params[4] = {471.690643292, 471.765601046, 371.087464172, 228.63874151};
+  float dists[4] = {0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139};
+
+  cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, float> undistorter(752, 480, params, dists);
   undistorter.undistort(*cv_img);
 }
