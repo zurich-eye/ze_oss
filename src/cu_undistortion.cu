@@ -86,6 +86,8 @@ template <typename CameraModel,
           typename T>
 ImageUndistorter<CameraModel, DistortionModel, T>::~ImageUndistorter()
 {
+  cudaFree(d_cam_params_);
+  cudaFree(d_dist_coeffs_);
 }
 
 template <typename CameraModel,
