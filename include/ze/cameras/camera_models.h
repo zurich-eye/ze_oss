@@ -13,7 +13,6 @@ namespace ze {
 struct PinholeGeometry
 {
   template <typename T>
-  __host__ __device__ __forceinline__
   static void project(const T* params, T* px)
   {
     const T fx = params[0];
@@ -25,7 +24,6 @@ struct PinholeGeometry
   }
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void backProject(const T* params, T* px)
   {
     const T fx = params[0];
@@ -67,7 +65,6 @@ struct NoDistortion
   static constexpr DistortionType type = DistortionType::No;
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void distort(const T* /*params*/, T* /*px*/, T* jac_colmajor = nullptr)
   {
     if (jac_colmajor)
@@ -84,7 +81,6 @@ struct NoDistortion
   }
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void undistort(const T* /*params*/, T* /*px*/)
   {}
 };
@@ -97,7 +93,6 @@ struct FovDistortion
   static constexpr DistortionType type = DistortionType::Fov;
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -151,7 +146,6 @@ struct FovDistortion
   }
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void undistort(const T* params, T* px)
   {
     const T s = params[0];
@@ -172,7 +166,6 @@ struct RadialTangentialDistortion
   static constexpr DistortionType type = DistortionType::RadTan;
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -205,7 +198,6 @@ struct RadialTangentialDistortion
   }
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void undistort(const T* params, T* px)
   {
     const T k1 = params[0];
@@ -264,7 +256,6 @@ struct EquidistantDistortion
   static constexpr DistortionType type = DistortionType::Equidistant;
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -308,18 +299,18 @@ struct EquidistantDistortion
 
         T t1 = 1.0 / (xx + yy + 1.0);
         T t2 = k1 * theta_sqr
-            + k2 * theta_four
-            + k3 * theta_four * theta_sqr
-            + k4 * (theta_four * theta_four) + 1.0;
+             + k2 * theta_four
+             + k3 * theta_four * theta_sqr
+             + k4 * (theta_four * theta_four) + 1.0;
         T t3 = t1 * theta_inv_r;
 
         T offset = t2 * theta_inv_r;
         T scale  = t2 * (t1 / r_sqr - theta_inv_r / r_sqr)
             + theta_inv_r * t3 * (
-              2.0 * k1
-              + 4.0 * k2 * theta_sqr
-              + 6.0 * k3 * theta_four
-              + 8.0 * k4 * theta_four * theta_sqr);
+                  2.0 * k1
+                + 4.0 * k2 * theta_sqr
+                + 6.0 * k3 * theta_four
+                + 8.0 * k4 * theta_four * theta_sqr);
 
         J_11 = yy * scale + offset;
         J_00 = xx * scale + offset;
@@ -330,7 +321,6 @@ struct EquidistantDistortion
   }
 
   template <typename T>
-  __host__ __device__ __forceinline__
   static void undistort(const T* params, T* px)
   {
     const T k1 = params[0];
