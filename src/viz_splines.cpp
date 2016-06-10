@@ -1,5 +1,8 @@
 #include <ze/splines/viz_splines.hpp>
 
+#include <ze/matplotlib/matplotlibcpp.hpp>
+#include <ze/visualization/viz_interface.h>
+
 namespace ze {
 
 SplinesVisualizer::SplinesVisualizer(const std::shared_ptr<Visualizer>& viz)
@@ -47,7 +50,6 @@ void SplinesVisualizer::displaySplineTrajectory(const BSpline& bs,
     case 3:
       return displaySplineTrajectory(bs, topic, id, color, {0, 1, 2}, step_size);
   }
-
 }
 
 void SplinesVisualizer::displaySplineTrajectory(
@@ -77,6 +79,63 @@ void SplinesVisualizer::displaySplineTrajectory(
   }
 
   viz_->drawPoints(topic, id, points, color);
+}
+
+void SplinesVisualizer::displaySplineTrajectory(
+    const BSplinePoseMinimalRotationVector& bs,
+    const std::string& topic,
+    const size_t id,
+    FloatType step_size)
+{
+  ze::TransformationVector poses;
+
+  FloatType start = bs.t_min();
+  FloatType end = bs.t_max();
+  size_t samples = (end - start) / step_size;
+
+  for (size_t i = 0; i <= samples; ++i)
+  {
+    Transformation T(bs.transformation(start + i * step_size));
+    poses.push_back(T);
+  }
+
+  viz_->drawCoordinateFrames(topic, id, poses,  1);
+}
+
+void SplinesVisualizer::plotSpline(
+    const BSplinePoseMinimalRotationVector& bs,
+    FloatType step_size)
+{
+  FloatType start = bs.t_min();
+  FloatType end = bs.t_max();
+  size_t samples = (end - start) / step_size;
+
+  ze::MatrixX points(6, samples);
+  ze::VectorX times(samples);
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    points.col(i) = bs.eval(start + i * step_size);
+    times(i) = start + i * step_size;
+  }
+
+  // translation
+  plt::subplot(3, 1, 1);
+  plt::plot(times, points.row(0));
+  plt::subplot(3, 1, 2);
+  plt::plot(times, points.row(1));
+  plt::subplot(3, 1, 3);
+  plt::plot(times, points.row(2));
+  plt::show();
+
+  // rotation
+  plt::subplot(3, 1, 1);
+  plt::plot(times, points.row(3));
+  plt::subplot(3, 1, 2);
+  plt::plot(times, points.row(4));
+  plt::subplot(3, 1, 3);
+  plt::plot(times, points.row(5));
+  plt::show();
 }
 
 } // namespace ze
