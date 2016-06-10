@@ -20,8 +20,7 @@ void k_computeUndistortionMap(
 
   if (x < width && y < height)
   {
-    float px[2];
-    px[0] = x; px[1] = y;
+    float px[2]{x, y};
     CameraModel::backProject(d_cam_params, px);
     DistortionModel::distort(d_dist_coeffs, px);
     CameraModel::project(d_cam_params, px);
