@@ -1,5 +1,6 @@
 #include <imp/cu_imgproc/cu_undistortion.cuh>
 #include <imp/cu_core/cu_texture.cuh>
+#include <imp/cu_core/cu_linearmemory.cuh>
 
 namespace ze {
 namespace cu {
@@ -62,20 +63,9 @@ ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
   : undistortion_map_(img_size),
     fragm_(img_size)
 {
-  float* d_cam_params;
-  float* d_dist_coeffs;
-  cudaMalloc(&d_cam_params, camera_params.cols()*sizeof(float));
-  cudaMalloc(&d_dist_coeffs, dist_coeffs.cols()*sizeof(float));
-  IMP_CUDA_CHECK();
-  cudaMemcpy(
-        d_cam_params, camera_params.data(),
-        camera_params.cols()*sizeof(float),
-        cudaMemcpyHostToDevice);
-  cudaMemcpy(
-        d_dist_coeffs, dist_coeffs.data(),
-        dist_coeffs.cols()*sizeof(float),
-        cudaMemcpyHostToDevice);
-  IMP_CUDA_CHECK();
+  LinearMemory<Pixel32fC1> d_cam_params(camera_params);
+  LinearMemory<Pixel32fC1> d_dist_coeffs(dist_coeffs);
+
   k_computeUndistortionMap<CameraModel, DistortionModel>
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -83,12 +73,8 @@ ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
            undistortion_map_.stride(),
            undistortion_map_.width(),
            undistortion_map_.height(),
-           d_cam_params,
-           d_dist_coeffs);
-  IMP_CUDA_CHECK();
-  cudaFree(d_cam_params);
-  cudaFree(d_dist_coeffs);
-  IMP_CUDA_CHECK();
+           d_cam_params.cuData(),
+           d_dist_coeffs.cuData());
 }
 
 template <typename CameraModel,
