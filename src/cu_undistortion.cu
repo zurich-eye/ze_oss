@@ -96,8 +96,8 @@ template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
-    const ImageGpu<Pixel>& src,
-    ImageGpu<Pixel>& dst) const
+    ImageGpu<Pixel>& dst,
+    const ImageGpu<Pixel>& src) const
 {
   CHECK_EQ(src.size(), dst.size());
   CHECK_EQ(src.size(), undistortion_map_.size());

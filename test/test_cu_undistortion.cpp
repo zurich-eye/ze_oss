@@ -33,9 +33,9 @@ TEST(impCuUndistortionTexture, radTan32fC1_zeroDistortion)
 
   cu::RadTanUndistort32fC1 undistorter(
         gpu_src.size(), cam_params, dist_coeffs);
-  undistorter.undistort(gpu_src, gpu_dst);  // GPU warm-up
+  undistorter.undistort(gpu_dst, gpu_src);  // GPU warm-up
   auto undistortLambda = [&](){
-    undistorter.undistort(gpu_src, gpu_dst);
+    undistorter.undistort(gpu_dst, gpu_src);
   };
   runTimingBenchmark(
         undistortLambda, 10, 20,
@@ -116,9 +116,9 @@ TEST(impCuUndistortionTexture, equidist32fC1)
 
   cu::EquidistUndistort32fC1 undistorter(
         gpu_src.size(), cam_params, dist_coeffs);
-  undistorter.undistort(gpu_src, gpu_dst);  // GPU warm-up
+  undistorter.undistort(gpu_dst, gpu_src);  // GPU warm-up
   auto undistortLambda = [&](){
-    undistorter.undistort(gpu_src, gpu_dst);
+    undistorter.undistort(gpu_dst, gpu_src);
   };
   runTimingBenchmark(
         undistortLambda, 10, 20,

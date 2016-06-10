@@ -16,10 +16,13 @@ public:
       Size2u img_size,
       const Eigen::RowVectorXf& camera_params,
       const Eigen::RowVectorXf& dist_coeffs);
+
   ~ImageUndistorter() = default;
+
   void undistort(
-      const ImageGpu<Pixel>& src,
-      ImageGpu<Pixel>& dst) const;
+      ImageGpu<Pixel>& dst,
+      const ImageGpu<Pixel>& src) const;
+
   const ImageGpu32fC2& getUndistortionMap() const;
 
 private:
