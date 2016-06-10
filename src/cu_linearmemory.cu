@@ -41,9 +41,9 @@ LinearMemory<Pixel>::LinearMemory(const ze::LinearMemory<Pixel>& from)
 }
 
 //-----------------------------------------------------------------------------
-template<typename Pixel>
-LinearMemory<Pixel>::LinearMemory(const Eigen::RowVectorXf& from)
-  : ze::cu::LinearMemory<Pixel>(from.cols())
+template<>
+LinearMemory<Pixel32fC1>::LinearMemory(const Eigen::RowVectorXf& from)
+  : ze::cu::LinearMemory<Pixel32fC1>(from.cols())
 {
   if (from.data() == 0)
   {
