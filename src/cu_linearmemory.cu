@@ -49,8 +49,8 @@ LinearMemory<Pixel32fC1>::LinearMemory(const Eigen::RowVectorXf& from)
   {
     throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
   }
-  ze::LinearMemory<Pixel> tmp(from.cols());
-  for (size_t i = 0; i < from.cols(); ++i)
+  ze::LinearMemory<Pixel32fC1> tmp(from.cols());
+  for (int i = 0; i < from.cols(); ++i)
   {
     tmp(i)[0] = from(i);
   }
