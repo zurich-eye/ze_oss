@@ -63,8 +63,8 @@ ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
   : undistortion_map_(img_size),
     fragm_(img_size)
 {
-  LinearMemory<Pixel32fC1> d_cam_params(camera_params);
-  LinearMemory<Pixel32fC1> d_dist_coeffs(dist_coeffs);
+  LinearMemory32fC1 d_cam_params(camera_params);
+  LinearMemory32fC1 d_dist_coeffs(dist_coeffs);
 
   k_computeUndistortionMap<CameraModel, DistortionModel>
       <<<
