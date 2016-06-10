@@ -1,7 +1,8 @@
 #pragma once
+
 #include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_utils.hpp>
+#include <ze/cameras/camera_models.h>
 
 namespace ze {
 namespace cu {
@@ -30,8 +31,8 @@ private:
   Fragmentation<16, 16> fragm_;
 };
 
-using EquidistUndistort32fC1 = cu::ImageUndistorter<cu::PinholeGeometry, cu::EquidistantDistortion, Pixel32fC1>;
-using RadTanUndistort32fC1 = cu::ImageUndistorter<cu::PinholeGeometry, cu::RadialTangentialDistortion, Pixel32fC1>;
+using EquidistUndistort32fC1 = cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
+using RadTanUndistort32fC1 = cu::ImageUndistorter<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace

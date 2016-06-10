@@ -83,9 +83,9 @@ TEST(impCuUndistortionTexture, equidist32fC1_testMap)
       float px[2];
       px[0] = x;
       px[1] = y;
-      cu::PinholeGeometry::backProject(cam_params.data(), px);
-      cu::EquidistantDistortion::distort(dist_coeffs.data(), px);
-      cu::PinholeGeometry::project(cam_params.data(), px);
+      PinholeGeometry::backProject(cam_params.data(), px);
+      EquidistantDistortion::distort(dist_coeffs.data(), px);
+      PinholeGeometry::project(cam_params.data(), px);
       EXPECT_NEAR(px[0], cv_computed_map(x, y)[0], 0.0005);
     }
   }
