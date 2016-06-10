@@ -44,9 +44,9 @@ TEST(impCuUndistortion, pinholeEquidistant_32fC1_Texture)
         "CUDA undistortion using Textures", true);
   ze::ImageCv32fC1 cv_img_out(gpu_dst);
   //! @todo (MPI) find a baseline and compare
-  for (size_t y = 0; y < cv_img_out.height(); ++y)
+  for (uint32_t y = 0; y < cv_img_out.height(); ++y)
   {
-    for (size_t x = 0; x < cv_img_out.width(); ++x)
+    for (uint32_t x = 0; x < cv_img_out.width(); ++x)
     {
       EXPECT_LE(cv_img_out.cvMat().at<float>(y, x), 1.0f);
       EXPECT_GE(cv_img_out.cvMat().at<float>(y, x), 0.0f);

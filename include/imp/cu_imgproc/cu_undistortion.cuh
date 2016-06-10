@@ -19,7 +19,7 @@ public:
   ~ImageUndistorter() = default;
   void undistort(
       const ImageGpu<Pixel>& src,
-      ImageGpu<Pixel>& dst);
+      ImageGpu<Pixel>& dst) const;
 
 private:
   ImageGpu32fC2 undistortion_map_;

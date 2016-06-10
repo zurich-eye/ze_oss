@@ -12,8 +12,8 @@ void k_computeUndistortionMap(
     size_t dst_stride,
     std::uint32_t width,
     std::uint32_t height,
-    float* d_cam_params,
-    float* d_dist_coeffs)
+    const float* d_cam_params,
+    const float* d_dist_coeffs)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;
   const int y = blockIdx.y*blockDim.y + threadIdx.y;
@@ -35,7 +35,7 @@ __global__
 void k_undistort(
     Pixel1<T>* dst,
     size_t dst_stride,
-    Pixel32fC2* map,
+    const Pixel32fC2* map,
     size_t map_stride,
     std::uint32_t width,
     std::uint32_t height,
@@ -97,7 +97,7 @@ template <typename CameraModel,
           typename Pixel>
 void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
     const ImageGpu<Pixel>& src,
-    ImageGpu<Pixel>& dst)
+    ImageGpu<Pixel>& dst) const
 {
   CHECK_EQ(src.size(), dst.size());
   CHECK_EQ(src.size(), undistortion_map_.size());
