@@ -117,6 +117,7 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
 }
 
 template class ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
+template class ImageUndistorter<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace
