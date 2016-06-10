@@ -1,6 +1,5 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/bridge/opencv/cv_bridge.hpp>
-#include <ze/cameras/camera.h>
 #include <ze/common/file_utils.h>
 #include <ze/common/test_utils.h>
 
@@ -43,7 +42,7 @@ int main(int argc, char** argv)
   Eigen::RowVectorXf dist_coeff(4);
   dist_coeff << 0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139;
 
-  cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1> undistorter(
+  cu::ImageUndistorter<ze::cu::PinholeGeometry, ze::cu::EquidistantDistortion, ze::Pixel32fC1> undistorter(
         in.size(), cam_params, dist_coeff);
   undistorter.undistort(in, out);
 

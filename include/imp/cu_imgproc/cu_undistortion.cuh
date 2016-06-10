@@ -1,7 +1,7 @@
 #pragma once
 #include <imp/cu_core/cu_image_gpu.cuh>
+#include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_utils.hpp>
-#include <ze/cameras/camera_models.h>
 
 namespace ze {
 namespace cu {

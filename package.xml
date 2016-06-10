@@ -13,7 +13,6 @@
   <buildtool_depend>catkin_simple</buildtool_depend>
 
   <depend>ze_cmake</depend>
-  <depend>ze_cameras</depend>
   <depend>imp_core</depend>
   <depend>imp_imgproc</depend>
   <depend>imp_cu_core</depend>
