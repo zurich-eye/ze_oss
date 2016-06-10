@@ -116,6 +116,13 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
   IMP_CUDA_CHECK();
 }
 
+template <typename CameraModel,
+          typename DistortionModel,
+          typename Pixel>
+const ImageGpu32fC2& ImageUndistorter<CameraModel, DistortionModel, Pixel>::getUndistortionMap() const
+{
+  return undistortion_map_;
+}
 
 // Explicit template instantiations
 template class ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;

@@ -20,6 +20,7 @@ public:
   void undistort(
       const ImageGpu<Pixel>& src,
       ImageGpu<Pixel>& dst) const;
+  const ImageGpu32fC2& getUndistortionMap() const;
 
 private:
   ImageGpu32fC2 undistortion_map_;
