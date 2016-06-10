@@ -26,5 +26,8 @@ private:
   Fragmentation<16, 16> fragm_;
 };
 
+using EquidistUndistort32fC1 = cu::ImageUndistorter<cu::PinholeGeometry, cu::EquidistantDistortion, Pixel32fC1>;
+using RadTanUndistort32fC1 = cu::ImageUndistorter<cu::PinholeGeometry, cu::RadialTangentialDistortion, Pixel32fC1>;
+
 } // cu namespace
 } // ze namespace

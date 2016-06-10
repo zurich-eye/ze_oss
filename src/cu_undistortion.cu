@@ -116,6 +116,8 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
   IMP_CUDA_CHECK();
 }
 
+
+// Explicit template instantiations
 template class ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
 template class ImageUndistorter<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
