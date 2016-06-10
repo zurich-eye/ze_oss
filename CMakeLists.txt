@@ -1,3 +1,5 @@
+if(ZE_USE_ARRAYFIRE)
+
 project(imp_bridge_af)
 cmake_minimum_required(VERSION 2.8.0)
 
@@ -9,6 +11,7 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
+
 include(ze_macros_cuda)
 find_cuda()
 
@@ -47,3 +50,5 @@ target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 
 cs_install()
 cs_export()
+
+endif()
