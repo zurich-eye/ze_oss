@@ -12,7 +12,7 @@ namespace cu {
 struct PinholeGeometry
 {
   template <typename T>
-  __device__
+  __host__ __device__
   static void project(const T* params, T* px)
   {
     const T fx = params[0];
@@ -24,7 +24,7 @@ struct PinholeGeometry
   }
 
   template <typename T>
-  __device__
+  __host__ __device__
   static void backProject(const T* params, T* px)
   {
     const T fx = params[0];
@@ -53,7 +53,7 @@ struct RadialTangentialDistortion
   static constexpr DistortionType type = DistortionType::RadTan;
 
   template <typename T>
-  __device__
+  __host__ __device__
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -95,7 +95,7 @@ struct EquidistantDistortion
   static constexpr DistortionType type = DistortionType::Equidistant;
 
   template <typename T>
-  __device__
+  __host__ __device__
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
