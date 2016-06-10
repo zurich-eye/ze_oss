@@ -45,6 +45,48 @@ enum class DistortionType
 };
 
 // -----------------------------------------------------------------------------
+// This class implements the radial and tangential distortion model used by
+// OpenCV and ROS. Reference:
+// docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+struct RadialTangentialDistortion
+{
+  static constexpr DistortionType type = DistortionType::RadTan;
+
+  template <typename T>
+  __device__
+  static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
+  {
+    const T x = px[0];
+    const T y = px[1];
+    const T k1 = params[0];
+    const T k2 = params[1];
+    const T p1 = params[2];
+    const T p2 = params[3];
+    const T xx = x * x;
+    const T yy = y * y;
+    const T xy = x * y;
+    const T r2 = xx + yy;
+    const T cdist = (k1 + k2 * r2) * r2;
+    px[0] += px[0] * cdist + p1 * 2.0 * xy + p2 * (r2 + 2.0 * xx);
+    px[1] += px[1] * cdist + p2 * 2.0 * xy + p1 * (r2 + 2.0 * yy);
+
+    if (jac_colmajor)
+    {
+      const T k2_r2_x4 = k2 * r2 * 4.0;
+      const T cdist_p1 = cdist + 1.0;
+      T& J_00 = jac_colmajor[0];
+      T& J_10 = jac_colmajor[1];
+      T& J_01 = jac_colmajor[2];
+      T& J_11 = jac_colmajor[3];
+      J_00 = cdist_p1 + k1 * 2.0 * xx + k2_r2_x4 * xx + 2.0 * p1 * y + 6.0 * p2 * x;
+      J_11 = cdist_p1 + k1 * 2.0 * yy + k2_r2_x4 * yy + 2.0 * p2 * x + 6.0 * p1 * y;
+      J_10 = 2.0 * k1 * xy + k2_r2_x4 * xy + 2.0 * p1 * x + 2.0 * p2 * y;
+      J_01 = J_10;
+    }
+  }
+};
+
+// -----------------------------------------------------------------------------
 // This class implements the distortion model described in the paper:
 // "A Generic Camera Model and Calibration Method for Conventional, Wide-Angle,
 // and Fish-Eye Lenses" by Juho Kannala and Sami S. Brandt, PAMI.
@@ -116,56 +158,6 @@ struct EquidistantDistortion
         J_10 = J_01;
       }
     }
-  }
-
-  template <typename T>
-  __device__
-  static void undistort(const T* params, T* px)
-  {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-
-    T jac_colmajor[4];
-    T x[2];
-    T x_tmp[2];
-    x[0] = px[0]; x[1]= px[1];
-    for(int i = 0; i < 30; ++i)
-    {
-      x_tmp[0] = x[0]; x_tmp[1] = x[1];
-      distort(params, x_tmp, jac_colmajor);
-
-      const T e_u = px[0] - x_tmp[0];
-      const T e_v = px[1] - x_tmp[1];
-
-      const T a = jac_colmajor[0];
-      const T b = jac_colmajor[1];
-      const T d = jac_colmajor[3];
-
-      // direct gauss newton step
-      const T a_sqr = a * a;
-      const T b_sqr = b * b;
-      const T d_sqr = d * d;
-      const T abbd = a * b + b * d;
-      const T abbd_sqr = abbd * abbd;
-      const T a2b2 = a_sqr + b_sqr;
-      const T a2b2_inv = 1.0 / a2b2;
-      const T adabdb = a_sqr * d_sqr - 2 * a * b_sqr * d + b_sqr * b_sqr;
-      const T adabdb_inv = 1.0 / adabdb;
-      const T c1 = abbd * adabdb_inv;
-
-      x[0] += e_u * (a * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - b * c1) + e_v * (b * (abbd_sqr * a2b2_inv * adabdb_inv + a2b2_inv) - d * c1);
-      x[1] += e_u * (-a * c1 + b * a2b2 * adabdb_inv) + e_v * (-b * c1 + d * a2b2 * adabdb_inv);
-
-      if ((e_u * e_u + e_v * e_v) < 1e-8)
-      {
-        break;
-      }
-    }
-
-    px[0] = x[0];
-    px[1] = x[1];
   }
 };
 
