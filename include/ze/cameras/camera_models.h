@@ -200,11 +200,6 @@ struct RadialTangentialDistortion
   template <typename T>
   static void undistort(const T* params, T* px)
   {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-
     T jac_colmajor[4];
     T x[2];
     T x_tmp[2];
@@ -323,11 +318,6 @@ struct EquidistantDistortion
   template <typename T>
   static void undistort(const T* params, T* px)
   {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-
     T jac_colmajor[4];
     T x[2];
     T x_tmp[2];
