@@ -51,9 +51,6 @@ cs_cuda_add_library(${PROJECT_NAME}
    )
 #target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
-cs_add_executable(test_main src/test_main.cpp)
-target_link_libraries(test_main ${PROJECT_NAME})
-
 ##########
 # GTESTS #
 ##########
@@ -66,9 +63,11 @@ target_link_libraries(test_cu_rof ${PROJECT_NAME})
 catkin_add_gtest(test_cu_str_tex_decomp test/test_cu_str_tex_decomp.cpp)
 target_link_libraries(test_cu_str_tex_decomp ${PROJECT_NAME})
 
+catkin_add_gtest(test_cu_undistortion test/test_cu_undistortion.cpp)
+target_link_libraries(test_cu_undistortion ${PROJECT_NAME})
+
 ##########
 # EXPORT #
 ##########
 cs_install()
 cs_export()
-

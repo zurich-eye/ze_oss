@@ -23,7 +23,7 @@ public:
 
 private:
   ImageGpu32fC2 undistortion_map_;
-  Fragmentation<> fragm_;
+  Fragmentation<16, 16> fragm_;
 };
 
 } // cu namespace
