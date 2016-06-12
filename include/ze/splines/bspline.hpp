@@ -478,11 +478,13 @@ public:
                   const VectorX& p_0,
                   const VectorX& p_1);
 
+  //! Spline initialization version 2.
   void initSpline2(const VectorX& times,
                    const MatrixX& interpolation_points,
                    int num_segments,
                    FloatType lambda);
 
+  //! Spline initialization version 3.
   void initSpline3(const VectorX& times,
                    const MatrixX& interpolation_points,
                    int num_segments,

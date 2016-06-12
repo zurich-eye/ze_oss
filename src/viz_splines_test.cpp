@@ -5,6 +5,7 @@
 #include <ze/visualization/viz_ros.h>
 #include <ze/splines/viz_splines.hpp>
 #include <ze/splines/bspline.hpp>
+#include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/types.h>
 
 int main(int argc, char** argv)

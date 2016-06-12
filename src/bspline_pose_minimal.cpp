@@ -2,9 +2,6 @@
 
 namespace ze {
 
-// explicit specialization
-template class BSplinePoseMinimal<ze::sm::RotationVector>;
-
 template<class RP>
 BSplinePoseMinimal<RP>::BSplinePoseMinimal(int spline_order)
   : BSpline(spline_order)
@@ -451,5 +448,8 @@ void BSplinePoseMinimal<RP>::initPoseSplinePoses(const VectorX& times,
 
   initPoseSpline3(times, parameters, num_segments, lambda);
 }
+
+// explicit specialization
+template class BSplinePoseMinimal<ze::sm::RotationVector>;
 
 } // namespace ze
