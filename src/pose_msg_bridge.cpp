@@ -5,11 +5,11 @@ namespace ze {
 Transformation poseMsgTotransformation(
     const geometry_msgs::PoseStamped& pose_msg)
 {
-  Eigen::Vector3d p(
+  Vector3 p(
         pose_msg.pose.position.x,
         pose_msg.pose.position.y,
         pose_msg.pose.position.z);
-  Eigen::Quaterniond q(
+  Quaternion q(
         pose_msg.pose.orientation.w,
         pose_msg.pose.orientation.x,
         pose_msg.pose.orientation.y,
