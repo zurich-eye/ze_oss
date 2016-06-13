@@ -31,7 +31,7 @@ public:
     {
       FloatType dt = stamps[i+1] - stamps[i];
 
-      Matrix3 increment = Quaternion::exp(measurements[i].tail<3>(3) * (dt)).getRotationMatrix();
+      Matrix3 increment = Quaternion::exp(measurements[i].tail<3>(3) * dt).getRotationMatrix();
 
       // Reset to 0 at every step:
       if (i == 0)
@@ -47,10 +47,7 @@ public:
         R_i_k_.push_back(R_i_k_.back() * increment);
 
         // Propagate Covariance:
-        Vector3 psi = (Quaternion(D_R_i_k_.back())).log();
-        FloatType norm = psi.norm();
-        FloatType norm_sqr = norm*norm;
-        Matrix3 J_r = expmapDerivativeSO3(psi);
+        Matrix3 J_r = expmapDerivativeSO3(measurements[i].tail<3>(3) * dt);
 
         covariance_i_k_.push_back(
               D_R_i_k_.back().transpose() * covariance_i_k_.back() * D_R_i_k_.back()
