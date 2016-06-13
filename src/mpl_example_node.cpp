@@ -21,15 +21,8 @@ int main()
   plt::named_plot("A Name", times, points);
   plt::show();
 
-  // enable interactive mode as of now:
-  if (plt::ion())
-  {
-    std::cout << "Success" << "\n";
-  }
-  else
-  {
-    std::cout << "Not" << "\n";
-  }
+  // enable interactive mode as of now (only tests if it doesn't crash)
+  plt::ion();
 
   // subplots
   plt::subplot(3, 1, 1);
