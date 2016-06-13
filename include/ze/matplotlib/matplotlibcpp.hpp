@@ -87,13 +87,28 @@ bool plot(
 
 bool plot(
     const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::map<std::string, std::string>& keywords);
+
+bool plot(
+    const std::vector<FloatType>& x,
     const std::vector<FloatType>& y,
+    const std::string& s = "");
+bool plot(
+    const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
     const std::string& s = "");
 
 bool labelPlot(
     const std::string& name,
     const std::vector<FloatType>& x,
     const std::vector<FloatType>& y,
+    const std::string& format = "");
+
+bool labelPlot(
+    const std::string& name,
+    const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
     const std::string& format = "");
 //! @}
 

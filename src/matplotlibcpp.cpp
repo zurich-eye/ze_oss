@@ -446,6 +446,17 @@ bool plot(
 // -----------------------------------------------------------------------------
 bool plot(
     const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::map<std::string, std::string>& keywords)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  return plot(x_e, y, keywords);
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const std::vector<FloatType>& x,
     const std::vector<FloatType>& y,
     const std::string& s)
 {
@@ -454,6 +465,17 @@ bool plot(
   Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return plot(x_e, y_e, s);
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::string& s)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  return plot(x_e, y, s);
 }
 
 // -----------------------------------------------------------------------------
@@ -468,6 +490,18 @@ bool labelPlot(
   Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return labelPlot(name, x_e, y_e, format);
+}
+
+// -----------------------------------------------------------------------------
+bool labelPlot(
+    const std::string& name,
+    const std::vector<FloatType>& x,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::string& format)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  return labelPlot(name, x_e, y, format);
 }
 
 // -----------------------------------------------------------------------------
