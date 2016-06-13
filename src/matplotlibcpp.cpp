@@ -1,1 +1,643 @@
 #include <ze/matplotlib/matplotlibcpp.hpp>
+
+#include <ze/common/logging.hpp>
+
+#include <Python.h>
+
+namespace ze {
+namespace plt {
+
+namespace detail {
+
+// -----------------------------------------------------------------------------
+struct _interpreter
+{
+  PyObject *s_python_function_show;
+  PyObject *s_python_function_save;
+  PyObject *s_python_function_figure;
+  PyObject *s_python_function_plot;
+  PyObject *s_python_function_subplot;
+  PyObject *s_python_function_hist;
+  PyObject *s_python_function_legend;
+  PyObject *s_python_function_xlim;
+  PyObject *s_python_function_ylim;
+  PyObject *s_python_function_title;
+  PyObject *s_python_function_axis;
+  PyObject *s_python_function_xlabel;
+  PyObject *s_python_function_ylabel;
+  PyObject *s_python_function_ion;
+  PyObject *s_python_function_grid;
+  PyObject *s_python_empty_tuple;
+
+  /** For now, _interpreter is implemented as a singleton since its currently
+   * not possible to have multiple independent embedded python interpreters
+   * without patching the python source code or starting a seperate process
+   * for each.
+   * http://bytes.com/topic/python/answers/793370-multiple-independent-python-interpreters-c-c-program
+   */
+
+  static _interpreter& get()
+  {
+    static _interpreter ctx;
+    return ctx;
+  }
+
+private:
+  _interpreter()
+  {
+    char name[] = "plotting"; // silence compiler warning about const strings
+    Py_SetProgramName(name);  // optional but recommended
+    Py_Initialize();
+
+    PyObject* pyplotname = PyString_FromString("matplotlib.pyplot");
+    PyObject* pylabname  = PyString_FromString("pylab");
+    if (!pyplotname || !pylabname)
+    {
+      throw std::runtime_error("couldnt create string");
+    }
+
+    PyObject* pymod = PyImport_Import(pyplotname);
+    Py_DECREF(pyplotname);
+    if (!pymod) {
+      throw std::runtime_error("Error loading module matplotlib.pyplot!");
+    }
+
+    PyObject* pylabmod = PyImport_Import(pylabname);
+    Py_DECREF(pylabname);
+    if (!pymod)
+    {
+      throw std::runtime_error("Error loading module pylab!");
+    }
+
+    s_python_function_show = PyObject_GetAttrString(pymod, "show");
+    s_python_function_figure = PyObject_GetAttrString(pymod, "figure");
+    s_python_function_plot = PyObject_GetAttrString(pymod, "plot");
+    s_python_function_subplot = PyObject_GetAttrString(pymod, "subplot");
+    s_python_function_hist = PyObject_GetAttrString(pymod, "hist");
+    s_python_function_legend = PyObject_GetAttrString(pymod, "legend");
+    s_python_function_ylim = PyObject_GetAttrString(pymod, "ylim");
+    s_python_function_title = PyObject_GetAttrString(pymod, "title");
+    s_python_function_axis = PyObject_GetAttrString(pymod, "axis");
+    s_python_function_xlabel = PyObject_GetAttrString(pymod, "xlabel");
+    s_python_function_ylabel = PyObject_GetAttrString(pymod, "ylabel");
+    s_python_function_grid = PyObject_GetAttrString(pymod, "grid");
+    s_python_function_xlim = PyObject_GetAttrString(pymod, "xlim");
+    s_python_function_ion = PyObject_GetAttrString(pymod, "ion");
+
+    s_python_function_save = PyObject_GetAttrString(pylabmod, "savefig");
+
+    if(!s_python_function_show
+       || !s_python_function_save
+       || !s_python_function_figure
+       || !s_python_function_plot
+       || !s_python_function_subplot
+       || !s_python_function_hist
+       || !s_python_function_legend
+       || !s_python_function_xlim
+       || !s_python_function_ylim
+       || !s_python_function_title
+       || !s_python_function_axis
+       || !s_python_function_xlabel
+       || !s_python_function_ylabel
+       || !s_python_function_ion
+       || !s_python_function_grid
+       )
+    {
+      throw std::runtime_error("Couldnt find required function!");
+    }
+
+    if(!PyFunction_Check(s_python_function_show)
+       || !PyFunction_Check(s_python_function_save)
+       || !PyFunction_Check(s_python_function_figure)
+       || !PyFunction_Check(s_python_function_plot)
+       || !PyFunction_Check(s_python_function_subplot)
+       || !PyFunction_Check(s_python_function_hist)
+       || !PyFunction_Check(s_python_function_legend)
+       || !PyFunction_Check(s_python_function_xlim)
+       || !PyFunction_Check(s_python_function_ylim)
+       || !PyFunction_Check(s_python_function_title)
+       || !PyFunction_Check(s_python_function_axis)
+       || !PyFunction_Check(s_python_function_xlabel)
+       || !PyFunction_Check(s_python_function_ylabel)
+       || !PyFunction_Check(s_python_function_ion)
+       || !PyFunction_Check(s_python_function_grid)
+       )
+    {
+      throw std::runtime_error("Python object is unexpectedly not a PyFunction.");
+    }
+
+    s_python_empty_tuple = PyTuple_New(0);
+  }
+
+  ~_interpreter()
+  {
+    Py_Finalize();
+  }
+};
+} // namespace detail
+
+// -----------------------------------------------------------------------------
+bool ion()
+{
+
+  PyObject* args = PyTuple_New(0);
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_ion,
+                    args);
+
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+//! Create a new figure
+bool figure(std::string i)
+{
+  PyObject* args;
+  if (i != "")
+  {
+    args = PyTuple_New(1);
+    PyObject* i_py = PyString_FromString(i.c_str());
+    PyTuple_SetItem(args, 0, i_py);
+  }
+  else
+  {
+    args = PyTuple_New(0);
+  }
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_figure,
+                    args);
+
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool hist(
+    const Eigen::Ref<const VectorX>& x,
+    const double bins,
+    const std::string histtype)
+{
+  // using python lists
+  PyObject* xlist = PyList_New(x.size());
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
+  }
+
+  PyObject* bins_py = PyFloat_FromDouble(bins);
+  PyObject* histtype_py = PyString_FromString(histtype.c_str());
+
+  // construct positional args
+  PyObject* args = PyTuple_New(8);
+  PyTuple_SetItem(args, 0, xlist);
+  PyTuple_SetItem(args, 1, bins_py);
+  PyTuple_SetItem(args, 2, Py_None);
+  PyTuple_SetItem(args, 3, Py_False);
+  PyTuple_SetItem(args, 4, Py_None);
+  PyTuple_SetItem(args, 5, Py_False);
+  PyTuple_SetItem(args, 6, Py_None);
+  PyTuple_SetItem(args, 7, histtype_py);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_hist,
+                    args);
+
+  Py_DECREF(xlist);
+  Py_DECREF(bins_py);
+  Py_DECREF(histtype_py);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number)
+{
+  PyObject* nrows_py = PyFloat_FromDouble(nrows);
+  PyObject* ncols_py = PyFloat_FromDouble(ncols);
+  PyObject* plot_number_py = PyFloat_FromDouble(plot_number);
+  PyObject* subplot_args = PyTuple_New(3);
+  PyTuple_SetItem(subplot_args, 0, nrows_py);
+  PyTuple_SetItem(subplot_args, 1, ncols_py);
+  PyTuple_SetItem(subplot_args, 2, plot_number_py);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_subplot,
+                    subplot_args);
+
+  Py_DECREF(nrows_py);
+  Py_DECREF(ncols_py);
+  Py_DECREF(plot_number_py);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const Eigen::Ref<const VectorX>& x,
+    const Eigen::Ref<const VectorX>& y,
+    const std::map<std::string, std::string>& keywords)
+{
+  CHECK_EQ(x.size(), y.size());
+
+  // using python lists
+  PyObject* xlist = PyList_New(x.size());
+  PyObject* ylist = PyList_New(y.size());
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
+    PyList_SetItem(ylist, i, PyFloat_FromDouble(y(i)));
+  }
+
+  // construct positional args
+  PyObject* args = PyTuple_New(2);
+  PyTuple_SetItem(args, 0, xlist);
+  PyTuple_SetItem(args, 1, ylist);
+
+  Py_DECREF(xlist);
+  Py_DECREF(ylist);
+
+  // construct keyword args
+  PyObject* kwargs = PyDict_New();
+  for (std::map<std::string, std::string>::const_iterator it = keywords.begin();
+       it != keywords.end(); ++it)
+  {
+    PyDict_SetItemString(kwargs,
+                         it->first.c_str(),
+                         PyString_FromString(it->second.c_str()));
+  }
+
+  PyObject* res = PyObject_Call(
+                    detail::_interpreter::get().s_python_function_plot,
+                    args,
+                    kwargs);
+
+  Py_DECREF(args);
+  Py_DECREF(kwargs);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const Eigen::Ref<const VectorX>& x,
+    const Eigen::Ref<const VectorX>& y,
+    const std::string& s)
+{
+  assert(x.size() == y.size());
+
+  PyObject* xlist = PyList_New(x.size());
+  PyObject* ylist = PyList_New(y.size());
+  PyObject* pystring = PyString_FromString(s.c_str());
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
+    PyList_SetItem(ylist, i, PyFloat_FromDouble(y(i)));
+  }
+
+  PyObject* plot_args = PyTuple_New(3);
+  PyTuple_SetItem(plot_args, 0, xlist);
+  PyTuple_SetItem(plot_args, 1, ylist);
+  PyTuple_SetItem(plot_args, 2, pystring);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_plot,
+                    plot_args);
+
+  Py_DECREF(xlist);
+  Py_DECREF(ylist);
+  Py_DECREF(plot_args);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool named_plot(
+    const std::string& name,
+    const Eigen::Ref<const VectorX>& x,
+    const Eigen::Ref<const VectorX>& y,
+    const std::string& format)
+{
+  PyObject* kwargs = PyDict_New();
+  PyDict_SetItemString(kwargs, "label", PyString_FromString(name.c_str()));
+
+  PyObject* xlist = PyList_New(x.size());
+  PyObject* ylist = PyList_New(y.size());
+  PyObject* pystring = PyString_FromString(format.c_str());
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
+    PyList_SetItem(ylist, i, PyFloat_FromDouble(y(i)));
+  }
+
+  PyObject* plot_args = PyTuple_New(3);
+  PyTuple_SetItem(plot_args, 0, xlist);
+  PyTuple_SetItem(plot_args, 1, ylist);
+  PyTuple_SetItem(plot_args, 2, pystring);
+
+  PyObject* res = PyObject_Call(
+                    detail::_interpreter::get().s_python_function_plot,
+                    plot_args,
+                    kwargs);
+
+  Py_DECREF(kwargs);
+  Py_DECREF(xlist);
+  Py_DECREF(ylist);
+  Py_DECREF(plot_args);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const Eigen::Ref<const VectorX>& y,
+    const std::string& format)
+{
+  Eigen::Matrix<double, Eigen::Dynamic, 1> x(y.size());
+  for (int i=0; i < x.size(); ++i)
+  {
+    x(i) = i;
+  }
+  return plot(x,y,format);
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const std::vector<FloatType>& y,
+    const std::string& format)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+                                                                    y.size());
+  return plot(y_e, format);
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const std::vector<FloatType>& x,
+    const std::vector<FloatType>& y,
+    const std::map<std::string, std::string>& keywords)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+                                                                    y.size());
+  return plot(x_e, y_e, keywords);
+}
+
+// -----------------------------------------------------------------------------
+bool plot(
+    const std::vector<FloatType>& x,
+    const std::vector<FloatType>& y,
+    const std::string& s)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+                                                                    y.size());
+  return plot(x_e, y_e, s);
+}
+
+// -----------------------------------------------------------------------------
+bool named_plot(
+    const std::string& name,
+    const std::vector<FloatType>& x,
+    const std::vector<FloatType>& y,
+    const std::string& format)
+{
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+                                                                    x.size());
+  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+                                                                    y.size());
+  return named_plot(name, x_e, y_e, format);
+}
+
+// -----------------------------------------------------------------------------
+void legend()
+{
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_legend,
+                    detail::_interpreter::get().s_python_empty_tuple);
+
+  if (!res)
+  {
+    throw std::runtime_error("Call to legend() failed.");
+  }
+
+  Py_DECREF(res);
+}
+
+// -----------------------------------------------------------------------------
+void ylim(FloatType ymin, FloatType ymax)
+{
+  PyObject* list = PyList_New(2);
+  PyList_SetItem(list, 0, PyFloat_FromDouble(ymin));
+  PyList_SetItem(list, 1, PyFloat_FromDouble(ymax));
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, list);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_ylim,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to ylim() failed.");
+  }
+
+  Py_DECREF(list);
+  Py_DECREF(args);
+  Py_DECREF(res);
+}
+
+// -----------------------------------------------------------------------------
+void xlim(FloatType xmin, FloatType xmax)
+{
+  PyObject* list = PyList_New(2);
+  PyList_SetItem(list, 0, PyFloat_FromDouble(xmin));
+  PyList_SetItem(list, 1, PyFloat_FromDouble(xmax));
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, list);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_xlim,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to xlim() failed.");
+  }
+
+  Py_DECREF(list);
+  Py_DECREF(args);
+  Py_DECREF(res);
+}
+
+// -----------------------------------------------------------------------------
+void title(const std::string &titlestr)
+{
+  PyObject* pytitlestr = PyString_FromString(titlestr.c_str());
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, pytitlestr);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_title,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to title() failed.");
+  }
+
+  // if PyDeCRFF, the function doesn't work on Mac OS
+}
+
+// -----------------------------------------------------------------------------
+void axis(const std::string &axisstr)
+{
+  PyObject* str = PyString_FromString(axisstr.c_str());
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, str);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_axis,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to title() failed.");
+  }
+
+  // if PyDeCRFF, the function doesn't work on Mac OS
+}
+
+// -----------------------------------------------------------------------------
+void xlabel(const std::string &str)
+{
+  PyObject* pystr = PyString_FromString(str.c_str());
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, pystr);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_xlabel,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to xlabel() failed.");
+  }
+
+  // if PyDeCRFF, the function doesn't work on Mac OS
+}
+
+// -----------------------------------------------------------------------------
+void ylabel(const std::string &str)
+{
+  PyObject* pystr = PyString_FromString(str.c_str());
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, pystr);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_ylabel,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to ylabel() failed.");
+  }
+
+  // if PyDeCRFF, the function doesn't work on Mac OS
+}
+
+// -----------------------------------------------------------------------------
+void grid(bool flag)
+{
+  PyObject* pyflag = flag ? Py_True : Py_False;
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, pyflag);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_grid,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to grid() failed.");
+  }
+
+  // if PyDeCRFF, the function doesn't work on Mac OS
+}
+
+// -----------------------------------------------------------------------------
+void show(bool block)
+{
+  PyObject* pyflag = block ? Py_True : Py_False;
+
+  PyObject* kwargs = PyDict_New();
+
+  PyDict_SetItemString(kwargs, "block", pyflag);
+
+  PyObject* res = PyObject_Call(
+                    detail::_interpreter::get().s_python_function_show,
+                    detail::_interpreter::get().s_python_empty_tuple,
+                    kwargs);
+  if (!res)
+  {
+    throw std::runtime_error("Call to show() failed.");
+  }
+
+  Py_DECREF(res);
+  Py_DECREF(kwargs);
+}
+
+// -----------------------------------------------------------------------------
+void save(const std::string& filename)
+{
+  PyObject* pyfilename = PyString_FromString(filename.c_str());
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, pyfilename);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_save,
+                    args);
+  if (!res)
+  {
+    throw std::runtime_error("Call to save() failed.");
+  }
+
+  Py_DECREF(pyfilename);
+  Py_DECREF(args);
+  Py_DECREF(res);
+}
+
+} // namespace plt
+} // namespace ze
