@@ -159,6 +159,8 @@ private:
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 {
+  plt::ion();
+
   visualizer_ = std::make_shared<VisualizerRos>();
   splines_visualizer_ = std::make_shared<SplinesVisualizer>(visualizer_);
 
@@ -302,6 +304,7 @@ void PreIntegrationEvaluationNode::plotResults(
     est.col(i) = covariances_est[i].diagonal();
   }
 
+  plt::figure();
   plt::subplot(3, 1, 1);
   plt::plot(mc.row(0), "r");
   plt::plot(est.row(0), "b");
@@ -314,12 +317,15 @@ void PreIntegrationEvaluationNode::plotResults(
   plt::plot(mc.row(2), "r");
   plt::plot(est.row(2), "b");
 
-  plt::show();
+  plt::show(false);
 }
 
 // -----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::shutdown()
 {
+  // Blocking destructor to keep figures open.
+  plt::figure();
+  plt::show();
 }
 
 } // namespace ze
