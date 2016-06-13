@@ -26,7 +26,7 @@ public:
     for (size_t i = 0; i < DIM; ++i)
     {
       // The gaussian takes a standard deviation as input.
-      noise(i) = sampleFromNormalDistribution<FloatType>(deterministic_, 0.0, sigma_(i));
+      noise(i) = sampleNormalDistribution<FloatType>(deterministic_, 0.0, sigma_(i));
     }
     return noise;
   }
@@ -70,7 +70,7 @@ randomMatrixUniformDistributed(
   {
     for (int y = 0; y < rows; ++y)
     {
-      m(y,x) = sampleFromUniformRealDistribution(deterministic, from, to);
+      m(y,x) = sampleUniformRealDistribution(deterministic, from, to);
     }
   }
   return m;
@@ -102,7 +102,7 @@ randomMatrixNormalDistributed(
   {
     for (int y = 0; y < rows; ++y)
     {
-      m(y,x) = sampleFromNormalDistribution(deterministic, mean, sigma);
+      m(y,x) = sampleNormalDistribution(deterministic, mean, sigma);
     }
   }
   return m;

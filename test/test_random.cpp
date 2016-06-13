@@ -8,21 +8,21 @@ TEST(RandomTests, testRandomSampling)
   using namespace ze;
 
   // Deterministic sampling results always the same series of random numbers.
-  EXPECT_EQ(sampleFromUniformIntDistribution<uint8_t>(true), 140u);
-  EXPECT_EQ(sampleFromUniformIntDistribution<uint8_t>(true), 151u);
-  EXPECT_EQ(sampleFromUniformIntDistribution<uint8_t>(true), 183u);
+  EXPECT_EQ(sampleUniformIntDistribution<uint8_t>(true), 140u);
+  EXPECT_EQ(sampleUniformIntDistribution<uint8_t>(true), 151u);
+  EXPECT_EQ(sampleUniformIntDistribution<uint8_t>(true), 183u);
 
-  EXPECT_EQ(sampleFromUniformIntDistribution<int>(true), 209652396);
-  EXPECT_EQ(sampleFromUniformIntDistribution<int>(true), 398764591);
-  EXPECT_EQ(sampleFromUniformIntDistribution<int>(true), 924231285);
+  EXPECT_EQ(sampleUniformIntDistribution<int>(true), 209652396);
+  EXPECT_EQ(sampleUniformIntDistribution<int>(true), 398764591);
+  EXPECT_EQ(sampleUniformIntDistribution<int>(true), 924231285);
 
-  EXPECT_NEAR(sampleFromUniformRealDistribution<double>(true), 0.592844, 1e-5);
-  EXPECT_NEAR(sampleFromUniformRealDistribution<double>(true), 0.844265, 1e-5);
-  EXPECT_NEAR(sampleFromUniformRealDistribution<double>(true), 0.857945, 1e-5);
+  EXPECT_NEAR(sampleUniformRealDistribution<double>(true), 0.592844, 1e-5);
+  EXPECT_NEAR(sampleUniformRealDistribution<double>(true), 0.844265, 1e-5);
+  EXPECT_NEAR(sampleUniformRealDistribution<double>(true), 0.857945, 1e-5);
 
-  EXPECT_NEAR(sampleFromNormalDistribution<double>(true, 1.0, 4.0), 5.4911797, 1e-5);
-  EXPECT_NEAR(sampleFromNormalDistribution<double>(true, 1.0, 4.0), 1.2834369, 1e-5);
-  EXPECT_NEAR(sampleFromNormalDistribution<double>(true, 1.0, 4.0), -4.689303, 1e-5);
+  EXPECT_NEAR(sampleNormalDistribution<double>(true, 1.0, 4.0), 5.4911797, 1e-5);
+  EXPECT_NEAR(sampleNormalDistribution<double>(true, 1.0, 4.0), 1.2834369, 1e-5);
+  EXPECT_NEAR(sampleNormalDistribution<double>(true, 1.0, 4.0), -4.689303, 1e-5);
 
   EXPECT_TRUE (flipCoin(true, 0.7));
   EXPECT_FALSE(flipCoin(true, 0.7));
@@ -32,16 +32,16 @@ TEST(RandomTests, testRandomSampling)
   EXPECT_TRUE (flipCoin(true, 0.7));
 
   // Non-deterministic sampling, always results in different numbers:
-  EXPECT_NE(sampleFromUniformIntDistribution<int>(false), 209652396);
-  EXPECT_NE(sampleFromUniformIntDistribution<int>(false), 398764591);
-  EXPECT_NE(sampleFromUniformIntDistribution<int>(false), 924231285);
+  EXPECT_NE(sampleUniformIntDistribution<int>(false), 209652396);
+  EXPECT_NE(sampleUniformIntDistribution<int>(false), 398764591);
+  EXPECT_NE(sampleUniformIntDistribution<int>(false), 924231285);
 
   // Test mean and standard deviation of normal distribution.
   {
     RunningStatistics statistics;
     for (int i = 0; i < 10000; ++i)
     {
-      statistics.addSample(sampleFromNormalDistribution<double>(false, 2.0, 5.0));
+      statistics.addSample(sampleNormalDistribution<double>(false, 2.0, 5.0));
     }
     EXPECT_NEAR(statistics.mean(), 2.0, 0.2);
     EXPECT_NEAR(statistics.std(),  5.0, 0.2);
@@ -95,7 +95,7 @@ TEST(RandomTests, benchmark)
   {
     int sum = 0;
     for (int i = 0; i < 100000; ++i)
-      sum += sampleFromUniformIntDistribution<uint8_t>(false);
+      sum += sampleUniformIntDistribution<uint8_t>(false);
   };
   runTimingBenchmark(lambda1, 10, 10, "sampleSeparately", true);
 

@@ -9,7 +9,7 @@ namespace ze {
 //------------------------------------------------------------------------------
 //! @return Sample from integer-valued distribution.
 template<typename T>
-T sampleFromUniformIntDistribution(
+T sampleUniformIntDistribution(
     bool deterministic = false,
     T from = std::numeric_limits<T>::lowest(),
     T to   = std::numeric_limits<T>::max())
@@ -23,7 +23,7 @@ T sampleFromUniformIntDistribution(
 //------------------------------------------------------------------------------
 //! @return Sample from uniform real-valued distribution.
 template<typename T>
-T sampleFromUniformRealDistribution(
+T sampleUniformRealDistribution(
     bool deterministic = false,
     T from = T{0.0},
     T to   = T{1.0})
@@ -37,7 +37,7 @@ T sampleFromUniformRealDistribution(
 //------------------------------------------------------------------------------
 //! @return Sample from normal distribution (real-valued).
 template<typename T>
-T sampleFromNormalDistribution(
+T sampleNormalDistribution(
     bool deterministic = false,
     T mean = T{0.0},
     T sigma   = T{1.0})
