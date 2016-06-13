@@ -84,7 +84,7 @@ struct ImuPreIntegrationParameters
   int trajectory_num_interpolation_points;
   int trajectory_num_segments;
   FloatType trajectory_lambda;
-  int trajectory_spline_order = 3;
+  int trajectory_spline_order = 5;
 
   //! Initialize a parameter structure from gflags
   static ImuPreIntegrationParameters fromGFlags()
