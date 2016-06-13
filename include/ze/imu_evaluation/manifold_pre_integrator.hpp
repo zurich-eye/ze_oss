@@ -25,10 +25,9 @@ public:
     for (size_t i = 0; i < measurements.size(); ++i)
     {
       //! @todo revert loop for better efficiency D_R *= ...
-      D_R = Quaternion::exp(
-              measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix()
-          * D_R;
-
+      D_R = D_R *
+            Quaternion::exp(
+              measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix();
     }
     // update the absolute orientation
     R_i_.push_back(*R_i_.rbegin() * D_R);
