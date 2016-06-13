@@ -63,7 +63,7 @@ bool plot(
     const std::string& s = "");
 
 //! Create an x/y plot with name as label.
-bool named_plot(
+bool labelPlot(
     const std::string& name,
     const Eigen::Ref<const VectorX>& x,
     const Eigen::Ref<const VectorX>& y,
@@ -91,7 +91,7 @@ bool plot(
     const std::vector<FloatType>& y,
     const std::string& s = "");
 
-bool named_plot(
+bool labelPlot(
     const std::string& name,
     const std::vector<FloatType>& x,
     const std::vector<FloatType>& y,

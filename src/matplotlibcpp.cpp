@@ -340,7 +340,7 @@ bool plot(
 }
 
 // -----------------------------------------------------------------------------
-bool named_plot(
+bool labelPlot(
     const std::string& name,
     const Eigen::Ref<const VectorX>& x,
     const Eigen::Ref<const VectorX>& y,
@@ -431,7 +431,7 @@ bool plot(
 }
 
 // -----------------------------------------------------------------------------
-bool named_plot(
+bool labelPlot(
     const std::string& name,
     const std::vector<FloatType>& x,
     const std::vector<FloatType>& y,
@@ -441,7 +441,7 @@ bool named_plot(
                                                                     x.size());
   Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
-  return named_plot(name, x_e, y_e, format);
+  return labelPlot(name, x_e, y_e, format);
 }
 
 // -----------------------------------------------------------------------------

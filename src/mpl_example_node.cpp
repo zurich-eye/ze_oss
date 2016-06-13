@@ -18,7 +18,7 @@ int main()
   plt::plot(times, points);
   plt::show();
 
-  plt::named_plot("A Name", times, points);
+  plt::labelPlot("A Name", times, points);
   plt::show();
 
   // enable interactive mode as of now (only tests if it doesn't crash)
