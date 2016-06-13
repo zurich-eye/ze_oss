@@ -96,9 +96,6 @@ target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
 catkin_add_gtest(test_random test/test_random.cpp)
 target_link_libraries(test_random ${PROJECT_NAME})
 
-catkin_add_gtest(test_random_matrix test/test_random_matrix.cpp)
-target_link_libraries(test_random_matrix ${PROJECT_NAME})
-
 catkin_add_gtest(test_running_statistics test/test_running_statistics.cpp)
 target_link_libraries(test_running_statistics ${PROJECT_NAME})
 
