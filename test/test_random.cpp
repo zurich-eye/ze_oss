@@ -107,6 +107,18 @@ TEST(RandomTests, benchmark)
       sum += dist();
   };
   runTimingBenchmark(lambda2, 10, 10, "sampleFromDistribution", true);
+
+  auto lambda3 = [&]()
+  {
+    int sum = 0;
+    static std::mt19937 gen_deterministic(0);
+    std::uniform_int_distribution<uint8_t> distribution(0, 255);
+    for (int i = 0; i < 100000; ++i)
+    {
+      sum += distribution(gen_deterministic);
+    }
+  };
+  runTimingBenchmark(lambda3, 10, 10, "Using std interface", true);
 }
 
 ZE_UNITTEST_ENTRYPOINT
