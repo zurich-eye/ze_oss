@@ -178,10 +178,10 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   Vector3 accel_covar = parameters_.accel_noise_density
                         * parameters_.accel_noise_density
-                        * Vector3::Identity();
+                        * Vector3::Ones();
   Vector3 gyro_covar = parameters_.gyro_noise_density
                        * parameters_.gyro_noise_density
-                       * Vector3::Identity();
+                       * Vector3::Ones();
   Matrix3 gyroscope_noise_covariance = gyro_covar.asDiagonal();
 
   VLOG(1) << "Initialize noise models with \n"
@@ -286,8 +286,8 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
   {
 
     return std::make_shared<ContinuousBias>(
-          Vector3::Identity() * parameters_.imu_acc_bias_noise_density,
-          Vector3::Identity() * parameters_.imu_gyr_bias_noise_density,
+          Vector3::Ones() * parameters_.imu_acc_bias_noise_density,
+          Vector3::Ones() * parameters_.imu_gyr_bias_noise_density,
           start,
           end,
           1000); // This is an arbitrary value.
@@ -295,8 +295,8 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
   //! a simple constant bias
   else
   {
-    Vector3 accel_bias = Vector3::Identity() * parameters_.imu_acc_bias_const;
-    Vector3 gyro_bias = Vector3::Identity() * parameters_.imu_gyr_bias_const;
+    Vector3 accel_bias = Vector3::Ones() * parameters_.imu_acc_bias_const;
+    Vector3 gyro_bias = Vector3::Ones() * parameters_.imu_gyr_bias_const;
 
     return std::make_shared<ConstantBias>(accel_bias, gyro_bias);
   }
