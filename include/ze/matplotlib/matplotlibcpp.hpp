@@ -52,26 +52,25 @@ bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number);
 
 //! Create an x/y plot with properties as map.
 bool plot(
-    const Eigen::Ref<const VectorX>& x,
-    const Eigen::Ref<const VectorX>& y,
+    const Eigen::Ref<const MatrixX>& x,
+    const Eigen::Ref<const MatrixX>& y,
     const std::map<std::string, std::string>& keywords);
 
 //! Create an x/y plot with properties in string.
 bool plot(
-    const Eigen::Ref<const VectorX>& x,
-    const Eigen::Ref<const VectorX>& y,
+    const Eigen::Ref<const MatrixX>& x,
+    const Eigen::Ref<const MatrixX>& y,
     const std::string& s = "");
 
 //! Create an x/y plot with name as label.
 bool labelPlot(
     const std::string& name,
-    const Eigen::Ref<const VectorX>& x,
-    const Eigen::Ref<const VectorX>& y,
+    const Eigen::Ref<const MatrixX>& x,
+    const Eigen::Ref<const MatrixX>& y,
     const std::string& format = "");
 
-
 bool plot(
-    const Eigen::Ref<const VectorX>& x,
+    const Eigen::Ref<const MatrixX>& x,
     const std::string& format = "");
 
 // -----------------------------------------------------------------------------
