@@ -29,9 +29,8 @@ public:
   __host__ LinearMemory(const uint32_t& length);
   __host__ LinearMemory(const ze::cu::LinearMemory<Pixel>& from);
   __host__ LinearMemory(const ze::LinearMemory<Pixel>& from);
-  __host__ LinearMemory(const Eigen::RowVectorXf& from);
-  //  __host__ LinearMemory(Pixel* host_data, const uint32_t& length,
-  //                        bool use_ext_data_pointer = false);
+//  __host__ LinearMemory(Pixel* host_data, const uint32_t& length,
+//                        bool use_ext_data_pointer = false);
 
   /**
    * @brief Returns a pointer to the device buffer.

@@ -41,23 +41,6 @@ LinearMemory<Pixel>::LinearMemory(const ze::LinearMemory<Pixel>& from)
 }
 
 //-----------------------------------------------------------------------------
-template<>
-LinearMemory<Pixel32fC1>::LinearMemory(const Eigen::RowVectorXf& from)
-  : ze::cu::LinearMemory<Pixel32fC1>(from.cols())
-{
-  if (from.data() == 0)
-  {
-    throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
-  ze::LinearMemory<Pixel32fC1> tmp(from.cols());
-  for (int i = 0; i < from.cols(); ++i)
-  {
-    tmp(i)[0] = from(i);
-  }
-  this->copyFrom(tmp);
-}
-
-//-----------------------------------------------------------------------------
 template<typename Pixel>
 Pixel* LinearMemory<Pixel>::data()
 {
