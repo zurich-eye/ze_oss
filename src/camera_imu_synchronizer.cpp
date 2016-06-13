@@ -1,10 +1,12 @@
 #include <ze/data_provider/camera_imu_synchronizer.hpp>
-#include <ze/data_provider/data_provider_base.hpp>
 
 #include <functional>
-
-#include <ze/common/logging.hpp>
 #include <gflags/gflags.h>
+
+#include <imp/core/image_base.hpp>
+#include <ze/common/ringbuffer.h>
+#include <ze/common/logging.hpp>
+#include <ze/data_provider/data_provider_base.hpp>
 
 DEFINE_int32(data_sync_init_skip_n_frames, 0,
              "How many frames should be skipped at the beginning.");
@@ -14,14 +16,12 @@ DEFINE_int32(data_sync_stop_after_n_frames, -1,
 
 namespace ze {
 
-CameraImuSynchronizer::CameraImuSynchronizer(
-    DataProviderBase& data_provider,
-    FloatType imu_buffer_length_seconds)
+CameraImuSynchronizer::CameraImuSynchronizer(DataProviderBase& data_provider)
   : num_cameras_(data_provider.cameraCount())
   , num_imus_(data_provider.imuCount())
 {
   subscribeDataProvider(data_provider);
-  initBuffers(imu_buffer_length_seconds);
+  initBuffers();
 }
 
 void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provider)
@@ -41,10 +41,13 @@ void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provide
   }
 }
 
-void CameraImuSynchronizer::initBuffers(FloatType imu_buffer_length_seconds)
+void CameraImuSynchronizer::initBuffers()
 {
   img_buffer_ = StampedImages(num_cameras_, std::make_pair(-1, nullptr));
-  imu_buffers_ = ImuBufferVector(num_imus_, Buffer<FloatType, 6>(imu_buffer_length_seconds));
+  for (uint32_t i = 0u; i < num_imus_; ++i)
+  {
+    imu_buffers_.emplace_back(std::make_shared<ImuSyncBuffer>());
+  }
 }
 
 void CameraImuSynchronizer::addImgData(
@@ -98,7 +101,7 @@ void CameraImuSynchronizer::addImuData(
   Vector6 acc_gyr;
   acc_gyr.head<3>() = acc;
   acc_gyr.tail<3>() = gyr;
-  imu_buffers_.at(imu_idx).insert(stamp, acc_gyr);
+  imu_buffers_[imu_idx]->insert(stamp, acc_gyr);
   checkDataAndCallback();
 }
 
@@ -191,19 +194,19 @@ void CameraImuSynchronizer::checkDataAndCallback()
   }
 
   // always provide imu structures in the callback (empty if no imu present)
-  ImuStampsVector imu_timestamps(imu_buffers_.size());
-  ImuAccGyrVector imu_measurements(imu_buffers_.size());
+  ImuStampsVector imu_timestamps(num_imus_);
+  ImuAccGyrVector imu_measurements(num_imus_);
 
   if (num_imus_ != 0)
   {
     // get oldest / newest stamp for all imu buffers
-    std::vector<std::tuple<int64_t, int64_t, bool> > oldest_newest_stamp_vector(imu_buffers_.size());
+    std::vector<std::tuple<int64_t, int64_t, bool>> oldest_newest_stamp_vector(num_imus_);
     std::transform(
           imu_buffers_.begin(),
           imu_buffers_.end(),
           oldest_newest_stamp_vector.begin(),
-          [](Buffer<FloatType, 6>& imu_buffer) {
-            return imu_buffer.getOldestAndNewestStamp();
+          [](ImuSyncBufferPtr& imu_buffer) {
+            return imu_buffer->getOldestAndNewestStamp();
           }
     );
 
@@ -216,7 +219,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
     // If this is the very first image bundle, we send all IMU messages that we have
     // received so far. For every later image bundle, we just send the IMU messages
     // that we have received in between.
-    for (size_t i = 0; i < imu_buffers_.size(); ++i)
+    for (size_t i = 0; i < num_imus_; ++i)
     {
       if(last_img_bundle_min_stamp_ < 0)
       {
@@ -225,7 +228,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
         ImuStamps imu_stamps;
         ImuAccGyr imu_accgyr;
         std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i].getBetweenValuesInterpolated(oldest_stamp, min_stamp);
+            imu_buffers_[i]->getBetweenValuesInterpolated(oldest_stamp, min_stamp);
         imu_timestamps[i] = imu_stamps;
         imu_measurements[i] = imu_accgyr;
       }
@@ -234,7 +237,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
         ImuStamps imu_stamps;
         ImuAccGyr imu_accgyr;
         std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i].getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
+            imu_buffers_[i]->getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
         imu_timestamps[i] = imu_stamps;
         imu_measurements[i] = imu_accgyr;
       }

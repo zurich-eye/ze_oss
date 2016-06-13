@@ -1,3 +1,4 @@
+#include <ze/data_provider/data_provider_base.hpp>
 #include <ze/data_provider/data_provider_factory.hpp>
 #include <ze/data_provider/data_provider_csv.hpp>
 #include <ze/data_provider/data_provider_rosbag.hpp>
