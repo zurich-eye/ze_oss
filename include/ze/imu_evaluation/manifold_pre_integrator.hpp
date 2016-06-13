@@ -20,36 +20,55 @@ public:
   void pushD_R_i_j(times_container_t stamps,
                    measurements_container_t measurements)
   {
-    Matrix3 D_R_i_j = Matrix3::Identity();
-    // integrate measurements between frames
-    for (size_t i = 0; i < measurements.size(); ++i)
+    measurements_.insert(measurements_.end(),
+                         measurements.begin(),
+                         measurements.end() - 1);
+
+    VLOG(1) << "Pushing " << measurements.size() << " measurements \n";
+
+    // Integrate measurements between frames.
+    for (size_t i = 0; i < measurements.size() - 1; ++i)
     {
-      //! @todo revert loop for better efficiency D_R *= ...
-      D_R_i_j = D_R_i_j *
-                Quaternion::exp(
-                  measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix();
+      FloatType dt = stamps[i+1] - stamps[i];
+
+      Matrix3 increment = Quaternion::exp(measurements[i].tail<3>(3) * (dt)).getRotationMatrix();
+
+      // Reset to 0 at every step:
+      if (i == 0)
+      {
+        // D_R_i_k restarts with every push to the container.
+        D_R_i_k_.push_back(Matrix3::Identity());
+        R_i_k_.push_back(R_i_k_.back() * increment);
+        covariance_i_k_.push_back(Matrix3::Zero());
+      }
+      else
+      {
+        D_R_i_k_.push_back(D_R_i_k_.back() * increment);
+        R_i_k_.push_back(R_i_k_.back() * increment);
+
+        // Propagate Covariance:
+        Vector3 psi = (Quaternion(D_R_i_k_.back())).log();
+        FloatType norm = psi.norm();
+        FloatType norm_sqr = norm*norm;
+        Matrix3 J_r = expmapDerivativeSO3(psi);
+
+        covariance_i_k_.push_back(
+              D_R_i_k_.back().transpose() * covariance_i_k_.back() * D_R_i_k_.back()
+              + J_r * gyro_noise_covariance_ * dt * dt * J_r.transpose());
+      }
+
+      times_raw_.push_back(stamps[i]);
     }
-    // update the absolute orientation
-    R_i_j_.push_back(*R_i_j_.rbegin() * D_R_i_j);
 
-    D_R_i_j_.push_back(D_R_i_j);
-    times_.push_back(*stamps.rbegin());
+    // Push the keyframe sampled pre-integration states:
+    D_R_i_j_.push_back(D_R_i_k_.back());
+    R_i_j_.push_back(R_i_j_.back() * D_R_i_j_.back());
 
-    propagateCovariance();
-  }
+    // push covariance
+    covariance_i_j_.push_back(covariance_i_k_.back());
 
-  void propagateCovariance()
-  {
-    Vector3 psi = (Quaternion(D_R_i_j_.back())).log();
-    FloatType norm = psi.norm();
-    FloatType norm_sqr = norm*norm;
-    Matrix3 J_r = expmapDerivativeSO3(psi);
+    times_.push_back(times_raw_.back());
 
-    FloatType dt = *(times_.end() - 1) - *(times_.end() - 2);
-
-    covariances_.push_back(
-          (D_R_i_j_.rbegin()->transpose()) * covariances_.back() * D_R_i_j_.back()
-          + J_r * gyro_noise_covariance_ * dt * dt * J_r.transpose());
   }
 };
 

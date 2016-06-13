@@ -25,17 +25,17 @@ public:
   {
     typename pre_integrator_t::Ptr pre_int_actual
         = preintegrateActual(start, end);
-    D_R_ref_ = pre_int_actual->D_R_i_j();
-    R_ref_ = pre_int_actual->R_i_j();
+    D_R_ref_ = pre_int_actual->D_R_i_k();
+    R_ref_ = pre_int_actual->R_i_k();
 
     // A vector of simulated results.
     for (size_t i = 0; i < num_rounds; ++i)
     {
       VLOG(1) << "Monte-Carlo run #" << i;
       typename pre_integrator_t::Ptr pre_int_mc
-          = preintegrate_corrupted(start, end);
-      D_R_mc_.push_back(pre_int_mc->D_R_i_j());
-      R_mc_.push_back(pre_int_mc->R_i_j());
+          = preintegrateCorrupted(start, end);
+      D_R_mc_.push_back(pre_int_mc->D_R_i_k());
+      R_mc_.push_back(pre_int_mc->R_i_k());
     }
 
     // estimate the variance / covariance
@@ -62,7 +62,7 @@ public:
   //! Every call to this function will generate different results due to
   //! the repeated noise generation in the scenarios. The bias will not change
   //! between calls.
-  typename pre_integrator_t::Ptr preintegrate_corrupted(FloatType start, FloatType end)
+  typename pre_integrator_t::Ptr preintegrateCorrupted(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
     typename pre_integrator_t::Ptr pre_integrator(

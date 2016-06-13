@@ -20,6 +20,7 @@
 #include <ze/splines/viz_splines.hpp>
 #include <ze/visualization/viz_ros.h>
 #include <ze/matplotlib/matplotlibcpp.hpp>
+#include <ze/splines/rotation_vector.hpp>
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -145,6 +146,15 @@ public:
   void plotResults(const std::vector<Matrix3>& covariances_mc,
                    const std::vector<Matrix3>& covariances_est);
 
+  //! Plot the estimated / integrated vector of rotation matrices.
+  void plotOrientation(const std::vector<FloatType>& times,
+                       const std::vector<Matrix3>& R_i);
+
+  //! Plot the measurements used to obtain a preintegration state.
+  void plotImuMeasurements(const std::vector<FloatType>& times,
+                           const std::vector<Vector6>& measurements,
+                           const std::vector<Vector6>& measurements2);
+
   void shutdown();
 
 private:
@@ -203,6 +213,8 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
         parameters_.imu_sampling_time,
         parameters_.camera_sampling_time);
 
+  preintegraton_runner->setInitialOrientation(trajectory_->orientation(start));
+
   VLOG(1) << "Initialize monte carlo runner";
   PreIntegratorMonteCarlo<ManifoldPreIntegrationState> mc(preintegraton_runner,
                                                           gyroscope_noise_covariance);
@@ -211,12 +223,18 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   mc.simulate(FLAGS_monte_carlo_runs, scenario->start(), scenario->end());
 
   VLOG(1) << "Reference Estimate";
-  ManifoldPreIntegrationState::Ptr est_integrator = mc.preintegrate_corrupted(
+  ManifoldPreIntegrationState::Ptr est_integrator = mc.preintegrateCorrupted(
                                                       start, end);
+  ManifoldPreIntegrationState::Ptr actual_integrator = mc.preintegrateActual(
+                                                         start, end);
 
-  plotResults(mc.covariances(), est_integrator->covariances());
+  plotResults(mc.covariances(), est_integrator->covariance_i_k());
+  plotOrientation(est_integrator->times_raw(), est_integrator->R_i_k());
+  plotImuMeasurements(est_integrator->times_raw(),
+                      est_integrator->measurements(),
+                      actual_integrator->measurements());
 
-  plotResults(mc.covariances_absolute(), est_integrator->covariances());
+//  plotResults(mc.covariances_absolute(), est_integrator->covariances());
 }
 
 // -----------------------------------------------------------------------------
@@ -318,6 +336,87 @@ void PreIntegrationEvaluationNode::plotResults(
   plt::plot(est.row(2), "b");
 
   plt::show(false);
+}
+
+//-----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::plotOrientation(
+    const std::vector<FloatType>& times,
+    const std::vector<Matrix3>& orientation)
+{
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
+
+  for (size_t i = 0; i < orientation.size(); ++i)
+  {
+    ze::sm::RotationVector rv(orientation[i]);
+    points.col(i) = rv.getParameters();
+    ref_points.col(i) = trajectory_->eval(times[i]).tail<3>();
+  }
+  plt::figure();
+  plt::subplot(3, 1, 1);
+  plt::title("Orientation");
+  plt::plot(points.row(0), "r");
+  plt::plot(ref_points.row(0), "b");
+
+  plt::subplot(3, 1, 2);
+  plt::plot(points.row(1), "r");
+  plt::plot(ref_points.row(1), "b");
+
+  plt::subplot(3, 1, 3);
+  plt::plot(points.row(2), "r");
+  plt::plot(ref_points.row(2), "b");
+
+  plt::show(false);
+}
+
+//-----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::plotImuMeasurements(
+    const std::vector<FloatType>& times,
+    const std::vector<Vector6>& measurements_std1,
+    const std::vector<Vector6>& measurements_std2)
+{
+  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> measurements1(6, measurements_std1.size());
+  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> measurements2(6, measurements_std2.size());
+
+  for (size_t i = 0; i < measurements_std2.size(); ++i)
+  {
+    measurements1.col(i) = measurements_std1[i];
+    measurements2.col(i) = measurements_std2[i];
+  }
+
+  plt::figure();
+  plt::subplot(3, 1, 1);
+  plt::title("Imu Measurements (Accel)");
+  plt::plot(times, measurements1.row(0));
+  plt::plot(times, measurements2.row(0));
+
+  plt::subplot(3, 1, 2);
+  plt::plot(times, measurements1.row(1));
+  plt::plot(times, measurements2.row(1));
+
+  plt::subplot(3, 1, 3);
+  plt::plot(times, measurements1.row(2));
+  plt::plot(times, measurements2.row(2));
+
+  plt::show(false);
+
+  plt::figure();
+  plt::subplot(3, 1, 1);
+  plt::title("Imu Measurements (Gyro)");
+  plt::plot(times, measurements1.row(3));
+  plt::plot(times, measurements2.row(3));
+
+  plt::subplot(3, 1, 2);
+  plt::plot(times, measurements1.row(4));
+  plt::plot(times, measurements2.row(4));
+
+  plt::subplot(3, 1, 3);
+  plt::plot(times, measurements1.row(5));
+  plt::plot(times, measurements2.row(5));
+
+  plt::show(false);
+
+  VLOG(1) << "Measurements: " << measurements1.size() << "\n";
 }
 
 // -----------------------------------------------------------------------------

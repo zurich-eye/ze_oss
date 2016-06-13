@@ -13,15 +13,27 @@ class PreIntegrationRunner
 public:
   ZE_POINTER_TYPEDEFS(PreIntegrationRunner);
 
+  //! Negative sampling values for camera sampling implies a single run where
+  //! all imu samples are processed in a single step.
   PreIntegrationRunner(ScenarioRunner::Ptr scenario_runner,
                        FloatType imu_sampling_time,
-                       FloatType camera_sampling_time)
+                       FloatType camera_sampling_time = -1)
     : scenario_runner_(scenario_runner)
     , imu_sampling_time_(imu_sampling_time)
     , camera_sampling_time_(camera_sampling_time)
+    , initial_orientation_(Matrix3::Identity())
   {
-    CHECK_LE(imu_sampling_time_, camera_sampling_time_)
-        << "IMU Sampling time must be smaller than camera's";
+    if (camera_sampling_time_ >= 0)
+    {
+      CHECK_LE(imu_sampling_time_, camera_sampling_time_)
+          << "IMU Sampling time must be smaller than camera's";
+    }
+  }
+
+  //! Optionally set the initial value for the absolute orientation integrator.
+  void setInitialOrientation(Matrix3 initial_orientation)
+  {
+    initial_orientation_ = initial_orientation;
   }
 
   //! Process the whole scenario given a start and end-time.
@@ -31,7 +43,13 @@ public:
                FloatType end)
   {
     FloatType t = start;
-    FloatType next_camera_sample = start + camera_sampling_time_;
+    pre_integrator->setInitialOrientation(initial_orientation_);
+
+    // For negative camera sampling rates, a single batch of imu samples between
+    // start and end is taken.
+    FloatType next_camera_sample = camera_sampling_time_ < 0 ?
+                                   end : start + camera_sampling_time_;
+
     std::vector<FloatType> times;
     std::vector<Vector6> imu_measurements;
     for (FloatType t = start; t <= end; t += imu_sampling_time_)
@@ -60,6 +78,12 @@ public:
         imu_measurements.clear();
       }
     }
+
+    // Ensure that all results are pushed to the container.
+    if (imu_measurements.size() != 0)
+    {
+      pre_integrator->pushD_R_i_j(times, imu_measurements);
+    }
   }
 
 private:
@@ -69,6 +93,9 @@ private:
   //! should be larger than the imu's.
   FloatType imu_sampling_time_;
   FloatType camera_sampling_time_;
+
+  //! An initial value for the orientation
+  Matrix3 initial_orientation_;
 };
 
 } // namespace ze
