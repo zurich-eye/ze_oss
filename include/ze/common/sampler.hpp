@@ -15,6 +15,7 @@ public:
 
   typedef Eigen::Matrix<FloatType, DIM, DIM> covariance_matrix_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> covariance_vector_t;
+  typedef Eigen::Matrix<FloatType, DIM, 1> sigma_vector_t;
   typedef Eigen::Matrix<FloatType, DIM, 1> noise_vector_t;
 
   //! Get a noise sample.
@@ -31,7 +32,7 @@ public:
 
   //! Construct a gaussian sampler with a given covariance vector.
   //! The vector represents the diagonal elements of a covariance matrix.
-  static Ptr sigmas(const covariance_vector_t& sigmas)
+  static Ptr sigmas(const sigma_vector_t& sigmas)
   {
     Ptr noise(new GaussianSampler);
     noise->sigma_ = sigmas;
