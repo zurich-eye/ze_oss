@@ -126,9 +126,10 @@ void SplinesVisualizer::plotSpline(
   plt::plot(times, points.row(1));
   plt::subplot(3, 1, 3);
   plt::plot(times, points.row(2));
-  plt::show();
+  plt::show(false);
 
   // rotation
+  plt::figure();
   plt::subplot(3, 1, 1);
   plt::plot(times, points.row(3));
   plt::subplot(3, 1, 2);
