@@ -23,8 +23,8 @@ TEST(ManifoldPreIntegratorTest, testPushD_R)
   times.push_back(i);
   times2.push_back(i + 11);
 
-  state.pushD_R(times, measurements);
-  state.pushD_R(times2, measurements);
+  state.pushD_R_i_j(times, measurements);
+  state.pushD_R_i_j(times2, measurements);
 }
 
 ZE_UNITTEST_ENTRYPOINT

@@ -17,41 +17,38 @@ public:
   {
   }
 
-  void pushD_R(times_container_t stamps,
-               measurements_container_t measurements)
+  void pushD_R_i_j(times_container_t stamps,
+                   measurements_container_t measurements)
   {
-    Matrix3 D_R = Matrix3::Identity();
+    Matrix3 D_R_i_j = Matrix3::Identity();
     // integrate measurements between frames
     for (size_t i = 0; i < measurements.size(); ++i)
     {
       //! @todo revert loop for better efficiency D_R *= ...
-      D_R = D_R *
-            Quaternion::exp(
-              measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix();
+      D_R_i_j = D_R_i_j *
+                Quaternion::exp(
+                  measurements[i].tail<3>(3) * (stamps[i+1] - stamps[i])).getRotationMatrix();
     }
     // update the absolute orientation
-    R_i_.push_back(*R_i_.rbegin() * D_R);
+    R_i_j_.push_back(*R_i_j_.rbegin() * D_R_i_j);
 
-    D_R_.push_back(D_R);
+    D_R_i_j_.push_back(D_R_i_j);
     times_.push_back(*stamps.rbegin());
 
-    propagate_covariance();
+    propagateCovariance();
   }
 
-  void propagate_covariance()
+  void propagateCovariance()
   {
-    Vector3 psi = ((Quaternion(*D_R_.rbegin())).log());
+    Vector3 psi = (Quaternion(D_R_i_j_.back())).log();
     FloatType norm = psi.norm();
     FloatType norm_sqr = norm*norm;
-    Matrix3 J_r = Matrix3::Identity()
-                  - (1 - cos(norm)) / (norm_sqr) * skewSymmetric(psi)
-                  + (norm - sin(norm)) / (norm_sqr * norm)
-                  * skewSymmetric(psi) * skewSymmetric(psi);
+    Matrix3 J_r = expmapDerivativeSO3(psi);
 
     FloatType dt = *(times_.end() - 1) - *(times_.end() - 2);
 
     covariances_.push_back(
-          (D_R_.rbegin()->transpose()) * (*covariances_.rbegin()) * (*D_R_.rbegin())
+          (D_R_i_j_.rbegin()->transpose()) * covariances_.back() * D_R_i_j_.back()
           + J_r * gyro_noise_covariance_ * dt * dt * J_r.transpose());
   }
 };

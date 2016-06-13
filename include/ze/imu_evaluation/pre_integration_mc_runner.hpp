@@ -24,9 +24,9 @@ public:
   void simulate(size_t num_rounds, FloatType start, FloatType end)
   {
     typename pre_integrator_t::Ptr pre_int_actual
-        = preintegrate_actual(start, end);
-    D_R_ref_ = pre_int_actual->getD_R();
-    R_ref_ = pre_int_actual->getR_i();
+        = preintegrateActual(start, end);
+    D_R_ref_ = pre_int_actual->D_R_i_j();
+    R_ref_ = pre_int_actual->R_i_j();
 
     // A vector of simulated results.
     for (size_t i = 0; i < num_rounds; ++i)
@@ -34,8 +34,8 @@ public:
       VLOG(1) << "Monte-Carlo run #" << i;
       typename pre_integrator_t::Ptr pre_int_mc
           = preintegrate_corrupted(start, end);
-      D_R_mc_.push_back(pre_int_mc->getD_R());
-      R_mc_.push_back(pre_int_mc->getR_i());
+      D_R_mc_.push_back(pre_int_mc->D_R_i_j());
+      R_mc_.push_back(pre_int_mc->R_i_j());
     }
 
     // estimate the variance / covariance
@@ -44,7 +44,7 @@ public:
   }
 
   //! Perform a pre-integration of the actual (exact, noise-free) trajectory.
-  typename pre_integrator_t::Ptr preintegrate_actual(FloatType start, FloatType end)
+  typename pre_integrator_t::Ptr preintegrateActual(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
     typename pre_integrator_t::Ptr pre_integrator(

@@ -19,6 +19,7 @@
 #include <ze/imu_evaluation/imu_bias.hpp>
 #include <ze/splines/viz_splines.hpp>
 #include <ze/visualization/viz_ros.h>
+#include <ze/matplotlib/matplotlibcpp.hpp>
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -211,9 +212,9 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   ManifoldPreIntegrationState::Ptr est_integrator = mc.preintegrate_corrupted(
                                                       start, end);
 
-  plotResults(mc.covariances(), est_integrator->getCovariance());
+  plotResults(mc.covariances(), est_integrator->covariances());
 
-  plotResults(mc.covariances_absolute(), est_integrator->getCovariance());
+  plotResults(mc.covariances_absolute(), est_integrator->covariances());
 }
 
 // -----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ public:
       if (t > next_camera_sample)
       {
         next_camera_sample = t + camera_sampling_time_;
-        pre_integrator->pushD_R(times, imu_measurements);
+        pre_integrator->pushD_R_i_j(times, imu_measurements);
         times.clear();
         imu_measurements.clear();
       }
