@@ -58,13 +58,16 @@ template <typename CameraModel,
           typename Pixel>
 ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
     Size2u img_size,
-    const Eigen::RowVectorXf& camera_params,
-    const Eigen::RowVectorXf& dist_coeffs)
+    Eigen::RowVectorXf& camera_params,
+    Eigen::RowVectorXf& dist_coeffs)
   : undistortion_map_(img_size),
     fragm_(img_size)
 {
-  LinearMemory32fC1 d_cam_params(camera_params);
-  LinearMemory32fC1 d_dist_coeffs(dist_coeffs);
+  ze::LinearMemory32fC1 h_cam_params(reinterpret_cast<Pixel32fC1*>(camera_params.data()), camera_params.cols(), true);
+  ze::LinearMemory32fC1 h_dist_coeffs(reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()), dist_coeffs.cols(), true);
+
+  cu::LinearMemory32fC1 d_cam_params(h_cam_params);
+  cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
 
   k_computeUndistortionMap<CameraModel, DistortionModel>
       <<<
