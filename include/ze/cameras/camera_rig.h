@@ -27,7 +27,7 @@ public:
       const CameraVector& cameras,
       const std::string& label,
       const FloatType stereo_min_fov_overlap = 0.7,
-      const FloatType stereo_min_baseline = 0.1);
+      const FloatType stereo_min_baseline = 0.04);
 
   //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
   static CameraRig::Ptr loadFromYaml(const std::string& yaml_file);

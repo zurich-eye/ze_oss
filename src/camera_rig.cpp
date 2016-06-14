@@ -104,12 +104,20 @@ StereoIndexPairs identifyStereoPairsInRig(
     {
       FloatType overlap = overlappingFieldOfView(rig, cam_A, cam_B);
       FloatType baseline = (rig.T_C_B(cam_B) * rig.T_C_B(cam_A).inverse()).getPosition().norm();
-      VLOG(10) << "Camera " << cam_A << " and " << cam_B << ": Overlap = "
-               << overlap << ", Baseline = " << baseline;
+
 
       if (overlap > min_fov_overlap && baseline > min_baseline)
       {
+        VLOG(1) << "Camera " << cam_A << " and " << cam_B
+                 << ": Overlap = " << overlap << ", Baseline = " << baseline
+                 << " -> Stereo Rig.";
         pairs.push_back(std::make_pair(cam_A, cam_B));
+      }
+      else
+      {
+        VLOG(1) << "Camera " << cam_A << " and " << cam_B
+                 << ": Overlap = " << overlap << ", Baseline = " << baseline
+                 << " -> No stereo rig (baseline or overlap too small)";
       }
     }
   }
