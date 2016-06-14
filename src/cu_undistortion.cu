@@ -35,10 +35,11 @@ __global__
 void k_undistort(
     Pixel1<T>* dst,
     size_t dst_stride,
+    const Pixel32fC2* map,
+    size_t map_stride,
     std::uint32_t width,
     std::uint32_t height,
-    Texture2D src,
-    Texture2D map_tex)
+    Texture2D src)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;
   const int y = blockIdx.y*blockDim.y + threadIdx.y;
@@ -46,8 +47,7 @@ void k_undistort(
   if (x < width && y < height)
   {
     Pixel1<T> val;
-    Pixel32fC2 px;
-    tex2DFetch(px, map_tex, x, y);
+    const Pixel32fC2& px = map[y*map_stride+x];
     tex2DFetch(val, src, px[0], px[1]);
     dst[y*dst_stride+x] = val;
   }
@@ -82,8 +82,6 @@ ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
            undistortion_map_.height(),
            d_cam_params.cuData(),
            d_dist_coeffs.cuData());
-  map_tex = undistortion_map_.genTexture(false, cudaFilterModePoint);
-  IMP_CUDA_CHECK();
 }
 
 template <typename CameraModel,
@@ -98,16 +96,16 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
-
   k_undistort
       <<<
         fragm_.dimGrid, fragm_.dimBlock
       >>> (dst.data(),
            dst.stride(),
+           undistortion_map_.data(),
+           undistortion_map_.stride(),
            dst.width(),
            dst.height(),
-           *src_tex,
-           *map_tex);
+           *src_tex);
   IMP_CUDA_CHECK();
 }
 
