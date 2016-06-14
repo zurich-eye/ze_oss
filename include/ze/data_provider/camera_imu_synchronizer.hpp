@@ -1,12 +1,13 @@
 #pragma once
 
 #include <memory>
+#include <ze/common/ringbuffer.h>
 #include <ze/common/types.h>
+#include <ze/common/time_conversions.h>
 
 namespace ze {
 
 // fwd
-template <typename Scalar, size_t ValueDim, size_t Size> class Ringbuffer;
 class DataProviderBase;
 class ImageBase;
 
@@ -14,8 +15,7 @@ class ImageBase;
 using ImuStampsVector = std::vector<ImuStamps>;
 using ImuAccGyrVector = std::vector<ImuAccGyr>;
 using ImuSyncBuffer = Ringbuffer<FloatType, 6, 1000>;
-using ImuSyncBufferPtr = std::shared_ptr<ImuSyncBuffer>;
-using ImuBufferVector = std::vector<ImuSyncBufferPtr>;
+using ImuBufferVector = std::vector<ImuSyncBuffer>;
 using ImageBasePtr = std::shared_ptr<ImageBase>;
 using StampedImage = std::pair<int64_t, ImageBasePtr>;
 using StampedImages = std::vector<StampedImage>;
@@ -59,7 +59,7 @@ private:
   uint32_t num_imus_;
 
   //! Max time difference of images in a bundle
-  int64_t img_bundle_max_dt_nsec_ { 2000000 }; // 2ms
+  int64_t img_bundle_max_dt_nsec_ = millisecToNanosec(2.0);
 
   //! Stamp of previous synchronized image bundle.
   int64_t last_img_bundle_min_stamp_ { -1 };

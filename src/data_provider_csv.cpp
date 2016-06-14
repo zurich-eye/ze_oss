@@ -51,14 +51,6 @@ DataProviderCsv::DataProviderCsv(
   VLOG(1) << "done.";
 }
 
-void DataProviderCsv::spin()
-{
-  while (ok())
-  {
-    spinOnce();
-  }
-}
-
 bool DataProviderCsv::spinOnce()
 {
   if (buffer_it_ != buffer_.cend())

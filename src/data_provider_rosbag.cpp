@@ -78,14 +78,6 @@ size_t DataProviderRosbag::imuCount() const
   return imu_topic_imuidx_map_.size();
 }
 
-void DataProviderRosbag::spin()
-{
-  while (ok())
-  {
-    spinOnce();
-  }
-}
-
 bool DataProviderRosbag::spinOnce()
 {
   if (bag_view_it_ != bag_view_->end())

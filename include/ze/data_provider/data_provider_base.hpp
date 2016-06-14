@@ -47,7 +47,7 @@ public:
   virtual ~DataProviderBase() = default;
 
   //! Process all callbacks. Waits until callback is processed.
-  virtual void spin() = 0;
+  void spin();
 
   //! Read next data field and process callback. Returns false when datatset finished.
   virtual bool spinOnce() = 0;

@@ -119,8 +119,6 @@ public:
 
   virtual ~DataProviderCsv() = default;
 
-  virtual void spin() override;
-
   virtual bool spinOnce() override;
 
   virtual bool ok() const override;

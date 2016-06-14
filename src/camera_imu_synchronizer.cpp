@@ -4,7 +4,6 @@
 #include <gflags/gflags.h>
 
 #include <imp/core/image_base.hpp>
-#include <ze/common/ringbuffer.h>
 #include <ze/common/logging.hpp>
 #include <ze/data_provider/data_provider_base.hpp>
 
@@ -44,10 +43,7 @@ void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provide
 void CameraImuSynchronizer::initBuffers()
 {
   img_buffer_ = StampedImages(num_cameras_, std::make_pair(-1, nullptr));
-  for (uint32_t i = 0u; i < num_imus_; ++i)
-  {
-    imu_buffers_.emplace_back(std::make_shared<ImuSyncBuffer>());
-  }
+  imu_buffers_ = ImuBufferVector(num_imus_);
 }
 
 void CameraImuSynchronizer::addImgData(
@@ -101,7 +97,7 @@ void CameraImuSynchronizer::addImuData(
   Vector6 acc_gyr;
   acc_gyr.head<3>() = acc;
   acc_gyr.tail<3>() = gyr;
-  imu_buffers_[imu_idx]->insert(stamp, acc_gyr);
+  imu_buffers_[imu_idx].insert(stamp, acc_gyr);
   checkDataAndCallback();
 }
 
@@ -145,7 +141,7 @@ bool CameraImuSynchronizer::validateImuBuffers(
                      }
                      return false;
                    })
-  )
+     )
   {
     LOG(WARNING) << "Oldest IMU measurement is newer than image timestamp.";
     resetImgBuffer();
@@ -162,7 +158,7 @@ bool CameraImuSynchronizer::validateImuBuffers(
                      }
                      return false;
                    })
-  )
+     )
   {
     VLOG(100) << "Waiting for IMU measurements.";
     return false;
@@ -205,10 +201,9 @@ void CameraImuSynchronizer::checkDataAndCallback()
           imu_buffers_.begin(),
           imu_buffers_.end(),
           oldest_newest_stamp_vector.begin(),
-          [](ImuSyncBufferPtr& imu_buffer) {
-            return imu_buffer->getOldestAndNewestStamp();
-          }
-    );
+          [](ImuSyncBuffer& imu_buffer) {
+            return imu_buffer.getOldestAndNewestStamp();
+          });
 
     // imu buffers are not consistent with the image buffers
     if (!validateImuBuffers(min_stamp, max_stamp, oldest_newest_stamp_vector))
@@ -228,7 +223,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
         ImuStamps imu_stamps;
         ImuAccGyr imu_accgyr;
         std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i]->getBetweenValuesInterpolated(oldest_stamp, min_stamp);
+            imu_buffers_[i].getBetweenValuesInterpolated(oldest_stamp, min_stamp);
         imu_timestamps[i] = imu_stamps;
         imu_measurements[i] = imu_accgyr;
       }
@@ -237,7 +232,7 @@ void CameraImuSynchronizer::checkDataAndCallback()
         ImuStamps imu_stamps;
         ImuAccGyr imu_accgyr;
         std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i]->getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
+            imu_buffers_[i].getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
         imu_timestamps[i] = imu_stamps;
         imu_measurements[i] = imu_accgyr;
       }

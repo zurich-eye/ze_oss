@@ -23,13 +23,12 @@ public:
 
   virtual ~DataProviderRosbag() = default;
 
-  virtual void spin() override;
-
   virtual bool spinOnce() override;
 
   virtual bool ok() const override;
 
   virtual size_t imuCount() const;
+
   virtual size_t cameraCount() const;
 
   size_t size() const;

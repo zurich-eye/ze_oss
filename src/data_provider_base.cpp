@@ -7,6 +7,14 @@ DataProviderBase::DataProviderBase(DataProviderType type)
   , signal_handler_(running_)
 {}
 
+void DataProviderBase::spin()
+{
+  while (ok())
+  {
+    spinOnce();
+  }
+}
+
 void DataProviderBase::shutdown()
 {
   running_ = false;

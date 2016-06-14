@@ -2,6 +2,7 @@
 #include <ze/data_provider/data_provider_factory.hpp>
 #include <ze/data_provider/data_provider_csv.hpp>
 #include <ze/data_provider/data_provider_rosbag.hpp>
+#include <ze/data_provider/data_provider_rostopic.hpp>
 
 DEFINE_string(bag_filename, "dataset.bag", "Name of bagfile in data_dir.");
 
@@ -15,7 +16,7 @@ DEFINE_string(topic_imu1, "/imu1", "");
 DEFINE_string(topic_imu2, "/imu2", "");
 DEFINE_string(topic_imu3, "/imu3", "");
 
-DEFINE_int32(data_source, 1, " 0: CSV, 1: Rosbag");
+DEFINE_int32(data_source, 1, " 0: CSV, 1: Rosbag, 2: Rostopic");
 DEFINE_string(data_dir, "", "Directory for csv dataset.");
 
 namespace ze {
@@ -56,6 +57,11 @@ DataProviderBase::Ptr loadDataProviderFromGflags(
     {
       data_provider.reset(
             new DataProviderRosbag(FLAGS_bag_filename, imu_topics, cam_topics));
+      break;
+    }
+    case 2: // Rostopic
+    {
+      data_provider.reset(new DataProviderRostopic(imu_topics, cam_topics));
       break;
     }
     default:

@@ -15,6 +15,7 @@ set(HEADERS
   include/ze/data_provider/data_provider_factory.hpp
   include/ze/data_provider/data_provider_csv.hpp
   include/ze/data_provider/data_provider_rosbag.hpp
+  include/ze/data_provider/data_provider_rostopic.hpp
   include/ze/data_provider/camera_imu_synchronizer.hpp
   )
 
@@ -23,6 +24,7 @@ set(SOURCES
   src/data_provider_factory.cpp
   src/data_provider_csv.cpp
   src/data_provider_rosbag.cpp
+  src/data_provider_rostopic.cpp
   src/camera_imu_synchronizer.cpp
   )
 
