@@ -8,13 +8,6 @@
 #include <ze/common/timer_collection.h>
 #include <ze/common/timer_statistics.h>
 
-TEST(TimerTests, testTimerInterface)
-{
-  ze::Timer t;
-  std::this_thread::sleep_for(ze::Timer::ms(10));
-  EXPECT_NEAR(t.stopAndGetMilliseconds(), 10.0, 0.5);
-}
-
 TEST(TimerTests, testTimerStatistics)
 {
   ze::TimerStatistics timer;
