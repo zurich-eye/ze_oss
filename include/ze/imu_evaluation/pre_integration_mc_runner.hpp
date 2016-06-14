@@ -7,17 +7,15 @@
 namespace ze {
 
 //! A class to run monte-carlo simulations of an imu pre-integration setup.
-template<class PRE_INTEGRATOR>
 class PreIntegratorMonteCarlo
 {
 public:
-  typedef PRE_INTEGRATOR pre_integrator_t;
 
   PreIntegratorMonteCarlo(PreIntegrationRunner::Ptr preintegraton_runner,
-                          Matrix3 gyroscope_noise_covariance,
+                          PreIntegratorFactory::Ptr pre_integrator_factory,
                           size_t threads = 1)
     : preintegraton_runner_(preintegraton_runner)
-    , gyroscope_noise_covariance_(gyroscope_noise_covariance)
+    , pre_integrator_factory_(pre_integrator_factory)
     , threads_(threads)
   {
   }
@@ -27,14 +25,13 @@ public:
   //! must be compatible with the underlying scenario.
   void simulate(size_t num_rounds, FloatType start, FloatType end)
   {
-    typename pre_integrator_t::Ptr pre_int_actual
-        = preintegrateActual(start, end);
+    PreIntegrator::Ptr pre_int_actual = preintegrateActual(start, end);
     D_R_ref_ = pre_int_actual->D_R_i_k();
     R_ref_ = pre_int_actual->R_i_k();
 
     // Threaded run of the monte carlo simulations.
     ThreadPool pool(threads_);
-    std::vector<std::future<typename pre_integrator_t::Ptr>> results;
+    std::vector<std::future<PreIntegrator::Ptr>> results;
 
     // A vector of simulated results.
     for (size_t i = 0; i < num_rounds; ++i)
@@ -42,8 +39,7 @@ public:
       results.emplace_back(
         pool.enqueue([i, start, end, this] {
           VLOG(1) << "Monte-Carlo run #" << i;
-          typename pre_integrator_t::Ptr pre_int_mc
-            = preintegrateCorrupted(start, end);
+           PreIntegrator::Ptr pre_int_mc = preintegrateCorrupted(start, end);
 
           return pre_int_mc;
       }));
@@ -63,11 +59,10 @@ public:
   }
 
   //! Perform a pre-integration of the actual (exact, noise-free) trajectory.
-  typename pre_integrator_t::Ptr preintegrateActual(FloatType start, FloatType end)
+  PreIntegrator::Ptr preintegrateActual(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
-    typename pre_integrator_t::Ptr pre_integrator(
-          std::make_shared<pre_integrator_t>(gyroscope_noise_covariance_));
+    PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
 
     preintegraton_runner_->process(pre_integrator,
                                    false,
@@ -81,11 +76,10 @@ public:
   //! Every call to this function will generate different results due to
   //! the repeated noise generation in the scenarios. The bias will not change
   //! between calls.
-  typename pre_integrator_t::Ptr preintegrateCorrupted(FloatType start, FloatType end)
+  PreIntegrator::Ptr preintegrateCorrupted(FloatType start, FloatType end)
   {
     // Create a new container to integrate and store the results.
-    typename pre_integrator_t::Ptr pre_integrator(
-          std::make_shared<pre_integrator_t>(gyroscope_noise_covariance_));
+    PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
 
     preintegraton_runner_->process(pre_integrator,
                                    true,
@@ -112,7 +106,7 @@ public:
 
 private:
   PreIntegrationRunner::Ptr preintegraton_runner_;
-  Matrix3 gyroscope_noise_covariance_;
+  PreIntegratorFactory::Ptr pre_integrator_factory_;
 
   //! The number of threads to run the simulation on.
   size_t threads_;

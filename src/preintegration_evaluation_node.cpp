@@ -216,10 +216,13 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   preintegraton_runner->setInitialOrientation(trajectory_->orientation(start));
 
+  PreIntegratorFactory::Ptr preintegrator_factory(
+        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance));
+
   VLOG(1) << "Initialize monte carlo runner";
-  PreIntegratorMonteCarlo<ManifoldPreIntegrationState> mc(preintegraton_runner,
-                                                          gyroscope_noise_covariance,
-                                                          FLAGS_num_threads);
+  PreIntegratorMonteCarlo mc(preintegraton_runner,
+                             preintegrator_factory,
+                             FLAGS_num_threads);
 
   VLOG(1) << "Monte Carlo Simulation";
   mc.simulate(FLAGS_monte_carlo_runs, scenario->start(), scenario->end());

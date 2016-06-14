@@ -49,13 +49,13 @@ public:
                            measurements_container_t imu_measurements) = 0;
 
   //! Get the result of the pre-integration process.
-  preintegrated_orientation_container_t D_R_i_j()
+  const preintegrated_orientation_container_t& D_R_i_j() const
   {
     return D_R_i_j_;
   }
 
   //! Get the absolute orientation after pre-integration.
-  preintegrated_orientation_container_t R_i_j()
+  const preintegrated_orientation_container_t& R_i_j() const
   {
     return R_i_j_;
   }
@@ -63,39 +63,39 @@ public:
   //! Get the timestamps corresponding to the pre-integrated orientations,
   //! Where the i'th element in the orientation container refers to the
   //! time interval: [i, i+1].
-  times_container_t times()
+  const times_container_t& times() const
   {
     return times_;
   }
 
   //! Get the propagated covariance matrix.
-  covariance_container_t covariance_i_j()
+  const covariance_container_t& covariance_i_j() const
   {
     return covariance_i_j_;
   }
 
   // Getters for the above quantities at the sampling rate of the imu.
-  preintegrated_orientation_container_t D_R_i_k()
+  const preintegrated_orientation_container_t& D_R_i_k() const
   {
     return D_R_i_k_;
   }
 
-  preintegrated_orientation_container_t R_i_k()
+  const preintegrated_orientation_container_t& R_i_k() const
   {
     return R_i_k_;
   }
 
-  times_container_t times_raw()
+  const times_container_t& times_raw() const
   {
     return times_raw_;
   }
 
-  covariance_container_t covariance_i_k()
+  const covariance_container_t& covariance_i_k() const
   {
     return covariance_i_k_;
   }
 
-  const measurements_container_t& measurements()
+  const measurements_container_t& measurements() const
   {
     return measurements_;
   }
@@ -125,6 +125,25 @@ protected:
   // Keep track of all incoming measurements.
   measurements_container_t measurements_;
 
+  //! The covariance matrix of the gyroscope noise.
+  Matrix3 gyro_noise_covariance_;
+};
+
+//! A base class for pre-integrator factory objects
+class PreIntegratorFactory
+{
+public:
+  ZE_POINTER_TYPEDEFS(PreIntegratorFactory);
+
+  PreIntegratorFactory(Matrix3 gyro_noise_covariance)
+    : gyro_noise_covariance_(gyro_noise_covariance)
+  {
+  }
+
+  //! Get an instance of the Pre-Integrator.
+  virtual PreIntegrator::Ptr get() = 0;
+
+protected:
   //! The covariance matrix of the gyroscope noise.
   Matrix3 gyro_noise_covariance_;
 };
