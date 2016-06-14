@@ -1,5 +1,4 @@
 #include <imp/cu_core/cu_image_reduction.cuh>
-#include <imp/cu_core/cu_utils.hpp>
 
 namespace ze {
 namespace cu {
@@ -20,17 +19,17 @@ struct SharedMemory
 
 // Required specializations
 template<>
-struct SharedMemory<ze::Pixel32sC1>
+struct SharedMemory<Pixel32sC1>
 {
-  __device__ ze::Pixel32sC1 *getPointer()
+  __device__ Pixel32sC1 *getPointer()
   {
-    extern __shared__ ze::Pixel32sC1 s_int[];
+    extern __shared__ Pixel32sC1 s_int[];
     return s_int;
   }
 };
 
 template<>
-struct SharedMemory<ze::Pixel32fC1>
+struct SharedMemory<Pixel32fC1>
 {
   __device__ Pixel32fC1 *getPointer()
   {
@@ -44,11 +43,11 @@ template<typename Pixel>
 __global__
 void reductionSumKernel(
     Pixel* out_dev_ptr,
-    ze::size_t out_stride,
+    size_t out_stride,
     const Pixel* in_dev_ptr,
-    ze::size_t in_stride,
-    ze::uint32_t width,
-    ze::uint32_t height)
+    size_t in_stride,
+    uint32_t width,
+    uint32_t height)
 {
   SharedMemory<Pixel> smem;
   Pixel* s_partial = smem.getPointer();
@@ -97,11 +96,11 @@ template<typename Pixel>
 __global__
 void reductionCountEqKernel(
     Pixel* out_dev_ptr,
-    ze::size_t out_stride,
+    size_t out_stride,
     const Pixel* in_dev_ptr,
     size_t in_stride,
-    ze::uint32_t width,
-    ze::uint32_t height,
+    uint32_t width,
+    uint32_t height,
     Pixel value)
 {
   SharedMemory<Pixel> smem;
@@ -152,107 +151,91 @@ void reductionCountEqKernel(
 
 template<typename Pixel>
 ImageReducer<Pixel>::ImageReducer()
-  : fragm_(dim3(4, 4, 1), dim3(16, 16, 1))
-  , partial_(fragm_.dimGrid.x, fragm_.dimGrid.y)
+  : partial_(fragm_.dimGrid.x, fragm_.dimGrid.y)
 {
   // Compute required amount of shared memory
   sh_mem_size_ = fragm_.dimBlock.x * fragm_.dimBlock.y * sizeof(Pixel);
-
-  // Allocate final result
-  dev_final_ = ze::cu::MemoryStorage<Pixel>::alloc(1);
 }
 
 template<typename Pixel>
 ImageReducer<Pixel>::~ImageReducer()
-{
-  ze::cu::MemoryStorage<Pixel>::free(dev_final_);
-}
+{ }
 
 // Sum image by reduction
 // Cfr. listing 12.1 by N. Wilt, "The CUDA Handbook"
 template<typename Pixel>
-Pixel ImageReducer<Pixel>::sum(const ze::cu::ImageGpu<Pixel>& in_img)
+Pixel ImageReducer<Pixel>::sum(const ImageGpu<Pixel>& in_img)
 {
   //if(is_dev_fin_alloc_ && is_dev_part_alloc_)
 
   reductionSumKernel<Pixel>
-      <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
-                                                        (partial_.data(),
-                                                         partial_.stride(),
-                                                         in_img.data(),
-                                                         in_img.stride(),
-                                                         in_img.width(),
-                                                         in_img.height());
+      <<<
+        fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_
+      >>>
+        (partial_.data(),
+         partial_.stride(),
+         in_img.data(),
+         in_img.stride(),
+         in_img.width(),
+         in_img.height());
 
   reductionSumKernel<Pixel>
-      <<<1, fragm_.dimBlock, sh_mem_size_>>>
-                                           (dev_final_,
-                                            0,
-                                            partial_.data(),
-                                            partial_.stride(),
-                                            fragm_.dimGrid.x,
-                                            fragm_.dimGrid.y);
+      <<<
+        1, fragm_.dimBlock, sh_mem_size_
+      >>>
+        (dev_final_.data(),
+         0,
+         partial_.data(),
+         partial_.stride(),
+         fragm_.dimGrid.x,
+         fragm_.dimGrid.y);
 
   // download sum
-  Pixel h_sum;
-  const cudaError err =
-      cudaMemcpy(
-        &h_sum,
-        dev_final_,
-        sizeof(Pixel),
-        cudaMemcpyDeviceToHost);
-  if(cudaSuccess != err)
-  {
-    LOG(FATAL) << "sum: unable to copy result from device to host";
-  }
-  return h_sum;
+  ze::LinearMemory<Pixel> h_sum(1);
+  dev_final_.copyTo(h_sum);
+  return h_sum(0);
 }
 
 // Count elements equal to 'value'
 // First count over the thread grid,
 // then perform a reduction sum on a single thread block
 template<>
-size_t ImageReducer<ze::Pixel32sC1>::countEqual(
-    const ze::cu::ImageGpu32sC1& in_img,
+size_t ImageReducer<Pixel32sC1>::countEqual(
+    const ImageGpu32sC1& in_img,
     int32_t value)
 {
 
-  reductionCountEqKernel<ze::Pixel32sC1>
-      <<<fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_>>>
-                                                        (partial_.data(),
-                                                         partial_.stride(),
-                                                         in_img.data(),
-                                                         in_img.stride(),
-                                                         in_img.width(),
-                                                         in_img.height(),
-                                                         value);
+  reductionCountEqKernel<Pixel32sC1>
+      <<<
+        fragm_.dimGrid, fragm_.dimBlock, sh_mem_size_
+      >>>
+        (partial_.data(),
+         partial_.stride(),
+         in_img.data(),
+         in_img.stride(),
+         in_img.width(),
+         in_img.height(),
+         value);
 
-  reductionSumKernel<ze::Pixel32sC1>
-      <<<1, fragm_.dimBlock, sh_mem_size_>>>
-                                           (dev_final_,
-                                            0,
-                                            partial_.data(),
-                                            partial_.stride(),
-                                            fragm_.dimGrid.x,
-                                            fragm_.dimGrid.y);
+  reductionSumKernel<Pixel32sC1>
+      <<<
+        1, fragm_.dimBlock, sh_mem_size_
+      >>>
+        (dev_final_.data(),
+         0,
+         partial_.data(),
+         partial_.stride(),
+         fragm_.dimGrid.x,
+         fragm_.dimGrid.y);
 
   // download count
-  int32_t h_count;
-  const cudaError err =
-      cudaMemcpy(
-        &h_count,
-        dev_final_,
-        sizeof(int32_t),
-        cudaMemcpyDeviceToHost);
-  if(cudaSuccess != err)
-  {
-    LOG(FATAL) << "countEqual: unable to copy result from device to host";
-  }
-  return static_cast<size_t>(h_count);
+  ze::LinearMemory32sC1 h_count{1};
+  dev_final_.copyTo(h_count);
+  return static_cast<size_t>(h_count(0));
 }
 
-template class ImageReducer<ze::Pixel32sC1>;
-template class ImageReducer<ze::Pixel32fC1>;
+template class ImageReducer<Pixel32sC1>;
+template class ImageReducer<Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace

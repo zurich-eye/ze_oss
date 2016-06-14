@@ -1,9 +1,10 @@
 #include <sstream>
 #include <string>
 
+#include <ze/common/benchmark.h>
+#include <ze/common/random.hpp>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
-#include <ze/common/benchmark.h>
 #include <ze/common/types.h>
 
 #include <imp/cu_core/cu_image_gpu.cuh>
@@ -22,10 +23,10 @@ protected:
     , cu_image2_(size_)
     , cu_dst_(size_)
   {
-    auto random_val_generator = ze::getRandomGenerator<typename Pixel::T>();
+    auto random_val_generator = ze::uniformDistribution<typename Pixel::T>(ZE_DETERMINISTIC);
     val1_ = random_val_generator();
     val2_ = random_val_generator();
-    auto float_random_val_generator = ze::getRandomGenerator<float>();
+    auto float_random_val_generator = ze::uniformDistribution<float>(ZE_DETERMINISTIC);
     weight1_ = float_random_val_generator();
     weight2_ = float_random_val_generator();
 

@@ -4,13 +4,13 @@
 #include <assert.h>
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <functional>
 #include <limits>
 #include <type_traits>
 
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_linearmemory.cuh>
+#include <ze/common/random.hpp>
 #include <ze/common/test_utils.h>
 
 template <typename Pixel>
@@ -29,7 +29,7 @@ class CuLinearMemoryTest : public ::testing::Test
     , roi_linmem_copy_(roi_.length())
   {
     using T = typename Pixel::T;
-    auto random_val_generator = ze::getRandomGenerator<T>();
+    auto random_val_generator = ze::uniformDistribution<T>(ZE_DETERMINISTIC);
 
     for (size_t i=0; i<this->numel_; ++i)
     {

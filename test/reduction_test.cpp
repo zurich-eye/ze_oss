@@ -14,6 +14,7 @@
 #include <imp/cu_core/cu_image_reduction.cuh>
 #include <ze/common/benchmark.h>
 #include <ze/common/file_utils.h>
+#include <ze/common/random.hpp>
 #include <ze/common/test_utils.h>
 
 namespace ze {
@@ -33,7 +34,7 @@ double gtSum(const ze::ImageRaw32fC1& im)
 
 ze::ImageRaw32fC1 generateRandomImage(size_t width, size_t height)
 {
-  auto random_val = ze::getRandomGenerator<float>();
+  auto random_val = ze::uniformDistribution<float>(ZE_DETERMINISTIC);
   ze::ImageRaw32fC1 im(width,height);
   for (size_t y = 0; y < im.height(); ++y)
   {
@@ -86,7 +87,7 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestConstImg_32fC1)
         20, 40,
         "sum using parallel reduction",
         true);
-  const double tolerance = 0.01;
+  const double tolerance = 0.015;
   EXPECT_NEAR(gt_sum, cu_sum, tolerance);
   VLOG(1) << "GT sum: " << std::fixed << gt_sum;
   VLOG(1) << "GPU sum: " << std::fixed << cu_sum;
@@ -117,7 +118,7 @@ TEST(IMPCuCoreTestSuite, sumByReductionTestRndImg_32fC1)
         20, 40,
         "sum using parallel reduction",
         true);
-  const double tolerance = 0.01;
+  const double tolerance = 0.015;
   EXPECT_NEAR(gt_sum, cu_sum, tolerance);
   VLOG(1) << "GT sum: " << std::fixed << gt_sum;
   VLOG(1) << "GPU sum: " << std::fixed << cu_sum;
