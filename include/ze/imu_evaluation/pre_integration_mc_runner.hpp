@@ -2,6 +2,7 @@
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
 #include <ze/common/statistics.h>
+#include <ze/common/thread_pool.hpp>
 
 namespace ze {
 
@@ -13,9 +14,11 @@ public:
   typedef PRE_INTEGRATOR pre_integrator_t;
 
   PreIntegratorMonteCarlo(PreIntegrationRunner::Ptr preintegraton_runner,
-                          Matrix3 gyroscope_noise_covariance)
+                          Matrix3 gyroscope_noise_covariance,
+                          size_t threads = 1)
     : preintegraton_runner_(preintegraton_runner)
     , gyroscope_noise_covariance_(gyroscope_noise_covariance)
+    , threads_(threads)
   {
   }
 
@@ -29,14 +32,29 @@ public:
     D_R_ref_ = pre_int_actual->D_R_i_k();
     R_ref_ = pre_int_actual->R_i_k();
 
+    // Threaded run of the monte carlo simulations.
+    ThreadPool pool(threads_);
+    std::vector<std::future<typename pre_integrator_t::Ptr>> results;
+
     // A vector of simulated results.
     for (size_t i = 0; i < num_rounds; ++i)
     {
-      VLOG(1) << "Monte-Carlo run #" << i;
-      typename pre_integrator_t::Ptr pre_int_mc
-          = preintegrateCorrupted(start, end);
-      D_R_mc_.push_back(pre_int_mc->D_R_i_k());
-      R_mc_.push_back(pre_int_mc->R_i_k());
+      results.emplace_back(
+        pool.enqueue([i, start, end, this] {
+          VLOG(1) << "Monte-Carlo run #" << i;
+          typename pre_integrator_t::Ptr pre_int_mc
+            = preintegrateCorrupted(start, end);
+
+          return pre_int_mc;
+      }));
+    }
+
+    // Extract the results of the simulations
+    for (auto iter = results.begin(); iter != results.end(); ++iter)
+    {
+      auto value = iter->get();
+      D_R_mc_.push_back(value->D_R_i_k());
+      R_mc_.push_back(value->R_i_k());
     }
 
     // estimate the variance / covariance
@@ -96,8 +114,8 @@ private:
   PreIntegrationRunner::Ptr preintegraton_runner_;
   Matrix3 gyroscope_noise_covariance_;
 
-  //! Should the simulation run threaded?
-  bool threaded_;
+  //! The number of threads to run the simulation on.
+  size_t threads_;
 
   //! Vector of the results of the monte carlo runs (Absolute and Relative Orientations)
   std::vector<std::vector<Matrix3>> D_R_mc_;

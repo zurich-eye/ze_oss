@@ -50,6 +50,7 @@ DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
 
 // A series of visualization controls:
 DEFINE_bool(show_trajectory, true, "Show the trajectory that was loaded / generated.");
+DEFINE_int32(num_threads, 16, "Number of threads to take for the monte-carlo simulations");
 
 
 namespace ze {
@@ -217,7 +218,8 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   VLOG(1) << "Initialize monte carlo runner";
   PreIntegratorMonteCarlo<ManifoldPreIntegrationState> mc(preintegraton_runner,
-                                                          gyroscope_noise_covariance);
+                                                          gyroscope_noise_covariance,
+                                                          FLAGS_num_threads);
 
   VLOG(1) << "Monte Carlo Simulation";
   mc.simulate(FLAGS_monte_carlo_runs, scenario->start(), scenario->end());
