@@ -25,12 +25,12 @@ public:
     measurements_.rightCols(measurements.cols() - 1) = measurements.leftCols(
                                                          measurements.cols() - 1);
 
-    VLOG(1) << "Pushing " << measurements.cols() << " measurements \n";
-
     // Integrate measurements between frames.
     for (int i = 0; i < measurements.cols() - 1; ++i)
     {
       FloatType dt = stamps[i+1] - stamps[i];
+      // Covariance of the discrete process.
+      Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
 
       Vector6 measurement = measurements.col(i);
       Vector3 gyro_measurement = measurement.tail<3>(3);
@@ -55,7 +55,7 @@ public:
 
         covariance_i_k_.push_back(
               D_R_i_k_.back().transpose() * covariance_i_k_.back() * D_R_i_k_.back()
-              + J_r * gyro_noise_covariance_ * dt * dt * J_r.transpose());
+              + J_r * gyro_noise_covariance_d * dt * dt * J_r.transpose());
       }
 
       times_raw_.push_back(stamps[i]);
