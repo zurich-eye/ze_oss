@@ -104,7 +104,7 @@ TEST(impCuUndistortionTexture, equidist32fC1)
   ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(calib_file);
   VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
-  for (int i = 0; i < 12; ++i)
+  for (int i = 0; i < 1; ++i)
   {
     for (int lr = 0; lr < 2; ++lr)
     {
