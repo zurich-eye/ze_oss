@@ -1,6 +1,7 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/cu_imgproc/cu_undistortion.cuh>
 
+#include <ze/cameras/camera_rig.h>
 #include <ze/common/benchmark.h>
 #include <ze/common/file_utils.h>
 #include <ze/common/test_entrypoint.h>
@@ -93,36 +94,72 @@ TEST(impCuUndistortionTexture, equidist32fC1_testMap)
 
 TEST(impCuUndistortionTexture, equidist32fC1)
 {
-  const std::string test_data_name{"imp_cu_imgproc"};
-  const std::string predefined_img_data_file_name{"pyr_0.png"};
+  const double tolerance_on_sad{0.0014};   // Tolerance in SAD/nelems
+  const double tolerance_on_sad_max{0.5};  // Tolerance on max of SAD
+  const std::string test_folder =
+      ze::getTestDataDir("imp_cu_imgproc");
+  const std::string calib_file =
+      ze::joinPath(test_folder, "visensor_22030_swe_params.yaml");
 
-  std::string path(
-        joinPath(
-          getTestDataDir(test_data_name),
-          predefined_img_data_file_name));
+  ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(calib_file);
+  VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
-  ImageCv32fC1::Ptr cv_img;
-  cvBridgeLoad(cv_img, path, PixelOrder::gray);
-  VLOG(2) << "loaded image " << path
-          << ", size " << cv_img->size();
+  for (int i = 0; i < 12; ++i)
+  {
+    for (int lr = 0; lr < 2; ++lr)
+    {
+      std::stringstream file_suffix;
+      file_suffix << lr << "_" << i << ".png";
+      const std::string dist_img_file =
+          ze::joinPath(test_folder, "distorted" + file_suffix.str());
+      const std::string undist_img_file =
+          ze::joinPath(test_folder, "undistorted" + file_suffix.str());
+      VLOG(2) << "undistorted GT file: " << undist_img_file;
+      VLOG(2) << "distorted file: " << dist_img_file;
+      // Load test image
+      ImageCv32fC1::Ptr cv_img;
+      cvBridgeLoad(cv_img, dist_img_file, PixelOrder::gray);
+      VLOG(2) << "loaded image " << dist_img_file
+              << ", size " << cv_img->size();
+      // Allocate GPU memory
+      cu::ImageGpu32fC1 gpu_src(*cv_img);
+      cu::ImageGpu32fC1 gpu_dst(cv_img->size());
+      // Camera parameters
+      Eigen::RowVectorXf cam_params(4);
+      for (int cp = 0; cp < 4; ++cp)
+      {
+        cam_params(cp) = rig->at(lr).projectionParameters()(cp);
+      }
+      Eigen::RowVectorXf dist_coeffs(4);
+      for (int dc = 0; dc < 4; ++dc)
+      {
+        dist_coeffs(dc) = rig->at(lr).distortionParameters()(dc);
+      }
+      cu::EquidistUndistort32fC1 undistorter(
+            gpu_src.size(), cam_params, dist_coeffs);
+      undistorter.undistort(gpu_dst, gpu_src);  // GPU warm-up
+      auto undistortLambda = [&](){
+        undistorter.undistort(gpu_dst, gpu_src);
+      };
+      runTimingBenchmark(
+            undistortLambda, 10, 20,
+            "CUDA undistortion using Textures", true);
+      // Download result image
+      ImageCv32fC1 cv_img_out(gpu_dst);
+      // Load GT undistorted image
+      cvBridgeLoad(cv_img, undist_img_file, PixelOrder::gray);
+      // Compare
+      cv::Mat abs_diff = cv::abs(cv_img->cvMat() - cv_img_out.cvMat());
+      double ad_min, ad_max;
 
-  Eigen::RowVectorXf cam_params(4);
-  cam_params << 471.690643292, 471.765601046, 371.087464172, 228.63874151;
-  Eigen::RowVectorXf dist_coeffs(4);
-  dist_coeffs << 0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139;
+      cv::minMaxLoc(abs_diff, &ad_min, &ad_max);
+      EXPECT_LT(ad_max, tolerance_on_sad_max);
 
-  cu::ImageGpu32fC1 gpu_src(*cv_img);
-  cu::ImageGpu32fC1 gpu_dst(cv_img->size());
-
-  cu::EquidistUndistort32fC1 undistorter(
-        gpu_src.size(), cam_params, dist_coeffs);
-  undistorter.undistort(gpu_dst, gpu_src);  // GPU warm-up
-  auto undistortLambda = [&](){
-    undistorter.undistort(gpu_dst, gpu_src);
-  };
-  runTimingBenchmark(
-        undistortLambda, 10, 20,
-        "CUDA undistortion using Textures", true);
+      double sad = cv::sum(abs_diff)[0];
+      EXPECT_LT(sad/static_cast<double>(cv_img->numel()), tolerance_on_sad)
+          << " - testing image " << dist_img_file ;
+    }
+  }
 }
 
 ZE_UNITTEST_ENTRYPOINT
