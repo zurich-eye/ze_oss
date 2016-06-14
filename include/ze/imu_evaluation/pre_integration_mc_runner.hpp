@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
+#include <ze/common/statistics.h>
 
 namespace ze {
 
@@ -94,12 +95,21 @@ public:
 private:
   PreIntegrationRunner::Ptr preintegraton_runner_;
   Matrix3 gyroscope_noise_covariance_;
+
+  //! Should the simulation run threaded?
+  bool threaded_;
+
+  //! Vector of the results of the monte carlo runs (Absolute and Relative Orientations)
   std::vector<std::vector<Matrix3>> D_R_mc_;
+  std::vector<std::vector<Matrix3>> R_mc_;
+
+  //! Estiamted covariances for the relative motion and absolute motion.
   std::vector<Matrix3> covariances_;
   std::vector<Matrix3> covariances_absolute_;
+
+  //! The reference values of the relative and absolute orientation.
   std::vector<Matrix3> D_R_ref_;
   std::vector<Matrix3> R_ref_;
-  std::vector<std::vector<Matrix3>> R_mc_;
 
   //! Estimate the covariance of the experiment set (relative orientation).
   std::vector<Matrix3> covariance_estimate(std::vector<Matrix3> D_R_actual,
@@ -122,11 +132,8 @@ private:
         Quaternion delta_q(delta);
         errors.col(run) = Quaternion::log(delta_q);
       }
-      Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic> zero_mean
-          = errors.colwise() - errors.rowwise().mean();
 
-      covariances.push_back((zero_mean * zero_mean.adjoint())
-                            / (zero_mean.cols() - 1));
+      covariances.push_back(measurementCovariance(errors));
     }
 
     return covariances;
