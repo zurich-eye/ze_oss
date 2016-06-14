@@ -22,7 +22,7 @@ public:
       const std::map<std::string, size_t>& imu_topics,
       const std::map<std::string, size_t>& camera_topics,
       uint32_t polling_rate = 1000u,
-      uint32_t img_queue_size = 20u,
+      uint32_t img_queue_size = 100u,
       uint32_t imu_queue_size = 1000u);
 
   virtual ~DataProviderRostopic() = default;

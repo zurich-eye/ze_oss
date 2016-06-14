@@ -3,7 +3,7 @@
 #include <functional>
 #include <gflags/gflags.h>
 
-#include <imp/core/image_base.hpp>
+
 #include <ze/common/logging.hpp>
 #include <ze/data_provider/data_provider_base.hpp>
 
@@ -42,13 +42,16 @@ void CameraImuSynchronizer::subscribeDataProvider(DataProviderBase& data_provide
 
 void CameraImuSynchronizer::initBuffers()
 {
-  img_buffer_ = StampedImages(num_cameras_, std::make_pair(-1, nullptr));
+  img_buffer_.resize(2 * num_cameras_);
   imu_buffers_ = ImuBufferVector(num_imus_);
 }
 
 void CameraImuSynchronizer::addImgData(
     int64_t stamp, const ImageBase::Ptr& img, uint32_t camera_idx)
 {
+  CHECK_LT(camera_idx, num_cameras_);
+
+  // Skip frame processing for first N frames.
   if (sync_frame_count_ < FLAGS_data_sync_init_skip_n_frames)
   {
     if (camera_idx == 0)
@@ -58,37 +61,78 @@ void CameraImuSynchronizer::addImgData(
     return;
   }
 
-  CHECK_LT(camera_idx, num_cameras_);
-  if(img_buffer_.at(camera_idx).first != -1)
+  // Add image to first available slot in our buffer:
+  int slot = -1;
+  for (size_t i = 0u; i < img_buffer_.size(); ++i)
   {
-    LOG(WARNING) << "Received new camera image before the previous set was complete."
-                 << " Unordered camera images are arriving!";
-  }
-
-  // time consistency checks
-  // ensure that the oldest image is < 2 ms offset from current image (same frame)
-  for (size_t i = 0; i < img_buffer_.size(); ++i)
-  {
-    if (i == camera_idx)
+    if (img_buffer_[i].empty())
     {
-      continue;
-    }
-
-    if (img_buffer_.at(i).first != -1 && img_buffer_.at(i).first > stamp)
-    {
-      LOG(WARNING) << "Unordered images arriving.";
-    }
-
-    if (img_buffer_.at(i).first != -1 && std::abs(stamp - img_buffer_.at(i).first) > 2000)
-    {
-      // invalidate old data
-      img_buffer_.at(i).first = -1;
-      LOG(WARNING) << "Invalidated image of older frame.";
+      slot = i;
+      break;
     }
   }
 
-  img_buffer_[camera_idx] = std::make_pair(stamp, img);
-  checkDataAndCallback();
+  if (slot == -1)
+  {
+    // No space in buffer to process frame. Delete oldest one. This happens
+    // also when the processing is not fast enough such that frames are skipped.
+    int64_t min_stamp = std::numeric_limits<int64_t>::max();
+    for (size_t i = 0u; i < img_buffer_.size(); ++i)
+    {
+      if (!img_buffer_[i].empty() && img_buffer_[i].stamp < min_stamp)
+      {
+        slot = i;
+        min_stamp = img_buffer_[i].stamp;
+      }
+    }
+  }
+
+  img_buffer_[slot].stamp = stamp;
+  img_buffer_[slot].img = img;
+  img_buffer_[slot].camera_idx = camera_idx;
+
+  // Now check, if we have all images from this bundle:
+  uint32_t num_imgs = 0u;
+  for (size_t i = 0; i <= img_buffer_.size(); ++i)
+  {
+    if (std::abs(stamp - img_buffer_[i].stamp) < millisecToNanosec(2))
+    {
+      ++num_imgs;
+    }
+  }
+
+  if (num_imgs != num_cameras_)
+  {
+    return; // We don't have all frames yet.
+  }
+
+  // We have frames with very close timestamps. Put them together in a vector.
+  sync_imgs_ready_to_process_.clear();
+  sync_imgs_ready_to_process_.resize(num_imgs, {-1, nullptr});
+  for (size_t i = 0; i <= img_buffer_.size(); ++i)
+  {
+    ImageBufferItem& item = img_buffer_[i];
+    if (std::abs(stamp - item.stamp) < c_camera_bundle_time_accuracy_ns)
+    {
+      DEBUG_CHECK_GT(item.stamp, 0);
+      DEBUG_CHECK(item.img);
+      sync_imgs_ready_to_process_.at(item.camera_idx) = { item.stamp, item.img };
+    }
+  }
+
+  // Double-check that we have all images.
+  for (size_t i = 0; i < sync_imgs_ready_to_process_.size(); ++i)
+  {
+    if (sync_imgs_ready_to_process_.at(i).first == -1)
+    {
+      LOG(ERROR) << "Sync images failed!";
+      sync_imgs_ready_to_process_.clear();
+      return;
+    }
+  }
+  sync_imgs_ready_to_process_stamp_ = sync_imgs_ready_to_process_.front().first;
+
+  checkImuDataAndCallback();
 }
 
 void CameraImuSynchronizer::addImuData(
@@ -98,7 +142,7 @@ void CameraImuSynchronizer::addImuData(
   acc_gyr.head<3>() = acc;
   acc_gyr.tail<3>() = gyr;
   imu_buffers_[imu_idx].insert(stamp, acc_gyr);
-  checkDataAndCallback();
+  checkImuDataAndCallback();
 }
 
 void CameraImuSynchronizer::registerCameraImuCallback(
@@ -127,7 +171,6 @@ bool CameraImuSynchronizer::validateImuBuffers(
       )
   {
     LOG(WARNING) << "Received all images but no imu measurements!";
-    resetImgBuffer();
     return false;
   }
 
@@ -144,7 +187,6 @@ bool CameraImuSynchronizer::validateImuBuffers(
      )
   {
     LOG(WARNING) << "Oldest IMU measurement is newer than image timestamp.";
-    resetImgBuffer();
     return false;
   }
 
@@ -167,26 +209,11 @@ bool CameraImuSynchronizer::validateImuBuffers(
   return true;
 }
 
-void CameraImuSynchronizer::checkDataAndCallback()
+void CameraImuSynchronizer::checkImuDataAndCallback()
 {
-  // Check if we have received all images from the cameras:
-  int64_t max_stamp = std::numeric_limits<int64_t>::min();
-  int64_t min_stamp = std::numeric_limits<int64_t>::max();
-  for(const StampedImage& it : img_buffer_)
+  if (sync_imgs_ready_to_process_stamp_ < 0)
   {
-    if(it.first < 0)
-    {
-      // Negative time-stamp means that this image was not yet received!
-      return;
-    }
-    max_stamp = std::max(it.first, max_stamp);
-    min_stamp = std::min(it.first, min_stamp);
-  }
-
-  if(max_stamp - min_stamp > img_bundle_max_dt_nsec_)
-  {
-    LOG(WARNING) << "Images in bundle have too large varying timestamps: "
-                 << nanosecToMillisecTrunc(max_stamp - min_stamp) << " milliseconds";
+    return; // Images are not synced yet.
   }
 
   // always provide imu structures in the callback (empty if no imu present)
@@ -206,7 +233,10 @@ void CameraImuSynchronizer::checkDataAndCallback()
           });
 
     // imu buffers are not consistent with the image buffers
-    if (!validateImuBuffers(min_stamp, max_stamp, oldest_newest_stamp_vector))
+    if (!validateImuBuffers(
+          sync_imgs_ready_to_process_stamp_,
+          sync_imgs_ready_to_process_stamp_,
+          oldest_newest_stamp_vector))
     {
       return;
     }
@@ -219,40 +249,35 @@ void CameraImuSynchronizer::checkDataAndCallback()
       if(last_img_bundle_min_stamp_ < 0)
       {
         int64_t oldest_stamp = std::get<0>(oldest_newest_stamp_vector[i]);
-
-        ImuStamps imu_stamps;
-        ImuAccGyr imu_accgyr;
-        std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i].getBetweenValuesInterpolated(oldest_stamp, min_stamp);
-        imu_timestamps[i] = imu_stamps;
-        imu_measurements[i] = imu_accgyr;
+        std::tie(imu_timestamps[i], imu_measurements[i]) =
+            imu_buffers_[i].getBetweenValuesInterpolated(oldest_stamp,
+                                                         sync_imgs_ready_to_process_stamp_);
       }
       else
       {
-        ImuStamps imu_stamps;
-        ImuAccGyr imu_accgyr;
-        std::tie(imu_stamps, imu_accgyr) =
-            imu_buffers_[i].getBetweenValuesInterpolated(last_img_bundle_min_stamp_, min_stamp);
-        imu_timestamps[i] = imu_stamps;
-        imu_measurements[i] = imu_accgyr;
+        std::tie(imu_timestamps[i], imu_measurements[i]) =
+            imu_buffers_[i].getBetweenValuesInterpolated(last_img_bundle_min_stamp_,
+                                                         sync_imgs_ready_to_process_stamp_);
       }
     }
   }
 
   // Let's process the callback.
-  cam_imu_callback_(img_buffer_, imu_timestamps, imu_measurements);
+  cam_imu_callback_(sync_imgs_ready_to_process_, imu_timestamps, imu_measurements);
 
-  last_img_bundle_min_stamp_ = min_stamp;
-  resetImgBuffer();
-}
-
-void CameraImuSynchronizer::resetImgBuffer()
-{
-  for(StampedImage& it : img_buffer_)
+  // Reset Buffer:
+  for (size_t i = 0; i <= img_buffer_.size(); ++i)
   {
-    it.first = -1;
-    it.second.reset();
+    ImageBufferItem& item = img_buffer_[i];
+    if (std::abs(sync_imgs_ready_to_process_stamp_ - item.stamp)
+        < c_camera_bundle_time_accuracy_ns)
+    {
+      item.reset();
+    }
   }
+  last_img_bundle_min_stamp_ = sync_imgs_ready_to_process_stamp_;
+  sync_imgs_ready_to_process_stamp_ = -1;
+  sync_imgs_ready_to_process_.clear();
 }
 
 } // namespace ze

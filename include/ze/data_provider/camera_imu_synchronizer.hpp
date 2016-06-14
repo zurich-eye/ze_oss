@@ -1,9 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <imp/core/image_base.hpp>
 #include <ze/common/ringbuffer.h>
 #include <ze/common/types.h>
 #include <ze/common/time_conversions.h>
+
 
 namespace ze {
 
@@ -16,9 +18,6 @@ using ImuStampsVector = std::vector<ImuStamps>;
 using ImuAccGyrVector = std::vector<ImuAccGyr>;
 using ImuSyncBuffer = Ringbuffer<FloatType, 6, 1000>;
 using ImuBufferVector = std::vector<ImuSyncBuffer>;
-using ImageBasePtr = std::shared_ptr<ImageBase>;
-using StampedImage = std::pair<int64_t, ImageBasePtr>;
-using StampedImages = std::vector<StampedImage>;
 
 // callback typedefs
 using SynchronizedCameraImuCallback =
@@ -26,6 +25,28 @@ using SynchronizedCameraImuCallback =
                       const ImuStampsVector& /*imu_timestamps*/,
                       const ImuAccGyrVector& /*imu_measurements*/)>;
 
+// -----------------------------------------------------------------------------
+//! Container to buffer received images.
+struct ImageBufferItem
+{
+  int64_t stamp        { -1 };
+  ImageBasePtr img     { nullptr };
+  int32_t camera_idx   { -1 };
+  inline bool empty()
+  {
+    return stamp == -1;
+  }
+
+  inline void reset()
+  {
+    stamp = -1;
+    img.reset();
+    camera_idx = -1;
+  }
+};
+using ImgBuffer = std::vector<ImageBufferItem>;
+
+// -----------------------------------------------------------------------------
 //! Synchronizes multiple cameras with multiple imus. Triggers a callback
 //! once measurements from all cameras and IMUs are available.
 class CameraImuSynchronizer
@@ -37,7 +58,7 @@ public:
   //! Add Image to the frame synchronizer.
   void addImgData(
       int64_t stamp,
-      const ImageBasePtr& img,
+      const ImageBase::Ptr& img,
       uint32_t camera_idx);
 
   //! Add IMU measurement to the frame synchronizer.
@@ -52,6 +73,9 @@ public:
   void registerCameraImuCallback(const SynchronizedCameraImuCallback& callback);
 
 private:
+  //! Allowed time differences of images in bundle.
+  static constexpr FloatType c_camera_bundle_time_accuracy_ns = millisecToNanosec(2.0);
+
   //! Num images to synchronize.
   uint32_t num_cameras_;
 
@@ -67,11 +91,14 @@ private:
   //! Count number of synchronized frames.
   int sync_frame_count_  { 0 };
 
-  //! Image buffer has fixed size of camera_rig_size_.
-  StampedImages img_buffer_;
+  //! Image buffer is buffering images of max the last 2*rig_size images.
+  ImgBuffer img_buffer_;
 
   //! IMU buffer stores all imu measurements, size of imu_count_.
   ImuBufferVector imu_buffers_;
+
+  StampedImages sync_imgs_ready_to_process_;
+  int64_t sync_imgs_ready_to_process_stamp_ { -1 };
 
   //! Registered callback for synchronized measurements.
   SynchronizedCameraImuCallback cam_imu_callback_;
@@ -89,10 +116,7 @@ private:
       const std::vector<std::tuple<int64_t, int64_t, bool>>& oldest_newest_stamp_vector);
 
   //! This function checks if we have all data ready to call the callback.
-  void checkDataAndCallback();
-
-  //! Clear all
-  void resetImgBuffer();
+  void checkImuDataAndCallback();
 };
 
 } // namespace ze

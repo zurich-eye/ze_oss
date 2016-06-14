@@ -26,7 +26,6 @@ DataProviderBase::Ptr loadDataProviderFromGflags(
 {
   CHECK_GT(num_cams, 0u);
   CHECK_LE(num_cams, 4u);
-  CHECK_GT(num_imus, 0u);
   CHECK_LE(num_cams, 4u);
 
   // Fill camera topics.
