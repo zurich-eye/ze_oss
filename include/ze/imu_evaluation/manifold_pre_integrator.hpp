@@ -20,18 +20,22 @@ public:
   void pushD_R_i_j(times_container_t stamps,
                    measurements_container_t measurements)
   {
-    measurements_.insert(measurements_.end(),
-                         measurements.begin(),
-                         measurements.end() - 1);
+    // Append the new measurements to the container,
+    measurements_.resize(6, measurements_.cols() + measurements.cols() - 1);
+    measurements_.rightCols(measurements.cols() - 1) = measurements.leftCols(
+                                                         measurements.cols() - 1);
 
-    VLOG(1) << "Pushing " << measurements.size() << " measurements \n";
+    VLOG(1) << "Pushing " << measurements.cols() << " measurements \n";
 
     // Integrate measurements between frames.
-    for (size_t i = 0; i < measurements.size() - 1; ++i)
+    for (int i = 0; i < measurements.cols() - 1; ++i)
     {
       FloatType dt = stamps[i+1] - stamps[i];
 
-      Matrix3 increment = Quaternion::exp(measurements[i].tail<3>(3) * dt).getRotationMatrix();
+      Vector6 measurement = measurements.col(i);
+      Vector3 gyro_measurement = measurement.tail<3>(3);
+
+      Matrix3 increment = Quaternion::exp(gyro_measurement * dt).getRotationMatrix();
 
       // Reset to 0 at every step:
       if (i == 0)
@@ -47,7 +51,7 @@ public:
         R_i_k_.push_back(R_i_k_.back() * increment);
 
         // Propagate Covariance:
-        Matrix3 J_r = expmapDerivativeSO3(measurements[i].tail<3>(3) * dt);
+        Matrix3 J_r = expmapDerivativeSO3(gyro_measurement * dt);
 
         covariance_i_k_.push_back(
               D_R_i_k_.back().transpose() * covariance_i_k_.back() * D_R_i_k_.back()

@@ -47,11 +47,27 @@ public:
 
     // For negative camera sampling rates, a single batch of imu samples between
     // start and end is taken.
-    FloatType next_camera_sample = camera_sampling_time_ < 0 ?
-                                   end : start + camera_sampling_time_;
+    FloatType next_camera_sample;
+    int samples_per_batch;
 
     std::vector<FloatType> times;
-    std::vector<Vector6> imu_measurements;
+    // Worst case container size allocation.
+    if (camera_sampling_time_ < 0)
+    {
+      next_camera_sample = end;
+      samples_per_batch =static_cast<int>(
+                           std::ceil(end - start) / imu_sampling_time_) + 1;
+    }
+    else
+    {
+      next_camera_sample = start + camera_sampling_time_;
+      samples_per_batch = static_cast<int>(
+                            std::ceil(camera_sampling_time_ / imu_sampling_time_)) + 1;
+    }
+
+    ImuAccGyr imu_measurements(6, samples_per_batch);
+
+    int i = 0;
     for (FloatType t = start; t <= end; t += imu_sampling_time_)
     {
       times.push_back(t);
@@ -66,23 +82,25 @@ public:
         measurement.head<3>() = scenario_runner_->specific_force_actual(t);
         measurement.tail<3>() = scenario_runner_->angular_velocity_actual(t);
       }
-      imu_measurements.push_back(measurement);
+      imu_measurements.col(i) = measurement;
 
       // Wait for the next camera sample and push the collected data to the
       // integrator.
       if (t > next_camera_sample)
       {
         next_camera_sample = t + camera_sampling_time_;
-        pre_integrator->pushD_R_i_j(times, imu_measurements);
+        pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
         times.clear();
-        imu_measurements.clear();
+        i = 0;
       }
+
+      ++i;
     }
 
     // Ensure that all results are pushed to the container.
     if (imu_measurements.size() != 0)
     {
-      pre_integrator->pushD_R_i_j(times, imu_measurements);
+      pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
     }
   }
 

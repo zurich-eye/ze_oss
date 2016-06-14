@@ -152,8 +152,8 @@ public:
 
   //! Plot the measurements used to obtain a preintegration state.
   void plotImuMeasurements(const std::vector<FloatType>& times,
-                           const std::vector<Vector6>& measurements,
-                           const std::vector<Vector6>& measurements2);
+                           const ImuAccGyr& measurements,
+                           const ImuAccGyr& measurements2);
 
   void shutdown();
 
@@ -372,18 +372,9 @@ void PreIntegrationEvaluationNode::plotOrientation(
 //-----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::plotImuMeasurements(
     const std::vector<FloatType>& times,
-    const std::vector<Vector6>& measurements_std1,
-    const std::vector<Vector6>& measurements_std2)
+    const ImuAccGyr& measurements1,
+    const ImuAccGyr& measurements2)
 {
-  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> measurements1(6, measurements_std1.size());
-  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> measurements2(6, measurements_std2.size());
-
-  for (size_t i = 0; i < measurements_std2.size(); ++i)
-  {
-    measurements1.col(i) = measurements_std1[i];
-    measurements2.col(i) = measurements_std2[i];
-  }
-
   plt::figure();
   plt::subplot(3, 1, 1);
   plt::title("Imu Measurements (Accel)");

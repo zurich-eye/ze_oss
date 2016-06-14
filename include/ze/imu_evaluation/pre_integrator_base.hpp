@@ -17,7 +17,7 @@ public:
    ZE_POINTER_TYPEDEFS(PreIntegrator);
 
   typedef std::vector<FloatType> times_container_t;
-  typedef std::vector<Vector6> measurements_container_t;
+  typedef ImuAccGyr measurements_container_t;
   typedef std::vector<Matrix3> preintegrated_orientation_container_t;
   typedef std::vector<Matrix3> covariance_container_t;
 
@@ -46,7 +46,7 @@ public:
   //! two images / keyframes.
   //! The input measurements should be bias corrected.
   virtual void pushD_R_i_j(times_container_t imu_stamps,
-                       measurements_container_t imu_measurements) = 0;
+                           measurements_container_t imu_measurements) = 0;
 
   //! Get the result of the pre-integration process.
   preintegrated_orientation_container_t D_R_i_j()
