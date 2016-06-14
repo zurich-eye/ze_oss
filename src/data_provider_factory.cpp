@@ -1,5 +1,5 @@
-#include <ze/data_provider/data_provider_base.hpp>
 #include <ze/data_provider/data_provider_factory.hpp>
+#include <ze/data_provider/data_provider_base.hpp>
 #include <ze/data_provider/data_provider_csv.hpp>
 #include <ze/data_provider/data_provider_rosbag.hpp>
 #include <ze/data_provider/data_provider_rostopic.hpp>
@@ -18,15 +18,15 @@ DEFINE_string(topic_imu3, "/imu3", "");
 
 DEFINE_int32(data_source, 1, " 0: CSV, 1: Rosbag, 2: Rostopic");
 DEFINE_string(data_dir, "", "Directory for csv dataset.");
+DEFINE_uint64(num_imus, 1, "Number of IMUs used in the pipeline.");
 
 namespace ze {
 
-DataProviderBase::Ptr loadDataProviderFromGflags(
-    const uint32_t num_cams, const uint32_t num_imus)
+DataProviderBase::Ptr loadDataProviderFromGflags(const uint32_t num_cams)
 {
   CHECK_GT(num_cams, 0u);
   CHECK_LE(num_cams, 4u);
-  CHECK_LE(num_cams, 4u);
+  CHECK_LE(FLAGS_num_imus, 4u);
 
   // Fill camera topics.
   std::map<std::string, size_t> cam_topics;
@@ -37,10 +37,10 @@ DataProviderBase::Ptr loadDataProviderFromGflags(
 
   // Fill imu topics.
   std::map<std::string, size_t> imu_topics;
-  if (num_imus >= 1) imu_topics[FLAGS_topic_imu0] = 0;
-  if (num_imus >= 2) imu_topics[FLAGS_topic_imu1] = 1;
-  if (num_imus >= 3) imu_topics[FLAGS_topic_imu2] = 2;
-  if (num_imus >= 4) imu_topics[FLAGS_topic_imu3] = 3;
+  if (FLAGS_num_imus >= 1) imu_topics[FLAGS_topic_imu0] = 0;
+  if (FLAGS_num_imus >= 2) imu_topics[FLAGS_topic_imu1] = 1;
+  if (FLAGS_num_imus >= 3) imu_topics[FLAGS_topic_imu2] = 2;
+  if (FLAGS_num_imus >= 4) imu_topics[FLAGS_topic_imu3] = 3;
 
   // Create data provider.
   ze::DataProviderBase::Ptr data_provider;

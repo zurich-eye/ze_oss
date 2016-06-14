@@ -4,7 +4,6 @@
 
 namespace ze {
 
-DataProviderBase::Ptr loadDataProviderFromGflags(
-    const std::uint32_t num_cams, const std::uint32_t num_imus);
+DataProviderBase::Ptr loadDataProviderFromGflags(const std::uint32_t num_cams);
 
 } // namespace ze

@@ -63,7 +63,8 @@ DataProviderRosbag::DataProviderRosbag(
   // Ensure that topics exist
   // The connection info only contains topics that are available in the bag
   // If a topic is requested that is not avaiable, it does not show up in the info.
-  std::vector<const rosbag::ConnectionInfo *> connection_infos = bag_view_->getConnections();
+  std::vector<const rosbag::ConnectionInfo*> connection_infos =
+      bag_view_->getConnections();
   CHECK(topics.size() == connection_infos.size())
       << "Not all requested topics founds in bagfile";
 }
