@@ -63,8 +63,12 @@ ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
   : undistortion_map_(img_size),
     fragm_(img_size)
 {
-  ze::LinearMemory32fC1 h_cam_params(reinterpret_cast<Pixel32fC1*>(camera_params.data()), camera_params.cols(), true);
-  ze::LinearMemory32fC1 h_dist_coeffs(reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()), dist_coeffs.cols(), true);
+  ze::LinearMemory32fC1 h_cam_params(
+        reinterpret_cast<Pixel32fC1*>(camera_params.data()),
+        camera_params.cols(), true);
+  ze::LinearMemory32fC1 h_dist_coeffs(
+        reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()),
+        dist_coeffs.cols(), true);
 
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
@@ -89,7 +93,8 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
 {
   CHECK_EQ(src.size(), dst.size());
   CHECK_EQ(src.size(), undistortion_map_.size());
-  std::shared_ptr<Texture2D> src_tex = src.genTexture(false, cudaFilterModeLinear);
+  std::shared_ptr<Texture2D> src_tex =
+      src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
   k_undistort
       <<<
