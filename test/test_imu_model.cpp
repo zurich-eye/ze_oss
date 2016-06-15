@@ -25,8 +25,8 @@ TEST(ImuModelTest, testUndistortion)
   using namespace ze;
   Matrix3 M;
   M << 0., 0., 1.,
-	   0., 1., 0.,
-	   1., 0., 0.;
+       0., 1., 0.,
+       1., 0., 0.;
   std::shared_ptr<ImuIntrinsicModelScaleMisalignment> intrinsics =
       std::make_shared<ImuIntrinsicModelScaleMisalignment>(0.0, ImuIntrinsicModel::UndefinedRange,
     		                                               Vector3::Zero(), M);
