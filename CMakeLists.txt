@@ -21,6 +21,7 @@ set(HEADERS
   include/ze/imu/accelerometer_model.h
   include/ze/imu/gyroscope_model.h
   include/ze/imu/imu_yaml_serialization.h
+  include/ze/imu/imu_buffer.h
   )
 
 set(SOURCES
@@ -31,6 +32,7 @@ set(SOURCES
     src/accelerometer_model.cpp
     src/gyroscope_model.cpp
     src/imu_yaml_serialization.cpp
+    src/imu_buffer.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
