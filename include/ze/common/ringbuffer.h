@@ -14,6 +14,47 @@
 
 namespace ze {
 
+
+//! @todo: move the interpolators somewhere where they make more sense?
+//!
+//! Interpolators have to implement:
+//! _ interpolate(Ringbuffer<...>::Ptr, int64_t time, Ringbuffer<...>timering_t::iterator*);
+//! Passing the (optional) interator to the timestamp right before the to be
+//! interpolated value speeds up the process.
+//!
+//! A nearest neighbour "interpolator".
+struct InterpolatorNearest
+{
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer, int64_t time);
+};
+
+//! A simple linear interpolator
+struct InterpolatorLinear
+{
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time,
+      typename Ringbuffer_T::timering_t::iterator* it_before_ptr = nullptr)
+  {
+    CHECK_EQ(false, it_before_ptr == nullptr) << "Non-initialized interpolation not"
+                                          << "yet supported";
+    auto it_before = *it_before_ptr;
+    auto it_after = it_before + 1;
+
+    const FloatType w1 =
+        static_cast<FloatType>(time - *it_before) /
+        static_cast<FloatType>(*it_after - *it_before);
+
+    return (FloatType{1.0} - w1) * buffer->dataAtTimeIterator(it_before)
+        + w1 * buffer->dataAtTimeIterator(it_after);
+  }
+};
+using DefaultInterpolator = InterpolatorLinear;
+
+
 //! a fixed size timed buffer templated on the number of entries
 //! Opposed to the `Buffer`, values are expected to be received ORDERED in
 //! TIME!
@@ -23,6 +64,10 @@ class Ringbuffer
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  //! Ringbuffer is friend with the interpolator types.
+  friend struct InterpolatorNearest;
+  friend struct InterpolatorLinear;
 
   typedef int64_t time_t;
   typedef Eigen::Matrix<time_t, Size, 1> times_t;
@@ -80,6 +125,7 @@ public:
    * are interpolated. Returns a vector of timestamps and a block matrix with
    * values as columns. Returns empty matrices if not successful.
    */
+  template <typename Interpolator = DefaultInterpolator>
   std::pair<Eigen::Matrix<time_t, Eigen::Dynamic, 1>,
             Eigen::Matrix<Scalar, ValueDim, Eigen::Dynamic> >
   getBetweenValuesInterpolated(time_t stamp_from, time_t stamp_to);

@@ -100,6 +100,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getOldestAndNewestStamp() const
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
 typename Ringbuffer<Scalar, ValueDim, Size>::TimeDataRangePair
 Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
     time_t stamp_from,
@@ -149,11 +150,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // first element interpolated:
   stamps(0) = stamp_from;
-  const FloatType w1 =
-      static_cast<Scalar>(stamp_from - *it_from_before) /
-      static_cast<Scalar>(*it_from_after - *it_from_before);
-  values.col(0) = (FloatType{1.0} - w1) * dataAtTimeIterator(it_from_before)
-                  + w1 * dataAtTimeIterator(it_from_after);
+  values.col(0) = Interpolator::interpolate(this, stamp_from, &it_from_before);
 
   // this is a real edge case where we hit the two consecutive timestamps
   //  with from and to.
@@ -193,11 +190,8 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // last element interpolated
   stamps(range - 1) = stamp_to;
-  const FloatType w2 =
-      static_cast<Scalar>(stamp_to - *it_to_before) /
-      static_cast<Scalar>(*it_to_after - *it_to_before);
-  values.col(range - 1) = (FloatType{1.0} - w2) * dataAtTimeIterator(it_to_before)
-                          + w2 * dataAtTimeIterator(it_to_after);
+
+  values.col(range - 1) = Interpolator::interpolate(this, stamp_to, &it_to_before);
 
   return std::make_pair(stamps, values);
 }
