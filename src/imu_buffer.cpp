@@ -9,7 +9,7 @@ ImuBuffer<BufferSize, Interpolator>::ImuBuffer(ImuModel::Ptr imu_model)
 }
 
 template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertImu(
+void ImuBuffer<BufferSize, Interpolator>::insertImuMeasurement(
     int64_t time, const Vector6 value)
 {
   acc_buffer_.insert(time, value.head<3>(3));
@@ -18,14 +18,14 @@ void ImuBuffer<BufferSize, Interpolator>::insertImu(
 
 
 template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertGyroscope(
+void ImuBuffer<BufferSize, Interpolator>::insertGyroscopeMeasurement(
     int64_t time, const Vector3 value)
 {
   gyr_buffer_.insert(time, value);
 }
 
 template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertAccelerometer(
+void ImuBuffer<BufferSize, Interpolator>::insertAccelerometerMeasurement(
     int64_t time, const Vector3 value)
 {
   acc_buffer_.insert(time, value);
@@ -54,13 +54,25 @@ Vector3 ImuBuffer<BufferSize, Interpolator>::getGyroscope(int64_t time)
 }
 
 template<int BufferSize, typename Interpolator>
-std::pair<Eigen::Matrix<time_t, Eigen::Dynamic, 1>,
-Eigen::Matrix<FloatType, 6, Eigen::Dynamic> >
+std::pair<ImuStamps, ImuAccGyr>
 ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
     int64_t stamp_from, int64_t stamp_to)
 {
-  return std::make_pair<Eigen::Matrix<time_t, Eigen::Dynamic, 1>,
-      Eigen::Matrix<FloatType, 6, Eigen::Dynamic>>(MatrixX(), MatrixX());
+  // Takes the gyroscope time as reference and samples the accelerometer
+  // measurements to fit
+  ImuStamps stamps;
+  ImuAccGyr imu_measurements;
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> gyr_measurements;
+
+  std::tie(stamps, gyr_measurements) =
+      gyr_buffer_.getBetweenValuesInterpolated<this.template Interpolator>(
+        stamp_from, stamp_to);
+
+  // resample the accelerometer measurement at the gyro timestamps
+  imu_measurements.topRows<3>() = acc_buffer_.getValuesInterpolated(stamps);
+  imu_measurements.bottomRows<3>() = gyr_measurements;
+
+  return std::make_pair(stamps, imu_measurements);
 }
 
 } // namespace ze
