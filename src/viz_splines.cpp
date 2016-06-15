@@ -15,7 +15,7 @@ void SplinesVisualizer::plotSpline(const BSpline& bs,
 {
   FloatType start = bs.t_min();
   FloatType end = bs.t_max();
-  size_t samples = (end - start) / step_size;
+  size_t samples = (end - start) / step_size - 1;
   size_t spline_dimension = bs.dimension();
   CHECK_LE(dimension, spline_dimension);
 
@@ -62,7 +62,7 @@ void SplinesVisualizer::displaySplineTrajectory(
 {
   FloatType start = bs.t_min();
   FloatType end = bs.t_max();
-  size_t samples = (end - start) / step_size;
+  size_t samples = (end - start) / step_size - 1;
   size_t dimension = bs.dimension();
 
   ze::Positions points(3, samples);
@@ -91,7 +91,7 @@ void SplinesVisualizer::displaySplineTrajectory(
 
   FloatType start = bs.t_min();
   FloatType end = bs.t_max();
-  size_t samples = (end - start) / step_size;
+  size_t samples = (end - start) / step_size - 1;
 
   for (size_t i = 0; i <= samples; ++i)
   {
@@ -108,7 +108,7 @@ void SplinesVisualizer::plotSpline(
 {
   FloatType start = bs.t_min();
   FloatType end = bs.t_max();
-  size_t samples = (end - start) / step_size;
+  size_t samples = (end - start) / step_size - 1;
 
   ze::MatrixX points(6, samples);
   ze::VectorX times(samples);
