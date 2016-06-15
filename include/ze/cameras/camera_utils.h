@@ -13,7 +13,13 @@ class Camera;
 //! Generate count random visible keypoints.
 Keypoints generateRandomKeypoints(
     const uint32_t image_width, const uint32_t image_height,
-    const uint32_t margin, const size_t count);
+    const uint32_t margin, const uint32_t count);
+
+inline Keypoints generateRandomKeypoints(
+    const Size2u image_size, const uint32_t margin, const uint32_t count)
+{
+  return generateRandomKeypoints(image_size.width(), image_size.height(), margin, count);
+}
 
 //! Generate random visible 3d points.
 std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(

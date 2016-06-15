@@ -33,6 +33,20 @@ CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
   return nullptr;
 }
 
+CameraRig::Ptr CameraRig::getSubRig(
+    const std::vector<uint32_t>& camera_indices,
+    const std::string& label)
+{
+  CameraVector cameras;
+  TransformationVector T;
+  for (uint32_t i : camera_indices)
+  {
+    cameras.push_back(atShared(i));
+    T.push_back(T_C_B(i));
+  }
+  return std::make_shared<CameraRig>(T, cameras, label);
+}
+
 std::ostream& operator<<(std::ostream& out, const CameraRig& rig)
 {
   out << "Camera Rig: \n"
