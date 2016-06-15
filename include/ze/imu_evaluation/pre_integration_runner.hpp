@@ -1,8 +1,8 @@
 #pragma once
 
 #include <ze/common/types.h>
+#include <ze/imu_evaluation/pre_integrator_base.hpp>
 #include <ze/imu_evaluation/scenario_runner.hpp>
-#include <ze/imu_evaluation/manifold_pre_integrator.hpp>
 
 namespace ze {
 

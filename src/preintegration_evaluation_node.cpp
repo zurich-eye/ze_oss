@@ -1,5 +1,6 @@
 #include <functional>
 #include <memory>
+#include <initializer_list>
 
 #include <gflags/gflags.h>
 #include <ze/common/logging.hpp>
@@ -21,6 +22,7 @@
 #include <ze/visualization/viz_ros.h>
 #include <ze/matplotlib/matplotlibcpp.hpp>
 #include <ze/splines/rotation_vector.hpp>
+#include <ze/imu_evaluation/manifold_pre_integrator.hpp>
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -136,6 +138,20 @@ public:
   //! Return the ImuBias for model and parameters specified in the GFlags.
   ImuBias::Ptr imuBias(FloatType start, FloatType end);
 
+  //! Simulation Runners
+  PreIntegratorMonteCarlo::Ptr runManifoldClean(
+      PreIntegrationRunner::Ptr preintegration_runner,
+      const Matrix3& gyroscope_noise_covariance,
+      const std::vector<Matrix3>* D_R_i_k_reference,
+      FloatType start,
+      FloatType end);
+
+  PreIntegratorMonteCarlo::Ptr runManifoldCorrupted(
+      PreIntegrationRunner::Ptr preintegration_runner,
+      const Matrix3& gyroscope_noise_covariance,
+      FloatType start,
+      FloatType end);
+
   //! Given the GFLags configuration loads and returns a bspline representing
   //! a trajectory.
   void loadTrajectory();
@@ -144,8 +160,12 @@ public:
   void showTrajectory();
 
   //! Generate a series of plots that show the results
-  void plotResults(const std::vector<Matrix3>& covariances_mc,
-                   const std::vector<Matrix3>& covariances_est);
+  void plotCovarianceResults(std::initializer_list<const std::vector<Matrix3>>
+                             covariances_vectors);
+
+  //! Generate a series of plots that show the results
+  void plotCovarianceOffsets(const std::vector<Matrix3> ref,
+                             const std::vector<Matrix3> est);
 
   //! Plot the estimated / integrated vector of rotation matrices.
   void plotOrientation(const std::vector<FloatType>& times,
@@ -208,38 +228,94 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                                        parameters_.gyro_noise_bandwidth_hz,
                                        parameters_.gravity);
 
-  PreIntegrationRunner::Ptr preintegraton_runner =
+  PreIntegrationRunner::Ptr preintegration_runner =
       std::make_shared<PreIntegrationRunner>(
         scenario_runner,
         parameters_.imu_sampling_time,
         parameters_.camera_sampling_time);
 
-  preintegraton_runner->setInitialOrientation(trajectory_->orientation(start));
+  preintegration_runner->setInitialOrientation(trajectory_->orientation(start));
 
+  PreIntegratorMonteCarlo::Ptr mc_corrupted =
+      runManifoldCorrupted(preintegration_runner,
+                           gyroscope_noise_covariance,
+                           start,
+                           end);
+
+  // Use the corrupted MC simulator to get an unperturbed orientation estimate.
+  PreIntegrator::Ptr actual_integrator = mc_corrupted->preintegrateActual(start,
+                                                                          end);
+  runManifoldClean(preintegration_runner,
+                   gyroscope_noise_covariance,
+                   &actual_integrator->D_R_i_k(),
+                   start,
+                   end);
+
+//  plotOrientation(est_integrator->times_raw(), est_integrator->R_i_k());
+//  plotImuMeasurements(est_integrator->times_raw(),
+//                      est_integrator->measurements(),
+//                      actual_integrator->measurements());
+}
+
+// -----------------------------------------------------------------------------
+PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    const Matrix3& gyroscope_noise_covariance,
+    const std::vector<Matrix3>* D_R_i_k_reference,
+    FloatType start,
+    FloatType end)
+{
+  VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Clean]";
+  PreIntegratorFactory::Ptr preintegrator_factory_clean(
+        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
+                                                        D_R_i_k_reference));
+  PreIntegratorMonteCarlo::Ptr mc(
+        std::make_shared<PreIntegratorMonteCarlo>(
+          preintegration_runner,
+          preintegrator_factory_clean,
+          FLAGS_num_threads));
+  mc->simulate(FLAGS_monte_carlo_runs, start, end);
+
+  ManifoldPreIntegrationState::Ptr est_integrator =
+      mc->preintegrateCorrupted(start, end);
+
+  plotCovarianceResults({mc->covariances(),
+                         est_integrator->covariance_i_k()});
+
+  plotCovarianceOffsets(mc->covariances(),
+                        est_integrator->covariance_i_k());
+
+  return mc;
+}
+
+// -----------------------------------------------------------------------------
+PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    const Matrix3& gyroscope_noise_covariance,
+    FloatType start,
+    FloatType end)
+{
+  VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Corrupted]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance));
+  PreIntegratorMonteCarlo::Ptr mc(
+        std::make_shared<PreIntegratorMonteCarlo>(preintegration_runner,
+                                                  preintegrator_factory,
+                                                  FLAGS_num_threads));
+  mc->simulate(FLAGS_monte_carlo_runs, start, end);
 
-  VLOG(1) << "Initialize monte carlo runner";
-  PreIntegratorMonteCarlo mc(preintegraton_runner,
-                             preintegrator_factory,
-                             FLAGS_num_threads);
-
-  VLOG(1) << "Monte Carlo Simulation";
-  mc.simulate(FLAGS_monte_carlo_runs, scenario->start(), scenario->end());
-
-  VLOG(1) << "Reference Estimate";
-  ManifoldPreIntegrationState::Ptr est_integrator = mc.preintegrateCorrupted(
+  VLOG(1) << "Reference Estimates";
+  // Corrupted integration:
+  ManifoldPreIntegrationState::Ptr est_integrator = mc->preintegrateCorrupted(
                                                       start, end);
-  ManifoldPreIntegrationState::Ptr actual_integrator = mc.preintegrateActual(
-                                                         start, end);
+  // Result visualization:
+  plotCovarianceResults({mc->covariances(),
+                         est_integrator->covariance_i_k()});
 
-  plotResults(mc.covariances(), est_integrator->covariance_i_k());
-  plotOrientation(est_integrator->times_raw(), est_integrator->R_i_k());
-  plotImuMeasurements(est_integrator->times_raw(),
-                      est_integrator->measurements(),
-                      actual_integrator->measurements());
+  plotCovarianceOffsets(mc->covariances(),
+                        est_integrator->covariance_i_k());
 
-//  plotResults(mc.covariances_absolute(), est_integrator->covariances());
+  return mc;
 }
 
 // -----------------------------------------------------------------------------
@@ -314,31 +390,47 @@ void PreIntegrationEvaluationNode::showTrajectory()
 }
 
 // -----------------------------------------------------------------------------
-void PreIntegrationEvaluationNode::plotResults(
-    const std::vector<Matrix3>& covariances_mc,
-    const std::vector<Matrix3>& covariances_est)
+void PreIntegrationEvaluationNode::plotCovarianceResults(
+    std::initializer_list<const std::vector<Matrix3>> covariances_vectors)
 {
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> mc(3, covariances_mc.size());
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> est(3, covariances_est.size());
 
-  for (size_t i = 0; i < covariances_mc.size(); ++i)
+  plt::figure("covariances");
+  for(auto elem: covariances_vectors)
   {
-    mc.col(i) = covariances_mc[i].diagonal();
-    est.col(i) = covariances_est[i].diagonal();
+    Eigen::Matrix<FloatType, 3, Eigen::Dynamic> v(3, elem.size());
+    for (size_t i = 0; i < elem.size(); ++i)
+    {
+      v.col(i) = elem[i].diagonal();
+    }
+    plt::subplot(3, 1, 1);
+    plt::plot(v.row(0));
+    plt::subplot(3, 1, 2);
+    plt::plot(v.row(1));
+    plt::subplot(3, 1, 3);
+    plt::plot(v.row(2));
   }
+  plt::show(false);
+}
 
-  plt::figure();
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::plotCovarianceOffsets(
+    const std::vector<Matrix3> ref,
+    const std::vector<Matrix3> est)
+{
+  CHECK_EQ(ref.size(), est.size());
+
+  plt::figure("covariance_offsets");
+  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> v(3, ref.size());
+  for (size_t i = 0; i < ref.size(); ++i)
+  {
+    v.col(i) = (ref[i].diagonal() - est[i].diagonal()).cwiseAbs();
+  }
   plt::subplot(3, 1, 1);
-  plt::plot(mc.row(0), "r");
-  plt::plot(est.row(0), "b");
-
+  plt::plot(v.row(0));
   plt::subplot(3, 1, 2);
-  plt::plot(mc.row(1), "r");
-  plt::plot(est.row(1), "b");
-
+  plt::plot(v.row(1));
   plt::subplot(3, 1, 3);
-  plt::plot(mc.row(2), "r");
-  plt::plot(est.row(2), "b");
+  plt::plot(v.row(2));
 
   plt::show(false);
 }

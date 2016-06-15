@@ -147,7 +147,7 @@ public:
   }
 
 private:
-  //! The optinal already pre-integrated (clean, non corrupted) orientations.
+  //! The optional already pre-integrated (clean, non corrupted) orientations.
   const preintegrated_orientation_container_t* D_R_i_k_reference_;
 };
 

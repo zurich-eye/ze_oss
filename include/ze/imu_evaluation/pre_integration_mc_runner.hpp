@@ -10,6 +10,7 @@ namespace ze {
 class PreIntegratorMonteCarlo
 {
 public:
+  ZE_POINTER_TYPEDEFS(PreIntegratorMonteCarlo);
 
   PreIntegratorMonteCarlo(PreIntegrationRunner::Ptr preintegraton_runner,
                           PreIntegratorFactory::Ptr pre_integrator_factory,
