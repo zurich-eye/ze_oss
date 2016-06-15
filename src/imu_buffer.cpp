@@ -38,7 +38,7 @@ Vector6 ImuBuffer<BufferSize, Interpolator>::get(int64_t time)
   out.head<3>(3) = Interpolator::interpolate(acc_buffer_, time);
   out.tail<3>(3) = Interpolator::interpolate(gyr_buffer_, time);
 
-  return out;
+  return imu_model_->undistort(out);
 }
 
 template<int BufferSize, typename Interpolator>
