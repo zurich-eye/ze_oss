@@ -27,12 +27,14 @@ ImuModel::Ptr ImuModel::loadFromYaml(const std::string& path)
 
 void ImuModel::distort(Eigen::Ref<measurement_t> in) const
 {
-  //! @todo
+  accelerometerModel_->distort(in.head<3>());
+  gyroscopeModel_->distort(in.tail<3>());
 }
 
 void ImuModel::undistort(Eigen::Ref<measurement_t> in) const
 {
-  //! @todo
+  accelerometerModel_->undistort(in.head<3>());
+  gyroscopeModel_->undistort(in.tail<3>());
 }
 
 } // namespace ze

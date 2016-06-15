@@ -30,7 +30,7 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentGSensitivity)
 {
   using namespace ze;
   Vector3 b; b << 1.0, 2.0, 3.0;
-  Matrix3 M; M << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0;
+  Matrix3 M; M << 1.0, 0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0;
   Matrix3 Ma; Ma << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0;
 
   ImuIntrinsicModelScaleMisalignmentGSensitivity::Ptr model =

@@ -12,6 +12,7 @@ ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
 ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range)
  : type_(type), delay_(delay), range_(range)
 {
+  CHECK(range == UndefinedRange || range > 0) << "Range must either be of constant UndefinedRange or be > 0";
 }
 
 std::string ImuIntrinsicModel::typeAsString() const
@@ -46,7 +47,6 @@ void ImuIntrinsicModelCalibrated::undistort(Eigen::Ref<measurement_t> in) const
   //! @todo
   //! The calibrated model assumes that all relevant deterministic effects have been taken care of by the manufacturer.
   //! Hence, the mapping would be an identity.
-
 }
 
 void ImuIntrinsicModelCalibrated::distort(Eigen::Ref<measurement_t> in) const
@@ -66,7 +66,8 @@ ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
   , M_(M)
   , M_inverse_(M.inverse())
 {
-  CHECK(range > 0) << "Range must be > 0";
+	CHECK(std::fabs(M_.determinant()) > 1.e-10)
+	  << "M must be invertible. Its determinant evaluates to " << M_.determinant();
 }
 
 void ImuIntrinsicModelScaleMisalignment::undistort(Eigen::Ref<measurement_t> in) const
@@ -92,7 +93,6 @@ ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignme
   , M_(M)
   , Ma_(Ma)
 {
-  CHECK(range > 0) << "Range must be > 0";
 }
 
 void ImuIntrinsicModelScaleMisalignmentGSensitivity::undistort(
@@ -121,7 +121,6 @@ ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignment
   , M_(M)
   , R_(R)
 {
-  CHECK(range > 0) << "Range must be > 0";
 }
 
 void ImuIntrinsicModelScaleMisalignmentSizeEffect::undistort(
