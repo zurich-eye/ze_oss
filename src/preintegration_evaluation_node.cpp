@@ -351,7 +351,7 @@ void PreIntegrationEvaluationNode::plotOrientation(
   Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
   Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
 
-  for (size_t i = 0; i < orientation.size(); ++i)
+  for (size_t i = 0; i < orientation.size() - 1; ++i)
   {
     ze::sm::RotationVector rv(orientation[i]);
     points.col(i) = rv.getParameters();
