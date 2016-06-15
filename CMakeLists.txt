@@ -1,4 +1,6 @@
-if(ZE_USE_ARRAYFIRE)
+if(NOT ${ZE_USE_ARRAYFIRE})
+  return()
+endif()
 
 project(imp_bridge_af)
 cmake_minimum_required(VERSION 2.8.0)
@@ -51,4 +53,3 @@ target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 cs_install()
 cs_export()
 
-endif()
