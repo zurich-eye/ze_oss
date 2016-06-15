@@ -23,6 +23,7 @@
 #include <ze/matplotlib/matplotlibcpp.hpp>
 #include <ze/splines/rotation_vector.hpp>
 #include <ze/imu_evaluation/manifold_pre_integrator.hpp>
+#include <ze/imu_evaluation/quaternion_pre_integrator.hpp>
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -152,6 +153,20 @@ public:
       FloatType start,
       FloatType end);
 
+  PreIntegratorMonteCarlo::Ptr runQuaternionForward(
+      PreIntegrationRunner::Ptr preintegration_runner,
+      const Matrix3& gyroscope_noise_covariance,
+      FloatType start,
+      FloatType end);
+
+  //! Runs a single noisy integration on all channels and shows plots of the
+  //! estimates.
+  void runDriftEvaluation(
+      PreIntegrationRunner::Ptr preintegration_runner,
+      const Matrix3& gyroscope_noise_covariance,
+      FloatType start,
+      FloatType end);
+
   //! Given the GFLags configuration loads and returns a bspline representing
   //! a trajectory.
   void loadTrajectory();
@@ -236,12 +251,16 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   preintegration_runner->setInitialOrientation(trajectory_->orientation(start));
 
+  /////// Different Monte Carlo Simulation runs:
+
+  // 1) Manifold Integration
   PreIntegratorMonteCarlo::Ptr mc_corrupted =
       runManifoldCorrupted(preintegration_runner,
                            gyroscope_noise_covariance,
                            start,
                            end);
 
+  // 2) Manifold Integration with clean orientation estimates
   // Use the corrupted MC simulator to get an unperturbed orientation estimate.
   PreIntegrator::Ptr actual_integrator = mc_corrupted->preintegrateActual(start,
                                                                           end);
@@ -251,11 +270,55 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                    start,
                    end);
 
-//  plotOrientation(est_integrator->times_raw(), est_integrator->R_i_k());
+  // 3) Quaternion Integration: Forward Integration
+  PreIntegratorMonteCarlo::Ptr mc_quat_fwd =
+      runQuaternionForward(preintegration_runner,
+                       gyroscope_noise_covariance,
+                       start,
+                       end);
+
+  /////// Evaluate drifts:
+  runDriftEvaluation(preintegration_runner,
+                     gyroscope_noise_covariance,
+                     start,
+                     end);
+
 //  plotImuMeasurements(est_integrator->times_raw(),
 //                      est_integrator->measurements(),
 //                      actual_integrator->measurements());
 }
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::runDriftEvaluation(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    const Matrix3& gyroscope_noise_covariance,
+    FloatType start,
+    FloatType end)
+{
+  VLOG(1) << "Simulate single run for integration drift.";
+
+  // 1) Manifold
+  PreIntegrator::Ptr pi_manifold =
+      std::make_shared<ManifoldPreIntegrationState>(gyroscope_noise_covariance);
+
+  preintegration_runner->process(pi_manifold,
+                                 true,
+                                 start,
+                                 end);
+
+  // 2) Quaternion
+  PreIntegrator::Ptr pi_quat_fwd =
+      std::make_shared<QuaternionPreIntegrationState>(gyroscope_noise_covariance);
+  preintegration_runner->process(pi_quat_fwd,
+                                 true,
+                                 start,
+                                 end);
+
+  plotOrientation(pi_manifold->times_raw(), pi_manifold->R_i_k());
+  plotOrientation(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k());
+
+}
+
 
 // -----------------------------------------------------------------------------
 PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
@@ -298,6 +361,37 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
   VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Corrupted]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance));
+  PreIntegratorMonteCarlo::Ptr mc(
+        std::make_shared<PreIntegratorMonteCarlo>(preintegration_runner,
+                                                  preintegrator_factory,
+                                                  FLAGS_num_threads));
+  mc->simulate(FLAGS_monte_carlo_runs, start, end);
+
+  VLOG(1) << "Reference Estimates";
+  // Corrupted integration:
+  ManifoldPreIntegrationState::Ptr est_integrator = mc->preintegrateCorrupted(
+                                                      start, end);
+  // Result visualization:
+  plotCovarianceResults({mc->covariances(),
+                         est_integrator->covariance_i_k()});
+
+  plotCovarianceOffsets(mc->covariances(),
+                        est_integrator->covariance_i_k());
+
+  return mc;
+}
+
+// -----------------------------------------------------------------------------
+PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionForward(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    const Matrix3& gyroscope_noise_covariance,
+    FloatType start,
+    FloatType end)
+{
+  VLOG(1) << "Monte Carlo Simulation [Quaternion: Forward]";
+  PreIntegratorFactory::Ptr preintegrator_factory(
+        std::make_shared<QuaternionPreIntegrationFactory>(
+          gyroscope_noise_covariance));
   PreIntegratorMonteCarlo::Ptr mc(
         std::make_shared<PreIntegratorMonteCarlo>(preintegration_runner,
                                                   preintegrator_factory,
@@ -449,7 +543,7 @@ void PreIntegrationEvaluationNode::plotOrientation(
     points.col(i) = rv.getParameters();
     ref_points.col(i) = trajectory_->eval(times[i]).tail<3>();
   }
-  plt::figure();
+  plt::figure("orientation");
   plt::subplot(3, 1, 1);
   plt::title("Orientation");
   plt::plot(points.row(0), "r");

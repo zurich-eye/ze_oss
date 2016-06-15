@@ -21,6 +21,7 @@ set(HEADERS
     include/ze/imu_evaluation/pre_integration_runner.hpp
     include/ze/imu_evaluation/pre_integration_mc_runner.hpp
     include/ze/imu_evaluation/manifold_pre_integrator.hpp
+    include/ze/imu_evaluation/quaternion_pre_integrator.hpp
     )
 
 set(SOURCES
