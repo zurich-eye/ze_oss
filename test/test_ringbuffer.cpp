@@ -231,6 +231,28 @@ TEST(RingBufferTest, testInterpolation)
   EXPECT_EQ(12.5, values(0, 6));
 }
 
+TEST(RingBufferTest, testInterpolationTimestamps)
+{
+  using namespace ze;
+  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  for(int i = 1; i < 10; ++i)
+  {
+    buffer.insert(secToNanosec(i), Vector2(i, i));
+  }
+
+  Eigen::Matrix<int64_t, 1, 3> times;
+  times << secToNanosec(1.5), secToNanosec(2.5), secToNanosec(3.5);
+
+  MatrixX values = buffer.getValuesInterpolated(times);
+
+  EXPECT_DOUBLE_EQ(values(0, 0), 1.5);
+  EXPECT_DOUBLE_EQ(values(0, 1), 2.5);
+  EXPECT_DOUBLE_EQ(values(0, 2), 3.5);
+  EXPECT_DOUBLE_EQ(values(1, 0), 1.5);
+  EXPECT_DOUBLE_EQ(values(1, 1), 2.5);
+  EXPECT_DOUBLE_EQ(values(1, 2), 3.5);
+}
+
 TEST(RingBufferTest, testInterpolationBounds)
 {
   using namespace ze;

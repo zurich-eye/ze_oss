@@ -86,7 +86,7 @@ public:
   // a series of return types
   using DataBoolPair = std::pair<DataType, bool>;
   using TimeDataBoolTuple = std::tuple<time_t, DataType, bool>;
-  using TimeDataRangePair = std::pair<times_dynamic_t, data_dynamic_t >;
+  using TimeDataRangePair = std::pair<times_dynamic_t, data_dynamic_t>;
 
   Ringbuffer()
     : times_(timering_t(times_raw_.data(),
@@ -126,9 +126,13 @@ public:
    * values as columns. Returns empty matrices if not successful.
    */
   template <typename Interpolator = DefaultInterpolator>
-  std::pair<Eigen::Matrix<time_t, Eigen::Dynamic, 1>,
-            Eigen::Matrix<Scalar, ValueDim, Eigen::Dynamic> >
+  TimeDataRangePair
   getBetweenValuesInterpolated(time_t stamp_from, time_t stamp_to);
+
+  //! Get the values of the container at the given timestamps
+  //! The requested timestamps are expected to be in order!
+  template <typename Interpolator = DefaultInterpolator>
+  data_dynamic_t getValuesInterpolated(times_dynamic_t stamps);
 
   inline void clear()
   {

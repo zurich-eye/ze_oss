@@ -197,6 +197,42 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
+typename Ringbuffer<Scalar, ValueDim, Size>::data_dynamic_t
+Ringbuffer<Scalar, ValueDim, Size>::getValuesInterpolated(
+    times_dynamic_t stamps)
+{
+  CHECK_GT(stamps.size(), 0);
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  time_t oldest_time = times_.front();
+  time_t newest_time = times_.back();
+
+  data_dynamic_t values(ValueDim, stamps.size());
+
+  // Starting point
+  auto it_before = iterator_equal_or_before(stamps(0));
+  values.col(0) = Interpolator::interpolate(this, stamps(0), &it_before);
+
+  for (int i = 1; i < stamps.size(); ++i)
+  {
+    // ensure that we stay within the bounds of the buffer
+    CHECK_LT(stamps(i), newest_time);
+    CHECK_GT(stamps(i), oldest_time);
+
+    // advance to next value
+    while (*(it_before + 1) < stamps(i))
+    {
+      ++it_before;
+    }
+
+    values.col(i) = Interpolator::interpolate(this, stamps(i), &it_before);
+  }
+
+  return values;
+}
+
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_before(time_t stamp)
 {
