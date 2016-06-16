@@ -35,6 +35,7 @@ struct InterpolatorNearest
     auto it_after = it_before + 1;
     if (it_after == buffer->times_.end())
     {
+      LOG(WARNING) << "Interpolation hit end of buffer.";
       return buffer->dataAtTimeIterator(it_before);
     }
 
@@ -72,6 +73,7 @@ struct InterpolatorLinear
     auto it_after = it_before + 1;
     if (it_after == buffer->times_.end())
     {
+      LOG(WARNING) << "Interpolation hit end of buffer.";
       return buffer->dataAtTimeIterator(it_before);
     }
 
