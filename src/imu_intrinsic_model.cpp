@@ -2,6 +2,9 @@
 
 namespace ze {
 
+// The constexpr needs a definition to make it passable by reference.
+constexpr FloatType ImuIntrinsicModel::UndefinedRange;
+
 //------------------------------------------------------------------------------
 // Intrinsics Base Class
 ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
