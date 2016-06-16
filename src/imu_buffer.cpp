@@ -32,28 +32,37 @@ void ImuBuffer<BufferSize, Interpolator>::insertAccelerometerMeasurement(
 }
 
 template<int BufferSize, typename Interpolator>
-Vector6 ImuBuffer<BufferSize, Interpolator>::get(int64_t time)
+bool ImuBuffer<BufferSize, Interpolator>::get(int64_t time,
+                                              Eigen::Ref<Vector6> out)
 {
-  Vector6 out;
-  out.head<3>(3) = Interpolator::interpolate(acc_buffer_, time);
-  out.tail<3>(3) = Interpolator::interpolate(gyr_buffer_, time);
+  if (!acc_buffer_.getValueInterpolated(time, out.head<3>(3)) ||
+      !gyr_buffer_.getValueInterpolated(time, out.tail<3>(3)))
+  {
+    return false;
+  }
 
-  return imu_model_->undistort(out);
+  imu_model_->undistort(out);
+
+  return true;
 }
 
 template<int BufferSize, typename Interpolator>
-Vector3 ImuBuffer<BufferSize, Interpolator>::getAccelerometer(int64_t time)
+bool ImuBuffer<BufferSize, Interpolator>::getAccelerometerDistorted(
+    int64_t time,
+    Eigen::Ref<Vector3> out)
 {
-  return Interpolator::interpolate(acc_buffer_, time);
+  return acc_buffer_.getValueInterpolated(time, out);
 }
 
 template<int BufferSize, typename Interpolator>
-Vector3 ImuBuffer<BufferSize, Interpolator>::getGyroscope(int64_t time)
+bool ImuBuffer<BufferSize, Interpolator>::getGyroscopeDistorted(
+    int64_t time,
+    Eigen::Ref<Vector3> out)
 {
-  return Interpolator::interpolate(gyr_buffer_, time);
+  return gyr_buffer_.getValueInterpolated(time, out);
 }
 
-template<int BufferSize, typename Interpolator>
+template<int BufferSize, class Interpolator>
 std::pair<ImuStamps, ImuAccGyr>
 ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
     int64_t stamp_from, int64_t stamp_to)
@@ -61,12 +70,18 @@ ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
   // Takes the gyroscope time as reference and samples the accelerometer
   // measurements to fit
   ImuStamps stamps;
-  ImuAccGyr imu_measurements;
   Eigen::Matrix<FloatType, 3, Eigen::Dynamic> gyr_measurements;
 
   std::tie(stamps, gyr_measurements) =
-      gyr_buffer_.getBetweenValuesInterpolated<this.template Interpolator>(
+      gyr_buffer_.template getBetweenValuesInterpolated<Interpolator>(
         stamp_from, stamp_to);
+
+  ImuAccGyr imu_measurements(6, stamps.size());
+  if (stamps.size() == 0)
+  {
+    // return an empty set:
+    return std::make_pair(stamps, imu_measurements);
+  }
 
   // resample the accelerometer measurement at the gyro timestamps
   imu_measurements.topRows<3>() = acc_buffer_.getValuesInterpolated(stamps);
@@ -74,5 +89,11 @@ ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
 
   return std::make_pair(stamps, imu_measurements);
 }
+
+// A set of explicit declarations
+template class ImuBuffer<2000, InterpolatorLinear>;
+template class ImuBuffer<5000, InterpolatorLinear>;
+template class ImuBuffer<2000, InterpolatorNearest>;
+template class ImuBuffer<5000, InterpolatorNearest>;
 
 } // namespace ze
