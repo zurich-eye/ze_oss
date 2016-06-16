@@ -4,7 +4,7 @@
 #include <ze/imu/imu_intrinsic_model.h>
 #include <ze/imu/imu_noise_model.h>
 
-TEST(GyroscopeModelTest, tesGyroscope)
+TEST(GyroscopeModelTest, testGyroscope)
 {
   using namespace ze;
   std::shared_ptr<ImuIntrinsicModelCalibrated> intrinsics =

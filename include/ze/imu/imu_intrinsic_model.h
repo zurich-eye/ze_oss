@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Eigen/LU>
+
 #include <ze/common/logging.hpp>
 #include <ze/common/macros.h>
 #include <ze/common/types.h>
@@ -22,8 +24,11 @@ public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModel);
 
   explicit ImuIntrinsicModel(ImuIntrinsicType type);
+  ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range);
 
   typedef Eigen::Matrix<FloatType, 3, 1> measurement_t;
+
+  static constexpr FloatType UndefinedRange = -1.;
 
   inline ImuIntrinsicType type() const { return type_; }
   std::string typeAsString() const;
@@ -34,8 +39,14 @@ public:
   //! undistort in place
   virtual void undistort(Eigen::Ref<measurement_t> in) const = 0;
 
+  // getters
+  inline FloatType delay() const { return delay_; }
+  inline FloatType range() const { return range_; }
+
 private:
   ImuIntrinsicType type_;
+  FloatType delay_;
+  FloatType range_;
 };
 
 //------------------------------------------------------------------------------
@@ -47,6 +58,7 @@ public:
   static constexpr ImuIntrinsicType Type = ImuIntrinsicType::Calibrated;
 
   ImuIntrinsicModelCalibrated();
+  ImuIntrinsicModelCalibrated(FloatType delay, FloatType range);
 
   //! distort in place
   virtual void distort(Eigen::Ref<measurement_t> in) const;
@@ -74,16 +86,13 @@ public:
   virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
-  inline FloatType delay() const { return delay_; }
-  inline uint32_t range() const { return range_; }
   inline const Vector3& b() const { return b_; }
   inline const Matrix3& M() const { return M_; }
 
 private:
-  FloatType delay_;
-  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
+  Matrix3 M_inverse_;
 };
 
 //------------------------------------------------------------------------------
@@ -109,15 +118,11 @@ public:
   virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
-  inline FloatType delay() const { return delay_; }
-  inline uint32_t range() const { return range_; }
   inline const Vector3& b() const { return b_; }
   inline const Matrix3& M() const { return M_; }
   inline const Matrix3& Ma() const { return Ma_; }
 
 private:
-  FloatType delay_;
-  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
   Matrix3 Ma_;
@@ -145,15 +150,11 @@ public:
   virtual void undistort(Eigen::Ref<measurement_t> in) const;
 
   // getters
-  inline FloatType delay() const { return delay_; }
-  inline FloatType range() const { return range_; }
   inline const Vector3& b() const { return b_; }
   inline const Matrix3& M() const { return M_; }
   inline const Matrix3& R() const { return R_; }
 
 private:
-  FloatType delay_;
-  FloatType range_;
   Vector3 b_;
   Matrix3 M_;
   Matrix3 R_;
