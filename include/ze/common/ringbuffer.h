@@ -17,9 +17,10 @@ namespace ze {
 //! @todo: move the interpolators somewhere where they make more sense?
 //!
 //! Interpolators have to implement:
-//! _ interpolate(Ringbuffer<...>::Ptr, int64_t time, Ringbuffer<...>timering_t::iterator*);
+//! _ interpolate(Ringbuffer<...>*, int64_t time, Ringbuffer<...>timering_t::iterator);
 //! Passing the (optional) interator to the timestamp right before the to be
 //! interpolated value speeds up the process.
+//! The passed it_before is expected to be valid.
 //!
 //! A nearest neighbour "interpolator".
 struct InterpolatorNearest
@@ -38,14 +39,11 @@ struct InterpolatorNearest
     }
 
     // The times are ordered, we can guarantee those differences to be positive
-    if ((time - *it_before) < (it_after - time))
+    if ((time - *it_before) < (*it_after - time))
     {
       return buffer->dataAtTimeIterator(it_before);
     }
-    else
-    {
-      return buffer->dataAtTimeIterator(it_after);
-    }
+    return buffer->dataAtTimeIterator(it_after);
   }
 
   template<typename Ringbuffer_T>
@@ -54,6 +52,8 @@ struct InterpolatorNearest
       int64_t time)
   {
     auto it_before = buffer->iterator_equal_or_before(time);
+    // caller should check the bounds:
+    CHECK_NE(it_before, buffer->times_.end());
 
     return interpolate(buffer, time, it_before);
   }
@@ -89,6 +89,8 @@ struct InterpolatorLinear
       int64_t time)
   {
     auto it_before = buffer->iterator_equal_or_before(time);
+    // caller should check the bounds:
+    CHECK_NE(it_before, buffer->times_.end());
 
     return interpolate(buffer, time, it_before);
   }
@@ -174,6 +176,10 @@ public:
   //! The requested timestamps are expected to be in order!
   template <typename Interpolator = DefaultInterpolator>
   data_dynamic_t getValuesInterpolated(times_dynamic_t stamps);
+
+  //! Interpolate a single value
+  template <typename Interpolator = DefaultInterpolator>
+  bool getValueInterpolated(time_t t,  Eigen::Ref<data_dynamic_t> out);
 
   inline void clear()
   {

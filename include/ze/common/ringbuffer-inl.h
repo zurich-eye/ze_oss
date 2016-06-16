@@ -233,6 +233,31 @@ Ringbuffer<Scalar, ValueDim, Size>::getValuesInterpolated(
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
+bool Ringbuffer<Scalar, ValueDim, Size>::getValueInterpolated(
+    time_t stamp,
+    Eigen::Ref<typename Ringbuffer<Scalar, ValueDim, Size>::data_dynamic_t> out)
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (stamp > times_.back())
+  {
+    return false;
+  }
+
+  // Starting point
+  auto it_before = iterator_equal_or_before(stamp);
+  if (it_before == times_.end())
+  {
+    return false;
+  }
+
+  out = Interpolator::interpolate(this, stamp, it_before);
+
+  return true;
+}
+
+template <typename Scalar, size_t ValueDim, size_t Size>
 typename Ringbuffer<Scalar, ValueDim, Size>::timering_t::iterator
 Ringbuffer<Scalar, ValueDim, Size>::iterator_equal_or_before(time_t stamp)
 {
