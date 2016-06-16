@@ -3,6 +3,15 @@
 #include <iostream>
 #include <cmath>
 
+#ifdef WITH_CUDA
+#  include<cuda_runtime_api.h>
+#  define CUDA_HOST __host__
+#  define CUDA_DEVICE  __device__
+#else
+#  define CUDA_HOST
+#  define CUDA_DEVICE
+#endif
+
 namespace ze {
 
 // Pure static camera projection and distortion models, intended to be used in
@@ -13,6 +22,7 @@ namespace ze {
 struct PinholeGeometry
 {
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void project(const T* params, T* px)
   {
     const T fx = params[0];
@@ -24,6 +34,7 @@ struct PinholeGeometry
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void backProject(const T* params, T* px)
   {
     const T fx = params[0];
@@ -35,6 +46,7 @@ struct PinholeGeometry
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void dProject_dBearing(const T* bearing, const T* params, T* H)
   {
     const T fx = params[0];
@@ -65,6 +77,7 @@ struct NoDistortion
   static constexpr DistortionType type = DistortionType::No;
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void distort(const T* /*params*/, T* /*px*/, T* jac_colmajor = nullptr)
   {
     if (jac_colmajor)
@@ -81,6 +94,7 @@ struct NoDistortion
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void undistort(const T* /*params*/, T* /*px*/)
   {}
 };
@@ -93,6 +107,7 @@ struct FovDistortion
   static constexpr DistortionType type = DistortionType::Fov;
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -146,6 +161,7 @@ struct FovDistortion
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void undistort(const T* params, T* px)
   {
     const T s = params[0];
@@ -166,6 +182,7 @@ struct RadialTangentialDistortion
   static constexpr DistortionType type = DistortionType::RadTan;
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -198,13 +215,9 @@ struct RadialTangentialDistortion
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void undistort(const T* params, T* px)
   {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-
     T jac_colmajor[4];
     T x[2];
     T x_tmp[2];
@@ -256,6 +269,7 @@ struct EquidistantDistortion
   static constexpr DistortionType type = DistortionType::Equidistant;
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void distort(const T* params, T* px, T* jac_colmajor = nullptr)
   {
     const T x = px[0];
@@ -321,13 +335,9 @@ struct EquidistantDistortion
   }
 
   template <typename T>
+  CUDA_HOST CUDA_DEVICE
   static void undistort(const T* params, T* px)
   {
-    const T k1 = params[0];
-    const T k2 = params[1];
-    const T p1 = params[2];
-    const T p2 = params[3];
-
     T jac_colmajor[4];
     T x[2];
     T x_tmp[2];
