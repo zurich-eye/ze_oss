@@ -10,7 +10,7 @@ ImuBuffer<BufferSize, Interpolator>::ImuBuffer(ImuModel::Ptr imu_model)
 
 template<int BufferSize, typename Interpolator>
 void ImuBuffer<BufferSize, Interpolator>::insertImuMeasurement(
-    int64_t time, const Vector6 value)
+    int64_t time, const ImuAccGyr value)
 {
   acc_buffer_.insert(time, value.head<3>(3));
   gyr_buffer_.insert(time, value.tail<3>(3));
@@ -33,7 +33,7 @@ void ImuBuffer<BufferSize, Interpolator>::insertAccelerometerMeasurement(
 
 template<int BufferSize, typename Interpolator>
 bool ImuBuffer<BufferSize, Interpolator>::get(int64_t time,
-                                              Eigen::Ref<Vector6> out)
+                                              Eigen::Ref<ImuAccGyr> out)
 {
   if (!acc_buffer_.getValueInterpolated(time, out.head<3>(3)) ||
       !gyr_buffer_.getValueInterpolated(time, out.tail<3>(3)))
@@ -63,7 +63,7 @@ bool ImuBuffer<BufferSize, Interpolator>::getGyroscopeDistorted(
 }
 
 template<int BufferSize, class Interpolator>
-std::pair<ImuStamps, ImuAccGyr>
+std::pair<ImuStamps, ImuAccGyrContainer>
 ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
     int64_t stamp_from, int64_t stamp_to)
 {
@@ -76,7 +76,7 @@ ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
       gyr_buffer_.template getBetweenValuesInterpolated<Interpolator>(
         stamp_from, stamp_to);
 
-  ImuAccGyr imu_measurements(6, stamps.size());
+  ImuAccGyrContainer imu_measurements(6, stamps.size());
   if (stamps.size() == 0)
   {
     // return an empty set:

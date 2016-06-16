@@ -31,17 +31,17 @@ TEST(ImuBufferTest, testBuffer)
   buffer.insertGyroscopeMeasurement(21, w2);
   buffer.insertGyroscopeMeasurement(33, w3);
 
-  Vector6 i1 = Vector6::Random();
+  ImuAccGyr i1 = ImuAccGyr::Random();
   buffer.insertImuMeasurement(40, i1);
 
-  Vector6 out1;
+  ImuAccGyr out1;
   EXPECT_TRUE(buffer.get(15, out1));
   EXPECT_TRUE(EIGEN_MATRIX_NEAR((a1 + a2)/2, out1.head<3>(3), 1e-6));
   EXPECT_TRUE(buffer.get(16, out1));
   EXPECT_TRUE(EIGEN_MATRIX_NEAR((w1 + w2)/2, out1.tail<3>(3), 1e-6));
 
   // Between interpolation:
-  ImuAccGyr values;
+  ImuAccGyrContainer values;
   ImuStamps stamps;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(15, 35);
 

@@ -20,17 +20,17 @@ public:
 
   //! Insert an IMU measurement at a given timestamp: First three values refer
   //! to the accelerometer, last 3 the gyroscope
-  void insertImuMeasurement(int64_t time, const Vector6 value);
+  void insertImuMeasurement(int64_t time, const ImuAccGyr value);
 
   //! Get the rectified values of the IMU at a given timestamp. Interpolates
   //! if necessary.
   //! Return flag if successful
-  bool get(int64_t time, Eigen::Ref<Vector6> out);
+  bool get(int64_t time, Eigen::Ref<ImuAccGyr> out);
 
   //! Get all values between two timestamps, synchronize Accelerometer and
   //! Gyroscope, interpolate edges to fit start and end. Interpolates Gyro
   //! and Accel measurements to have equal timestamps.
-  std::pair<ImuStamps, ImuAccGyr>
+  std::pair<ImuStamps, ImuAccGyrContainer>
   getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to);
 
 protected:
