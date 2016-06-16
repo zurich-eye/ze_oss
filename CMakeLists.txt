@@ -6,7 +6,6 @@ catkin_simple()
 
 include(ze_setup)
 
-
 #############
 # LIBRARIES #
 #############
@@ -17,6 +16,7 @@ set(HEADERS
   include/ze/data_provider/data_provider_rosbag.hpp
   include/ze/data_provider/data_provider_rostopic.hpp
   include/ze/data_provider/camera_imu_synchronizer.hpp
+  include/ze/data_provider/camera_imu_synchronizer_unsync.hpp
   )
 
 set(SOURCES
@@ -26,6 +26,7 @@ set(SOURCES
   src/data_provider_rosbag.cpp
   src/data_provider_rostopic.cpp
   src/camera_imu_synchronizer.cpp
+  src/camera_imu_synchronizer_unsync.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -38,6 +39,9 @@ target_link_libraries(test_data_provider ${PROJECT_NAME})
 
 catkin_add_gtest(test_camera_imu_synchronizer test/test_camera_imu_synchronizer.cpp)
 target_link_libraries(test_camera_imu_synchronizer ${PROJECT_NAME})
+
+catkin_add_gtest(test_camera_imu_synchronizer_unsync test/test_camera_imu_synchronizer_unsync.cpp)
+target_link_libraries(test_camera_imu_synchronizer_unsync ${PROJECT_NAME})
 
 ##########
 # EXPORT #
