@@ -15,6 +15,10 @@ using AngleAxis = kindr::minimal::AngleAxisTemplate<FloatType>;
 using TransformationVector = std::vector<Transformation, Eigen::aligned_allocator<Transformation>>;
 using QuaternionVector = std::vector<Transformation, Eigen::aligned_allocator<Quaternion>>;
 
+using StampedTransformation = std::pair<int64_t, Transformation>;
+using StampedTransformationVector = std::vector<StampedTransformation,
+                                                Eigen::aligned_allocator<StampedTransformation>>;
+
 // -----------------------------------------------------------------------------
 // Transformation utils
 
