@@ -14,6 +14,92 @@
 
 namespace ze {
 
+//! @todo: move the interpolators somewhere where they make more sense?
+//!
+//! Interpolators have to implement:
+//! _ interpolate(Ringbuffer<...>*, int64_t time, Ringbuffer<...>timering_t::iterator);
+//! Passing the (optional) interator to the timestamp right before the to be
+//! interpolated value speeds up the process.
+//! The passed it_before is expected to be valid.
+//!
+//! A nearest neighbour "interpolator".
+struct InterpolatorNearest
+{
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time,
+      typename Ringbuffer_T::timering_t::iterator it_before)
+  {
+    // the end value
+    auto it_after = it_before + 1;
+    if (it_after == buffer->times_.end())
+    {
+      LOG(WARNING) << "Interpolation hit end of buffer.";
+      return buffer->dataAtTimeIterator(it_before);
+    }
+
+    // The times are ordered, we can guarantee those differences to be positive
+    if ((time - *it_before) < (*it_after - time))
+    {
+      return buffer->dataAtTimeIterator(it_before);
+    }
+    return buffer->dataAtTimeIterator(it_after);
+  }
+
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time)
+  {
+    auto it_before = buffer->iterator_equal_or_before(time);
+    // caller should check the bounds:
+    CHECK_NE(it_before, buffer->times_.end());
+
+    return interpolate(buffer, time, it_before);
+  }
+};
+
+//! A simple linear interpolator
+struct InterpolatorLinear
+{
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time,
+      typename Ringbuffer_T::timering_t::iterator it_before)
+  {
+    // the end value
+    auto it_after = it_before + 1;
+    if (it_after == buffer->times_.end())
+    {
+      LOG(WARNING) << "Interpolation hit end of buffer.";
+      return buffer->dataAtTimeIterator(it_before);
+    }
+
+    const FloatType w1 =
+        static_cast<FloatType>(time - *it_before) /
+        static_cast<FloatType>(*it_after - *it_before);
+
+    return (FloatType{1.0} - w1) * buffer->dataAtTimeIterator(it_before)
+        + w1 * buffer->dataAtTimeIterator(it_after);
+  }
+
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time)
+  {
+    auto it_before = buffer->iterator_equal_or_before(time);
+    // caller should check the bounds:
+    CHECK_NE(it_before, buffer->times_.end());
+
+    return interpolate(buffer, time, it_before);
+  }
+};
+using DefaultInterpolator = InterpolatorLinear;
+
+
 //! a fixed size timed buffer templated on the number of entries
 //! Opposed to the `Buffer`, values are expected to be received ORDERED in
 //! TIME!
@@ -23,6 +109,10 @@ class Ringbuffer
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  //! Ringbuffer is friend with the interpolator types.
+  friend struct InterpolatorNearest;
+  friend struct InterpolatorLinear;
 
   typedef int64_t time_t;
   typedef Eigen::Matrix<time_t, Size, 1> times_t;
@@ -41,7 +131,7 @@ public:
   // a series of return types
   using DataBoolPair = std::pair<DataType, bool>;
   using TimeDataBoolTuple = std::tuple<time_t, DataType, bool>;
-  using TimeDataRangePair = std::pair<times_dynamic_t, data_dynamic_t >;
+  using TimeDataRangePair = std::pair<times_dynamic_t, data_dynamic_t>;
 
   Ringbuffer()
     : times_(timering_t(times_raw_.data(),
@@ -80,9 +170,18 @@ public:
    * are interpolated. Returns a vector of timestamps and a block matrix with
    * values as columns. Returns empty matrices if not successful.
    */
-  std::pair<Eigen::Matrix<time_t, Eigen::Dynamic, 1>,
-            Eigen::Matrix<Scalar, ValueDim, Eigen::Dynamic> >
+  template <typename Interpolator = DefaultInterpolator>
+  TimeDataRangePair
   getBetweenValuesInterpolated(time_t stamp_from, time_t stamp_to);
+
+  //! Get the values of the container at the given timestamps
+  //! The requested timestamps are expected to be in order!
+  template <typename Interpolator = DefaultInterpolator>
+  data_dynamic_t getValuesInterpolated(times_dynamic_t stamps);
+
+  //! Interpolate a single value
+  template <typename Interpolator = DefaultInterpolator>
+  bool getValueInterpolated(time_t t,  Eigen::Ref<data_dynamic_t> out);
 
   inline void clear()
   {

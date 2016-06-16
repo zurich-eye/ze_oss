@@ -231,6 +231,54 @@ TEST(RingBufferTest, testInterpolation)
   EXPECT_EQ(12.5, values(0, 6));
 }
 
+TEST(RingBufferTest, testInterpolationTimestamps)
+{
+  using namespace ze;
+  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  for(int i = 1; i < 10; ++i)
+  {
+    buffer.insert(secToNanosec(i), Vector2(i, i));
+  }
+
+  Eigen::Matrix<int64_t, 1, 3> times;
+  times << secToNanosec(1.5), secToNanosec(2.5), secToNanosec(3.5);
+
+  MatrixX values = buffer.getValuesInterpolated(times);
+
+  EXPECT_DOUBLE_EQ(values(0, 0), 1.5);
+  EXPECT_DOUBLE_EQ(values(0, 1), 2.5);
+  EXPECT_DOUBLE_EQ(values(0, 2), 3.5);
+  EXPECT_DOUBLE_EQ(values(1, 0), 1.5);
+  EXPECT_DOUBLE_EQ(values(1, 1), 2.5);
+  EXPECT_DOUBLE_EQ(values(1, 2), 3.5);  
+}
+
+TEST(RingBufferTest, testGetValueInterpolated)
+{
+  using namespace ze;
+  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  for(int i = 1; i < 10; ++i)
+  {
+    buffer.insert(secToNanosec(i), Vector2(i, i));
+  }
+
+  Vector2 out;
+  EXPECT_TRUE(buffer.getValueInterpolated(secToNanosec(1), out));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(out, Vector2(1, 1), 1e-8));
+
+  EXPECT_TRUE(buffer.getValueInterpolated(secToNanosec(5), out));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(out, Vector2(5, 5), 1e-8));
+
+  EXPECT_TRUE(buffer.getValueInterpolated(secToNanosec(9), out));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(out, Vector2(9, 9), 1e-8));
+
+  EXPECT_TRUE(buffer.getValueInterpolated(secToNanosec(8.5), out));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(out, Vector2(8.5, 8.5), 1e-8));
+
+  EXPECT_FALSE(buffer.getValueInterpolated(0, out));
+  EXPECT_FALSE(buffer.getValueInterpolated(secToNanosec(10), out));
+}
+
 TEST(RingBufferTest, testInterpolationBounds)
 {
   using namespace ze;
