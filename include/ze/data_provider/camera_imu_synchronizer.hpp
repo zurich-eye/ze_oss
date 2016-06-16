@@ -15,7 +15,7 @@ class ImageBase;
 
 // convenience typedefs
 using ImuStampsVector = std::vector<ImuStamps>;
-using ImuAccGyrVector = std::vector<ImuAccGyr>;
+using ImuAccGyrVector = std::vector<ImuAccGyrContainer>;
 using ImuSyncBuffer = Ringbuffer<FloatType, 6, 1000>;
 using ImuBufferVector = std::vector<ImuSyncBuffer>;
 
