@@ -1,6 +1,5 @@
 #include <ze/common/test_entrypoint.h>
 
-#include <ze/imu/imu_intrinsic_model.h>
 #include <ze/imu/imu_model.h>
 
 TEST(ImuModelTest, testImu)

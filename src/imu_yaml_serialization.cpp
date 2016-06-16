@@ -183,7 +183,7 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
            type == "scale-misalignment-size-effect")
   {
     FloatType delay;
-    uint32_t range;
+    FloatType range;
     Vector3 b;
     Matrix3 M;
 
