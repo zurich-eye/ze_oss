@@ -24,46 +24,5 @@ void loadDepthmapFromFile(
 // ############################################################################
 // RANDOM NUMBER GENERATORS
 
-// ----------------------------------------------------------------------------
-//! Random number generator for integral types.
-//! @return Random number in interval [lowest, highest]
-template<class T>
-inline
-typename std::enable_if<std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::mt19937 generator(std::random_device{}());
-  std::uniform_int_distribution<T> distribution(std::numeric_limits<T>::lowest(),
-                                                std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-// ----------------------------------------------------------------------------
-//! Random number generator for real types.
-//! @return Random number in interval [0.0, 1.0]
-template<class T>
-inline
-typename std::enable_if<!std::is_integral<T>::value, std::function<T()> >::type
-getRandomGenerator()
-{
-  std::mt19937 generator(std::random_device{}());
-  //! @todo (MWE) enable a min/max rnd generator - not working yet so using [0.0,1.0] for now
-  std::uniform_real_distribution<T> distribution(0.0, 1.0);
-//  std::numeric_limits<T>::lowest(),
-//      std::numeric_limits<T>::max());
-  auto random_val = std::bind(distribution, generator);
-  return random_val;
-}
-
-// ----------------------------------------------------------------------------
-//! Random number generator that returns a FloatType between 0.0 and 1.0.
-inline std::function<FloatType()> getRandomGenerator01()
-{
-  std::mt19937 generator(std::random_device{}());
-  std::uniform_real_distribution<FloatType> distribution(FloatType{0.0}, FloatType{1.0});
-  std::function<FloatType()> random_val = std::bind(distribution, generator);
-  return random_val;
-}
 
 } // namespace ze
