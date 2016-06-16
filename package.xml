@@ -22,6 +22,8 @@
   <depend>imp_bridge_ros</depend>
   <depend>rosbag</depend>
   <depend>sensor_msgs</depend>
+  <depend>ze_imu</depend>
+  <depend>ze_eval_node</depend>
 
   <test_depend>gtest</test_depend>
 </package>

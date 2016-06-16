@@ -24,6 +24,16 @@ using ImuCallback =
                       const Vector3& /*acc*/,
                       const Vector3& /*gyr*/,
                       uint32_t /*imu-idx*/)>;
+
+using GyroCallback =
+  std::function<void (int64_t /*timestamp*/,
+                      const Vector3& /*gyr*/,
+                      uint32_t /*imu-idx*/)>;
+using AccelCallback =
+  std::function<void (int64_t /*timestamp*/,
+                      const Vector3& /*acc*/,
+                      uint32_t /*imu-idx*/)>;
+
 using CameraCallback =
   std::function<void (int64_t /*timestamp*/,
                       const std::shared_ptr<ImageBase>& /*img*/,
@@ -70,10 +80,18 @@ public:
   //! Register callback function to call when new camera message is available.
   void registerCameraCallback(const CameraCallback& camera_callback);
 
+  //! Register callback function to call when new Gyroscope message is available.
+  void registerGyroCallback(const GyroCallback& gyro_callback);
+
+  //! Register callback function to call when new Accelerometer message is available.
+  void registerAccelCallback(const AccelCallback& accel_callback);
+
 protected:
   DataProviderType type_;
   ImuCallback imu_callback_;
   CameraCallback camera_callback_;
+  GyroCallback gyro_callback_;
+  AccelCallback accel_callback_;
   volatile bool running_ = true;
 
 private:
