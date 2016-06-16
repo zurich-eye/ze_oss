@@ -18,6 +18,7 @@
   <depend>ze_common</depend>
   
   <depend>roscpp</depend>
+  <depend>pcl_ros</depend>
   <depend>visualization_msgs</depend>
   <depend>image_transport</depend>
   

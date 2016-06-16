@@ -9,6 +9,10 @@ class Publisher;
 class NodeHandle;
 }
 
+namespace tf {
+class TransformBroadcaster;
+}
+
 namespace ze {
 
 //! @todo(cfo): Deal with multi-threaded publishing.
@@ -45,6 +49,10 @@ public:
       const Transformation& pose, // T_W_B
       const FloatType size = 0.2) override;
 
+  void publishTransform(
+      const Transformation& pose,
+      const std::string& name);
+
   // ---------------------------------------------------------------------------
   // Draw multiple elements
 
@@ -71,6 +79,7 @@ public:
 private:
   std::shared_ptr<ros::NodeHandle> nh_;
   std::shared_ptr<ros::Publisher> pub_marker_;
+  std::shared_ptr<tf::TransformBroadcaster> tf_broadcaster_;
   std::string world_frame = "map";    //!< World-frame
   double viz_scale_ = 1.0;            //!< Scale marker size
 };
