@@ -90,6 +90,36 @@ ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
   return std::make_pair(stamps, imu_measurements);
 }
 
+template<int BufferSize, class Interpolator>
+std::tuple<int64_t, int64_t, bool>
+ImuBuffer<BufferSize, Interpolator>::getOldestAndNewestStamp() const
+{
+  std::tuple<int64_t, int64_t, bool> accel =
+      acc_buffer_.getOldestAndNewestStamp();
+  std::tuple<int64_t, int64_t, bool> gyro =
+      gyr_buffer_.getOldestAndNewestStamp();
+
+  if (!std::get<2>(accel) || !std::get<2>(gyro))
+  {
+    return std::make_tuple(-1, -1, false);
+  }
+
+  int64_t oldest = std::get<0>(accel) < std::get<0>(gyro) ?
+                     std::get<0>(gyro) : std::get<0>(accel);
+
+  int64_t newest = std::get<1>(accel) < std::get<1>(gyro) ?
+                     std::get<1>(accel) : std::get<1>(gyro);
+
+  // This is an extreme edge case where the accel and gyro measurements
+  // do not overlap at all.
+  if (oldest > newest)
+  {
+    return std::make_tuple(-1, -1, false);
+  }
+
+  return std::make_tuple(oldest, newest, true);
+}
+
 // A set of explicit declarations
 template class ImuBuffer<2000, InterpolatorLinear>;
 template class ImuBuffer<5000, InterpolatorLinear>;

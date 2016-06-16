@@ -77,4 +77,42 @@ TEST(ImuBufferTest, testBuffer)
   EXPECT_FALSE(buffer.get(50, out1));
 }
 
+TEST(ImuBufferTest, testOldestAndNewestTimestamp)
+{
+  using namespace ze;
+  std::shared_ptr<ImuIntrinsicModelCalibrated> intrinsics =
+      std::make_shared<ImuIntrinsicModelCalibrated>();
+  std::shared_ptr<ImuNoiseNone> noise = std::make_shared<ImuNoiseNone>();
+
+  AccelerometerModel::Ptr a_model =
+      std::make_shared<AccelerometerModel>(intrinsics, noise);
+  GyroscopeModel::Ptr g_model =
+      std::make_shared<GyroscopeModel>(intrinsics, noise);
+
+  ImuModel::Ptr model(std::make_shared<ImuModel>(a_model, g_model));
+
+  ImuBufferLinear5000 buffer(model);
+
+  int64_t oldest;
+  int64_t newest;
+  bool success;
+  std::tie(oldest, newest, success) = buffer.getOldestAndNewestStamp();
+  EXPECT_FALSE(success);
+
+  buffer.insertImuMeasurement(1, ImuAccGyr::Random());
+
+  std::tie(oldest, newest, success) = buffer.getOldestAndNewestStamp();
+  EXPECT_TRUE(success);
+  EXPECT_EQ(1, oldest);
+  EXPECT_EQ(1, newest);
+
+  buffer.insertImuMeasurement(2, ImuAccGyr::Random());
+
+  std::tie(oldest, newest, success) = buffer.getOldestAndNewestStamp();
+  EXPECT_TRUE(success);
+  EXPECT_EQ(1, oldest);
+  EXPECT_EQ(2, newest);
+
+}
+
 ZE_UNITTEST_ENTRYPOINT

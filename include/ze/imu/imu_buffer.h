@@ -33,6 +33,10 @@ public:
   std::pair<ImuStamps, ImuAccGyrContainer>
   getBetweenValuesInterpolated(int64_t stamp_from, int64_t stamp_to);
 
+  //! Get the oldest and newest timestamps for which both Accelerometers
+  //! and Gyroscopes have measurements.
+  std::tuple<int64_t, int64_t, bool> getOldestAndNewestStamp() const;
+
 protected:
   bool getAccelerometerDistorted(int64_t time, Eigen::Ref<Vector3> out);
   bool getGyroscopeDistorted(int64_t time, Eigen::Ref<Vector3> out);
