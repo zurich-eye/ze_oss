@@ -23,6 +23,7 @@ DataProviderRosbag::DataProviderRosbag(
   , imu_topic_imuidx_map_(imu_topic_imuidx_map)
   , uses_split_messages_(false)
 {
+  VLOG(1) << "Create Dataprovider for synchronized Gyro/Accel";
   //! @todo: Check if topics exists.
   //! @todo: Display number of messages per topic in the beginning.
 
@@ -39,10 +40,12 @@ DataProviderRosbag::DataProviderRosbag(
   std::vector<std::string> topics;
   for (auto it : img_topic_camidx_map_)
   {
+    VLOG(1) << "Subscribing to: " << it.first;
     topics.push_back(it.first);
   }
   for (auto it : imu_topic_imuidx_map_)
   {
+    VLOG(1) << "Subscribing to: " << it.first;
     topics.push_back(it.first);
   }
 
@@ -60,6 +63,7 @@ DataProviderRosbag::DataProviderRosbag(
   , gyro_topic_imuidx_map_(gyro_topic_imuidx_map)
   , uses_split_messages_(true)
 {
+  VLOG(1) << "Create Dataprovider for UN-synchronized Gyro/Accel";
   //! @todo: Check if topics exists.
   //! @todo: Display number of messages per topic in the beginning.
 
@@ -79,14 +83,17 @@ DataProviderRosbag::DataProviderRosbag(
   std::vector<std::string> topics;
   for (auto it : img_topic_camidx_map_)
   {
+    VLOG(1) << "Subscribing to: " << it.first;
     topics.push_back(it.first);
   }
   for (auto it : accel_topic_imuidx_map_)
   {
+    VLOG(1) << "Subscribing to: " << it.first;
     topics.push_back(it.first);
   }
   for (auto it : gyro_topic_imuidx_map_)
   {
+    VLOG(1) << "Subscribing to: " << it.first;
     topics.push_back(it.first);
   }
 
@@ -117,9 +124,10 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
   // The connection info only contains topics that are available in the bag
   // If a topic is requested that is not avaiable, it does not show up in the info.
   std::vector<const rosbag::ConnectionInfo*> connection_infos =
-      bag_view_->getConnections();
+      bag_view_->getConnections(); 
   CHECK(topics.size() == connection_infos.size())
       << "Not all requested topics founds in bagfile";
+
 }
 
 size_t DataProviderRosbag::cameraCount() const

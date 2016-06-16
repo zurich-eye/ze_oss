@@ -46,10 +46,17 @@ struct ImageBufferItem
 };
 using ImgBuffer = std::vector<ImageBufferItem>;
 
+class CameraImuSynchronizerBase
+{
+public:
+  virtual void registerCameraImuCallback(
+      const SynchronizedCameraImuCallback& callback) = 0;
+};
+
 // -----------------------------------------------------------------------------
 //! Synchronizes multiple cameras with multiple imus. Triggers a callback
 //! once measurements from all cameras and IMUs are available.
-class CameraImuSynchronizer
+class CameraImuSynchronizer: public CameraImuSynchronizerBase
 {
 public:
   //! Default constructor.

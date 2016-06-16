@@ -47,7 +47,7 @@ void CameraImuSynchronizerUnsync::initBuffers(
   img_buffer_.resize(2 * num_cameras_);
   for (ImuModel::Ptr imu_model: imu_models)
   {
-    imu_buffers_.push_back(std::make_shared<ImuSyncBuffer>(imu_model));
+    imu_buffers_.push_back(std::make_shared<ImuSyncBufferUnsync>(imu_model));
   }
 }
 
@@ -237,7 +237,7 @@ void CameraImuSynchronizerUnsync::checkImuDataAndCallback()
           imu_buffers_.begin(),
           imu_buffers_.end(),
           oldest_newest_stamp_vector.begin(),
-          [](const ImuSyncBuffer::Ptr imu_buffer) {
+          [](const ImuSyncBufferUnsync::Ptr imu_buffer) {
             return imu_buffer->getOldestAndNewestStamp();
           });
 

@@ -29,8 +29,8 @@ DEFINE_string(topic_gyr3, "/gyr3", "");
 DEFINE_int32(data_source, 1, " 0: CSV, 1: Rosbag, 2: Rostopic");
 DEFINE_string(data_dir, "", "Directory for csv dataset.");
 DEFINE_uint64(num_imus, 1, "Number of IMUs used in the pipeline.");
-DEFINE_uint64(num_accels, 1, "Number of Accelerometers used in the pipeline.");
-DEFINE_uint64(num_gyros, 1, "Number of Gyroscopes used in the pipeline.");
+DEFINE_uint64(num_accels, 0, "Number of Accelerometers used in the pipeline.");
+DEFINE_uint64(num_gyros, 0, "Number of Gyroscopes used in the pipeline.");
 
 namespace ze {
 

@@ -5,6 +5,7 @@
 #include <ze/imu/imu_buffer.h>
 #include <ze/common/types.h>
 #include <ze/common/time_conversions.h>
+#include <ze/data_provider/camera_imu_synchronizer.hpp>
 
 namespace ze {
 
@@ -15,8 +16,8 @@ class ImageBase;
 // convenience typedefs
 using ImuStampsVector = std::vector<ImuStamps>;
 using ImuAccGyrVector = std::vector<ImuAccGyrContainer>;
-using ImuSyncBuffer = ImuBufferLinear2000;
-using ImuBufferVector = std::vector<ImuSyncBuffer::Ptr>;
+using ImuSyncBufferUnsync = ImuBufferLinear2000;
+using ImuBufferVectorUnsync = std::vector<ImuSyncBufferUnsync::Ptr>;
 
 // callback typedefs
 using SynchronizedCameraImuCallback =
@@ -25,32 +26,11 @@ using SynchronizedCameraImuCallback =
                       const ImuAccGyrVector& /*imu_measurements*/)>;
 
 // -----------------------------------------------------------------------------
-//! Container to buffer received images.
-struct ImageBufferItem
-{
-  int64_t stamp        { -1 };
-  ImageBasePtr img     { nullptr };
-  int32_t camera_idx   { -1 };
-  inline bool empty()
-  {
-    return stamp == -1;
-  }
-
-  inline void reset()
-  {
-    stamp = -1;
-    img.reset();
-    camera_idx = -1;
-  }
-};
-using ImgBuffer = std::vector<ImageBufferItem>;
-
-// -----------------------------------------------------------------------------
 //! Synchronizes multiple cameras with multiple imus. Triggers a callback
 //! once measurements from all cameras and IMUs are available. Uses an IMU
 //! Buffer that can handle model-based measurement corrections and synchronization
-//! of gyroscope and accelerometer.
-class CameraImuSynchronizerUnsync
+//! of gyroscope and accelerometer.it
+class CameraImuSynchronizerUnsync: public CameraImuSynchronizerBase
 {
 public:
   //! Default constructor.
@@ -102,7 +82,7 @@ private:
   ImgBuffer img_buffer_;
 
   //! IMU buffer stores all imu measurements, size of imu_count_.
-  ImuBufferVector imu_buffers_;
+  ImuBufferVectorUnsync imu_buffers_;
 
   StampedImages sync_imgs_ready_to_process_;
   int64_t sync_imgs_ready_to_process_stamp_ { -1 };
