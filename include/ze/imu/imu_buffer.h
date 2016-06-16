@@ -9,7 +9,6 @@ template<int BufferSize, typename Interpolator>
 class ImuBuffer
 {
 public:
-
   ImuBuffer(ImuModel::Ptr imu_model);
 
   inline void insertGyroscopeMeasurement(time_t stamp, const Vector3);
