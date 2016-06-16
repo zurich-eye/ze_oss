@@ -150,7 +150,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // first element interpolated:
   stamps(0) = stamp_from;
-  values.col(0) = Interpolator::interpolate(this, stamp_from, &it_from_before);
+  values.col(0) = Interpolator::interpolate(this, stamp_from, it_from_before);
 
   // this is a real edge case where we hit the two consecutive timestamps
   //  with from and to.
@@ -191,7 +191,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
   // last element interpolated
   stamps(range - 1) = stamp_to;
 
-  values.col(range - 1) = Interpolator::interpolate(this, stamp_to, &it_to_before);
+  values.col(range - 1) = Interpolator::interpolate(this, stamp_to, it_to_before);
 
   return std::make_pair(stamps, values);
 }
@@ -212,7 +212,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getValuesInterpolated(
 
   // Starting point
   auto it_before = iterator_equal_or_before(stamps(0));
-  values.col(0) = Interpolator::interpolate(this, stamps(0), &it_before);
+  values.col(0) = Interpolator::interpolate(this, stamps(0), it_before);
 
   for (int i = 1; i < stamps.size(); ++i)
   {
@@ -226,7 +226,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getValuesInterpolated(
       ++it_before;
     }
 
-    values.col(i) = Interpolator::interpolate(this, stamps(i), &it_before);
+    values.col(i) = Interpolator::interpolate(this, stamps(i), it_before);
   }
 
   return values;

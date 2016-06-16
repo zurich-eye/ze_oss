@@ -14,7 +14,6 @@
 
 namespace ze {
 
-
 //! @todo: move the interpolators somewhere where they make more sense?
 //!
 //! Interpolators have to implement:
@@ -27,7 +26,37 @@ struct InterpolatorNearest
 {
   template<typename Ringbuffer_T>
   static typename Ringbuffer_T::DataType interpolate(
-      Ringbuffer_T* buffer, int64_t time);
+      Ringbuffer_T* buffer,
+      int64_t time,
+      typename Ringbuffer_T::timering_t::iterator it_before)
+  {
+    // the end value
+    auto it_after = it_before + 1;
+    if (it_after == buffer->times_.end())
+    {
+      return buffer->dataAtTimeIterator(it_before);
+    }
+
+    // The times are ordered, we can guarantee those differences to be positive
+    if ((time - *it_before) < (it_after - time))
+    {
+      return buffer->dataAtTimeIterator(it_before);
+    }
+    else
+    {
+      return buffer->dataAtTimeIterator(it_after);
+    }
+  }
+
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time)
+  {
+    auto it_before = buffer->iterator_equal_or_before(time);
+
+    return interpolate(buffer, time, it_before);
+  }
 };
 
 //! A simple linear interpolator
@@ -37,12 +66,14 @@ struct InterpolatorLinear
   static typename Ringbuffer_T::DataType interpolate(
       Ringbuffer_T* buffer,
       int64_t time,
-      typename Ringbuffer_T::timering_t::iterator* it_before_ptr = nullptr)
+      typename Ringbuffer_T::timering_t::iterator it_before)
   {
-    CHECK_EQ(false, it_before_ptr == nullptr) << "Non-initialized interpolation not"
-                                          << "yet supported";
-    auto it_before = *it_before_ptr;
+    // the end value
     auto it_after = it_before + 1;
+    if (it_after == buffer->times_.end())
+    {
+      return buffer->dataAtTimeIterator(it_before);
+    }
 
     const FloatType w1 =
         static_cast<FloatType>(time - *it_before) /
@@ -50,6 +81,16 @@ struct InterpolatorLinear
 
     return (FloatType{1.0} - w1) * buffer->dataAtTimeIterator(it_before)
         + w1 * buffer->dataAtTimeIterator(it_after);
+  }
+
+  template<typename Ringbuffer_T>
+  static typename Ringbuffer_T::DataType interpolate(
+      Ringbuffer_T* buffer,
+      int64_t time)
+  {
+    auto it_before = buffer->iterator_equal_or_before(time);
+
+    return interpolate(buffer, time, it_before);
   }
 };
 using DefaultInterpolator = InterpolatorLinear;
