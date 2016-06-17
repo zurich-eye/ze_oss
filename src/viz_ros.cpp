@@ -1,6 +1,7 @@
 #include <ze/visualization/viz_ros.h>
 
 #include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -21,6 +22,7 @@ VisualizerRos::VisualizerRos()
   // Create node and subscribe.
   nh_.reset(new ros::NodeHandle("~"));
   pub_marker_.reset(new ros::Publisher(nh_->advertise<visualization_msgs::Marker>("markers", 100)));
+  tf_broadcaster_.reset(new tf::TransformBroadcaster());
 }
 
 VisualizerRos::VisualizerRos(const std::string& frame)
@@ -119,6 +121,26 @@ void VisualizerRos::drawCoordinateFrame(
   m.colors.push_back(getRosColor(Colors::Blue));
   m.pose = getRosPose(pose);
   pub_marker_->publish(m);
+}
+
+void VisualizerRos::drawRobot(
+    const std::string& name,
+    const Transformation& T_W_B)
+{
+  tf::StampedTransform tf;
+  tf.stamp_ = ros::Time::now();
+  tf.frame_id_ = world_frame;
+  tf.child_frame_id_ = name;
+  const Vector3& origin_eigen = T_W_B.getPosition();
+  const Quaternion& rotation_minkindr = T_W_B.getRotation();
+  tf::Vector3 origin(origin_eigen[0], origin_eigen[1], origin_eigen[2]);
+  tf::Quaternion rotation(rotation_minkindr.x(),
+                          rotation_minkindr.y(),
+                          rotation_minkindr.z(),
+                          rotation_minkindr.w());
+  tf.setOrigin(origin);
+  tf.setRotation(rotation);
+  tf_broadcaster_->sendTransform(tf);
 }
 
 void VisualizerRos::drawPoints(
