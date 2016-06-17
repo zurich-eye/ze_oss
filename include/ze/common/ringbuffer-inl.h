@@ -100,6 +100,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getOldestAndNewestStamp() const
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
 typename Ringbuffer<Scalar, ValueDim, Size>::TimeDataRangePair
 Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
     time_t stamp_from,
@@ -149,11 +150,7 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // first element interpolated:
   stamps(0) = stamp_from;
-  const FloatType w1 =
-      static_cast<Scalar>(stamp_from - *it_from_before) /
-      static_cast<Scalar>(*it_from_after - *it_from_before);
-  values.col(0) = (FloatType{1.0} - w1) * dataAtTimeIterator(it_from_before)
-                  + w1 * dataAtTimeIterator(it_from_after);
+  values.col(0) = Interpolator::interpolate(this, stamp_from, it_from_before);
 
   // this is a real edge case where we hit the two consecutive timestamps
   //  with from and to.
@@ -193,13 +190,71 @@ Ringbuffer<Scalar, ValueDim, Size>::getBetweenValuesInterpolated(
 
   // last element interpolated
   stamps(range - 1) = stamp_to;
-  const FloatType w2 =
-      static_cast<Scalar>(stamp_to - *it_to_before) /
-      static_cast<Scalar>(*it_to_after - *it_to_before);
-  values.col(range - 1) = (FloatType{1.0} - w2) * dataAtTimeIterator(it_to_before)
-                          + w2 * dataAtTimeIterator(it_to_after);
+
+  values.col(range - 1) = Interpolator::interpolate(this, stamp_to, it_to_before);
 
   return std::make_pair(stamps, values);
+}
+
+template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
+typename Ringbuffer<Scalar, ValueDim, Size>::data_dynamic_t
+Ringbuffer<Scalar, ValueDim, Size>::getValuesInterpolated(
+    times_dynamic_t stamps)
+{
+  CHECK_GT(stamps.size(), 0);
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  time_t oldest_time = times_.front();
+  time_t newest_time = times_.back();
+
+  data_dynamic_t values(ValueDim, stamps.size());
+
+  // Starting point
+  auto it_before = iterator_equal_or_before(stamps(0));
+  values.col(0) = Interpolator::interpolate(this, stamps(0), it_before);
+
+  for (int i = 1; i < stamps.size(); ++i)
+  {
+    // ensure that we stay within the bounds of the buffer
+    CHECK_LT(stamps(i), newest_time);
+    CHECK_GT(stamps(i), oldest_time);
+
+    // advance to next value
+    while (*(it_before + 1) < stamps(i))
+    {
+      ++it_before;
+    }
+
+    values.col(i) = Interpolator::interpolate(this, stamps(i), it_before);
+  }
+
+  return values;
+}
+
+template <typename Scalar, size_t ValueDim, size_t Size>
+template <typename Interpolator>
+bool Ringbuffer<Scalar, ValueDim, Size>::getValueInterpolated(
+    time_t stamp,
+    Eigen::Ref<typename Ringbuffer<Scalar, ValueDim, Size>::data_dynamic_t> out)
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (stamp > times_.back())
+  {
+    return false;
+  }
+
+  // Starting point
+  auto it_before = iterator_equal_or_before(stamp);
+  if (it_before == times_.end())
+  {
+    return false;
+  }
+
+  out = Interpolator::interpolate(this, stamp, it_before);
+
+  return true;
 }
 
 template <typename Scalar, size_t ValueDim, size_t Size>
