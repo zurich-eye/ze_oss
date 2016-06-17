@@ -45,7 +45,7 @@ private:
 
   //! Register callbacks in data provider to this class' addImgData, addGyroData
   //! and addAccelData.
-  virtual void subscribeDataProvider(DataProviderBase& data_provider) override;
+  void subscribeDataProvider(DataProviderBase& data_provider);
 
   //! Initialize the image and gyro/accel buffers
   void initBuffers(const std::vector<ImuModel::Ptr>& imu_models);

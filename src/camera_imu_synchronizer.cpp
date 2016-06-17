@@ -11,6 +11,7 @@ namespace ze {
 CameraImuSynchronizer::CameraImuSynchronizer(DataProviderBase& data_provider)
   : CameraImuSynchronizerBase(data_provider)
 {
+  subscribeDataProvider(data_provider);
   initBuffers();
 }
 

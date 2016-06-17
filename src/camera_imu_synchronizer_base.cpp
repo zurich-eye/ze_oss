@@ -15,7 +15,6 @@ CameraImuSynchronizerBase::CameraImuSynchronizerBase(
   : num_cameras_(data_provider.cameraCount())
   , num_imus_(data_provider.imuCount())
 {
-  subscribeDataProvider(data_provider);
 }
 
 void CameraImuSynchronizerBase::registerCameraImuCallback(

@@ -33,7 +33,7 @@ public:
 
 private:
   //! Register callbacks in data provider to this class' addImgData and addImuData.
-  virtual void subscribeDataProvider(DataProviderBase& data_provider) override;
+  void subscribeDataProvider(DataProviderBase& data_provider);
 
   //! IMU buffer stores all imu measurements, size of imu_count_.
   ImuBufferVector imu_buffers_;

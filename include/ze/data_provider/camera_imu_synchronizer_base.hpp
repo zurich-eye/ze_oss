@@ -74,9 +74,6 @@ protected:
   //! Image buffer is buffering images of max the last 2*rig_size images.
   ImgBuffer img_buffer_;
 
-  //! Register callbacks in data provider to this class' addImgData and addImuData.
-  virtual void subscribeDataProvider(DataProviderBase& data_provider) {};
-
   //! This function checks if we have all data ready to call the callback.
   virtual void checkImuDataAndCallback() = 0;
 

@@ -13,6 +13,7 @@ CameraImuSynchronizerUnsync::CameraImuSynchronizerUnsync(
     const std::vector<ImuModel::Ptr>& imu_models)
   : CameraImuSynchronizerBase(data_provider)
 {
+  subscribeDataProvider(data_provider);
   initBuffers(imu_models);
 }
 
