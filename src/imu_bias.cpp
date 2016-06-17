@@ -2,6 +2,7 @@
 
 namespace ze {
 
+//------------------------------------------------------------------------------
 ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise_density,
                const Vector3 acc_bias_noise_density,
                FloatType start,
@@ -28,6 +29,7 @@ ContinuousBias::ContinuousBias(const Vector3& gyr_bias_noise_density,
   initialize();
 }
 
+//------------------------------------------------------------------------------
 void ContinuousBias::initialize()
 {
   Vector6 noise;

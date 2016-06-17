@@ -26,6 +26,11 @@ set(HEADERS
 
 set(SOURCES
     src/imu_bias.cpp
+    src/manifold_pre_integrator.cpp
+    src/quaternion_pre_integrator.cpp
+    src/pre_integrator_base.cpp
+    src/pre_integration_mc_runner.cpp
+    src/pre_integration_runner.cpp
     )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
