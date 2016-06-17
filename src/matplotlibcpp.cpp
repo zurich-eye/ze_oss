@@ -408,6 +408,21 @@ bool labelPlot(
 }
 
 // -----------------------------------------------------------------------------
+bool labelPlot(
+    const std::string& name,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::string& format)
+{
+  Eigen::Matrix<double, Eigen::Dynamic, 1> x(y.size());
+  for (int i=0; i < x.size(); ++i)
+  {
+    x(i) = i;
+  }
+  return labelPlot(name, x, y, format);
+
+}
+
+// -----------------------------------------------------------------------------
 bool plot(
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format)

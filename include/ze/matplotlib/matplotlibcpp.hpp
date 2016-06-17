@@ -68,6 +68,10 @@ bool labelPlot(
     const Eigen::Ref<const MatrixX>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format = "");
+bool labelPlot(
+    const std::string& name,
+    const Eigen::Ref<const MatrixX>& y,
+    const std::string& format = "");
 
 bool plot(
     const Eigen::Ref<const MatrixX>& x,
