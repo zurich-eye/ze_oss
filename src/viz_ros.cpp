@@ -5,6 +5,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+#include <ze/ros/tf_bridge.h>
 #include <ze/visualization/viz_ros_utils.h>
 
 namespace ze {
@@ -131,15 +132,7 @@ void VisualizerRos::drawRobot(
   tf.stamp_ = ros::Time::now();
   tf.frame_id_ = world_frame;
   tf.child_frame_id_ = name;
-  const Vector3& origin_eigen = T_W_B.getPosition();
-  const Quaternion& rotation_minkindr = T_W_B.getRotation();
-  tf::Vector3 origin(origin_eigen[0], origin_eigen[1], origin_eigen[2]);
-  tf::Quaternion rotation(rotation_minkindr.x(),
-                          rotation_minkindr.y(),
-                          rotation_minkindr.z(),
-                          rotation_minkindr.w());
-  tf.setOrigin(origin);
-  tf.setRotation(rotation);
+  tf.setData(transformationToTF(T_W_B));
   tf_broadcaster_->sendTransform(tf);
 }
 
