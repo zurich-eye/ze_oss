@@ -123,16 +123,16 @@ void VisualizerRos::drawCoordinateFrame(
   pub_marker_->publish(m);
 }
 
-void VisualizerRos::publishTransform(
-    const Transformation& pose,
-    const std::string& name)
+void VisualizerRos::drawRobot(
+    const std::string& name,
+    const Transformation& T_W_B)
 {
   tf::StampedTransform tf;
   tf.stamp_ = ros::Time::now();
   tf.frame_id_ = world_frame;
   tf.child_frame_id_ = name;
-  const Vector3& origin_eigen = pose.getPosition();
-  const Quaternion& rotation_minkindr = pose.getRotation();
+  const Vector3& origin_eigen = T_W_B.getPosition();
+  const Quaternion& rotation_minkindr = T_W_B.getRotation();
   tf::Vector3 origin(origin_eigen[0], origin_eigen[1], origin_eigen[2]);
   tf::Quaternion rotation(rotation_minkindr.x(),
                           rotation_minkindr.y(),

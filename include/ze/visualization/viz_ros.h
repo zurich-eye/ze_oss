@@ -49,9 +49,9 @@ public:
       const Transformation& pose, // T_W_B
       const FloatType size = 0.2) override;
 
-  void publishTransform(
-      const Transformation& pose,
-      const std::string& name);
+  virtual void drawRobot(
+      const std::string& name,
+      const Transformation& T_W_B) override;
 
   // ---------------------------------------------------------------------------
   // Draw multiple elements

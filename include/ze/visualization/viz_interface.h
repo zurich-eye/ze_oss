@@ -45,6 +45,10 @@ public:
       const Transformation& pose, // T_W_B
       const FloatType size = 0.02) = 0;
 
+  virtual void drawRobot(
+      const std::string& name,
+      const Transformation& T_W_B) = 0;
+
   // ---------------------------------------------------------------------------
   // Draw multiple elements
 
