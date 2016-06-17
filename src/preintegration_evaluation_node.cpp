@@ -179,12 +179,19 @@ public:
                              covariances_vectors);
 
   //! Generate a series of plots that show the results
-  void plotCovarianceOffsets(const std::vector<Matrix3> ref,
-                             const std::vector<Matrix3> est);
+  void plotCovarianceError(const std::vector<Matrix3> ref,
+                             const std::vector<Matrix3> est,
+                             const std::string& label);
 
   //! Plot the estimated / integrated vector of rotation matrices.
   void plotOrientation(const std::vector<FloatType>& times,
-                       const std::vector<Matrix3>& R_i);
+                       const std::vector<Matrix3>& R_i,
+                       const std::string& label,
+                       const bool plot_reference = false);
+
+  void plotOrientationError(const std::vector<FloatType>& times,
+                              const std::vector<Matrix3>& est,
+                              const std::string& label);
 
   //! Plot the measurements used to obtain a preintegration state.
   void plotImuMeasurements(const std::vector<FloatType>& times,
@@ -230,7 +237,7 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   loadTrajectory();
   FloatType start = trajectory_->t_min();
-  FloatType end = trajectory_->t_max();
+  FloatType end = trajectory_->t_max() - 5;
 
   VLOG(1) << "Initialize scenario";
   Scenario::Ptr scenario = std::make_shared<SplineScenario>(trajectory_);
@@ -299,26 +306,57 @@ void PreIntegrationEvaluationNode::runDriftEvaluation(
 {
   VLOG(1) << "Simulate single run for integration drift.";
 
-  // 1) Manifold
-  PreIntegrator::Ptr pi_manifold =
-      std::make_shared<ManifoldPreIntegrationState>(gyroscope_noise_covariance);
+  // 1) Manifold Fwd
+  PreIntegrator::Ptr pi_manifold_fwd =
+      std::make_shared<ManifoldPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::FirstOrderForward);
 
-  preintegration_runner->process(pi_manifold,
+  preintegration_runner->process(pi_manifold_fwd,
                                  true,
                                  start,
                                  end);
 
-  // 2) Quaternion
+  // 1) Manifold Mid
+  PreIntegrator::Ptr pi_manifold_mid =
+      std::make_shared<ManifoldPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::FirstOrderMidward);
+
+  preintegration_runner->process(pi_manifold_mid,
+                                 true,
+                                 start,
+                                 end);
+
+  // 2) Quaternion FWD
   PreIntegrator::Ptr pi_quat_fwd =
-      std::make_shared<QuaternionPreIntegrationState>(gyroscope_noise_covariance);
+      std::make_shared<QuaternionPreIntegrationState>(
+        gyroscope_noise_covariance,
+        QuaternionPreIntegrationState::FirstOrderForward);
   preintegration_runner->process(pi_quat_fwd,
                                  true,
                                  start,
                                  end);
 
-  plotOrientation(pi_manifold->times_raw(), pi_manifold->R_i_k());
-  plotOrientation(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k());
+  // 3) Quaternion Mid
+  PreIntegrator::Ptr pi_quat_mid =
+      std::make_shared<QuaternionPreIntegrationState>(
+        gyroscope_noise_covariance,
+        QuaternionPreIntegrationState::FirstOrderMidward);
+  preintegration_runner->process(pi_quat_mid,
+                                 true,
+                                 start,
+                                 end);
 
+  plotOrientation(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(), "ManifoldFwd", true);
+  plotOrientation(pi_manifold_mid->times_raw(), pi_manifold_mid->R_i_k(), "ManifoldMid");
+  plotOrientation(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k(), "QuatFwd");
+  plotOrientation(pi_quat_mid->times_raw(), pi_quat_mid->R_i_k(), "QuatMid");
+
+  plotOrientationError(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(), "ManifoldFwd");
+  plotOrientationError(pi_manifold_mid->times_raw(), pi_manifold_mid->R_i_k(), "ManifoldMid");
+  plotOrientationError(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k(), "QuatFwd");
+  plotOrientationError(pi_quat_mid->times_raw(), pi_quat_mid->R_i_k(), "QuatMid");
 }
 
 
@@ -333,6 +371,7 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
   VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Clean]";
   PreIntegratorFactory::Ptr preintegrator_factory_clean(
         std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
+                                                        PreIntegrator::FirstOrderForward,
                                                         D_R_i_k_reference));
   PreIntegratorMonteCarlo::Ptr mc(
         std::make_shared<PreIntegratorMonteCarlo>(
@@ -347,8 +386,9 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()});
 
-  plotCovarianceOffsets(mc->covariances(),
-                        est_integrator->covariance_i_k());
+  plotCovarianceError(mc->covariances(),
+                        est_integrator->covariance_i_k(),
+                        "Manifold Clean");
 
   return mc;
 }
@@ -362,7 +402,8 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
 {
   VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Corrupted]";
   PreIntegratorFactory::Ptr preintegrator_factory(
-        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance));
+        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
+                                                        PreIntegrator::FirstOrderForward));
   PreIntegratorMonteCarlo::Ptr mc(
         std::make_shared<PreIntegratorMonteCarlo>(preintegration_runner,
                                                   preintegrator_factory,
@@ -377,8 +418,9 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()});
 
-  plotCovarianceOffsets(mc->covariances(),
-                        est_integrator->covariance_i_k());
+  plotCovarianceError(mc->covariances(),
+                        est_integrator->covariance_i_k(),
+                        "ManifoldCorrupt");
 
   return mc;
 }
@@ -393,7 +435,7 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionForward(
   VLOG(1) << "Monte Carlo Simulation [Quaternion: Forward]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<QuaternionPreIntegrationFactory>(
-          gyroscope_noise_covariance));
+          gyroscope_noise_covariance, QuaternionPreIntegrationState::FirstOrderForward));
   PreIntegratorMonteCarlo::Ptr mc(
         std::make_shared<PreIntegratorMonteCarlo>(preintegration_runner,
                                                   preintegrator_factory,
@@ -408,8 +450,9 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionForward(
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()});
 
-  plotCovarianceOffsets(mc->covariances(),
-                        est_integrator->covariance_i_k());
+  plotCovarianceError(mc->covariances(),
+                        est_integrator->covariance_i_k(),
+                        "QuatFwd");
 
   return mc;
 }
@@ -509,9 +552,10 @@ void PreIntegrationEvaluationNode::plotCovarianceResults(
 }
 
 // -----------------------------------------------------------------------------
-void PreIntegrationEvaluationNode::plotCovarianceOffsets(
+void PreIntegrationEvaluationNode::plotCovarianceError(
     const std::vector<Matrix3> ref,
-    const std::vector<Matrix3> est)
+    const std::vector<Matrix3> est,
+    const std::string& label)
 {
   CHECK_EQ(ref.size(), est.size());
 
@@ -522,11 +566,12 @@ void PreIntegrationEvaluationNode::plotCovarianceOffsets(
     v.col(i) = (ref[i].diagonal() - est[i].diagonal()).cwiseAbs();
   }
   plt::subplot(3, 1, 1);
-  plt::plot(v.row(0));
+  plt::labelPlot(label, v.row(0));
+  plt::legend();
   plt::subplot(3, 1, 2);
-  plt::plot(v.row(1));
+  plt::labelPlot(label, v.row(1));
   plt::subplot(3, 1, 3);
-  plt::plot(v.row(2));
+  plt::labelPlot(label, v.row(2));
 
   plt::show(false);
 }
@@ -534,12 +579,16 @@ void PreIntegrationEvaluationNode::plotCovarianceOffsets(
 //-----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::plotOrientation(
     const std::vector<FloatType>& times,
-    const std::vector<Matrix3>& orientation)
+    const std::vector<Matrix3>& orientation,
+    const std::string& label,
+    const bool plot_reference)
 {
+  CHECK_EQ(times.size(), orientation.size());
+
   Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
   Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
 
-  for (size_t i = 0; i < orientation.size() - 1; ++i)
+  for (size_t i = 0; i < orientation.size(); ++i)
   {
     ze::sm::RotationVector rv(orientation[i]);
     points.col(i) = rv.getParameters();
@@ -548,16 +597,48 @@ void PreIntegrationEvaluationNode::plotOrientation(
   plt::figure("orientation");
   plt::subplot(3, 1, 1);
   plt::title("Orientation");
-  plt::plot(points.row(0), "r");
-  plt::plot(ref_points.row(0), "b");
+  plt::labelPlot(label, times, points.row(0), "r");
+  if(plot_reference)
+  {
+    plt::labelPlot("reference", times, ref_points.row(0), "b");
+  }
+  plt::legend();
 
   plt::subplot(3, 1, 2);
-  plt::plot(points.row(1), "r");
-  plt::plot(ref_points.row(1), "b");
-
+  plt::labelPlot(label, times, points.row(1), "r");
+  if(plot_reference)
+  {
+    plt::labelPlot("reference", times, ref_points.row(1), "b");
+  }
   plt::subplot(3, 1, 3);
-  plt::plot(points.row(2), "r");
-  plt::plot(ref_points.row(2), "b");
+  plt::labelPlot(label, times, points.row(2), "r");
+  if(plot_reference)
+  {
+    plt::labelPlot("reference", times, ref_points.row(2), "b");
+  }
+  plt::show(false);
+}
+
+//-----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::plotOrientationError(
+    const std::vector<FloatType>& times,
+    const std::vector<Matrix3>& est,
+    const std::string& label)
+{
+  CHECK_EQ(times.size(), est.size());
+
+  Eigen::Matrix<FloatType, 1, Eigen::Dynamic> err(1, est.size());
+
+  for (size_t i = 0; i < est.size(); ++i)
+  {
+    Quaternion q1(est[i]);
+    Quaternion q2(trajectory_->orientation(times[i]));
+    err(i) = q1.getDisparityAngle(q2);
+  }
+  plt::figure("orientation_offset");
+  plt::title("Orientation Offset");
+  plt::labelPlot(label, times, err.row(0));
+  plt::legend();
 
   plt::show(false);
 }
@@ -568,6 +649,8 @@ void PreIntegrationEvaluationNode::plotImuMeasurements(
     const ImuAccGyrContainer& measurements1,
     const ImuAccGyrContainer& measurements2)
 {
+  CHECK_EQ(static_cast<int>(times.size()), measurements1.size());
+  CHECK_EQ(static_cast<int>(times.size()), measurements2.size());
   plt::figure();
   plt::subplot(3, 1, 1);
   plt::title("Imu Measurements (Accel)");
