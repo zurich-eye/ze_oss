@@ -15,6 +15,7 @@ set(HEADERS
   include/ze/data_provider/data_provider_csv.hpp
   include/ze/data_provider/data_provider_rosbag.hpp
   include/ze/data_provider/data_provider_rostopic.hpp
+  include/ze/data_provider/camera_imu_synchronizer_base.hpp
   include/ze/data_provider/camera_imu_synchronizer.hpp
   include/ze/data_provider/camera_imu_synchronizer_unsync.hpp
   )
@@ -27,6 +28,7 @@ set(SOURCES
   src/data_provider_rostopic.cpp
   src/camera_imu_synchronizer.cpp
   src/camera_imu_synchronizer_unsync.cpp
+  src/camera_imu_synchronizer_base.cpp
   )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
