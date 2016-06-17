@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ze/common/types.h>
-#include <ze/common/sampler.hpp>
+#include <ze/common/random_matrix.hpp>
 #include <ze/splines/bspline.hpp>
 
 namespace ze {

@@ -34,7 +34,7 @@ void ContinuousBias::initialize()
   noise.head<3>() = acc_bias_noise_density_;
   noise.tail<3>() = gyr_bias_noise_density_;
   // merge acc and bias noise
-  GaussianSampler<6>::Ptr sampler = GaussianSampler<6>::sigmas(noise);
+  RandomVectorSampler<6>::Ptr sampler = RandomVectorSampler<6>::sigmas(noise);
 
   // sampling interval
   FloatType dt = (end_ - start_) / samples_;

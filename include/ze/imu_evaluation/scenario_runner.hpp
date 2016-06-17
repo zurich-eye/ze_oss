@@ -20,8 +20,8 @@ public:
 
   ScenarioRunner(const Scenario::Ptr scenario,
                  const ImuBias::Ptr bias,
-                 GaussianSampler<3>::Ptr accelerometer_noise,
-                 GaussianSampler<3>::Ptr gyro_noise,
+                 RandomVectorSampler<3>::Ptr accelerometer_noise,
+                 RandomVectorSampler<3>::Ptr gyro_noise,
                  FloatType accelerometer_noise_bandwidth_hz,
                  FloatType gyroscope_noise_bandwidth_hz,
                  const Vector3& gravity)
@@ -72,8 +72,8 @@ private:
   const Scenario::Ptr scenario_;
   const ImuBias::Ptr bias_;
 
-  mutable GaussianSampler<3>::Ptr accelerometer_noise_;
-  mutable GaussianSampler<3>::Ptr gyro_noise_;
+  mutable RandomVectorSampler<3>::Ptr accelerometer_noise_;
+  mutable RandomVectorSampler<3>::Ptr gyro_noise_;
 
   //! The noise bandwidth of accelerometer and gyroscope (sqrt(hz))
   const FloatType accelerometer_noise_bandwidth_hz_sqrt_;

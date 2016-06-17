@@ -3,7 +3,7 @@
 #include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/types.h>
 #include <ze/imu_evaluation/imu_bias.hpp>
-#include <ze/common/sampler.hpp>
+#include <ze/common/random_matrix.hpp>
 
 TEST(ScenarioTest, testSplineScenario)
 {
@@ -21,10 +21,10 @@ TEST(ScenarioTest, testSplineScenario)
 
   // dependencies:
   ImuBias::Ptr bias(std::make_shared<ConstantBias>());
-  GaussianSampler<3>::Ptr acc_noise =
-      GaussianSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
-  GaussianSampler<3>::Ptr gyr_noise =
-      GaussianSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
+  RandomVectorSampler<3>::Ptr acc_noise =
+      RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
+  RandomVectorSampler<3>::Ptr gyr_noise =
+      RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
   Vector3 gravity(0, 0, -9.81);
 
   // test runner
