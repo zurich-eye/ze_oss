@@ -34,7 +34,7 @@ public:
   }
 
   //! Set the initial orientation of an absolute pre-integration term.
-  void setInitialOrientation(Matrix3 initial_orientation)
+  virtual void setInitialOrientation(Matrix3 initial_orientation)
   {
     R_i_j_.clear();
     R_i_k_.clear();

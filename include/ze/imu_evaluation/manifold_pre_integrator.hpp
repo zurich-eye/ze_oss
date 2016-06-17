@@ -26,6 +26,7 @@ public:
   void pushD_R_i_j(times_container_t stamps,
                    measurements_container_t measurements)
   {
+    CHECK_EQ(static_cast<int>(stamps.size()), measurements.cols());
     // Append the new measurements to the container,
     measurements_.resize(6, measurements_.cols() + measurements.cols() - 1);
     measurements_.rightCols(measurements.cols() - 1) = measurements.leftCols(

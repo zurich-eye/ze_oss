@@ -22,13 +22,19 @@ public:
   {
     D_R_i_j_quat_.push_back(Quaternion());
     R_i_j_quat_.push_back(Quaternion());
-    D_R_i_k_quat_.push_back(Quaternion());
-    R_i_k_quat_.push_back(Quaternion());
+  }
+
+  void setInitialOrientation(Matrix3 initial_orientation) override
+  {
+    PreIntegrator::setInitialOrientation(initial_orientation);
+    R_i_j_quat_.push_back(Quaternion(initial_orientation));
+    R_i_k_quat_.push_back(Quaternion(initial_orientation));
   }
 
   void pushD_R_i_j(times_container_t stamps,
                    measurements_container_t measurements)
   {
+    CHECK_EQ(static_cast<int>(stamps.size()), measurements.cols());
     // Append the new measurements to the container,
     measurements_.resize(6, measurements_.cols() + measurements.cols() - 1);
     measurements_.rightCols(measurements.cols() - 1) = measurements.leftCols(
@@ -47,7 +53,6 @@ public:
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
-        covariance_i_k_.push_back(Matrix3::Zero());
       }
       else
       {
