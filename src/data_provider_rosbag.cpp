@@ -180,8 +180,8 @@ bool DataProviderRosbag::spinOnce()
     }
 
     // Accelerometer Messages:
-    const ze_eval_node::bmx055_accConstPtr m_acc =
-        m.instantiate<ze_eval_node::bmx055_acc>();
+    const ze_ros_msg::bmx055_accConstPtr m_acc =
+        m.instantiate<ze_ros_msg::bmx055_acc>();
     if (m_acc && accel_callback_)
     {
       if (!accelSpin(m_acc, m))
@@ -196,8 +196,8 @@ bool DataProviderRosbag::spinOnce()
     }
 
     // Gyroscope Messages:
-    const ze_eval_node::bmx055_gyrConstPtr m_gyr =
-        m.instantiate<ze_eval_node::bmx055_gyr>();
+    const ze_ros_msg::bmx055_gyrConstPtr m_gyr =
+        m.instantiate<ze_ros_msg::bmx055_gyr>();
     if (m_gyr && gyro_callback_)
     {
       if(!gyroSpin(m_gyr, m))
@@ -270,7 +270,7 @@ bool DataProviderRosbag::imuSpin(sensor_msgs::ImuConstPtr m_imu,
   return true;
 }
 
-bool DataProviderRosbag::accelSpin(ze_eval_node::bmx055_accConstPtr m_acc,
+bool DataProviderRosbag::accelSpin(ze_ros_msg::bmx055_accConstPtr m_acc,
                                    const rosbag::MessageInstance& m)
 {
   auto it = accel_topic_imuidx_map_.find(m.getTopic());
@@ -293,7 +293,7 @@ bool DataProviderRosbag::accelSpin(ze_eval_node::bmx055_accConstPtr m_acc,
   return true;
 }
 
-bool DataProviderRosbag::gyroSpin(ze_eval_node::bmx055_gyrConstPtr m_gyr,
+bool DataProviderRosbag::gyroSpin(ze_ros_msg::bmx055_gyrConstPtr m_gyr,
                                   const rosbag::MessageInstance& m)
 {
   auto it = gyro_topic_imuidx_map_.find(m.getTopic());

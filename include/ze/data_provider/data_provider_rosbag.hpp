@@ -10,8 +10,8 @@
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
-#include <ze_eval_node/bmx055_acc.h>
-#include <ze_eval_node/bmx055_gyr.h>
+#include <ze_ros_msg/bmx055_acc.h>
+#include <ze_ros_msg/bmx055_gyr.h>
 
 #include <ze/data_provider/data_provider_base.hpp>
 
@@ -53,9 +53,9 @@ private:
                          const rosbag::MessageInstance& m);
   inline bool imuSpin(const sensor_msgs::ImuConstPtr m_imu,
                       const rosbag::MessageInstance& m);
-  inline bool accelSpin(const ze_eval_node::bmx055_accConstPtr m_acc,
+  inline bool accelSpin(const ze_ros_msg::bmx055_accConstPtr m_acc,
                         const rosbag::MessageInstance& m);
-  inline bool gyroSpin(const ze_eval_node::bmx055_gyrConstPtr m_gyr,
+  inline bool gyroSpin(const ze_ros_msg::bmx055_gyrConstPtr m_gyr,
                        const rosbag::MessageInstance& m);
 
   std::unique_ptr<rosbag::Bag> bag_;
