@@ -65,7 +65,7 @@ public:
                             std::ceil(camera_sampling_time_ / imu_sampling_time_)) + 1;
     }
 
-    ImuAccGyr imu_measurements(6, samples_per_batch);
+    ImuAccGyrContainer imu_measurements(6, samples_per_batch);
 
     int i = 0;
     for (FloatType t = start; t <= end; t += imu_sampling_time_)

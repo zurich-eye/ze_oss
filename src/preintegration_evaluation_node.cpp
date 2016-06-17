@@ -188,8 +188,8 @@ public:
 
   //! Plot the measurements used to obtain a preintegration state.
   void plotImuMeasurements(const std::vector<FloatType>& times,
-                           const ImuAccGyr& measurements,
-                           const ImuAccGyr& measurements2);
+                           const ImuAccGyrContainer& measurements,
+                           const ImuAccGyrContainer& measurements2);
 
   void shutdown();
 
@@ -223,8 +223,10 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   VLOG(1) << "Initialize noise models with \n"
           << " Accelerometer noise density: " << parameters_.accel_noise_density
           << " Gyroscope noise density: " << parameters_.gyro_noise_density;
-  GaussianSampler<3>::Ptr accel_noise = GaussianSampler<3>::variances(accel_covar);
-  GaussianSampler<3>::Ptr gyro_noise = GaussianSampler<3>::variances(gyro_covar);
+  RandomVectorSampler<3>::Ptr accel_noise =
+      RandomVectorSampler<3>::variances(accel_covar);
+  RandomVectorSampler<3>::Ptr gyro_noise =
+      RandomVectorSampler<3>::variances(gyro_covar);
 
   loadTrajectory();
   FloatType start = trajectory_->t_min();
@@ -563,8 +565,8 @@ void PreIntegrationEvaluationNode::plotOrientation(
 //-----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::plotImuMeasurements(
     const std::vector<FloatType>& times,
-    const ImuAccGyr& measurements1,
-    const ImuAccGyr& measurements2)
+    const ImuAccGyrContainer& measurements1,
+    const ImuAccGyrContainer& measurements2)
 {
   plt::figure();
   plt::subplot(3, 1, 1);

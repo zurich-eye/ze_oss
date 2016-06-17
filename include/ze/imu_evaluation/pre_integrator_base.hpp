@@ -17,7 +17,7 @@ public:
    ZE_POINTER_TYPEDEFS(PreIntegrator);
 
   typedef std::vector<FloatType> times_container_t;
-  typedef ImuAccGyr measurements_container_t;
+  typedef ImuAccGyrContainer measurements_container_t;
   typedef std::vector<Matrix3> preintegrated_orientation_container_t;
   typedef std::vector<Matrix3> covariance_container_t;
 

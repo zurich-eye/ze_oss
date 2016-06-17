@@ -5,7 +5,6 @@
 
 #include <ze/imu_evaluation/scenario.hpp>
 #include <ze/imu_evaluation/imu_bias.hpp>
-#include <ze/common/sampler.hpp>
 
 namespace ze {
 
