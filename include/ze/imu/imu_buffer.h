@@ -5,6 +5,9 @@
 
 namespace ze {
 
+//! An IMU Buffer with an underlying Gyro and Accel model that also corrects
+//! measurement timestamps. The timestamps are corrected when inserted into the
+//! buffers.
 template<int BufferSize, class Interpolator>
 class ImuBuffer
 {
@@ -19,7 +22,7 @@ public:
   void insertAccelerometerMeasurement(time_t stamp, const Vector3);
 
   //! Insert an IMU measurement at a given timestamp: First three values refer
-  //! to the accelerometer, last 3 the gyroscope
+  //! to the accelerometer, last 3 the gyroscope.
   void insertImuMeasurement(int64_t time, const ImuAccGyr value);
 
   //! Get the rectified values of the IMU at a given timestamp. Interpolates
@@ -37,6 +40,16 @@ public:
   //! and Gyroscopes have measurements.
   std::tuple<int64_t, int64_t, bool> getOldestAndNewestStamp() const;
 
+  //! Get the delay corrected timestamps (Delays are negative if in the past).
+  inline int64_t correctStampGyro(int64_t t)
+  {
+    return t + gyro_delay_;
+  }
+  inline int64_t correctStampAccel(int64_t t)
+  {
+     return t + accel_delay_;
+  }
+
 protected:
   bool getAccelerometerDistorted(int64_t time, Eigen::Ref<Vector3> out);
   bool getGyroscopeDistorted(int64_t time, Eigen::Ref<Vector3> out);
@@ -48,6 +61,10 @@ private:
   Ringbuffer<FloatType, 3, BufferSize> gyr_buffer_;
 
   ImuModel::Ptr imu_model_;
+
+  //! Store the accelerometer and gyroscope delays in nanoseconds
+  int64_t gyro_delay_;
+  int64_t accel_delay_;
 };
 
 // A set of explicit declarations

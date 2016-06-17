@@ -5,6 +5,8 @@ namespace ze {
 template<int BufferSize, typename Interpolator>
 ImuBuffer<BufferSize, Interpolator>::ImuBuffer(ImuModel::Ptr imu_model)
   : imu_model_(imu_model)
+  , gyro_delay_(secToNanosec(imu_model->gyroscopeModel()->intrinsicModel()->delay()))
+  , accel_delay_(secToNanosec(imu_model->accelerometerModel()->intrinsicModel()->delay()))
 {
 }
 
@@ -12,8 +14,8 @@ template<int BufferSize, typename Interpolator>
 void ImuBuffer<BufferSize, Interpolator>::insertImuMeasurement(
     int64_t time, const ImuAccGyr value)
 {
-  acc_buffer_.insert(time, value.head<3>(3));
-  gyr_buffer_.insert(time, value.tail<3>(3));
+  acc_buffer_.insert(correctStampAccel(time), value.head<3>(3));
+  gyr_buffer_.insert(correctStampGyro(time), value.tail<3>(3));
 }
 
 
@@ -21,14 +23,14 @@ template<int BufferSize, typename Interpolator>
 void ImuBuffer<BufferSize, Interpolator>::insertGyroscopeMeasurement(
     int64_t time, const Vector3 value)
 {
-  gyr_buffer_.insert(time, value);
+  gyr_buffer_.insert(correctStampGyro(time), value);
 }
 
 template<int BufferSize, typename Interpolator>
 void ImuBuffer<BufferSize, Interpolator>::insertAccelerometerMeasurement(
     int64_t time, const Vector3 value)
 {
-  acc_buffer_.insert(time, value);
+  acc_buffer_.insert(correctStampAccel(time), value);
 }
 
 template<int BufferSize, typename Interpolator>
