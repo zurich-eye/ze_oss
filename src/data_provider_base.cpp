@@ -15,6 +15,11 @@ void DataProviderBase::spin()
   }
 }
 
+void DataProviderBase::pause()
+{
+  running_ = false;
+}
+
 void DataProviderBase::shutdown()
 {
   running_ = false;

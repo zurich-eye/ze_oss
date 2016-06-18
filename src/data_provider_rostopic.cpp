@@ -60,7 +60,7 @@ bool DataProviderRostopic::ok() const
 {
   if (!running_)
   {
-    VLOG(1) << "Data Provider was terminated.";
+    VLOG(1) << "Data Provider was paused/terminated.";
     return false;
   }
   if (!ros::ok())

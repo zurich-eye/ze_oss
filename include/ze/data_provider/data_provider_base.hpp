@@ -65,6 +65,9 @@ public:
   //! False if there is no more data to process or there was a shutdown signal.
   virtual bool ok() const = 0;
 
+  //! Pause data provider.
+  virtual void pause();
+
   //! Stop data provider.
   virtual void shutdown();
 
