@@ -49,6 +49,9 @@ bool hist(
 
 //! Every row of X is the data for a box.
 bool boxplot(
+    const Eigen::Ref<const MatrixX>& x,
+    const std::vector<std::string>& labels);
+bool boxplot(
     const Eigen::Ref<const MatrixX>& x);
 
 //! Create a subplot.

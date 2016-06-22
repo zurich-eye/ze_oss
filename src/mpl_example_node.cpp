@@ -55,6 +55,13 @@ int main()
   MatrixX data(2, 100);
   data.setRandom();
   plt::figure();
+  std::vector<std::string> labels = {"A", "B"};
+  plt::boxplot(data, labels);
+  plt::show();
+
+  // Boxplot unlabelled
+  data.setRandom();
+  plt::figure();
   plt::boxplot(data);
   plt::show();
 

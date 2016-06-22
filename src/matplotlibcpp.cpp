@@ -230,14 +230,18 @@ bool hist(
 
 // -----------------------------------------------------------------------------
 bool boxplot(
-    const Eigen::Ref<const MatrixX>& x)
+    const Eigen::Ref<const MatrixX>& x,
+    const std::vector<std::string>& labels)
 {
   // using python lists
   PyObject* data = PyList_New(x.rows());
+  PyObject* py_labels = PyList_New(x.rows());
 
   for (int i = 0; i < x.rows(); ++i)
   {
     PyObject* row = PyList_New(x.cols());
+
+    PyList_SetItem(py_labels, i, PyString_FromString(labels[i].c_str()));
 
     for (int j = 0; j < x.cols(); ++j)
     {
@@ -250,9 +254,16 @@ bool boxplot(
   PyObject* args = PyTuple_New(1);
   PyTuple_SetItem(args, 0, data);
 
-  PyObject* res = PyObject_CallObject(
+  // construct keyword args
+  PyObject* kwargs = PyDict_New();
+  PyDict_SetItemString(kwargs,
+                       "labels",
+                       py_labels);
+
+  PyObject* res = PyObject_Call(
                     detail::_interpreter::get().s_python_function_boxplot,
-                    args);
+                    args,
+                    kwargs);
 
   Py_DECREF(data);
   if (res)
@@ -262,6 +273,19 @@ bool boxplot(
 
   return res;
 }
+
+// -----------------------------------------------------------------------------
+bool boxplot(
+    const Eigen::Ref<const MatrixX>& x)
+{
+  std::vector<std::string> labels;
+  for (int i = 0; i < x.rows(); ++i)
+  {
+    labels.push_back(std::to_string(i));
+  }
+  return boxplot(x, labels);
+}
+
 
 // -----------------------------------------------------------------------------
 bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number)
