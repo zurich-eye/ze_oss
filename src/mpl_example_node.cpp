@@ -51,4 +51,11 @@ int main()
   plt::plot(matrix.row(0), matrix.row(1));
   plt::show();
 
+  // BoxPlot
+  MatrixX data(2, 100);
+  data.setRandom();
+  plt::figure();
+  plt::boxplot(data);
+  plt::show();
+
 }

@@ -18,6 +18,7 @@ struct _interpreter
   PyObject *s_python_function_plot;
   PyObject *s_python_function_subplot;
   PyObject *s_python_function_hist;
+  PyObject *s_python_function_boxplot;
   PyObject *s_python_function_legend;
   PyObject *s_python_function_xlim;
   PyObject *s_python_function_ylim;
@@ -74,6 +75,7 @@ private:
     s_python_function_plot = PyObject_GetAttrString(pymod, "plot");
     s_python_function_subplot = PyObject_GetAttrString(pymod, "subplot");
     s_python_function_hist = PyObject_GetAttrString(pymod, "hist");
+    s_python_function_boxplot = PyObject_GetAttrString(pymod, "boxplot");
     s_python_function_legend = PyObject_GetAttrString(pymod, "legend");
     s_python_function_ylim = PyObject_GetAttrString(pymod, "ylim");
     s_python_function_title = PyObject_GetAttrString(pymod, "title");
@@ -92,6 +94,7 @@ private:
        || !s_python_function_plot
        || !s_python_function_subplot
        || !s_python_function_hist
+       || !s_python_function_boxplot
        || !s_python_function_legend
        || !s_python_function_xlim
        || !s_python_function_ylim
@@ -112,6 +115,7 @@ private:
        || !PyFunction_Check(s_python_function_plot)
        || !PyFunction_Check(s_python_function_subplot)
        || !PyFunction_Check(s_python_function_hist)
+       || !PyFunction_Check(s_python_function_boxplot)
        || !PyFunction_Check(s_python_function_legend)
        || !PyFunction_Check(s_python_function_xlim)
        || !PyFunction_Check(s_python_function_ylim)
@@ -216,6 +220,41 @@ bool hist(
   Py_DECREF(xlist);
   Py_DECREF(bins_py);
   Py_DECREF(histtype_py);
+  if (res)
+  {
+    Py_DECREF(res);
+  }
+
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+bool boxplot(
+    const Eigen::Ref<const MatrixX>& x)
+{
+  // using python lists
+  PyObject* data = PyList_New(x.rows());
+
+  for (int i = 0; i < x.rows(); ++i)
+  {
+    PyObject* row = PyList_New(x.cols());
+
+    for (int j = 0; j < x.cols(); ++j)
+    {
+      PyList_SetItem(row, j, PyFloat_FromDouble(x(i, j)));
+    }
+    PyList_SetItem(data, i, row);
+  }
+
+  // construct positional args
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SetItem(args, 0, data);
+
+  PyObject* res = PyObject_CallObject(
+                    detail::_interpreter::get().s_python_function_boxplot,
+                    args);
+
+  Py_DECREF(data);
   if (res)
   {
     Py_DECREF(res);
@@ -381,6 +420,14 @@ bool labelPlot(
 
   for (int i = 0; i < x.size(); ++i)
   {
+    PyObject* f_xi = PyFloat_FromDouble(x(i));
+    PyObject* f_yi = PyFloat_FromDouble(y(i));
+    if (!f_xi || !f_yi)
+    {
+      VLOG(1) << "MPL: value could not be converted to PyFloat:"
+              << x(i) << ", " << y(i);
+      continue;
+    }
     PyList_SetItem(xlist, i, PyFloat_FromDouble(x(i)));
     PyList_SetItem(ylist, i, PyFloat_FromDouble(y(i)));
   }

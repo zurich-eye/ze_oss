@@ -47,6 +47,10 @@ bool hist(
     const double bins = 10,
     const std::string histtype = "bar");
 
+//! Every row of X is the data for a box.
+bool boxplot(
+    const Eigen::Ref<const MatrixX>& x);
+
 //! Create a subplot.
 bool subplot(const size_t nrows, const size_t ncols, const size_t plot_number);
 
