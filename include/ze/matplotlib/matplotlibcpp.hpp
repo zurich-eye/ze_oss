@@ -55,7 +55,7 @@ bool boxplot(
     const std::vector<std::string>& labels);
 bool boxplot(
     const Eigen::Ref<const MatrixX>& x,
-    const std::initializer_list<std::string> labels);
+    std::initializer_list<const std::string> labels);
 bool boxplot(
     const Eigen::Ref<const MatrixX>& x);
 

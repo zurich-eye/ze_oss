@@ -59,6 +59,13 @@ int main()
   plt::boxplot(data, labels);
   plt::show();
 
+
+  // BoxPlot
+  data.setRandom();
+  plt::figure();
+  plt::boxplot(data, {"A", "B"});
+  plt::show();
+
   // Boxplot unlabelled
   data.setRandom();
   plt::figure();
