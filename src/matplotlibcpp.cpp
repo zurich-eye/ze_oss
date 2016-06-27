@@ -276,6 +276,17 @@ bool boxplot(
 
 // -----------------------------------------------------------------------------
 bool boxplot(
+    const Eigen::Ref<const MatrixX>& x,
+    const std::initializer_list<std::string> labels)
+{
+  std::vector<std::string> labels_vector;
+  labels_vector.insert(labels_vector.end(), labels.begin(), labels.end());
+
+  return boxplot(x, labels);
+}
+
+// -----------------------------------------------------------------------------
+bool boxplot(
     const Eigen::Ref<const MatrixX>& x)
 {
   std::vector<std::string> labels;

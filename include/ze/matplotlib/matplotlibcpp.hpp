@@ -31,6 +31,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <ze/common/types.h>
+#include <initializer_list>
+
 
 namespace ze {
 namespace plt {
@@ -51,6 +53,9 @@ bool hist(
 bool boxplot(
     const Eigen::Ref<const MatrixX>& x,
     const std::vector<std::string>& labels);
+bool boxplot(
+    const Eigen::Ref<const MatrixX>& x,
+    const std::initializer_list<std::string> labels);
 bool boxplot(
     const Eigen::Ref<const MatrixX>& x);
 
