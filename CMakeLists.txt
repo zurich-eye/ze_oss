@@ -14,6 +14,9 @@ include(ze_options)
 message(STATUS "ZE_USE_BRISK: ${ZE_USE_BRISK}")
 message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
 message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
+message(STATUS "ZE_USE_ARRAYFIRE: ${ZE_USE_ARRAYFIRE}")
+message(STATUS "ZE_DETERMINISTIC: ${ZE_DETERMINISTIC}")
+
 configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
 
@@ -37,13 +40,13 @@ set(HEADERS
   include/ze/common/noncopyable.hpp
   include/ze/common/numerical_derivative.h
   include/ze/common/path_utils.h
+  include/ze/common/random.hpp
+  include/ze/common/random_matrix.hpp
   include/ze/common/ringbuffer.h
   include/ze/common/ringbuffer-inl.h
   include/ze/common/ring_view.h
   include/ze/common/running_statistics.h
   include/ze/common/running_statistics_collection.h
-  include/ze/common/sample.h
-  include/ze/common/sampler.hpp
   include/ze/common/signal_handler.hpp
   include/ze/common/statistics.h
   include/ze/common/stl_utils.h
@@ -67,7 +70,7 @@ set(SOURCES
   src/csv_trajectory.cpp
   src/line.cpp
   src/matrix.cpp
-  src/sample.cpp
+  src/random.cpp
   src/signal_handler.cpp
   src/test_utils.cpp
   src/thread_pool.cpp
@@ -93,6 +96,12 @@ target_link_libraries(test_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_numerical_derivative test/test_numerical_derivative.cpp)
 target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
+
+catkin_add_gtest(test_random test/test_random.cpp)
+target_link_libraries(test_random ${PROJECT_NAME})
+
+catkin_add_gtest(test_random_matrix test/test_random_matrix.cpp)
+target_link_libraries(test_random_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_running_statistics test/test_running_statistics.cpp)
 target_link_libraries(test_running_statistics ${PROJECT_NAME})
@@ -126,9 +135,6 @@ target_link_libraries(test_ringbuffer ${PROJECT_NAME})
 
 catkin_add_gtest(test_line test/test_line.cpp)
 target_link_libraries(test_line ${PROJECT_NAME})
-
-catkin_add_gtest(test_sampler test/test_sampler.cpp)
-target_link_libraries(test_sampler ${PROJECT_NAME})
 
 ##########
 # EXPORT #

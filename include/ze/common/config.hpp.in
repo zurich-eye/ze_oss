@@ -3,3 +3,5 @@
 #cmakedefine ZE_SINGLE_PRECISION_FLOAT
 #cmakedefine ZE_USE_BRISK
 #cmakedefine ZE_USE_GTSAM
+#cmakedefine ZE_USE_ARRAYFIRE
+#cmakedefine ZE_DETERMINISTIC
