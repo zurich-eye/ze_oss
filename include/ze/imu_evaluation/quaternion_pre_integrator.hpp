@@ -40,10 +40,30 @@ private:
                                     Vector3 w_i_1,
                                     FloatType dt);
 
+  //! Runge-Kutta Integration
+  Quaternion integrateRK(Quaternion q,
+                         Vector3 w_i,
+                         Vector3 w_i_1,
+                         FloatType dt,
+                         uint32_t order);
+
+  //! Runge-Kutta Integration
+  Quaternion integrateCrouchGrossman(Quaternion q,
+                         Vector3 w_i,
+                         Vector3 w_i_1,
+                         FloatType dt,
+                         uint32_t order);
+
   void doPushFirstOrderFwd(times_container_t stamps,
                            measurements_container_t measurements);
   void doPushFirstOrderMid(times_container_t stamps,
                            measurements_container_t measurements);
+  void doPushRK(times_container_t stamps,
+                 measurements_container_t measurements,
+                uint32_t order = 3);
+  void doPushCrouchGrossman(times_container_t stamps,
+                            measurements_container_t measurements,
+                            uint32_t order = 3);
 
 };
 

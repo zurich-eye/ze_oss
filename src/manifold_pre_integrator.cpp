@@ -176,7 +176,7 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
   R_i_k_.push_back(R_i_k_.back() * increment);
 
   // Propagate Covariance:
-  Matrix3 J_r = expmapDerivativeSO3(gyro_measurement * dt);
+  Matrix3 J_r = expmapDerivativeSO3((gyro_measurement + gyro_measurement2) * 0.5 * dt);
 
   // Covariance of the discrete process.
   Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;

@@ -19,7 +19,11 @@ public:
    enum IntegratorType
    {
      FirstOrderForward,
-     FirstOrderMidward
+     FirstOrderMidward,
+     RungeKutta3,
+     RungeKutta4,
+     CrouchGrossman3,
+     CrouchGrossman4
    };
 
   typedef std::vector<FloatType> times_container_t;
