@@ -354,18 +354,17 @@ void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
   VLOG(1) << "CG3: " << mean(6) << "\n";
   VLOG(1) << "CG4: " << mean(7) << "\n";
 
-  std::vector<std::string> labels = {
-    "Manifold Fwd",
-    "Manifold Mid",
-    "Quaternion Fwd",
-    "Quaternion Mid",
-    "RK3",
-    "RK4",
-    "CG3",
-    "CG4"
-  };
   plt::figure("drift_eval_boxplot");
-  plt::boxplot(results, labels);
+  plt::boxplot(results, {
+                 "Manifold Fwd",
+                 "Manifold Mid",
+                 "Quaternion Fwd",
+                 "Quaternion Mid",
+                 "RK3",
+                 "RK4",
+                 "CG3",
+                 "CG4"
+               });
   plt::title("Rotational Drift Cumulative Error");
   plt::show();
 }
