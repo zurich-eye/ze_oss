@@ -5,3 +5,4 @@
 #cmakedefine ZE_USE_GTSAM
 #cmakedefine ZE_USE_ARRAYFIRE
 #cmakedefine ZE_DETERMINISTIC
+#cmakedefine ZE_VIO_LIMITED

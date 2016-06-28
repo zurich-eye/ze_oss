@@ -16,6 +16,7 @@ message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
 message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
 message(STATUS "ZE_USE_ARRAYFIRE: ${ZE_USE_ARRAYFIRE}")
 message(STATUS "ZE_DETERMINISTIC: ${ZE_DETERMINISTIC}")
+message(STATUS "ZE_VIO_LIMITED: ${ZE_VIO_LIMITED}")
 
 configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
