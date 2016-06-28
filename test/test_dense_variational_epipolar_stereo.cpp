@@ -53,7 +53,7 @@ TEST_P(DenseEpipolarStereoTests, EpipolarStereoAlgorithms)
   ze::Transformation T_ref_cur = T_W_C_vec[1].inverse() * T_W_C_vec[3];
 
   VLOG(10) << "load camera";
-  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(data_path + "/calib.yaml");
+  ze::Camera::Ptr cam = ze::cameraFromYaml(data_path + "/calib.yaml");
 
   const ze::VectorX projection_parameteres = cam->projectionParameters();
   ze::cu::PinholeCamera cu_cam(projection_parameteres(0), projection_parameteres(1),
