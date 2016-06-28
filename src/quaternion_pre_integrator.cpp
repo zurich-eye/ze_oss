@@ -91,7 +91,7 @@ Quaternion QuaternionPreIntegrationState::integrateFirstOrderMid(
 }
 
 //------------------------------------------------------------------------------
-Quaternion QuaternionPreIntegrationState::integrateRK(
+std::pair<Quaternion, Matrix3> QuaternionPreIntegrationState::integrateRK(
     Quaternion q,
     Vector3 w_i,
     Vector3 w_i_1,
@@ -113,6 +113,15 @@ Quaternion QuaternionPreIntegrationState::integrateRK(
     return 0.5 * omega(w) * q;
   };
 
+  // get phi_i+1 given phi_i and w_i
+  auto covarTransitionDerivative = [](Vector3 w, Matrix3 phi) -> Matrix3
+  {
+    // A is the continuous-time state update: x_dot = A(t) * x(t)
+    Matrix3 A = -skewSymmetric(w);
+
+    return A * phi;
+  };
+
   if (order == 3)
   {
     Vector3 w_k1 = w_i;
@@ -120,14 +129,35 @@ Quaternion QuaternionPreIntegrationState::integrateRK(
     Vector3 w_k3 = w_k2;
 
     Vector4 q_v = q.vector();
-    Vector4 q_1_dot = stateDerivative(w_k1, q_v);
-    Vector4 q_2_dot = stateDerivative(w_k2, q_v + 0.5 * dt * q_1_dot);
-    Vector4 q_3_dot = stateDerivative(w_k3, q_v + dt * (-1 * q_1_dot + 2 * q_2_dot));
 
-    Vector4 q_i_1_v = q_v + dt * (q_1_dot + 4 * q_2_dot + q_3_dot) * 1.0/6.0;
+    Vector4 q_1_dot = stateDerivative(w_k1, q_v);
+    Vector4 q_v_1 = q_v + 0.5 * dt * q_1_dot;
+
+    Vector4 q_2_dot = stateDerivative(w_k2, q_v_1);
+    Vector4 q_v_2 = q_v + dt * (-1 * q_1_dot + 2 * q_2_dot);
+
+    Vector4 q_3_dot = stateDerivative(w_k3, q_v_2);
+
+    Vector4 q_i_1_v = q_v + dt * (q_1_dot + 4 * q_2_dot + q_3_dot) * 1.0 / 6.0;
     q_i_1_v.normalize();
 
-    return Quaternion(q_i_1_v[0], q_i_1_v[1], q_i_1_v[2], q_i_1_v[3]);
+    ///////////////
+    //! Covariance
+    Matrix3 phi = Matrix3::Identity();
+    // Use a runge-kutta approximation of the state-transition matrix phi
+    Matrix3 phi_1_dot = covarTransitionDerivative(w_k1, phi);
+    Matrix3 phi_1 = phi + 0.5 * dt * phi_1_dot;
+
+    Matrix3 phi_2_dot = covarTransitionDerivative(w_k2, phi_1);
+    Matrix3 phi_2 = phi + dt * (-1 * phi_1_dot + 2 * phi_2_dot);
+
+    Matrix3 phi_3_dot = covarTransitionDerivative(w_k3, phi_2);
+    Matrix3 phi_i_1 = Matrix3::Identity()
+                      + dt * (phi_1_dot + 4 * phi_2_dot + phi_3_dot) * 1.0 / 6.0;
+
+    return std::make_pair<Quaternion, Matrix3>(
+          Quaternion(q_i_1_v[0], q_i_1_v[1], q_i_1_v[2], q_i_1_v[3]),
+          Matrix3(phi_i_1));
   }
   else if (order == 4)
   {
@@ -137,20 +167,47 @@ Quaternion QuaternionPreIntegrationState::integrateRK(
     Vector3 w_k4 = w_i_1;
 
     Vector4 q_v = q.vector();
+
     Vector4 q_1_dot = stateDerivative(w_k1, q_v);
-    Vector4 q_2_dot = stateDerivative(w_k2, q_v + 0.5 * dt * q_1_dot);
-    Vector4 q_3_dot = stateDerivative(w_k3, q_v + 0.5 * dt * q_2_dot);
-    Vector4 q_4_dot = stateDerivative(w_k4, q_v + dt * q_3_dot);
+    Vector4 q_v_1 = q_v + 0.5 * dt * q_1_dot;
+
+    Vector4 q_2_dot = stateDerivative(w_k2, q_v_1);
+    Vector4 q_v_2 = q_v + 0.5 * dt * q_2_dot;
+
+    Vector4 q_3_dot = stateDerivative(w_k3, q_v_2);
+    Vector4 q_v_3 = q_v + dt * q_3_dot;
+
+    Vector4 q_4_dot = stateDerivative(w_k4, q_v_3);
 
     Vector4 q_i_1_v = q_v + dt * (q_1_dot + 2 * q_2_dot + 2 * q_3_dot + q_4_dot) * 1.0/6.0;
     q_i_1_v.normalize();
 
-    return Quaternion(q_i_1_v[0], q_i_1_v[1], q_i_1_v[2], q_i_1_v[3]);
+    ///////////////
+    //! Covariance
+    Matrix3 phi = Matrix3::Identity();
+    // Use a runge-kutta approximation of the state-transition matrix phi
+    Matrix3 phi_1_dot = covarTransitionDerivative(w_k1, phi);
+    Matrix3 phi_1 = phi + 0.5 * dt * phi_1_dot;
+
+    Matrix3 phi_2_dot = covarTransitionDerivative(w_k2, phi_1);
+    Matrix3 phi_2 = phi + 0.5 * dt * phi_2_dot;
+
+    Matrix3 phi_3_dot = covarTransitionDerivative(w_k3, phi_2);
+    Matrix3 phi_3 = phi + dt * phi_3_dot;
+
+    Matrix3 phi_4_dot = covarTransitionDerivative(w_k4, phi_3);
+    Matrix3 phi_i_1 = Matrix3::Identity()
+                      + dt * 1.0 / 6.0 *
+                      (phi_1_dot + 2 * phi_2_dot + 2 * phi_3_dot + phi_4_dot);
+
+    return std::make_pair<Quaternion, Matrix3>(
+          Quaternion(q_i_1_v[0], q_i_1_v[1], q_i_1_v[2], q_i_1_v[3]),
+          Matrix3(phi_i_1));
   }
 
   throw std::runtime_error("Unsupported Runge-Kutta Integration Order");
 
-  return Quaternion();
+  return std::make_pair<Quaternion, Matrix3>(Quaternion(), Matrix3::Identity());
 }
 
 //------------------------------------------------------------------------------
@@ -321,12 +378,15 @@ void QuaternionPreIntegrationState::doPushRK(
     if (i == 0)
     {
       D_R_i_k_quat_.push_back(Quaternion());
-      R_i_k_quat_.push_back(integrateRK(
-                              R_i_k_quat_.back(),
-                              measurements.col(i).tail<3>(3),
-                              measurements.col(i+1).tail<3>(3),
-                              dt,
-                              order));
+
+      Quaternion q_i_1;
+      std::tie(q_i_1, std::ignore) = integrateRK(
+                                       R_i_k_quat_.back(),
+                                       measurements.col(i).tail<3>(3),
+                                       measurements.col(i+1).tail<3>(3),
+                                       dt,
+                                       order);
+      R_i_k_quat_.push_back(q_i_1);
       D_R_i_k_.push_back(Matrix3::Identity());
       R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       covariance_i_k_.push_back(Matrix3::Zero());
@@ -334,33 +394,37 @@ void QuaternionPreIntegrationState::doPushRK(
     else
     {
       // Integrate
-      D_R_i_k_quat_.push_back(integrateRK(
-                                D_R_i_k_quat_.back(),
-                                measurements.col(i).tail<3>(3),
-                                measurements.col(i + 1).tail<3>(3),
-                                dt,
-                                order));
+      Quaternion q_i_1;
+      Matrix3 S_i_1;
 
-      R_i_k_quat_.push_back(integrateRK(
-                              R_i_k_quat_.back(),
-                              measurements.col(i).tail<3>(3),
-                              measurements.col(i + 1).tail<3>(3),
-                              dt,
-                              order));
+      std::tie(q_i_1, S_i_1) = integrateRK(
+                                 D_R_i_k_quat_.back(),
+                                 measurements.col(i).tail<3>(3),
+                                 measurements.col(i + 1).tail<3>(3),
+                                 dt,
+                                 order);
+
+      D_R_i_k_quat_.push_back(q_i_1);
+
+      Quaternion q_i_1_global;
+      std::tie(q_i_1_global, std::ignore) = integrateRK(
+                                              R_i_k_quat_.back(),
+                                              measurements.col(i).tail<3>(3),
+                                              measurements.col(i + 1).tail<3>(3),
+                                              dt,
+                                              order);
+
+      R_i_k_quat_.push_back(q_i_1_global);
 
       // Push the rotation matrix equivalent representations:
       D_R_i_k_.push_back(D_R_i_k_quat_.back().getRotationMatrix());
       R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
 
       // Covariance Prediction
-      // @todo: implement native RK3/RK4 propagation
       Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
-      Matrix3 D_R = Quaternion(Vector3((measurements.col(i).tail<3>(3) +
-                                        measurements.col(i + 1).tail<3>(3)) * 0.5 * dt)).
-                    getRotationMatrix();
 
       covariance_i_k_.push_back(
-            D_R.transpose() * covariance_i_k_.back() * D_R
+            S_i_1.transpose() * covariance_i_k_.back() * S_i_1
             + gyro_noise_covariance_d * dt * dt);
     }
 

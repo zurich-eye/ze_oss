@@ -41,11 +41,14 @@ private:
                                     FloatType dt);
 
   //! Runge-Kutta Integration
-  Quaternion integrateRK(Quaternion q,
-                         Vector3 w_i,
-                         Vector3 w_i_1,
-                         FloatType dt,
-                         uint32_t order);
+  //! Returns the quaternion after preintegration and
+  //! the state propagation matrix to propagate the
+  //! covariance.
+  std::pair<Quaternion, Matrix3> integrateRK(Quaternion q,
+                                             Vector3 w_i,
+                                             Vector3 w_i_1,
+                                             FloatType dt,
+                                             uint32_t order);
 
   //! Runge-Kutta Integration
   Quaternion integrateCrouchGrossman(Quaternion q,

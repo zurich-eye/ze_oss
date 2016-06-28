@@ -309,6 +309,24 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                     start,
                     end);
 
+  // 6) Quaternion Integration: RK3
+  PreIntegratorMonteCarlo::Ptr mc_quat_rk3 =
+      runQuaternion(preintegration_runner,
+                    PreIntegrator::RungeKutta3,
+                    "RK3",
+                    gyroscope_noise_covariance,
+                    start,
+                    end);
+
+  // 7) Quaternion Integration: RK4
+  PreIntegratorMonteCarlo::Ptr mc_quat_rk4 =
+      runQuaternion(preintegration_runner,
+                    PreIntegrator::RungeKutta4,
+                    "RK4",
+                    gyroscope_noise_covariance,
+                    start,
+                    end);
+
   /////// Evaluate drifts:
   runDriftEvaluationRuns(200, gyroscope_noise_covariance, accel_noise, gyro_noise);
 
