@@ -48,9 +48,6 @@ public:
 
   virtual ~Camera() = default;
 
-  //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
-  static Ptr loadFromYaml(const std::string& path);
-
   //! @name: Projection and back-projection operations. The main use of the camera.
   //! @{
   //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
@@ -124,6 +121,9 @@ protected:
   CameraType type_;
   Image8uC1::Ptr mask_ = nullptr;
 };
+
+//! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
+Camera::Ptr cameraFromYaml(const std::string& path);
 
 //! Print camera:
 std::ostream& operator<<(std::ostream& out, const Camera& cam);

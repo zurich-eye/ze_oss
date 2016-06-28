@@ -1,7 +1,17 @@
 #include <ze/cameras/camera_rig.h>
+
+#include <imp/bridge/opencv/cv_bridge.hpp>
+#include <imp/core/image_raw.hpp>
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_yaml_serialization.h>
 #include <ze/common/path_utils.h>
+
+DEFINE_string(calib_filename, "", "Camera calibration file.");
+DEFINE_string(mask_cam0, "", "Mask for camera 0");
+DEFINE_string(mask_cam1, "", "Mask for camera 1");
+DEFINE_string(mask_cam2, "", "Mask for camera 2");
+DEFINE_string(mask_cam3, "", "Mask for camera 3");
+DEFINE_bool(calib_use_single_camera, false, "");
 
 namespace ze {
 
@@ -30,7 +40,22 @@ CameraRig::CameraRig(
 }
 
 // -----------------------------------------------------------------------------
-CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
+CameraRig::Ptr CameraRig::getSubRig(
+    const std::vector<uint32_t>& camera_indices,
+    const std::string& label)
+{
+  CameraVector cameras;
+  TransformationVector T;
+  for (uint32_t i : camera_indices)
+  {
+    cameras.push_back(atShared(i));
+    T.push_back(T_C_B(i));
+  }
+  return std::make_shared<CameraRig>(T, cameras, label);
+}
+
+// -----------------------------------------------------------------------------
+CameraRig::Ptr cameraRigFromYaml(const std::string& yaml_file)
 {
   CHECK(fileExists(yaml_file)) << "File does not exist: " << yaml_file;
 
@@ -51,18 +76,54 @@ CameraRig::Ptr CameraRig::loadFromYaml(const std::string& yaml_file)
 }
 
 // -----------------------------------------------------------------------------
-CameraRig::Ptr CameraRig::getSubRig(
-    const std::vector<uint32_t>& camera_indices,
-    const std::string& label)
+CameraRig::Ptr cameraRigFromGflags()
 {
-  CameraVector cameras;
-  TransformationVector T;
-  for (uint32_t i : camera_indices)
+  CHECK(fileExists(FLAGS_calib_filename)) << "Camera file does not exist.";
+  CameraRig::Ptr rig = cameraRigFromYaml(FLAGS_calib_filename);
+  CHECK(rig);
+  if (FLAGS_calib_use_single_camera)
   {
-    cameras.push_back(atShared(i));
-    T.push_back(T_C_B(i));
+    rig = rig->getSubRig({0}, rig->label());
+    CHECK(rig);
   }
-  return std::make_shared<CameraRig>(T, cameras, label);
+
+  if(!FLAGS_mask_cam0.empty())
+  {
+    CHECK_GT(rig->size(), 0u);
+    CHECK(fileExists(FLAGS_mask_cam0));
+    ImageCv8uC1::Ptr mask;
+    cvBridgeLoad<Pixel8uC1>(mask, FLAGS_mask_cam0, PixelOrder::gray);
+    rig->atShared(0)->setMask(mask);
+  }
+
+  if(!FLAGS_mask_cam1.empty())
+  {
+    CHECK_GT(rig->size(), 1u);
+    CHECK(fileExists(FLAGS_mask_cam1));
+    ImageCv8uC1::Ptr mask;
+    cvBridgeLoad<Pixel8uC1>(mask, FLAGS_mask_cam1, PixelOrder::gray);
+    rig->atShared(1)->setMask(mask);
+  }
+
+  if(!FLAGS_mask_cam2.empty())
+  {
+    CHECK_GT(rig->size(), 2u);
+    CHECK(fileExists(FLAGS_mask_cam2));
+    ImageCv8uC1::Ptr mask;
+    cvBridgeLoad<Pixel8uC1>(mask, FLAGS_mask_cam2, PixelOrder::gray);
+    rig->atShared(2)->setMask(mask);
+  }
+
+  if(!FLAGS_mask_cam3.empty())
+  {
+    CHECK_GT(rig->size(), 3u);
+    CHECK(fileExists(FLAGS_mask_cam3));
+    ImageCv8uC1::Ptr mask;
+    cvBridgeLoad<Pixel8uC1>(mask, FLAGS_mask_cam3, PixelOrder::gray);
+    rig->atShared(3)->setMask(mask);
+  }
+
+  return rig;
 }
 
 // -----------------------------------------------------------------------------

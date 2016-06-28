@@ -9,8 +9,8 @@ TEST(CameraRigTests, testYamlLoading)
 {
   using namespace ze;
   CameraRig::Ptr rig =
-      CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
-                                       "camera_rig_1.yaml"));
+      cameraRigFromYaml(joinPath(getTestDataDir("camera_models"),
+                                 "camera_rig_1.yaml"));
 
   EXPECT_EQ(rig->size(), 2);
   EXPECT_NEAR(rig->at(0).projectionParameters()(0), 458.654, 1e-3);

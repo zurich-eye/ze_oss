@@ -2,11 +2,19 @@
 
 #include <string>
 #include <vector>
+#include <gflags/gflags.h>
 
 #include <ze/cameras/camera.h>
 #include <ze/common/types.h>
 #include <ze/common/macros.h>
 #include <ze/common/transformation.h>
+
+DECLARE_string(calib_filename);
+DECLARE_string(mask_cam0);
+DECLARE_string(mask_cam1);
+DECLARE_string(mask_cam2);
+DECLARE_string(mask_cam3);
+DECLARE_bool(calib_use_single_camera);
 
 namespace ze {
 
@@ -28,9 +36,6 @@ public:
       const std::string& label,
       const FloatType stereo_min_fov_overlap = 0.7,
       const FloatType stereo_min_baseline = 0.04);
-
-  //! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
-  static CameraRig::Ptr loadFromYaml(const std::string& yaml_file);
 
   //! @name Camera poses with respect to body frame.
   //! @{
@@ -108,6 +113,12 @@ private:
   //! A label for this camera rig, a name.
   std::string label_;
 };
+
+//! Load a camera rig form a yaml file. Returns a nullptr if the loading fails.
+CameraRig::Ptr cameraRigFromYaml(const std::string& yaml_file);
+
+//! Load a camera rig form a gflag parameters. Returns a nullptr if the loading fails.
+CameraRig::Ptr cameraRigFromGflags();
 
 //! Formatted printing.
 std::ostream& operator<<(std::ostream& out, const CameraRig& rig);
