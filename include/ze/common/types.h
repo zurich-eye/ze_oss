@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#pragma diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <Eigen/Core>
+#pragma diagnostic pop
 #include <Eigen/StdVector>
 #include <ze/common/config.hpp>
 
