@@ -7,6 +7,8 @@
 #include <mutex>
 #pragma diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+// Eigen 3.2.7 uses std::binder1st and std::binder2nd which are deprecated since c++11
+// Fix is in 3.3 devel (http://eigen.tuxfamily.org/bz/show_bug.cgi?id=872).
 #include <Eigen/Dense>
 #pragma diagnostic pop
 #include <ze/common/logging.hpp>
