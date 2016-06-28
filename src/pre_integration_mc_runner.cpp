@@ -48,7 +48,6 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
 
   // estimate the variance / covariance
   covariances_ = covariance_estimate(D_R_ref_, D_R_mc_);
-  covariances_absolute_ = covariance_estimate(R_ref_, R_mc_);
 }
 
 //------------------------------------------------------------------------------
@@ -108,6 +107,15 @@ std::vector<Matrix3> PreIntegratorMonteCarlo::covariance_estimate(
   }
 
   return covariances;
+}
+
+//------------------------------------------------------------------------------
+void PreIntegratorMonteCarlo::clean()
+{
+  D_R_mc_ = std::vector<std::vector<Matrix3>>();
+  R_mc_ = std::vector<std::vector<Matrix3>>();
+  D_R_ref_ = std::vector<Matrix3>();
+  R_ref_ = std::vector<Matrix3>();
 }
 
 } // namespace ze

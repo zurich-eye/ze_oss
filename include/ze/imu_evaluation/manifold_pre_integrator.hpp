@@ -23,6 +23,8 @@ public:
   void doPushD_R_i_j(times_container_t stamps,
                      measurements_container_t measurements);
 
+  ~ManifoldPreIntegrationState() {}
+
 private:
   //! The manifold pre-integrator can operate on noise-free relative
   //! orientation estimates if provided. The provided estimates have to be generated

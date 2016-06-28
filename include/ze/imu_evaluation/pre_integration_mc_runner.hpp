@@ -35,15 +35,13 @@ public:
     return covariances_;
   }
 
-  const std::vector<Matrix3>& covariances_absolute()
-  {
-    return covariances_absolute_;
-  }
-
   const std::vector<std::vector<Matrix3>>& D_R_mc()
   {
     return D_R_mc_;
   }
+
+  //! Clean the runner from unused temporaries to reduce the memory footprint.
+  void clean();
 
 private:
   PreIntegrationRunner::Ptr preintegraton_runner_;
@@ -58,7 +56,6 @@ private:
 
   //! Estiamted covariances for the relative motion and absolute motion.
   std::vector<Matrix3> covariances_;
-  std::vector<Matrix3> covariances_absolute_;
 
   //! The reference values of the relative and absolute orientation.
   std::vector<Matrix3> D_R_ref_;

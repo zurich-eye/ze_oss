@@ -20,6 +20,8 @@ public:
       Matrix3 gyro_noise_covariance,
       PreIntegrator::IntegratorType integrator_type);
 
+  ~QuaternionPreIntegrationState() {}
+
   void setInitialOrientation(Matrix3 initial_orientation) override;
   void doPushD_R_i_j(times_container_t stamps,
                      measurements_container_t measurements);

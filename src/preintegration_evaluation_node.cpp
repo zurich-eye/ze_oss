@@ -572,11 +572,11 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
 
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()},
-                        {"MC" + name, "Est" + name});
+                         {"MC" + name, "Est" + name});
 
   plotCovarianceError(mc->covariances(),
-                        est_integrator->covariance_i_k(),
-                        name);
+                      est_integrator->covariance_i_k(),
+                      name);
 
   return mc;
 }
@@ -607,12 +607,13 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
   // Result visualization:
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()},
-                        {"MC" + name, "Es" + name});
+                        {"MC" + name, "Est" + name});
 
   plotCovarianceError(mc->covariances(),
                         est_integrator->covariance_i_k(),
                         name);
 
+  mc->clean();
   return mc;
 }
 
@@ -637,8 +638,9 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternion(
 
   VLOG(1) << "Reference Estimates";
   // Corrupted integration:
-  ManifoldPreIntegrationState::Ptr est_integrator = mc->preintegrateCorrupted(
-                                                      start, end);
+  QuaternionPreIntegrationState::Ptr est_integrator =
+      mc->preintegrateCorrupted(start, end);
+
   // Result visualization:
   plotCovarianceResults({mc->covariances(),
                          est_integrator->covariance_i_k()},
@@ -648,6 +650,7 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternion(
                         est_integrator->covariance_i_k(),
                         name);
 
+  mc->clean();
   return mc;
 }
 
