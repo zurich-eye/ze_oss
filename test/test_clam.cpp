@@ -61,7 +61,7 @@ TEST(ClamTests, testExperiment)
 
   const size_t n = 120;
   std::string data_dir = ze::getTestDataDir("synthetic_room_pinhole");
-  CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(data_dir + "/calib_rig.yaml");
+  CameraRig::Ptr rig = ze::cameraRigFromYaml(data_dir + "/calib_rig.yaml");
   Keypoints px_Cr_true = generateRandomKeypoints(rig->at(0).size(), 10, n);
   Bearings f_Cr = rig->at(0).backProjectVectorized(px_Cr_true);
   Positions p_Cr = f_Cr;
