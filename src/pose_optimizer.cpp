@@ -250,12 +250,8 @@ std::pair<FloatType, VectorX> evaluateLineErrors(
   Matrix2X error(2, n);
   for (size_t i = 0; i < n; ++i)
   {
-    const Vector3 direction_W = data.lines_W[i].direction();
-    error(0, i) = line_measurements_W.col(i).dot(direction_W);
-    const Vector3 camera_to_anchor = camera_pos_W - data.lines_W[i].anchorPoint();
-    error(1, i) =
-        line_measurements_W.col(i).dot(camera_to_anchor) /
-        camera_to_anchor.norm();
+    error.col(i) = data.lines_W[i].calculateMeasurementError(line_measurements_W.col(i),
+                                                             camera_pos_W);
   }
   VectorX error_norm = error.colwise().norm();
 

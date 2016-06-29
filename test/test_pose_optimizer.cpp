@@ -159,8 +159,18 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   {
     line_measurements_noisy.col(i) =
         (bearings_noisy.col(i).cross(bearings_noisy.col(n + i))).normalized();
+    // Since b1xb2 = -(b2xb1) we choose the normal with positive first entry.
+    if (line_measurements_noisy(0, i) < 0.0)
+    {
+      line_measurements_noisy.col(i) *= -1;
+    }
+
     line_measurements_truth.col(i) =
         (bearings_truth.col(i).cross(bearings_truth.col(n + i))).normalized();
+    if (line_measurements_truth(0, i) < 0.0)
+    {
+      line_measurements_truth.col(i) *= -1;
+    }
   }
 
   // Check if error for truth is zero.
@@ -174,9 +184,7 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   PoseOptimizer optimizer(
         PoseOptimizer::getDefaultSolverOptions(),
         data_vec, T_B_W, 0.0, 0.0);
-  LeastSquaresSolver<Transformation, PoseOptimizer>::HessianMatrix H;
-  LeastSquaresSolver<Transformation, PoseOptimizer>::GradientVector g;
-  FloatType error = optimizer.evaluateError(T_B_W, &H, &g);
+  FloatType error = optimizer.evaluateError(T_B_W, nullptr, nullptr);
   EXPECT_NEAR(error, 0.0, 1e-5);
 
   // Perturb pose:
