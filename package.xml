@@ -16,6 +16,7 @@
   <depend>minkindr</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
+  <depend>ze_ros</depend>
   
   <depend>roscpp</depend>
   <depend>tf</depend>
