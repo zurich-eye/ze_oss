@@ -10,6 +10,7 @@
 #include <ze/common/timer.h>
 #include <ze/common/transformation.h>
 #include <ze/common/types.h>
+#include <ze/data_provider/data_provider_factory.hpp>
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
 #include <ze/imu_evaluation/pre_integration_mc_runner.hpp>
@@ -29,6 +30,7 @@
 
 DEFINE_bool(time_integration, false, "Show timings for the integrations?");
 DEFINE_string(run_type, "drift", "'drift'' evaluation, 'covariance'' monte carlo run, 'real'' dataset run");
+DEFINE_string(reference_trajectory_csv, "", "The path to the csv file that contains the reference trajectory for a real run (Euroc-format)");
 
 namespace ze {
 
@@ -220,9 +222,76 @@ void PreIntegrationEvaluationNode::runRealDatasetMain()
   RandomVectorSampler<3>::Ptr gyro_noise =
       RandomVectorSampler<3>::variances(gyro_covar);
 
-  PreIntegrationRunner::Ptr preintegration_runner = getPreIntegrationRunner(
-                                                      accel_noise,
-                                                      gyro_noise);
+  DataProviderBase::Ptr data_provider = loadDataProviderFromGflags(1);
+
+  // Load reference orientations from ground truth csv file
+  EurocResultSeries reference_result_series;
+  reference_result_series.load(FLAGS_reference_trajectory_csv);
+  StampedTransformationVector T_ref_list =
+      reference_result_series.getStampedTransformationVector();
+
+  PreIntegrationRunnerDataProvider::Ptr preintegration_runner(
+        std::make_shared<PreIntegrationRunnerDataProvider>(data_provider));
+  preintegration_runner->setInitialOrientation(
+        T_ref_list.front().second.getRotationMatrix());
+
+  // Manifold FWD
+  PreIntegrator::Ptr pi_manifold_fwd =
+      std::make_shared<ManifoldPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::FirstOrderForward);
+  pi_manifold_fwd->computeAbsolutes(true);
+  preintegration_runner->process(pi_manifold_fwd);
+
+  plotOrientation(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(),
+                  "Manifold FWD");
+
+  // Manifold MWD
+  PreIntegrator::Ptr pi_manifold_mwd =
+      std::make_shared<ManifoldPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::FirstOrderMidward);
+  pi_manifold_mwd->computeAbsolutes(true);
+  preintegration_runner->process(pi_manifold_mwd);
+
+  plotOrientation(pi_manifold_mwd->times_raw(), pi_manifold_mwd->R_i_k(),
+                  "Manifold MWD");
+
+  // Quat RK4
+  PreIntegrator::Ptr pi_quat_rk4 =
+      std::make_shared<QuaternionPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::RungeKutta4);
+  pi_quat_rk4->computeAbsolutes(true);
+  preintegration_runner->process(pi_quat_rk4);
+
+  plotOrientation(pi_quat_rk4->times_raw(), pi_quat_rk4->R_i_k(),
+                  "Quat RK4");
+
+  // Quat CG4
+  PreIntegrator::Ptr pi_quat_cg4 =
+      std::make_shared<QuaternionPreIntegrationState>(
+        gyroscope_noise_covariance,
+        PreIntegrator::CrouchGrossman4);
+  pi_quat_cg4->computeAbsolutes(true);
+  preintegration_runner->process(pi_quat_cg4);
+
+  plotOrientation(pi_quat_cg4->times_raw(), pi_quat_cg4->R_i_k(),
+                  "Quat CG4");
+
+
+  // Map the stamped transformation vector to time and Rotation matrix vectors.
+  std::vector<FloatType> times_ref;
+  std::vector<Matrix3> R_ref_list;
+  for (auto entry: T_ref_list)
+  {
+    times_ref.push_back(static_cast<FloatType>(entry.first) * 1e-9);
+    R_ref_list.push_back(entry.second.getRotationMatrix());
+  }
+
+  plotOrientation(times_ref, R_ref_list, "Reference");
+  VLOG(1) << "Processed integration steps: " << times_ref.size();
+
 }
 
 
@@ -813,29 +882,32 @@ void PreIntegrationEvaluationNode::plotOrientation(
   {
     ze::sm::RotationVector rv(orientation[i]);
     points.col(i) = rv.getParameters();
-    ref_points.col(i) = trajectory_->eval(times[i]).tail<3>();
+    if (plot_reference)
+    {
+      ref_points.col(i) = trajectory_->eval(times[i]).tail<3>();
+    }
   }
   plt::figure("orientation");
   plt::subplot(3, 1, 1);
   plt::title("Orientation");
-  plt::labelPlot(label, times, points.row(0), "r");
+  plt::labelPlot(label, times, points.row(0));
   if(plot_reference)
   {
-    plt::labelPlot("reference", times, ref_points.row(0), "b");
+    plt::labelPlot("reference", times, ref_points.row(0));
   }
   plt::legend();
 
   plt::subplot(3, 1, 2);
-  plt::labelPlot(label, times, points.row(1), "r");
+  plt::labelPlot(label, times, points.row(1));
   if(plot_reference)
   {
-    plt::labelPlot("reference", times, ref_points.row(1), "b");
+    plt::labelPlot("reference", times, ref_points.row(1));
   }
   plt::subplot(3, 1, 3);
-  plt::labelPlot(label, times, points.row(2), "r");
+  plt::labelPlot(label, times, points.row(2));
   if(plot_reference)
   {
-    plt::labelPlot("reference", times, ref_points.row(2), "b");
+    plt::labelPlot("reference", times, ref_points.row(2));
   }
   plt::show(false);
 }
