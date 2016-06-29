@@ -28,16 +28,16 @@ TEST(CameraRigTests, testStereoPairIdentification)
 
   {
     CameraRig::Ptr rig =
-        CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
-                                         "camera_rig_1.yaml"));
+        cameraRigFromYaml(joinPath(getTestDataDir("camera_models"),
+                                   "camera_rig_1.yaml"));
     StereoIndexPairs pairs = identifyStereoPairsInRig(*rig, 0.7, 0.1);
     EXPECT_EQ(pairs.size(), 1u);
   }
 
   {
     CameraRig::Ptr rig =
-        CameraRig::loadFromYaml(joinPath(getTestDataDir("camera_models"),
-                                         "camera_rig_2.yaml"));
+        cameraRigFromYaml(joinPath(getTestDataDir("camera_models"),
+                                   "camera_rig_2.yaml"));
     StereoIndexPairs pairs = identifyStereoPairsInRig(*rig, 0.7, 0.1);
     EXPECT_EQ(pairs.size(), 1u);
   }

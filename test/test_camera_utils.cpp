@@ -50,7 +50,7 @@ TEST(CameraUtilsTest, overlappingFieldOfView)
 
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = ze::joinPath(data_dir, "camera_rig_1.yaml");
-  ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(yaml_file);
+  ze::CameraRig::Ptr rig = ze::cameraRigFromYaml(yaml_file);
 
   FloatType overlap1 = overlappingFieldOfView(*rig, 0u, 1u);
   FloatType overlap2 = overlappingFieldOfView(*rig, 1u, 0u);
