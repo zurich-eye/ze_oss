@@ -7,7 +7,7 @@ PreIntegratorMonteCarlo::PreIntegratorMonteCarlo(
     PreIntegrationRunner::Ptr preintegraton_runner,
     PreIntegratorFactory::Ptr pre_integrator_factory,
     size_t threads)
-  : preintegraton_runner_(preintegraton_runner)
+  : preintegration_runner_(preintegraton_runner)
   , pre_integrator_factory_(pre_integrator_factory)
   , threads_(threads)
 {
@@ -20,7 +20,6 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
 {
   PreIntegrator::Ptr pre_int_actual = preintegrateActual(start, end);
   D_R_ref_ = pre_int_actual->D_R_i_k();
-  R_ref_ = pre_int_actual->R_i_k();
 
   // Threaded run of the monte carlo simulations.
   ThreadPool pool(threads_);
@@ -43,7 +42,6 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
   {
     auto value = iter->get();
     D_R_mc_.push_back(value->D_R_i_k());
-    R_mc_.push_back(value->R_i_k());
   }
 
   // estimate the variance / covariance
@@ -57,7 +55,7 @@ PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateActual(
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
 
-  preintegraton_runner_->process(pre_integrator,
+  preintegration_runner_->process(pre_integrator,
                                  false,
                                  start,
                                  end);
@@ -72,7 +70,7 @@ PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateCorrupted(
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
 
-  preintegraton_runner_->process(pre_integrator,
+  preintegration_runner_->process(pre_integrator,
                                  true,
                                  start,
                                  end);
@@ -113,9 +111,7 @@ std::vector<Matrix3> PreIntegratorMonteCarlo::covariance_estimate(
 void PreIntegratorMonteCarlo::clean()
 {
   D_R_mc_ = std::vector<std::vector<Matrix3>>();
-  R_mc_ = std::vector<std::vector<Matrix3>>();
   D_R_ref_ = std::vector<Matrix3>();
-  R_ref_ = std::vector<Matrix3>();
 }
 
 } // namespace ze

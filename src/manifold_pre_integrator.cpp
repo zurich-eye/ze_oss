@@ -41,7 +41,11 @@ void ManifoldPreIntegrationState::doPushD_R_i_j(
 
   // Push the keyframe sampled pre-integration states:
   D_R_i_j_.push_back(D_R_i_k_.back());
-  R_i_j_.push_back(R_i_j_.back() * D_R_i_j_.back());
+
+  if (compute_absolutes_)
+  {
+    R_i_j_.push_back(R_i_j_.back() * D_R_i_j_.back());
+  }
 
   // push covariance
   covariance_i_j_.push_back(covariance_i_k_.back());
@@ -113,7 +117,10 @@ void ManifoldPreIntegrationState::pushInitialValuesFwd(
 
   // D_R_i_k restarts with every push to the container.
   D_R_i_k_.push_back(Matrix3::Identity());
-  R_i_k_.push_back(R_i_k_.back() * increment);
+  if (compute_absolutes_)
+  {
+    R_i_k_.push_back(R_i_k_.back() * increment);
+  }
   covariance_i_k_.push_back(Matrix3::Zero());
 }
 
@@ -125,7 +132,10 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
   Matrix3 increment = Quaternion::exp(gyro_measurement * dt).getRotationMatrix();
 
   D_R_i_k_.push_back(D_R_i_k_.back() * increment);
-  R_i_k_.push_back(R_i_k_.back() * increment);
+  if (compute_absolutes_)
+  {
+    R_i_k_.push_back(R_i_k_.back() * increment);
+  }
 
   // Propagate Covariance:
   Matrix3 J_r = expmapDerivativeSO3(gyro_measurement * dt);
@@ -158,7 +168,10 @@ void ManifoldPreIntegrationState::pushInitialValuesMid(
 
   // D_R_i_k restarts with every push to the container.
   D_R_i_k_.push_back(Matrix3::Identity());
-  R_i_k_.push_back(R_i_k_.back() * increment);
+  if (compute_absolutes_)
+  {
+    R_i_k_.push_back(R_i_k_.back() * increment);
+  }
   covariance_i_k_.push_back(Matrix3::Zero());
 }
 
@@ -173,7 +186,10 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
                       .getRotationMatrix();
 
   D_R_i_k_.push_back(D_R_i_k_.back() * increment);
-  R_i_k_.push_back(R_i_k_.back() * increment);
+  if (compute_absolutes_)
+  {
+    R_i_k_.push_back(R_i_k_.back() * increment);
+  }
 
   // Propagate Covariance:
   Matrix3 J_r = expmapDerivativeSO3((gyro_measurement + gyro_measurement2) * 0.5 * dt);

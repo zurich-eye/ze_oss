@@ -8,6 +8,7 @@ PreIntegrator::PreIntegrator(
     IntegratorType integrator_type)
   : gyro_noise_covariance_(gyro_noise_covariance)
   , integrator_type_(integrator_type)
+  , compute_absolutes_(false)
 {
   R_i_j_.push_back(Matrix3::Identity());
   D_R_i_j_.push_back(Matrix3::Identity());
@@ -38,16 +39,19 @@ void PreIntegrator::pushD_R_i_j(times_container_t imu_stamps,
   measurements_.rightCols(imu_measurements.cols()) = imu_measurements.leftCols(
                                                        imu_measurements.cols());
 
-
   doPushD_R_i_j(imu_stamps, imu_measurements);
 
   // Sanity checks:
-  CHECK_EQ(D_R_i_k_.size(), R_i_k_.size());
+  if (compute_absolutes_)
+  {
+    CHECK_EQ(D_R_i_k_.size(), R_i_k_.size());
+    CHECK_EQ(D_R_i_j_.size(), R_i_j_.size());
+  }
+
   CHECK_EQ(D_R_i_k_.size(), covariance_i_k_.size());
   CHECK_EQ(D_R_i_k_.size(), times_raw_.size());
   CHECK_EQ(static_cast<int>(times_raw_.size()), measurements_.cols());
 
-  CHECK_EQ(D_R_i_j_.size(), R_i_j_.size());
   CHECK_EQ(D_R_i_j_.size(), covariance_i_j_.size());
   CHECK_EQ(D_R_i_j_.size(), times_.size());
 }

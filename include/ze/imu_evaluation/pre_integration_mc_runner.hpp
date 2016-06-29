@@ -44,7 +44,7 @@ public:
   void clean();
 
 private:
-  PreIntegrationRunner::Ptr preintegraton_runner_;
+  PreIntegrationRunner::Ptr preintegration_runner_;
   PreIntegratorFactory::Ptr pre_integrator_factory_;
 
   //! The number of threads to run the simulation on.
@@ -52,7 +52,6 @@ private:
 
   //! Vector of the results of the monte carlo runs (Absolute and Relative Orientations)
   std::vector<std::vector<Matrix3>> D_R_mc_;
-  std::vector<std::vector<Matrix3>> R_mc_;
 
   //! Estiamted covariances for the relative motion and absolute motion.
   std::vector<Matrix3> covariances_;

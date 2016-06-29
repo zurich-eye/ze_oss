@@ -33,6 +33,12 @@ public:
 
   PreIntegrator(Matrix3 gyro_noise_covariance, IntegratorType integrator_type);
 
+  //! Compute absolute values or not.
+  void computeAbsolutes(bool flag)
+  {
+    compute_absolutes_ = flag;
+  }
+
   //! Set the initial orientation of an absolute pre-integration term.
   virtual void setInitialOrientation(Matrix3 initial_orientation);
 
@@ -125,6 +131,9 @@ protected:
 
   //! The type of integration (fwd, bwd, midpoint etc.)
   IntegratorType integrator_type_;
+
+  //! Should the preintegrator estimate the absolute values or only relatives?
+  bool compute_absolutes_;
 };
 
 //------------------------------------------------------------------------------

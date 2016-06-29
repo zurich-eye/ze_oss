@@ -24,209 +24,10 @@
 #include <ze/splines/rotation_vector.hpp>
 #include <ze/imu_evaluation/manifold_pre_integrator.hpp>
 #include <ze/imu_evaluation/quaternion_pre_integrator.hpp>
-
-DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
-
-DEFINE_int32(monte_carlo_runs, 10, "Number of monte-carlo simulations.");
-
-// For an empty curve_source parameters to generate a random trajectory:
-DEFINE_double(trajectory_length, 30.0, "The length of the curve in seconds");
-DEFINE_int32(trajectory_interpolation_points, 100, "Number of interpolation to randomize");
-DEFINE_int32(trajectory_num_segments, 100, "Number of spline segments to fit the interpolation points.");
-DEFINE_double(trajectory_lambda, 1e-5, "The regularizing smoothing factor used to fit the trajectory to the interpolation curve. Smaller values give more aggressive curves.");
-
-// Imu Simulation Parameters:
-DEFINE_double(imu_sampling_time, 0.005, "Sampling time of the IMU.");
-DEFINE_double(camera_sampling_time, 0.1, "Sampling time of the Camera, only used to split the pre-integration steps.");
-DEFINE_double(accelerometer_noise_bandwidth_hz, 200, "Bandwidth of accelerometer noise");
-DEFINE_double(gyroscope_noise_bandwidth_hz, 200, "Bandwith of gyroscope noise");
-DEFINE_double(accelerometer_noise_density, 0, "Noise density of accelerometer.");
-DEFINE_double(gyroscope_noise_density, 0, "Noise density of gyroscope");
-
-// Im u Bias Simulation
-DEFINE_string(imu_bias_type, "constant", "Bias model of the imu");
-DEFINE_double(imu_acc_bias_noise_density, 0, "Noise density of continuous-time accelerometer bias.");
-DEFINE_double(imu_gyr_bias_noise_density, 0, "Noise density of continuous-time gyroscope bias.");
-
-DEFINE_double(imu_acc_bias_const, 0, "Value of constant accelerometer bias.");
-DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
-
-// A series of visualization controls:
-DEFINE_bool(show_trajectory, true, "Show the trajectory that was loaded / generated.");
-DEFINE_int32(num_threads, 16, "Number of threads to take for the monte-carlo simulations");
-
+#include <ze/imu_evaluation/imu_preintegration_parameters.hpp>
+#include <ze/imu_evaluation/preintegration_evaluation_node.hpp>
 
 namespace ze {
-
-//! A parameter structure to regroup all simulation parameters.
-struct ImuPreIntegrationParameters
-{
-  // The Imu Model and Noise Parameters:
-  FloatType imu_sampling_time;
-  FloatType camera_sampling_time;
-  FloatType accel_noise_bandwidth_hz;
-  FloatType gyro_noise_bandwidth_hz;
-  FloatType accel_noise_density;
-  FloatType gyro_noise_density;
-  Vector3 gravity;
-
-  // Imu Bias Model
-  std::string imu_bias_type;
-
-  // Parameters of continous-time bias model:
-  FloatType imu_acc_bias_noise_density;
-  FloatType imu_gyr_bias_noise_density;
-
-  // Parameters of constant bias model:
-  FloatType imu_acc_bias_const;
-  FloatType imu_gyr_bias_const;
-
-  // Trajectory Generation Parameters:
-  std::string trajectory_source;
-  FloatType trajectory_start_time;
-  FloatType trajectory_end_time;
-  int trajectory_num_interpolation_points;
-  int trajectory_num_segments;
-  FloatType trajectory_lambda;
-  int trajectory_spline_order = 5;
-
-  //! Initialize a parameter structure from gflags
-  static ImuPreIntegrationParameters fromGFlags()
-  {
-    ImuPreIntegrationParameters p;
-
-    p.imu_sampling_time = FLAGS_imu_sampling_time;
-    p.camera_sampling_time = FLAGS_camera_sampling_time;
-    p.accel_noise_bandwidth_hz = FLAGS_accelerometer_noise_bandwidth_hz;
-    p.gyro_noise_bandwidth_hz = FLAGS_gyroscope_noise_bandwidth_hz;
-    p.gravity = Vector3(0, 0, -9.81);
-
-    p.accel_noise_density = FLAGS_accelerometer_noise_density;
-    p.gyro_noise_density = FLAGS_gyroscope_noise_density;
-
-    p.trajectory_source = FLAGS_trajectory_source;
-    p.trajectory_start_time = 0.0;
-    p.trajectory_end_time = FLAGS_trajectory_length;
-    p.trajectory_num_interpolation_points = FLAGS_trajectory_interpolation_points;
-    p.trajectory_num_segments = FLAGS_trajectory_num_segments;
-    p.trajectory_lambda = FLAGS_trajectory_lambda;
-
-    p.imu_bias_type = FLAGS_imu_bias_type;
-
-    p.imu_acc_bias_noise_density = FLAGS_imu_acc_bias_noise_density;
-    p.imu_gyr_bias_noise_density = FLAGS_imu_gyr_bias_noise_density;
-
-    p.imu_acc_bias_const = FLAGS_imu_acc_bias_const;
-    p.imu_gyr_bias_const = FLAGS_imu_gyr_bias_const;
-
-    return p;
-  }
-
-  //! Initialize a parameter structure given an imu yaml file.
-  static /*ImuPreIntegrationParameters*/ void fromImuModel()
-  {
-    //! @todo
-  }
-};
-
-// -----------------------------------------------------------------------------
-class PreIntegrationEvaluationNode
-{
-public:
-  PreIntegrationEvaluationNode();
-  ~PreIntegrationEvaluationNode() = default;
-
-  //! Return the ImuBias for model and parameters specified in the GFlags.
-  ImuBias::Ptr imuBias(FloatType start, FloatType end);
-
-  //! Simulation Runners
-  PreIntegratorMonteCarlo::Ptr runManifoldClean(
-      PreIntegrationRunner::Ptr preintegration_runner,
-      PreIntegrator::IntegratorType integrator_type,
-      const std::string& name,
-      const Matrix3& gyroscope_noise_covariance,
-      const std::vector<Matrix3>* D_R_i_k_reference,
-      FloatType start,
-      FloatType end);
-
-  PreIntegratorMonteCarlo::Ptr runManifoldCorrupted(
-      PreIntegrationRunner::Ptr preintegration_runner,
-      PreIntegrator::IntegratorType integrator_type,
-      const std::string& name,
-      const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end);
-
-  PreIntegratorMonteCarlo::Ptr runQuaternion(
-      PreIntegrationRunner::Ptr preintegration_runner,
-      PreIntegrator::IntegratorType integrator_type,
-      const std::string& name,
-      const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end);
-
-  //! Runs a single noisy integration on all channels and shows plots of the
-  //! estimates.
-  //! Returns the error offset (rotation only) for the different methods
-  std::vector<FloatType> runDriftEvaluation(
-      PreIntegrationRunner::Ptr preintegration_runner,
-      const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end,
-      bool plot = false);
-
-  void runDriftEvaluationRuns(size_t runs,
-                              const Matrix3& gyroscope_noise_covariance,
-                              RandomVectorSampler<3>::Ptr accel_noise,
-                              RandomVectorSampler<3>::Ptr gyro_noise);
-
-  //! Get a preintegration runner and generate a trajectory.
-  PreIntegrationRunner::Ptr getPreIntegrationRunner(
-      RandomVectorSampler<3>::Ptr accel_noise,
-      RandomVectorSampler<3>::Ptr gyro_noise);
-
-  //! Given the GFLags configuration loads and returns a bspline representing
-  //! a trajectory.
-  void loadTrajectory();
-
-  //! Show the trajectory that was loaded or generated.
-  void showTrajectory();
-
-  //! Generate a series of plots that show the results
-  void plotCovarianceResults(
-      std::initializer_list<const std::vector<Matrix3>> covariances_vectors,
-      std::initializer_list<const std::string> labels);
-
-  //! Generate a series of plots that show the results
-  void plotCovarianceError(const std::vector<Matrix3> ref,
-                             const std::vector<Matrix3> est,
-                             const std::string& label);
-
-  //! Plot the estimated / integrated vector of rotation matrices.
-  void plotOrientation(const std::vector<FloatType>& times,
-                       const std::vector<Matrix3>& R_i,
-                       const std::string& label,
-                       const bool plot_reference = false);
-
-  void plotOrientationError(const std::vector<FloatType>& times,
-                              const std::vector<Matrix3>& est,
-                              const std::string& label);
-
-  //! Plot the measurements used to obtain a preintegration state.
-  void plotImuMeasurements(const std::vector<FloatType>& times,
-                           const ImuAccGyrContainer& measurements,
-                           const ImuAccGyrContainer& measurements2);
-
-  void shutdown();
-
-private:
-  ImuPreIntegrationParameters parameters_;
-
-  std::shared_ptr<BSplinePoseMinimalRotationVector> trajectory_;
-
-  std::shared_ptr<Visualizer> visualizer_;
-  std::shared_ptr<SplinesVisualizer> splines_visualizer_;
-};
 
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
@@ -261,75 +62,89 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   FloatType start = trajectory_->t_min();
   FloatType end = trajectory_->t_max() - 5;
 
-  /////// Different Monte Carlo Simulation runs:
+  //! A single monte carlo run
+  PreIntegratorMonteCarlo::Ptr mc = runManifoldCorruptedMc(
+                                      preintegration_runner,
+                                      PreIntegrator::FirstOrderMidward,
+                                      "Manifold MWD",
+                                      gyroscope_noise_covariance,
+                                      start,
+                                      end);
+
+  //! Run the pre-integrators:
 
   // 1) Manifold Integration Forward
-  PreIntegratorMonteCarlo::Ptr mc_corrupted_fwd =
+  ManifoldPreIntegrationState::Ptr state_corrupted_fwd =
       runManifoldCorrupted(preintegration_runner,
                            PreIntegrator::FirstOrderForward,
                            "Manifold Corr FWD",
                            gyroscope_noise_covariance,
                            start,
-                           end);
+                           end,
+                           mc);
 
   // 2) Manifold Integration Midward
-  PreIntegratorMonteCarlo::Ptr mc_corrupted_mid =
+  ManifoldPreIntegrationState::Ptr state_corrupted_mid =
       runManifoldCorrupted(preintegration_runner,
                            PreIntegrator::FirstOrderMidward,
                            "Manifold Corr MWD",
                            gyroscope_noise_covariance,
                            start,
-                           end);
+                           end,
+                           mc);
 
   // 3) Manifold Integration with clean orientation estimates
   // Use the corrupted MC simulator to get an unperturbed orientation estimate.
-  PreIntegrator::Ptr actual_integrator = mc_corrupted->preintegrateActual(start,
-                                                                          end);
-  runManifoldClean(preintegration_runner,
-                   gyroscope_noise_covariance,
-                   &actual_integrator->D_R_i_k(),
-                   start,
-                   end);
+//  PreIntegrator::Ptr actual_integrator = mc_corrupted_mid->preintegrateActual(start,
+//                                                                              end);
+//  runManifoldClean(preintegration_runner,
+//                   gyroscope_noise_covariance,
+//                   &actual_integrator->D_R_i_k(),
+//                   start,
+//                   end);
 
   // 4) Quaternion Integration: Forward Integration
-  PreIntegratorMonteCarlo::Ptr mc_quat_fwd =
+  QuaternionPreIntegrationState::Ptr state_quat_fwd =
       runQuaternion(preintegration_runner,
                     PreIntegrator::FirstOrderForward,
                     "Quat FWD",
                     gyroscope_noise_covariance,
                     start,
-                    end);
+                    end,
+                    mc);
 
   // 5) Quaternion Integration: Forward Integration
-  PreIntegratorMonteCarlo::Ptr mc_quat_mid =
+  QuaternionPreIntegrationState::Ptr state_quat_mid =
       runQuaternion(preintegration_runner,
                     PreIntegrator::FirstOrderMidward,
                     "Quat MWD",
                     gyroscope_noise_covariance,
                     start,
-                    end);
+                    end,
+                    mc);
 
   // 6) Quaternion Integration: RK3
-  PreIntegratorMonteCarlo::Ptr mc_quat_rk3 =
+  QuaternionPreIntegrationState::Ptr state_quat_rk3 =
       runQuaternion(preintegration_runner,
                     PreIntegrator::RungeKutta3,
                     "RK3",
                     gyroscope_noise_covariance,
                     start,
-                    end);
+                    end,
+                    mc);
 
   // 7) Quaternion Integration: RK4
-  PreIntegratorMonteCarlo::Ptr mc_quat_rk4 =
+  QuaternionPreIntegrationState::Ptr state_quat_rk4 =
       runQuaternion(preintegration_runner,
                     PreIntegrator::RungeKutta4,
                     "RK4",
                     gyroscope_noise_covariance,
                     start,
-                    end);
+                    end,
+                    mc);
 
   /////// Evaluate drifts:
-  runDriftEvaluationRuns(200, gyroscope_noise_covariance, accel_noise, gyro_noise);
-
+  // runDriftEvaluationRuns(200, gyroscope_noise_covariance, accel_noise, gyro_noise);
 }
 
 // -----------------------------------------------------------------------------
@@ -419,6 +234,7 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<ManifoldPreIntegrationState>(
         gyroscope_noise_covariance,
         PreIntegrator::FirstOrderForward);
+  pi_manifold_fwd->computeAbsolutes(true);
 
   preintegration_runner->process(pi_manifold_fwd,
                                  true,
@@ -433,6 +249,7 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<ManifoldPreIntegrationState>(
         gyroscope_noise_covariance,
         PreIntegrator::FirstOrderMidward);
+  pi_manifold_mid->computeAbsolutes(true);
 
   preintegration_runner->process(pi_manifold_mid,
                                  true,
@@ -447,6 +264,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::FirstOrderForward);
+  pi_quat_fwd->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_fwd,
                                  true,
                                  start,
@@ -460,6 +279,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::FirstOrderMidward);
+  pi_quat_mid->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_mid,
                                  true,
                                  start,
@@ -473,6 +294,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::RungeKutta3);
+  pi_quat_rk3->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_rk3,
                                  true,
                                  start,
@@ -486,6 +309,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::RungeKutta4);
+  pi_quat_rk4->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_rk4,
                                  true,
                                  start,
@@ -499,6 +324,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::CrouchGrossman3);
+  pi_quat_cg3->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_cg3,
                                  true,
                                  start,
@@ -512,6 +339,8 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
       std::make_shared<QuaternionPreIntegrationState>(
         gyroscope_noise_covariance,
         QuaternionPreIntegrationState::CrouchGrossman4);
+  pi_quat_cg4->computeAbsolutes(true);
+
   preintegration_runner->process(pi_quat_cg4 ,
                                  true,
                                  start,
@@ -545,52 +374,60 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
 }
 
 
+//// -----------------------------------------------------------------------------
+//PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
+//    PreIntegrationRunner::Ptr preintegration_runner,
+//    PreIntegrator::IntegratorType integrator_type,
+//    const std::string& name,
+//    const Matrix3& gyroscope_noise_covariance,
+//    const std::vector<Matrix3>* D_R_i_k_reference,
+//    FloatType start,
+//    FloatType end,
+//    PreIntegratorMonteCarlo::Ptr mc_ref)
+//{
+//  PreIntegratorFactory::Ptr preintegrator_factory(
+//        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
+//                                                        integrator_type,
+//                                                        D_R_i_k_reference));
+//  if (!mc_ref)
+//  {
+//    VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Clean]";
+//    PreIntegratorMonteCarlo::Ptr mc(
+//          std::make_shared<PreIntegratorMonteCarlo>(
+//            preintegration_runner,
+//            preintegrator_factory,
+//            FLAGS_num_threads));
+//    mc->simulate(FLAGS_monte_carlo_runs, start, end);
+//  }
+
+//  //
+//  ManifoldPreIntegrationState::Ptr est_integrator = preintegrator_factory->get();
+//  preintegration_runner->process(est_integrator,
+//                                 true,
+//                                 start,
+//                                 end);
+
+//  plotCovarianceResults({mc->covariances(),
+//                         est_integrator->covariance_i_k()},
+//                         {"MC" + name, "Est" + name});
+
+//  plotCovarianceError(mc->covariances(),
+//                      est_integrator->covariance_i_k(),
+//                      name);
+
+//  return mc;
+//}
+
 // -----------------------------------------------------------------------------
-PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
+PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorruptedMc(
     PreIntegrationRunner::Ptr preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
-    const std::vector<Matrix3>* D_R_i_k_reference,
     FloatType start,
     FloatType end)
 {
-  VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Clean]";
-  PreIntegratorFactory::Ptr preintegrator_factory_clean(
-        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
-                                                        integrator_type,
-                                                        D_R_i_k_reference));
-  PreIntegratorMonteCarlo::Ptr mc(
-        std::make_shared<PreIntegratorMonteCarlo>(
-          preintegration_runner,
-          preintegrator_factory_clean,
-          FLAGS_num_threads));
-  mc->simulate(FLAGS_monte_carlo_runs, start, end);
-
-  ManifoldPreIntegrationState::Ptr est_integrator =
-      mc->preintegrateCorrupted(start, end);
-
-  plotCovarianceResults({mc->covariances(),
-                         est_integrator->covariance_i_k()},
-                         {"MC" + name, "Est" + name});
-
-  plotCovarianceError(mc->covariances(),
-                      est_integrator->covariance_i_k(),
-                      name);
-
-  return mc;
-}
-
-// -----------------------------------------------------------------------------
-PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
-    PreIntegrationRunner::Ptr preintegration_runner,
-    PreIntegrator::IntegratorType integrator_type,
-    const std::string& name,
-    const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end)
-{
-  VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Corrupted]";
+  VLOG(1) << "Monte Carlo Simulation [Manifoold: " + name + "]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
                                                         integrator_type));
@@ -600,25 +437,14 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
                                                   FLAGS_num_threads));
   mc->simulate(FLAGS_monte_carlo_runs, start, end);
 
-  VLOG(1) << "Reference Estimates";
-  // Corrupted integration:
-  ManifoldPreIntegrationState::Ptr est_integrator = mc->preintegrateCorrupted(
-                                                      start, end);
-  // Result visualization:
-  plotCovarianceResults({mc->covariances(),
-                         est_integrator->covariance_i_k()},
-                        {"MC" + name, "Est" + name});
+  plotCovarianceResults({mc->covariances()},
+                        {"MC" + name});
 
-  plotCovarianceError(mc->covariances(),
-                        est_integrator->covariance_i_k(),
-                        name);
-
-  mc->clean();
   return mc;
 }
 
 // -----------------------------------------------------------------------------
-PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternion(
+PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionMc(
     PreIntegrationRunner::Ptr preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
@@ -626,7 +452,7 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternion(
     FloatType start,
     FloatType end)
 {
-  VLOG(1) << "Monte Carlo Simulation [Quaternion: Forward]";
+  VLOG(1) << "Monte Carlo Simulation [Quaternion: " + name + "]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<QuaternionPreIntegrationFactory>(
           gyroscope_noise_covariance, integrator_type));
@@ -636,22 +462,74 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternion(
                                                   FLAGS_num_threads));
   mc->simulate(FLAGS_monte_carlo_runs, start, end);
 
-  VLOG(1) << "Reference Estimates";
-  // Corrupted integration:
-  QuaternionPreIntegrationState::Ptr est_integrator =
-      mc->preintegrateCorrupted(start, end);
+  plotCovarianceResults({mc->covariances()},
+                        {"MC" + name});
 
+  return mc;
+}
+
+// -----------------------------------------------------------------------------
+ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    PreIntegrator::IntegratorType integrator_type,
+    const std::string& name,
+    const Matrix3& gyroscope_noise_covariance,
+    FloatType start,
+    FloatType end,
+    PreIntegratorMonteCarlo::Ptr mc)
+{
+  VLOG(1) << "Reference Estimates [ManifoldPreIntegrator:Corrupted]";
+  PreIntegratorFactory::Ptr preintegrator_factory(
+        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
+                                                        integrator_type));
+
+  ManifoldPreIntegrationState::Ptr est_integrator = preintegrator_factory->get();
+
+  preintegration_runner->process(est_integrator,
+                                 true,
+                                 start,
+                                 end);
   // Result visualization:
-  plotCovarianceResults({mc->covariances(),
-                         est_integrator->covariance_i_k()},
-                        {"MC" + name, "Est" + name});
+  plotCovarianceResults({est_integrator->covariance_i_k()},
+                        {"Est" + name});
 
   plotCovarianceError(mc->covariances(),
-                        est_integrator->covariance_i_k(),
-                        name);
+                      est_integrator->covariance_i_k(),
+                      name);
 
-  mc->clean();
-  return mc;
+  return est_integrator;
+}
+
+// -----------------------------------------------------------------------------
+QuaternionPreIntegrationState::Ptr PreIntegrationEvaluationNode::runQuaternion(
+    PreIntegrationRunner::Ptr preintegration_runner,
+    PreIntegrator::IntegratorType integrator_type,
+    const std::string& name,
+    const Matrix3& gyroscope_noise_covariance,
+    FloatType start,
+    FloatType end,
+    PreIntegratorMonteCarlo::Ptr mc)
+{
+  VLOG(1) << "Reference Estimates [Quaternion]";
+  PreIntegratorFactory::Ptr preintegrator_factory(
+        std::make_shared<QuaternionPreIntegrationFactory>(gyroscope_noise_covariance,
+                                                          integrator_type));
+
+  QuaternionPreIntegrationState::Ptr est_integrator = preintegrator_factory->get();
+
+  preintegration_runner->process(est_integrator,
+                                 true,
+                                 start,
+                                 end);
+  // Result visualization:
+  plotCovarianceResults({est_integrator->covariance_i_k()},
+                        {"Est" + name});
+
+  plotCovarianceError(mc->covariances(),
+                      est_integrator->covariance_i_k(),
+                      name);
+
+  return est_integrator;
 }
 
 // -----------------------------------------------------------------------------
