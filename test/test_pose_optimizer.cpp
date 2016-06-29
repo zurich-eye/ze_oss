@@ -55,7 +55,7 @@ TEST(PoseOptimizerTests, testSolver)
 
   const size_t n = 120;
   PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
-  Keypoints px_true = generateRandomKeypoints(640, 480, 10, n);
+  Keypoints px_true = generateRandomKeypoints(cam.size(), 10, n);
 
   Positions pos_C = cam.backProjectVectorized(px_true);
 

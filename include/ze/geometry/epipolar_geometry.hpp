@@ -20,8 +20,8 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
                                  const ze::VectorX& projection_parameteres0,
                                  const ze::VectorX& projection_parameteres1)
 {
-  CHECK(projection_parameteres0.size() >= 4);
-  CHECK(projection_parameteres1.size() >= 4);
+  CHECK_EQ(projection_parameteres0.size(), 4u);
+  CHECK_EQ(projection_parameteres1.size(), 4u);
 
   Matrix3 K0, K1;
   K0 << projection_parameteres0(0), 0, projection_parameteres0(2),
