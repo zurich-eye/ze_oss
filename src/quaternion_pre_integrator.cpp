@@ -262,6 +262,8 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
+    timers_[IntegrationTimer::integrate].start();
+
     FloatType dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
@@ -310,6 +312,8 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
     }
 
     times_raw_.push_back(stamps[i]);
+
+    timers_[IntegrationTimer::integrate].stop();
   }
 }
 
@@ -321,6 +325,8 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
+    timers_[IntegrationTimer::integrate].start();
+
     FloatType dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
@@ -373,6 +379,8 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
     }
 
     times_raw_.push_back(stamps[i]);
+
+    timers_[IntegrationTimer::integrate].stop();
   }
 }
 
@@ -385,6 +393,8 @@ void QuaternionPreIntegrationState::doPushRK(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
+    timers_[IntegrationTimer::integrate].start();
+
     FloatType dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
@@ -447,6 +457,8 @@ void QuaternionPreIntegrationState::doPushRK(
     }
 
     times_raw_.push_back(stamps[i]);
+
+    timers_[IntegrationTimer::integrate].stop();
   }
 }
 
@@ -459,6 +471,8 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
+    timers_[IntegrationTimer::integrate].start();
+
     FloatType dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
@@ -516,6 +530,8 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
     }
 
     times_raw_.push_back(stamps[i]);
+
+    timers_[IntegrationTimer::integrate].stop();
   }
 }
 

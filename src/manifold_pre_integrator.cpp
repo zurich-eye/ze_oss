@@ -129,6 +129,8 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
     const FloatType dt,
     const Eigen::Ref<Vector3>& gyro_measurement)
 {
+  timers_[IntegrationTimer::integrate].start();
+
   Matrix3 increment = Quaternion::exp(gyro_measurement * dt).getRotationMatrix();
 
   D_R_i_k_.push_back(D_R_i_k_.back() * increment);
@@ -156,6 +158,8 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
   covariance_i_k_.push_back(
         D_R_i_k.transpose() * covariance_i_k_.back() * D_R_i_k
         + J_r * gyro_noise_covariance_d * dt * dt * J_r.transpose());
+
+  timers_[IntegrationTimer::integrate].stop();
 }
 
 //------------------------------------------------------------------------------
@@ -181,6 +185,8 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
     const Eigen::Ref<Vector3>& gyro_measurement,
     const Eigen::Ref<Vector3>& gyro_measurement2)
 {
+  timers_[IntegrationTimer::integrate].start();
+
   Matrix3 increment = Quaternion::exp(
                         (gyro_measurement + gyro_measurement2) * 0.5 * dt)
                       .getRotationMatrix();
@@ -210,6 +216,8 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
   covariance_i_k_.push_back(
         D_R_i_k.transpose() * covariance_i_k_.back() * D_R_i_k
         + J_r * gyro_noise_covariance_d * dt * dt * J_r.transpose());
+
+  timers_[IntegrationTimer::integrate].stop();
 }
 
 } // namespace ze

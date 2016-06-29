@@ -27,6 +27,8 @@
 #include <ze/imu_evaluation/imu_preintegration_parameters.hpp>
 #include <ze/imu_evaluation/preintegration_evaluation_node.hpp>
 
+DEFINE_bool(time_integration, false, "Show timings for the integrations?");
+
 namespace ze {
 
 // -----------------------------------------------------------------------------
@@ -92,7 +94,6 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                            start,
                            end,
                            mc);
-
   // 3) Manifold Integration with clean orientation estimates
   // Use the corrupted MC simulator to get an unperturbed orientation estimate.
 //  PreIntegrator::Ptr actual_integrator = mc_corrupted_mid->preintegrateActual(start,
@@ -497,6 +498,12 @@ ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrup
                       est_integrator->covariance_i_k(),
                       name);
 
+  // Show the timers for the integration.
+  if (FLAGS_time_integration)
+  {
+    VLOG(1) << est_integrator->timers_;
+  }
+
   return est_integrator;
 }
 
@@ -528,6 +535,12 @@ QuaternionPreIntegrationState::Ptr PreIntegrationEvaluationNode::runQuaternion(
   plotCovarianceError(mc->covariances(),
                       est_integrator->covariance_i_k(),
                       name);
+
+  // Show the timers for the integration.
+  if (FLAGS_time_integration)
+  {
+    VLOG(1) << est_integrator->timers_;
+  }
 
   return est_integrator;
 }
@@ -694,6 +707,9 @@ void PreIntegrationEvaluationNode::plotCovarianceError(
   {
     dist(i) = (ref[i] - est[i]).norm();
   }
+  // total distance output:
+  VLOG(1) << "Covariance Offset [" + label + "]: " << dist.norm();
+
   plt::figure("covariance_distance");
   plt::labelPlot(label, dist);
   plt::legend();

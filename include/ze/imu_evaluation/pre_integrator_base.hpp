@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ze/common/types.h>
+#include <ze/common/timer_collection.h>
 #include <ze/imu_evaluation/scenario_runner.hpp>
 
 namespace ze {
@@ -100,6 +101,9 @@ public:
   {
     return measurements_;
   }
+
+  //! A collection of timers.
+  DECLARE_TIMER(IntegrationTimer, timers_, integrate);
 
 protected:
   //! The time at which a frame was captured.
