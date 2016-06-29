@@ -1,6 +1,11 @@
 #pragma once
 
+#pragma diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+// glog has an unused typedef.
+// https://github.com/google/glog/pull/33
 #include <glog/logging.h>
+#pragma diagnostic pop
 
 #define DEBUG_CHECK(val) CHECK(val)
 #define DEBUG_CHECK_NOTNULL(val) CHECK_NOTNULL(val)

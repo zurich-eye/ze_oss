@@ -5,9 +5,8 @@
 #include <thread>
 #include <utility>
 #include <mutex>
-#include <Eigen/Dense>
-#include <ze/common/logging.hpp>
 
+#include <ze/common/logging.hpp>
 #include <ze/common/types.h>
 #include <ze/common/time_conversions.h>
 

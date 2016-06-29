@@ -25,4 +25,17 @@ void loadDepthmapFromFile(
 // RANDOM NUMBER GENERATORS
 
 
+// ----------------------------------------------------------------------------
+//! Bernoulli distribution, returns true with probability `true_probability` and
+//! false with probability `1-true_probability`
+inline std::function<bool()> getRandomGeneratorBinary(FloatType true_probability)
+{
+  CHECK_GE(true_probability, FloatType{0.0});
+  CHECK_LE(true_probability, FloatType{1.0});
+  std::mt19937 generator(std::random_device{}());
+  std::bernoulli_distribution distribution(true_probability);
+  std::function<bool()> random_val = std::bind(distribution, generator);
+  return random_val;
+}
+
 } // namespace ze

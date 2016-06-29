@@ -16,6 +16,7 @@ message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
 message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
 message(STATUS "ZE_USE_ARRAYFIRE: ${ZE_USE_ARRAYFIRE}")
 message(STATUS "ZE_DETERMINISTIC: ${ZE_DETERMINISTIC}")
+message(STATUS "ZE_VIO_LIMITED: ${ZE_VIO_LIMITED}")
 
 configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ze/common/config.hpp)
 
@@ -35,6 +36,7 @@ set(HEADERS
   include/ze/common/logging.hpp
   include/ze/common/macros.h
   include/ze/common/manifold.h
+  include/ze/common/math.hpp
   include/ze/common/matrix.h
   include/ze/common/nonassignable.hpp
   include/ze/common/noncopyable.hpp
@@ -108,6 +110,9 @@ target_link_libraries(test_running_statistics ${PROJECT_NAME})
 
 catkin_add_gtest(test_statistics test/test_statistics.cpp)
 target_link_libraries(test_statistics ${PROJECT_NAME})
+
+catkin_add_gtest(test_stl_utils test/test_stl_utils.cpp)
+target_link_libraries(test_stl_utils ${PROJECT_NAME})
 
 catkin_add_gtest(test_string_utils test/test_string_utils.cpp)
 target_link_libraries(test_string_utils ${PROJECT_NAME})

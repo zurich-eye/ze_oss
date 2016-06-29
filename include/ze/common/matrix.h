@@ -83,6 +83,7 @@ FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
 std::tuple<int, FloatType, VectorX> directLinearTransform(
     const MatrixX& A, FloatType rank_tol = 1e-9);
 
+// ----------------------------------------------------------------------------
 //! Get a slice of vector X by the specified indices.
 template<typename Derived>
 Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> getVectorElements(
