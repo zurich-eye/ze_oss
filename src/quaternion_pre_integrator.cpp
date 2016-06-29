@@ -441,7 +441,6 @@ void QuaternionPreIntegrationState::doPushRK(
                                                 dt,
                                                 order);
         R_i_k_quat_.push_back(q_i_1_global);
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
 
       // Covariance Prediction

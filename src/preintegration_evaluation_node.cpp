@@ -28,8 +28,10 @@
 #include <ze/imu_evaluation/preintegration_evaluation_node.hpp>
 
 DEFINE_bool(time_integration, false, "Show timings for the integrations?");
+DEFINE_string(run_type, "drift", "'drift'' evaluation, 'covariance'' monte carlo run, 'real'' dataset run");
 
 namespace ze {
+
 
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
@@ -40,7 +42,12 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
   splines_visualizer_ = std::make_shared<SplinesVisualizer>(visualizer_);
 
   parameters_ = ImuPreIntegrationParameters::fromGFlags();
+}
 
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
+{
   Vector3 accel_covar = parameters_.accel_noise_density
                         * parameters_.accel_noise_density
                         * Vector3::Ones();
@@ -72,6 +79,15 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                                       gyroscope_noise_covariance,
                                       start,
                                       end);
+
+////  //! A single monte carlo run
+////  PreIntegratorMonteCarlo::Ptr mc2 = runQuaternionMc(
+////                                      preintegration_runner,
+////                                      PreIntegrator::FirstOrderMidward,
+////                                      "Quat MWD",
+////                                      gyroscope_noise_covariance,
+////                                      start,
+////                                      end);
 
   //! Run the pre-integrators:
 
@@ -143,10 +159,72 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
                     start,
                     end,
                     mc);
+}
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::runDriftEvaluationMain()
+{
+  Vector3 accel_covar = parameters_.accel_noise_density
+                        * parameters_.accel_noise_density
+                        * Vector3::Ones();
+  Vector3 gyro_covar = parameters_.gyro_noise_density
+                       * parameters_.gyro_noise_density
+                       * Vector3::Ones();
+  Matrix3 gyroscope_noise_covariance = gyro_covar.asDiagonal();
+
+  VLOG(1) << "Initialize noise models with \n"
+          << " Accelerometer noise density: " << parameters_.accel_noise_density
+          << " Gyroscope noise density: " << parameters_.gyro_noise_density;
+  RandomVectorSampler<3>::Ptr accel_noise =
+      RandomVectorSampler<3>::variances(accel_covar);
+  RandomVectorSampler<3>::Ptr gyro_noise =
+      RandomVectorSampler<3>::variances(gyro_covar);
+
+  PreIntegrationRunner::Ptr preintegration_runner = getPreIntegrationRunner(
+                                                      accel_noise,
+                                                      gyro_noise);
+
+  FloatType start = trajectory_->t_min();
+  FloatType end = trajectory_->t_max() - 5;
 
   /////// Evaluate drifts:
-  // runDriftEvaluationRuns(200, gyroscope_noise_covariance, accel_noise, gyro_noise);
+ runDriftEvaluationRuns(
+       200, gyroscope_noise_covariance, accel_noise, gyro_noise);
 }
+
+
+
+// -----------------------------------------------------------------------------
+void PreIntegrationEvaluationNode::runRealDatasetMain()
+{
+  plt::ion();
+
+  visualizer_ = std::make_shared<VisualizerRos>();
+  splines_visualizer_ = std::make_shared<SplinesVisualizer>(visualizer_);
+
+  parameters_ = ImuPreIntegrationParameters::fromGFlags();
+
+  Vector3 accel_covar = parameters_.accel_noise_density
+                        * parameters_.accel_noise_density
+                        * Vector3::Ones();
+  Vector3 gyro_covar = parameters_.gyro_noise_density
+                       * parameters_.gyro_noise_density
+                       * Vector3::Ones();
+  Matrix3 gyroscope_noise_covariance = gyro_covar.asDiagonal();
+
+  VLOG(1) << "Initialize noise models with \n"
+          << " Accelerometer noise density: " << parameters_.accel_noise_density
+          << " Gyroscope noise density: " << parameters_.gyro_noise_density;
+  RandomVectorSampler<3>::Ptr accel_noise =
+      RandomVectorSampler<3>::variances(accel_covar);
+  RandomVectorSampler<3>::Ptr gyro_noise =
+      RandomVectorSampler<3>::variances(gyro_covar);
+
+  PreIntegrationRunner::Ptr preintegration_runner = getPreIntegrationRunner(
+                                                      accel_noise,
+                                                      gyro_noise);
+}
+
 
 // -----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
@@ -597,6 +675,9 @@ void PreIntegrationEvaluationNode::loadTrajectory()
     // make translations significanter
     points.block(0, 0, 3, parameters_.trajectory_num_interpolation_points) *= 10;
 
+    // Rotation Multiplier
+    points.block(3, 0, 3, parameters_.trajectory_num_interpolation_points) *= 10;
+
     VectorX times;
     times.setLinSpaced(parameters_.trajectory_num_interpolation_points, start, end);
 
@@ -847,6 +928,23 @@ int main(int argc, char** argv)
 
   VLOG(1) << "Create PreIntegration Evaluation Node.";
   ze::PreIntegrationEvaluationNode node;
+
+  if (FLAGS_run_type == "drift")
+  {
+    node.runDriftEvaluationMain();
+  }
+  else if (FLAGS_run_type == "covariance")
+  {
+    node.runCovarianceMonteCarloMain();
+  }
+  else if (FLAGS_run_type == "real")
+  {
+    node.runRealDatasetMain();
+  }
+  else
+  {
+    throw std::runtime_error("Invalid run type");
+  }
 
   VLOG(1) << "Finish Processing.";
   node.shutdown();

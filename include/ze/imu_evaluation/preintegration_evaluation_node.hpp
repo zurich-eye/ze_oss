@@ -9,6 +9,15 @@ public:
   PreIntegrationEvaluationNode();
   ~PreIntegrationEvaluationNode() = default;
 
+  //! Run monte carlo simulations to evaluate the covariance propagation.
+  void runCovarianceMonteCarloMain();
+
+  //! Run various integration methods to evaluate drift
+  void runDriftEvaluationMain();
+
+  //! Run pre-integration on a given dataset.
+  void runRealDatasetMain();
+
   //! Return the ImuBias for model and parameters specified in the GFlags.
   ImuBias::Ptr imuBias(FloatType start, FloatType end);
 
