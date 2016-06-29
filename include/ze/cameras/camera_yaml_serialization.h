@@ -3,7 +3,10 @@
 #include <memory>
 
 #include <ze/common/logging.hpp>
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+// The yaml-cpp version in yaml_cpp_catkin uses auto_ptr which is deprecated.
 #include <yaml-cpp/yaml.h>
+#pragma diagnostic pop
 
 namespace ze {
 class Camera;
