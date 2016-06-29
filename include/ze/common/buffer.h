@@ -5,10 +5,6 @@
 #include <thread>
 #include <utility>
 #include <mutex>
-#pragma diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#include <Eigen/Dense>
-#pragma diagnostic pop
 #include <ze/common/logging.hpp>
 
 #include <ze/common/types.h>

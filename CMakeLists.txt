@@ -34,6 +34,7 @@ set(HEADERS
   include/ze/common/logging.hpp
   include/ze/common/macros.h
   include/ze/common/manifold.h
+  include/ze/common/math.hpp
   include/ze/common/matrix.h
   include/ze/common/nonassignable.hpp
   include/ze/common/noncopyable.hpp
