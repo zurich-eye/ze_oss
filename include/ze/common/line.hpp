@@ -58,6 +58,9 @@ public:
     return ze::calculateDistanceToLine(pos, anchorPoint(), direction());
   }
 
+  Vector2 calculateMeasurementError(const Vector3& measurement_W,
+                                    const Vector3& camera_position_W) const;
+
 private:
   Quaternion orientation_;
   FloatType distance_ = 0.0;

@@ -45,12 +45,8 @@ TEST(LineTests, testJacobian)
   auto measurementError = [&](const Transformation& T_B_W) {
     Transformation T_C_W = T_C_B * T_B_W;
     Position camera_pos_W = T_C_W.inverse().getPosition();
-    Vector2 error;
-    error(0) = T_C_W.getRotation().inverse().rotate(n).dot(lines[0].direction());
-    error(1) =
-        T_C_W.getRotation().inverse().rotate(n).dot(camera_pos_W - lines[0].anchorPoint()) /
-        (camera_pos_W - lines[0].anchorPoint()).norm();
-    return error;
+    Vector3 measurement_W = T_C_W.getRotation().inverse().rotate(n);
+    return lines[0].calculateMeasurementError(measurement_W, camera_pos_W);
   };
 
   Matrix26 J_numeric = numericalDerivative<Vector2, Transformation>(measurementError, T_B_W);
