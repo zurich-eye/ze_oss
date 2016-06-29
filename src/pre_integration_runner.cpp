@@ -107,49 +107,56 @@ void PreIntegrationRunnerDataProvider::setInitialOrientation(
 }
 
 //------------------------------------------------------------------------------
-void PreIntegrationRunnerDataProvider::process(PreIntegrator::Ptr pre_integrator,
-                                               FloatType start,
-                                               FloatType end)
+void PreIntegrationRunnerDataProvider::loadData()
 {
-
-  std::vector<FloatType> times;
-  std::vector<Vector6> measurement_vector;
-
-  // subscribe to the dataprovider callback to get all measurements between
-  // start and end.
-  ImuCallback integrate = [&times, &measurement_vector, &start, &end](
-                   int64_t stamp, const Vector3& acc,
-                   const Vector3 gyr, uint32_t imu_idx)
+  if (times_.size() == 0)
   {
-    FloatType stamp_float = static_cast<FloatType>(stamp) * 1e-9;
+    std::vector<FloatType> times;
+    std::vector<Vector6> measurement_vector;
 
-    // Skip anything that is not within our bounds.
-    if (stamp_float < start || stamp_float > end)
+    // subscribe to the dataprovider callback to get all measurements between
+    // start and end.
+    ImuCallback integrate = [&times, &measurement_vector](
+                            int64_t stamp, const Vector3& acc,
+                            const Vector3 gyr, uint32_t imu_idx)
     {
-      return;
+      FloatType stamp_float = static_cast<FloatType>(stamp) * 1e-9;
+
+      Vector6 measurement;
+      // @todo: actually inject into integrators
+      Vector3 gyr_bias;
+      gyr_bias << -0.002133, 0.021059, 0.076659;
+
+      measurement.head<3>() = acc; // @todo: remove bias
+      measurement.tail<3>() = gyr - gyr_bias;
+
+      measurement_vector.push_back(measurement);
+      times.push_back(stamp_float);
+    };
+
+    // Subscribe dataprovider and collect imu measurements.
+    data_provider_->registerImuCallback(integrate);
+    data_provider_->spin();
+
+    // Map onto an acc/gyr container.
+    times_ = times;
+    imu_measurements_.resize(6, measurement_vector.size());
+    for (size_t i = 0; i < measurement_vector.size(); ++i)
+    {
+      imu_measurements_.col(i) = measurement_vector[i];
     }
-    Vector6 measurement;
-    measurement.head<3>() = acc; // @todo: remove bias
-    measurement.tail<3>() = gyr; // @todo: remove bias
-
-    measurement_vector.push_back(measurement);
-    times.push_back(stamp_float);
-  };
-
-  // Subscribe dataprovider and collect imu measurements.
-  data_provider_->registerImuCallback(integrate);
-  data_provider_->spin();
-
-  // Map onto an acc/gyr container.
-  ImuAccGyrContainer imu_measurements(6, measurement_vector.size());
-  for (size_t i = 0; i < measurement_vector.size(); ++i)
-  {
-    imu_measurements.col(i) = measurement_vector[i];
   }
+}
+
+//------------------------------------------------------------------------------
+void PreIntegrationRunnerDataProvider::process(
+    PreIntegrator::Ptr pre_integrator)
+{
+  loadData();
 
   // The actual preintegration.
   pre_integrator->setInitialOrientation(initial_orientation_);
-  pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
+  pre_integrator->pushD_R_i_j(times_, imu_measurements_.leftCols(times_.size()));
 }
 
 } // namespace

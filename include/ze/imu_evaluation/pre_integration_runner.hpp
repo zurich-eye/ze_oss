@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ze/common/types.h>
-#include <ze/data_provider/data_provider_base.h>
+#include <ze/data_provider/data_provider_base.hpp>
 #include <ze/imu_evaluation/pre_integrator_base.hpp>
 #include <ze/imu_evaluation/scenario_runner.hpp>
 
@@ -44,8 +44,7 @@ private:
 
 //! Pre-integrate given a data provider source of imu data.
 //! The integrator that runs on real data has the following restrictions:
-//!   _ only runs once per dataprovider (dataproviders don't have a reset)
-//!   _ only allows to integrate a full sequence from start - end.
+//!   _ only allows to integrate a full dataset
 //!   _ the dataprovider should only listen for a single imu topic, and exactly
 //!     one imu topic.
 class PreIntegrationRunnerDataProvider
@@ -61,16 +60,21 @@ public:
   //! Optionally set the initial value for the absolute orientation integrator.
   void setInitialOrientation(Matrix3 initial_orientation);
 
-  //! Process the whole scenario given a start and end-time.
-  void process(PreIntegrator::Ptr pre_integrator,
-               FloatType start,
-               FloatType end);
+  //! Process the whole dataset in a single run.
+  void process(PreIntegrator::Ptr pre_integrator);
 
 private:
   DataProviderBase::Ptr data_provider_;
 
   //! An initial value for the orientation
   Matrix3 initial_orientation_;
+
+  //! Cached values for times and measurements
+  std::vector<FloatType> times_;
+  ImuAccGyrContainer imu_measurements_;
+
+  //! Load the bag data into memory.
+  void loadData();
 };
 
 } // namespace ze
