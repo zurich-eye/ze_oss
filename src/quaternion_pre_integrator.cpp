@@ -26,6 +26,7 @@ void QuaternionPreIntegrationState::doPushD_R_i_j(
     times_container_t stamps,
     measurements_container_t measurements)
 {
+  size_t previous_items = D_R_i_k_quat_.size();
 
   switch (integrator_type_)
   {
@@ -49,6 +50,16 @@ void QuaternionPreIntegrationState::doPushD_R_i_j(
       break;
     default:
       throw std::runtime_error("No valid integrator supplied");
+  }
+
+  // Push all quaternion values as rotation matrices (the base-reference type)
+  for (size_t i = previous_items; i < D_R_i_k_quat_.size(); ++i)
+  {
+    if (compute_absolutes_)
+    {
+      R_i_k_.push_back(R_i_k_quat_[i].getRotationMatrix());
+    }
+    D_R_i_k_.push_back(D_R_i_k_quat_[i].getRotationMatrix());
   }
 
   times_raw_.push_back(stamps.back());
@@ -270,14 +281,12 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
     if (i == 0)
     {
       D_R_i_k_quat_.push_back(Quaternion());
-      D_R_i_k_.push_back(Matrix3::Identity());
       if (compute_absolutes_)
       {
         R_i_k_quat_.push_back(integrateFirstOrderFwd(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
 
       covariance_i_k_.push_back(Matrix3::Zero());
@@ -290,17 +299,13 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
                                 measurements.col(i).tail<3>(3),
                                 dt));
 
-      if(compute_absolutes_)
+      if (compute_absolutes_)
       {
         R_i_k_quat_.push_back(integrateFirstOrderFwd(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
-
-      // Push the rotation matrix equivalent representations:
-      D_R_i_k_.push_back(D_R_i_k_quat_.back().getRotationMatrix());
 
       // Covariance Prediction (FWD Integrated)
       Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
@@ -322,6 +327,8 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
     times_container_t stamps,
     measurements_container_t measurements)
 {
+  size_t previous_items = D_R_i_k_quat_.size();
+
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
@@ -333,7 +340,6 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
     if (i == 0)
     {
       D_R_i_k_quat_.push_back(Quaternion());
-      D_R_i_k_.push_back(Matrix3::Identity());
 
       if(compute_absolutes_)
       {
@@ -342,7 +348,6 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
                                 dt));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
       covariance_i_k_.push_back(Matrix3::Zero());
     }
@@ -361,11 +366,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
                                 dt));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
-
-      // Push the rotation matrix equivalent representations:
-      D_R_i_k_.push_back(D_R_i_k_quat_.back().getRotationMatrix());
 
       // Covariance Prediction (MID Integrated)
       Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
@@ -409,11 +410,9 @@ void QuaternionPreIntegrationState::doPushRK(
                                        measurements.col(i+1).tail<3>(3),
                                        dt,
                                        order);
-      D_R_i_k_.push_back(Matrix3::Identity());
       if (compute_absolutes_)
       {
         R_i_k_quat_.push_back(q_i_1);
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
       covariance_i_k_.push_back(Matrix3::Zero());
     }
@@ -432,21 +431,18 @@ void QuaternionPreIntegrationState::doPushRK(
 
       D_R_i_k_quat_.push_back(q_i_1);
 
-      Quaternion q_i_1_global;
-      std::tie(q_i_1_global, std::ignore) = integrateRK(
-                                              R_i_k_quat_.back(),
-                                              measurements.col(i).tail<3>(3),
-                                              measurements.col(i + 1).tail<3>(3),
-                                              dt,
-                                              order);
-
       if (compute_absolutes_)
       {
+        Quaternion q_i_1_global;
+        std::tie(q_i_1_global, std::ignore) = integrateRK(
+                                                R_i_k_quat_.back(),
+                                                measurements.col(i).tail<3>(3),
+                                                measurements.col(i + 1).tail<3>(3),
+                                                dt,
+                                                order);
         R_i_k_quat_.push_back(q_i_1_global);
         R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
-      // Push the rotation matrix equivalent representations:
-      D_R_i_k_.push_back(D_R_i_k_quat_.back().getRotationMatrix());
 
       // Covariance Prediction
       Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
@@ -479,7 +475,6 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
     if (i == 0)
     {
       D_R_i_k_quat_.push_back(Quaternion());
-      D_R_i_k_.push_back(Matrix3::Identity());
       if (compute_absolutes_)
       {
         R_i_k_quat_.push_back(integrateCrouchGrossman(
@@ -488,7 +483,6 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
                                 measurements.col(i+1).tail<3>(3),
                                 dt,
                                 order));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
 
       covariance_i_k_.push_back(Matrix3::Zero());
@@ -511,11 +505,7 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
                                 measurements.col(i + 1).tail<3>(3),
                                 dt,
                                 order));
-        R_i_k_.push_back(R_i_k_quat_.back().getRotationMatrix());
       }
-
-      // Push the rotation matrix equivalent representations:
-      D_R_i_k_.push_back(D_R_i_k_quat_.back().getRotationMatrix());
 
       // Covariance Prediction (FWD Integrated)
       // @todo: implement native CG3/CG4 propagation
