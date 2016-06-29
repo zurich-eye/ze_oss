@@ -125,7 +125,7 @@ TEST(PoseOptimizerTests, testSolver_withLines)
 
   const size_t n = 120;
   PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
-  Keypoints endpoints_image = generateRandomKeypoints(640, 480, 10, 2 * n);
+  Keypoints endpoints_image = generateRandomKeypoints(cam.size(), 10, 2 * n);
   Positions endpoints_C = cam.backProjectVectorized(endpoints_image);
   // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
   std::ranlux24 gen;

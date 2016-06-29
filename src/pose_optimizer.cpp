@@ -79,7 +79,7 @@ FloatType PoseOptimizer::evaluateError(
   for (auto& residual_block : data_)
   {
     VLOG(400) << "Process residual block " << residual_block.camera_idx;
-    if (residual_block.kp_idx.size() == 0)
+    if (residual_block.kp_idx.size() == 0 && residual_block.lines_W.empty())
     {
       VLOG(40) << "Residual block has no measurements.";
       continue;
