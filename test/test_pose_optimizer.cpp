@@ -92,6 +92,7 @@ TEST(PoseOptimizerTests, testSolver)
   // Optimize using bearing vectors:
   PoseOptimizerFrameData data;
   data.f = bearings_noisy;
+  data.kp_idx = KeypointIndices(n, 1);
   data.p_W = pos_W;
   data.T_C_B = T_C_B;
   data.scale = pyr_scale;

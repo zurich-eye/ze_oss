@@ -105,6 +105,9 @@ public:
   }
 
 private:
+  //! Checks whether given data is valid. Throws if not.
+  void checkData() const;
+
   std::vector<PoseOptimizerFrameData>& data_;
 
   //! @name Prior
