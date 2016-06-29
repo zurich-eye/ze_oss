@@ -563,8 +563,8 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
                                        imuBias(start, end),
                                        accel_noise,
                                        gyro_noise,
-                                       parameters_.accel_noise_bandwidth_hz,
-                                       parameters_.gyro_noise_bandwidth_hz,
+                                       1.0 / parameters_.imu_sampling_time,
+                                       1.0 / parameters_.imu_sampling_time,
                                        parameters_.gravity);
 
   PreIntegrationRunner::Ptr preintegration_runner =

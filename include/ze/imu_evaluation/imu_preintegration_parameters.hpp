@@ -15,8 +15,6 @@ DEFINE_double(trajectory_lambda, 1e-5, "The regularizing smoothing factor used t
 // Imu Simulation Parameters:
 DEFINE_double(imu_sampling_time, 0.005, "Sampling time of the IMU.");
 DEFINE_double(camera_sampling_time, 0.1, "Sampling time of the Camera, only used to split the pre-integration steps.");
-DEFINE_double(accelerometer_noise_bandwidth_hz, 200, "Bandwidth of accelerometer noise");
-DEFINE_double(gyroscope_noise_bandwidth_hz, 200, "Bandwith of gyroscope noise");
 DEFINE_double(accelerometer_noise_density, 0, "Noise density of accelerometer.");
 DEFINE_double(gyroscope_noise_density, 0, "Noise density of gyroscope");
 
@@ -38,8 +36,6 @@ struct ImuPreIntegrationParameters
   // The Imu Model and Noise Parameters:
   FloatType imu_sampling_time;
   FloatType camera_sampling_time;
-  FloatType accel_noise_bandwidth_hz;
-  FloatType gyro_noise_bandwidth_hz;
   FloatType accel_noise_density;
   FloatType gyro_noise_density;
   Vector3 gravity;
@@ -71,8 +67,6 @@ struct ImuPreIntegrationParameters
 
     p.imu_sampling_time = FLAGS_imu_sampling_time;
     p.camera_sampling_time = FLAGS_camera_sampling_time;
-    p.accel_noise_bandwidth_hz = FLAGS_accelerometer_noise_bandwidth_hz;
-    p.gyro_noise_bandwidth_hz = FLAGS_gyroscope_noise_bandwidth_hz;
     p.gravity = Vector3(0, 0, -9.81);
 
     p.accel_noise_density = FLAGS_accelerometer_noise_density;
