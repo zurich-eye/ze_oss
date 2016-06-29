@@ -92,4 +92,64 @@ void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
   }
 }
 
+//------------------------------------------------------------------------------
+PreIntegrationRunnerDataProvider::PreIntegrationRunnerDataProvider(
+    DataProviderBase::Ptr data_provider)
+  : data_provider_(data_provider)
+  , initial_orientation_(Matrix3::Identity())
+{}
+
+//------------------------------------------------------------------------------
+void PreIntegrationRunnerDataProvider::setInitialOrientation(
+    Matrix3 initial_orientation)
+{
+  initial_orientation_ = initial_orientation;
+}
+
+//------------------------------------------------------------------------------
+void PreIntegrationRunnerDataProvider::process(PreIntegrator::Ptr pre_integrator,
+                                               FloatType start,
+                                               FloatType end)
+{
+
+  std::vector<FloatType> times;
+  std::vector<Vector6> measurement_vector;
+
+  // subscribe to the dataprovider callback to get all measurements between
+  // start and end.
+  ImuCallback integrate = [&times, &measurement_vector, &start, &end](
+                   int64_t stamp, const Vector3& acc,
+                   const Vector3 gyr, uint32_t imu_idx)
+  {
+    FloatType stamp_float = static_cast<FloatType>(stamp) * 1e-9;
+
+    // Skip anything that is not within our bounds.
+    if (stamp_float < start || stamp_float > end)
+    {
+      return;
+    }
+    Vector6 measurement;
+    measurement.head<3>() = acc; // @todo: remove bias
+    measurement.tail<3>() = gyr; // @todo: remove bias
+
+    measurement_vector.push_back(measurement);
+    times.push_back(stamp_float);
+  };
+
+  // Subscribe dataprovider and collect imu measurements.
+  data_provider_->registerImuCallback(integrate);
+  data_provider_->spin();
+
+  // Map onto an acc/gyr container.
+  ImuAccGyrContainer imu_measurements(6, measurement_vector.size());
+  for (size_t i = 0; i < measurement_vector.size(); ++i)
+  {
+    imu_measurements.col(i) = measurement_vector[i];
+  }
+
+  // The actual preintegration.
+  pre_integrator->setInitialOrientation(initial_orientation_);
+  pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
+}
+
 } // namespace

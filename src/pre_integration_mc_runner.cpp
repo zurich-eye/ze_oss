@@ -30,10 +30,10 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
   {
     results.emplace_back(
           pool.enqueue([i, start, end, this] {
-      VLOG(1) << "Monte-Carlo run #" << i;
-      PreIntegrator::Ptr pre_int_mc = preintegrateCorrupted(start, end);
+            VLOG(1) << "Monte-Carlo run #" << i;
+            PreIntegrator::Ptr pre_int_mc = preintegrateCorrupted(start, end);
 
-      return pre_int_mc;
+            return pre_int_mc;
     }));
   }
 

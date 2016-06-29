@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ze/common/types.h>
+#include <ze/data_provider/data_provider_base.h>
 #include <ze/imu_evaluation/pre_integrator_base.hpp>
 #include <ze/imu_evaluation/scenario_runner.hpp>
 
@@ -35,6 +36,38 @@ private:
   //! should be larger than the imu's.
   FloatType imu_sampling_time_;
   FloatType camera_sampling_time_;
+
+  //! An initial value for the orientation
+  Matrix3 initial_orientation_;
+};
+
+
+//! Pre-integrate given a data provider source of imu data.
+//! The integrator that runs on real data has the following restrictions:
+//!   _ only runs once per dataprovider (dataproviders don't have a reset)
+//!   _ only allows to integrate a full sequence from start - end.
+//!   _ the dataprovider should only listen for a single imu topic, and exactly
+//!     one imu topic.
+class PreIntegrationRunnerDataProvider
+{
+public:
+  ZE_POINTER_TYPEDEFS(PreIntegrationRunnerDataProvider);
+
+  //! Negative sampling values for camera sampling implies a single run where
+  //! all imu samples are processed in a single step.
+  PreIntegrationRunnerDataProvider(
+      DataProviderBase::Ptr data_provider);
+
+  //! Optionally set the initial value for the absolute orientation integrator.
+  void setInitialOrientation(Matrix3 initial_orientation);
+
+  //! Process the whole scenario given a start and end-time.
+  void process(PreIntegrator::Ptr pre_integrator,
+               FloatType start,
+               FloatType end);
+
+private:
+  DataProviderBase::Ptr data_provider_;
 
   //! An initial value for the orientation
   Matrix3 initial_orientation_;
