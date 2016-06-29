@@ -39,8 +39,8 @@ T sampleUniformRealDistribution(
 template<typename T>
 T sampleNormalDistribution(
     bool deterministic = false,
-    T mean = T{0.0},
-    T sigma   = T{1.0})
+    T mean  = T{0.0},
+    T sigma = T{1.0})
 {
   static std::mt19937 gen_nondeterministic(std::random_device{}());
   static std::mt19937 gen_deterministic(0);
@@ -65,10 +65,10 @@ inline bool flipCoin(
 //------------------------------------------------------------------------------
 // Sample manifolds:
 
-//! @return 3-dimensional unit vector.
+//! @return Random 3-dimensional unit vector.
 Vector3 randomDirection3D();
 
-//! @return 2-dimensional unit vector.
+//! @return Random 2-dimensional unit vector.
 Vector2 randomDirection2D();
 
 // -----------------------------------------------------------------------------

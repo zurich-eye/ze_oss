@@ -138,9 +138,9 @@ public:
                         times_raw_.data() + Size,
                         times_raw_.data(),
                         0))
-  {
-  }
-  // no copy, no move as there is no way to track the mutex
+  {}
+
+  //! no copy, no move as there is no way to track the mutex
   Ringbuffer(const Ringbuffer& from) = delete;
   Ringbuffer(const Ringbuffer&& from) = delete;
 

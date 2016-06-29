@@ -1,4 +1,4 @@
-// Mo
+// Modified by ZE.
 // Copyright (c) 2015, Autonomous Systems Lab, ETH Zurich
 // All rights reserved.
 //
@@ -69,6 +69,5 @@
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";\
   FLAGS_alsologtostderr = true; \
   FLAGS_colorlogtostderr = true; \
-  /*FLAGS_v = 1;*/ \
   return RUN_ALL_TESTS();\
 }

@@ -1,10 +1,13 @@
 #pragma once
 
+#include <numeric>
 #include <vector>
-#include <Eigen/Core>
+#include <ze/common/types.h>
+#include <ze/common/logging.hpp>
 
 namespace ze {
 
+// -----------------------------------------------------------------------------
 //! Transform Eigen::Vector to std::vector.
 template <typename DerivedVec>
 std::vector<typename DerivedVec::Scalar> eigenVectorToStlVector(
@@ -18,6 +21,23 @@ std::vector<typename DerivedVec::Scalar> eigenVectorToStlVector(
     rv[i] = v(i);
   }
   return rv;
+}
+
+// -----------------------------------------------------------------------------
+//! @return Returns a vector of indices form start to stop.
+inline std::vector<uint32_t> range(uint32_t start, uint32_t stop)
+{
+  DEBUG_CHECK_GE(stop, start);
+  std::vector<uint32_t> vec(stop - start);
+  std::iota(vec.begin(), vec.end(), start);
+  return vec;
+}
+
+// -----------------------------------------------------------------------------
+//! @return Returns a vector of indices form 0 to stop.
+inline std::vector<uint32_t> range(uint32_t stop)
+{
+  return range(0u, stop);
 }
 
 } // namespace ze

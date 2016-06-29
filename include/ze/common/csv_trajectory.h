@@ -8,10 +8,6 @@
 
 namespace ze {
 
-using StampedTransformationVector =
-  std::vector<std::pair<int64_t, Transformation>,
-              Eigen::aligned_allocator<std::pair<int64_t, Transformation>>>;
-
 class CSVTrajectory
 {
 public:
