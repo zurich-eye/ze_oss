@@ -15,8 +15,6 @@ DEFINE_double(trajectory_lambda, 1e-5, "The regularizing smoothing factor used t
 // Imu Simulation Parameters:
 DEFINE_double(imu_sampling_time, 0.005, "Sampling time of the IMU.");
 DEFINE_double(camera_sampling_time, 0.1, "Sampling time of the Camera, only used to split the pre-integration steps.");
-DEFINE_double(accelerometer_noise_bandwidth_hz, 200, "Bandwidth of accelerometer noise");
-DEFINE_double(gyroscope_noise_bandwidth_hz, 200, "Bandwith of gyroscope noise");
 DEFINE_double(accelerometer_noise_density, 0, "Noise density of accelerometer.");
 DEFINE_double(gyroscope_noise_density, 0, "Noise density of gyroscope");
 
