@@ -4,7 +4,16 @@
 
 namespace ze {
 
-static constexpr FloatType c_rad_to_deg = 180.0 / M_PI;
-static constexpr FloatType c_deg_to_rad = M_PI / 180.0;
+template<typename Scalar>
+constexpr Scalar radToDeg(Scalar rad)
+{
+  return rad * 180.0 / M_PI;
+}
+
+template<typename Scalar>
+constexpr Scalar degToRad(Scalar deg)
+{
+  return deg * M_PI / 180.0;
+}
 
 } // namespace ze
