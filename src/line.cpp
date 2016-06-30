@@ -9,7 +9,7 @@ Vector2 Line::calculateMeasurementError(const Vector3& measurement_W,
                                         const Vector3& camera_position_W) const
 {
   const Vector3 anchor_to_camera = camera_position_W - anchorPoint();
-  CHECK_GT(anchor_to_camera.norm(), 0.0);
+  DEBUG_CHECK_GT(anchor_to_camera.norm(), 0.0);
   return Vector2(measurement_W.dot(direction()),
                  measurement_W.dot(anchor_to_camera) / anchor_to_camera.norm());
 }
@@ -25,7 +25,7 @@ Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
   const Transformation T_C_W = T_C_B * T_B_W;
   const Matrix13 measurement_W_transpose = measurement_W.transpose();
   const Vector3 anchor_to_cam = T_C_W.inverse().getPosition() - line_anchor;
-  CHECK_NE(anchor_to_cam.norm(), 0.0);
+  DEBUG_CHECK_NE(anchor_to_cam.norm(), 0.0);
   const FloatType inverse_distance = 1.0 / anchor_to_cam.norm();
   const Vector3 anchor_to_cam_normalized = anchor_to_cam * inverse_distance;
   const Matrix3 d_anchor_to_cam_normalized_d_campos =
@@ -51,9 +51,9 @@ Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
 }
 
 // -----------------------------------------------------------------------------
-void generateRandomVisibleLines(const Camera& cam, const Transformation& T_W_C,
-                                size_t num_lines, Lines& lines_W,
-                                Positions* startpoints_W, Positions* endpoints_W)
+std::pair<Positions, Positions> generateRandomVisibleLines(
+    const Camera& cam, const Transformation& T_W_C,
+    size_t num_lines, Lines& lines_W)
 {
   auto visible_points_C =
       generateRandomVisible3dPoints(cam, num_lines * 2, 10, 1.0, 20.0);
@@ -65,23 +65,18 @@ void generateRandomVisibleLines(const Camera& cam, const Transformation& T_W_C,
       T_W_C.transformVectorized(
         std::get<2>(visible_points_C).topRightCorner(3, num_lines));
 
-  generateLinesFromEndpoints(start_W, end_W, lines_W);
+  lines_W = generateLinesFromEndpoints(start_W, end_W);
 
-  if (startpoints_W != nullptr && endpoints_W != nullptr)
-  {
-    *startpoints_W = start_W;
-    *endpoints_W = end_W;
-  }
+  return std::make_pair(start_W, end_W);
 }
 
 // -----------------------------------------------------------------------------
-void generateLinesFromEndpoints(const Positions& startpoints,
-                                const Positions& endpoints,
-                                Lines& lines)
+Lines generateLinesFromEndpoints(const Positions& startpoints,
+                                const Positions& endpoints)
 {
   CHECK_EQ(startpoints.cols(), endpoints.cols());
   const size_t n = startpoints.cols();
-  lines.clear();
+  Lines lines;
   lines.reserve(n);
   for (size_t i = 0; i < n; ++i)
   {
@@ -98,6 +93,7 @@ void generateLinesFromEndpoints(const Positions& startpoints,
     const Quaternion orientation(rotation);
     lines.emplace_back(orientation, anchor_point.norm());
   }
+  return lines;
 }
 
 } // namespace ze

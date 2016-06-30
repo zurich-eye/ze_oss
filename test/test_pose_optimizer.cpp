@@ -54,7 +54,7 @@ TEST(PoseOptimizerTests, testSolver)
   T_B_W.setRandom(); // Random body transformation.
 
   const size_t n = 120;
-  PinholeCamera cam = createTestCamera();
+  PinholeCamera cam = createTestPinholeCamera();
   Keypoints px_true = generateRandomKeypoints(cam.size(), 10, n);
 
   Positions pos_C = cam.backProjectVectorized(px_true);
@@ -123,28 +123,24 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   T_C_B.setRandom(); // Random camera to imu/body transformation.
   T_B_W.setRandom(); // Random body transformation.
 
-  const size_t n = 120;
-  PinholeCamera cam = createTestCamera();
-  Keypoints endpoints_image = generateRandomKeypoints(cam.size(), 10, 2 * n);
-  Positions endpoints_C = cam.backProjectVectorized(endpoints_image);
-  // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
-  std::ranlux24 gen;
-  std::uniform_real_distribution<double> scale(1.0, 3.0);
-  for(size_t i = 0; i < 2 * n; ++i)
-  {
-    endpoints_C.col(i) *= scale(gen);
-  }
+  const size_t n = 130;
+  PinholeCamera cam = createTestPinholeCamera();
+  Keypoints endpoints_image;
+  Bearings bearings_truth;
+  Positions endpoints_C;
+  std::tie(endpoints_image, bearings_truth, endpoints_C) =
+      generateRandomVisible3dPoints(cam, 2 * n, 10, 1.0, 3.0);
+
   Positions endpoints_W =
       (T_B_W.inverse() * T_C_B.inverse()).transformVectorized(endpoints_C);
 
-  Lines lines_W;
-  generateLinesFromEndpoints(endpoints_W.block(0, 0, 3, n),
-                             endpoints_W.block(0, n, 3, n),
-                             lines_W);
+  Lines lines_W = generateLinesFromEndpoints(endpoints_W.block(0, 0, 3, n),
+                                             endpoints_W.block(0, n, 3, n));
 
   // Apply some noise to the endpoints to simulate measurements.
   Keypoints endpoints_noisy = endpoints_image;
   const double stddev = 1.0;
+  std::ranlux24 gen;
   std::normal_distribution<double> endpoints_noise(0.0, stddev);
   for (size_t i = 0; i < 2 * n; ++i)
   {
@@ -152,15 +148,14 @@ TEST(PoseOptimizerTests, testSolver_withLines)
     endpoints_noisy(1, i) += endpoints_noise(gen);
   }
   Bearings bearings_noisy = cam.backProjectVectorized(endpoints_noisy);
-  Bearings bearings_truth = cam.backProjectVectorized(endpoints_image);
   LineMeasurements line_measurements_noisy(3, n);
   LineMeasurements line_measurements_truth(3, n);
   for (size_t i = 0; i < n; ++i)
   {
     line_measurements_noisy.col(i) =
-        (bearings_noisy.col(i).cross(bearings_noisy.col(n + i))).normalized();
+        lineMeasurementFromBearings(bearings_noisy.col(i), bearings_noisy.col(n + i));
     line_measurements_truth.col(i) =
-        (bearings_truth.col(i).cross(bearings_truth.col(n + i))).normalized();
+        lineMeasurementFromBearings(bearings_truth.col(i), bearings_truth.col(n + i));
   }
 
   // Check if error for truth is zero.
