@@ -9,7 +9,10 @@ QuaternionPreIntegrationState::QuaternionPreIntegrationState(
   : PreIntegrator(gyro_noise_covariance, integrator_type)
 {
   D_R_i_j_quat_.push_back(Quaternion());
+  D_R_i_k_quat_.push_back(Quaternion());
+
   R_i_j_quat_.push_back(Quaternion());
+  R_i_k_quat_.push_back(Quaternion());
 }
 
 //------------------------------------------------------------------------------
@@ -17,6 +20,8 @@ void QuaternionPreIntegrationState::setInitialOrientation(
                                       Matrix3 initial_orientation)
 {
   PreIntegrator::setInitialOrientation(initial_orientation);
+  R_i_j_quat_.clear();
+  R_i_k_quat_.clear();
   R_i_j_quat_.push_back(Quaternion(initial_orientation));
   R_i_k_quat_.push_back(Quaternion(initial_orientation));
 }
@@ -80,6 +85,10 @@ void QuaternionPreIntegrationState::doPushD_R_i_j(
 
   // push covariance
   covariance_i_j_.push_back(covariance_i_k_.back());
+
+  // Sanity Checks:
+  CHECK_EQ(R_i_k_.size(), R_i_k_quat_.size());
+  CHECK_EQ(D_R_i_k_.size(), D_R_i_k_quat_.size());
 }
 
 //------------------------------------------------------------------------------
