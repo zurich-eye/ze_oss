@@ -11,6 +11,8 @@ DEFINE_double(trajectory_length, 30.0, "The length of the curve in seconds");
 DEFINE_int32(trajectory_interpolation_points, 100, "Number of interpolation to randomize");
 DEFINE_int32(trajectory_num_segments, 100, "Number of spline segments to fit the interpolation points.");
 DEFINE_double(trajectory_lambda, 1e-5, "The regularizing smoothing factor used to fit the trajectory to the interpolation curve. Smaller values give more aggressive curves.");
+DEFINE_double(trajectory_translation_factor, 10, "Multiplier for the random trajectory magnitude (translation).");
+DEFINE_double(trajectory_rotation_factor, 1, "Multiplier for the random trajectory magnitude (rotation).");
 
 // Imu Simulation Parameters:
 DEFINE_double(imu_sampling_time, 0.005, "Sampling time of the IMU.");
@@ -59,6 +61,8 @@ struct ImuPreIntegrationParameters
   int trajectory_num_segments;
   FloatType trajectory_lambda;
   int trajectory_spline_order = 10;
+  FloatType trajectory_rotation_factor;
+  FloatType trajectory_translation_factor;
 
   //! Initialize a parameter structure from gflags
   static ImuPreIntegrationParameters fromGFlags()
@@ -78,6 +82,8 @@ struct ImuPreIntegrationParameters
     p.trajectory_num_interpolation_points = FLAGS_trajectory_interpolation_points;
     p.trajectory_num_segments = FLAGS_trajectory_num_segments;
     p.trajectory_lambda = FLAGS_trajectory_lambda;
+    p.trajectory_rotation_factor = FLAGS_trajectory_rotation_factor;
+    p.trajectory_translation_factor = FLAGS_trajectory_translation_factor;
 
     p.imu_bias_type = FLAGS_imu_bias_type;
 

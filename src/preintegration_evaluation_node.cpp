@@ -742,10 +742,12 @@ void PreIntegrationEvaluationNode::loadTrajectory()
     MatrixX points(6, parameters_.trajectory_num_interpolation_points);
     points.setRandom();
     // make translations significanter
-    points.block(0, 0, 3, parameters_.trajectory_num_interpolation_points) *= 10;
+    points.block(0, 0, 3, parameters_.trajectory_num_interpolation_points) *=
+        parameters_.trajectory_translation_factor;
 
     // Rotation Multiplier
-    points.block(3, 0, 3, parameters_.trajectory_num_interpolation_points) *= 10;
+    points.block(3, 0, 3, parameters_.trajectory_num_interpolation_points) *=
+        parameters_.trajectory_rotation_factor;
 
     VectorX times;
     times.setLinSpaced(parameters_.trajectory_num_interpolation_points, start, end);
