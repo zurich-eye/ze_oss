@@ -93,7 +93,6 @@ void ManifoldPreIntegrationState::doPushFirstOrderMid(
     Vector3 gyro_measurement = measurement.tail<3>(3);
     Vector3 gyro_measurement2 = measurements.col(i+1).tail<3>(3);
 
-
     // Reset to 0 at every step:
     if (i == 0)
     {

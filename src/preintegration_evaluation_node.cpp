@@ -161,6 +161,26 @@ void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
                     start,
                     end,
                     mc);
+
+  // 8) Quaternion Integration: CG3
+  QuaternionPreIntegrationState::Ptr state_quat_cg3 =
+      runQuaternion(preintegration_runner,
+                    PreIntegrator::CrouchGrossman3,
+                    "CG3",
+                    gyroscope_noise_covariance,
+                    start,
+                    end,
+                    mc);
+
+  // 9) Quaternion Integration: CG4
+  QuaternionPreIntegrationState::Ptr state_quat_cg4 =
+      runQuaternion(preintegration_runner,
+                    PreIntegrator::CrouchGrossman4,
+                    "CG4",
+                    gyroscope_noise_covariance,
+                    start,
+                    end,
+                    mc);
 }
 
 // -----------------------------------------------------------------------------
@@ -617,9 +637,12 @@ ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrup
   plotCovarianceResults({est_integrator->covariance_i_k()},
                         {"Est" + name});
 
-  plotCovarianceError(mc->covariances(),
-                      est_integrator->covariance_i_k(),
-                      name);
+  if (mc)
+  {
+    plotCovarianceError(mc->covariances(),
+                        est_integrator->covariance_i_k(),
+                        name);
+  }
 
   // Show the timers for the integration.
   if (FLAGS_time_integration)
@@ -655,9 +678,12 @@ QuaternionPreIntegrationState::Ptr PreIntegrationEvaluationNode::runQuaternion(
   plotCovarianceResults({est_integrator->covariance_i_k()},
                         {"Est" + name});
 
-  plotCovarianceError(mc->covariances(),
-                      est_integrator->covariance_i_k(),
-                      name);
+  if (mc)
+  {
+    plotCovarianceError(mc->covariances(),
+                        est_integrator->covariance_i_k(),
+                        name);
+  }
 
   // Show the timers for the integration.
   if (FLAGS_time_integration)

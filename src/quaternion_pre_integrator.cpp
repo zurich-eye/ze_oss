@@ -261,7 +261,7 @@ Quaternion QuaternionPreIntegrationState::integrateCrouchGrossman(
     Vector3 K_4 = w_i + (w_i_1 - w_i) * 0.3242290522866937;
     Vector3 K_5 = w_i + (w_i_1 - w_i) * 0.8768903263420429;
 
-    return q*
+    return q *
         exp(0.1370831520630755, dt, K_1) *
         exp(-0.0183698531564020, dt, K_2) *
         exp(0.7397813985370780, dt, K_3) *
