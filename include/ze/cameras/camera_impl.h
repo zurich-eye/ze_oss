@@ -131,4 +131,10 @@ inline EquidistantCamera createEquidistantCamera(
                            (Vector4() << k1, k2, k3, k4).finished());
 }
 
+//! Returns camera with some reasonable parameters.
+inline PinholeCamera createTestCamera()
+{
+  return createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
+}
+
 } // namespace ze
