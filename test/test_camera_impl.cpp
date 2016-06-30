@@ -27,7 +27,7 @@ public:
     , sample_size_(sample_size)
     , test_name_(test_name)
   {
-    px_ = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
+    px_ = generateRandomKeypoints(cam_.size(), 10u, sample_size_);
     f_ = cam.backProjectVectorized(px_);
   }
 
@@ -118,7 +118,7 @@ public:
   void testProjection()
   {
     uint32_t N = 300;
-    Keypoints px1 = generateRandomKeypoints(cam_.width(), cam_.height(), 10u, sample_size_);
+    Keypoints px1 = generateRandomKeypoints(cam_.size(), 10u, sample_size_);
     Bearings f1 = cam_.backProjectVectorized(px1);
     Keypoints px2 = cam_.projectVectorized(f1);
     Keypoints px_error = px1 - px2;
@@ -222,7 +222,7 @@ TEST(CameraImplTests, testYamlParsingPinhole)
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_nodistortion.yaml";
   ASSERT_TRUE(ze::fileExists(yaml_file));
-  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  ze::Camera::Ptr cam = ze::cameraFromYaml(yaml_file);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(1), 310.0);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(2), 376.5);
@@ -233,7 +233,7 @@ TEST(CameraImplTests, testYamlParsingFoV)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_fov.yaml";
-  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  ze::Camera::Ptr cam = ze::cameraFromYaml(yaml_file);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), 0.940454);
 }
@@ -242,7 +242,7 @@ TEST(CameraImplTests, testYamlParsingRadTan)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_radtan.yaml";
-  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  ze::Camera::Ptr cam = ze::cameraFromYaml(yaml_file);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), -0.28340811217029355);
 }
@@ -251,7 +251,7 @@ TEST(CameraImplTests, testYamlParsingEquidistant)
 {
   std::string data_dir = ze::getTestDataDir("camera_models");
   std::string yaml_file = data_dir + "/camera_pinhole_equidistant.yaml";
-  ze::Camera::Ptr cam = ze::Camera::loadFromYaml(yaml_file);
+  ze::Camera::Ptr cam = ze::cameraFromYaml(yaml_file);
   EXPECT_FLOATTYPE_EQ(cam->projectionParameters()(0), 320.0);
   EXPECT_FLOATTYPE_EQ(cam->distortionParameters()(0), -0.0027973061697674074);
 }

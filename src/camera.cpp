@@ -70,21 +70,6 @@ Matrix6X Camera::dProject_dLandmarkVectorized(const Positions& pos_vec) const
   return J_vec;
 }
 
-Camera::Ptr Camera::loadFromYaml(const std::string& path)
-{
-  try
-  {
-    YAML::Node doc = YAML::LoadFile(path.c_str());
-    return doc.as<Camera::Ptr>();
-  }
-  catch (const std::exception& ex)
-  {
-    LOG(ERROR) << "Failed to load Camera from file " << path << " with the error: \n"
-               << ex.what();
-  }
-  return Camera::Ptr();
-}
-
 std::string Camera::typeAsString() const
 {
   switch (type_)
@@ -104,6 +89,21 @@ void Camera::setMask(const Image8uC1::Ptr& mask)
   CHECK_NOTNULL(mask.get());
   CHECK_EQ(mask->size(), size_);
   mask_ = mask;
+}
+
+Camera::Ptr cameraFromYaml(const std::string& path)
+{
+  try
+  {
+    YAML::Node doc = YAML::LoadFile(path.c_str());
+    return doc.as<Camera::Ptr>();
+  }
+  catch (const std::exception& ex)
+  {
+    LOG(ERROR) << "Failed to load Camera from file " << path << " with the error: \n"
+               << ex.what();
+  }
+  return Camera::Ptr();
 }
 
 std::ostream& operator<<(std::ostream& out, const Camera& cam)
