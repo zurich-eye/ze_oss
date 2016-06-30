@@ -17,14 +17,13 @@ Vector2 Line::calculateMeasurementError(const Vector3& measurement_W,
 // -----------------------------------------------------------------------------
 Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
                                 const Transformation& T_C_B,
-                                const LineMeasurement& measurement,
+                                const LineMeasurement& measurement_W,
                                 const Position& line_anchor,
                                 const Vector3& line_direction)
 {
   //! @todo Can be optimized.
   const Transformation T_C_W = T_C_B * T_B_W;
-  const Matrix13 measurement_W_transpose =
-      T_C_W.getRotation().inverse().rotate(measurement).transpose();
+  const Matrix13 measurement_W_transpose = measurement_W.transpose();
   const Vector3 anchor_to_cam = T_C_W.inverse().getPosition() - line_anchor;
   CHECK_NE(anchor_to_cam.norm(), 0.0);
   const FloatType inverse_distance = 1.0 / anchor_to_cam.norm();

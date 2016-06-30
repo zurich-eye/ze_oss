@@ -21,7 +21,7 @@ inline FloatType calculateDistanceToLine(const Position& pos,
 
 Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
                                 const Transformation& T_C_B,
-                                const LineMeasurement& measurement,
+                                const LineMeasurement& measurement_W,
                                 const Position& line_anchor,
                                 const Vector3& line_direction);
 
