@@ -131,4 +131,14 @@ inline EquidistantCamera createEquidistantCamera(
                            (Vector4() << k1, k2, k3, k4).finished());
 }
 
+inline Camera::Ptr createEquidistantCameraShared(
+    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
+    FloatType k1, FloatType k2, FloatType k3, FloatType k4)
+{
+  return std::make_shared<EquidistantCamera>(
+        width, height, CameraType::PinholeEquidistant,
+        (Vector4() << fx, fy, cx, cy).finished(),
+        (Vector4() << k1, k2, k3, k4).finished());
+}
+
 } // namespace ze
