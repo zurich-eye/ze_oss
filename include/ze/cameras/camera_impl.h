@@ -132,7 +132,7 @@ inline EquidistantCamera createEquidistantCamera(
 }
 
 //! Returns camera with some reasonable parameters.
-inline PinholeCamera createTestCamera()
+inline PinholeCamera createTestPinholeCamera()
 {
   return createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
 }
