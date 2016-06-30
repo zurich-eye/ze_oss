@@ -1,17 +1,21 @@
 #include <functional>
 
-#include <ze/common/line.hpp>
+#include <ze/cameras/camera_impl.h>
 #include <ze/common/numerical_derivative.h>
 #include <ze/common/test_entrypoint.h>
+#include <ze/geometry/line.hpp>
 
 TEST(LineTests, testLineGeneration)
 {
   using namespace ze;
   // Create lines.
   size_t n = 100;
-  ze::Lines lines;
-  ze::Positions start, end;
-  generateRandomLines(n, lines, &start, &end);
+  Lines lines;
+  Positions start, end;
+  PinholeCamera cam = createTestCamera();
+  Transformation T_W_C;
+  T_W_C.setRandom();
+  generateRandomVisibleLines(cam, T_W_C, n, lines, &start, &end);
 
   for (size_t i = 0; i < n; ++i)
   {
@@ -23,7 +27,7 @@ TEST(LineTests, testLineGeneration)
     EXPECT_NEAR(direction.norm(), 1.0, 1e-15);
     // Anchor, start and end point should be on the line.
     EXPECT_NEAR(lines[i].calculateDistanceToLine(anchor_point), 0.0, 1e-14);
-    EXPECT_NEAR(lines[i].calculateDistanceToLine(start.col(i)), 0.0, 1e-14);
+    EXPECT_NEAR(lines[i].calculateDistanceToLine(start.col(i)), 0.0, 1e-13);
     EXPECT_NEAR(lines[i].calculateDistanceToLine(end.col(i)), 0.0, 1e-14);
   }
 }
@@ -35,24 +39,43 @@ TEST(LineTests, testJacobian)
   T_B_W.setRandom();
   T_C_B.setRandom();
   const Transformation T_C_W = T_C_B * T_B_W;
+  const Transformation T_W_C = T_C_W.inverse();
 
-  Lines lines;
-  Positions start, end;
-  generateRandomLines(1, lines, &start, &end);
+  size_t num_tests = 100;
+  Lines lines_W;
+  Positions start_W, end_W;
+  ze::PinholeCamera cam = createTestCamera();
+  generateRandomVisibleLines(cam, T_W_C, num_tests, lines_W, &start_W, &end_W);
 
-  const LineMeasurement n = (T_C_W * start.col(0)).cross(T_C_W * end.col(0));
-
-  auto measurementError = [&](const Transformation& T_B_W) {
-    Transformation T_C_W = T_C_B * T_B_W;
-    Position camera_pos_W = T_C_W.inverse().getPosition();
-    Vector3 measurement_W = T_C_W.getRotation().inverse().rotate(n);
-    return lines[0].calculateMeasurementError(measurement_W, camera_pos_W);
+  // Create measurements.
+  LineMeasurements measurements_C(3, num_tests);
+  size_t i;
+  for (i = 0; i < num_tests; ++i)
+  {
+    measurements_C.col(i) =
+        (T_C_W * start_W.col(i)).cross(T_C_W * end_W.col(0)).normalized();
+    if(std::rand() - RAND_MAX / 2 > 0)
+    {
+      measurements_C.col(i) *= -1;
+    }
+  }
+  auto measurementError = [&](const Transformation& T_B_W_in_lambda) {
+    Transformation T_W_C_in_lambda = (T_C_B * T_B_W_in_lambda).inverse();
+    Position camera_pos_W = T_W_C_in_lambda.getPosition();
+    Vector3 measurement_W = T_W_C_in_lambda.getRotation().rotate(measurements_C.col(i));
+    return lines_W[i].calculateMeasurementError(measurement_W, camera_pos_W);
   };
 
-  Matrix26 J_numeric = numericalDerivative<Vector2, Transformation>(measurementError, T_B_W);
-  Matrix26 J_analytic = dLineMeasurement_dPose(T_B_W, T_C_B, n, lines[0].anchorPoint(), lines[0].direction());
+  for (i = 0; i < num_tests; ++i)
+  {
+    Matrix26 J_numeric =
+        numericalDerivative<Vector2, Transformation>(measurementError, T_B_W);
+    Matrix26 J_analytic =
+        dLineMeasurement_dPose(T_B_W, T_C_B, measurements_C.col(i),
+                               lines_W[i].anchorPoint(), lines_W[i].direction());
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(J_numeric, J_analytic, 1e-9));
+  }
 
-  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(J_numeric, J_analytic));
 }
 
 ZE_UNITTEST_ENTRYPOINT

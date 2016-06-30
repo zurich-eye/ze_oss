@@ -5,6 +5,8 @@
 
 namespace ze {
 
+// fwd
+class Camera;
 class Line;
 
 // Convenience typedefs:
@@ -24,9 +26,10 @@ Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
                                 const Vector3& line_direction);
 
 
-void generateRandomLines(size_t num_lines, Lines& lines,
-                         Positions* startpoints = nullptr,
-                         Positions* endpoints = nullptr);
+void generateRandomVisibleLines(const Camera& cam, const Transformation& T_W_C,
+                                size_t num_lines, Lines& lines_W,
+                                Positions* startpoints_W = nullptr,
+                                Positions* endpoints_W = nullptr);
 
 void generateLinesFromEndpoints(const Positions& startpoints,
                                 const Positions& endpoints,

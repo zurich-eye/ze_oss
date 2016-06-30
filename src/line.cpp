@@ -1,5 +1,7 @@
 #include <ze/geometry/line.hpp>
 
+#include <ze/cameras/camera_utils.h>
+
 namespace ze {
 
 // -----------------------------------------------------------------------------
@@ -50,18 +52,26 @@ Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
 }
 
 // -----------------------------------------------------------------------------
-void generateRandomLines(size_t num_lines, Lines& lines,
-                         Positions* startpoints,
-                         Positions* endpoints)
+void generateRandomVisibleLines(const Camera& cam, const Transformation& T_W_C,
+                                size_t num_lines, Lines& lines_W,
+                                Positions* startpoints_W, Positions* endpoints_W)
 {
-  ze::Positions start, end;
-  start.setRandom(3, num_lines);
-  end.setRandom(3, num_lines);
-  ze::generateLinesFromEndpoints(start, end, lines);
-  if (startpoints != nullptr && endpoints != nullptr)
+  auto visible_points_C =
+      generateRandomVisible3dPoints(cam, num_lines * 2, 10, 1.0, 20.0);
+
+  Positions start_W =
+      T_W_C.transformVectorized(
+        std::get<2>(visible_points_C).topLeftCorner(3, num_lines));
+  Positions end_W =
+      T_W_C.transformVectorized(
+        std::get<2>(visible_points_C).topRightCorner(3, num_lines));
+
+  generateLinesFromEndpoints(start_W, end_W, lines_W);
+
+  if (startpoints_W != nullptr && endpoints_W != nullptr)
   {
-    *startpoints = start;
-    *endpoints = end;
+    *startpoints_W = start_W;
+    *endpoints_W = end_W;
   }
 }
 
@@ -83,12 +93,7 @@ void generateLinesFromEndpoints(const Positions& startpoints,
                                          (end - start).norm();
     const Vector3 anchor_point = start + anchor_point_distance * direction;
     const Vector3 anchor_point_direction = anchor_point.normalized();
-    // Since the direction could also be flipped we require that the first entry
-    // is positive.
-    if (direction[0] < 0.0)
-    {
-      direction *= -1.0;
-    }
+
     Matrix3 rotation;
     rotation << direction, anchor_point_direction.cross(direction), anchor_point_direction;
     const Quaternion orientation(rotation);

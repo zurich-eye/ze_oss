@@ -1,13 +1,13 @@
 #include <random>
 #include <ze/common/benchmark.h>
 #include <ze/common/test_entrypoint.h>
-#include <ze/common/line.hpp>
 #include <ze/common/matrix.h>
 #include <ze/common/timer.h>
 #include <ze/common/types.h>
 #include <ze/common/transformation.h>
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_impl.h>
+#include <ze/geometry/line.hpp>
 #include <ze/geometry/pose_optimizer.h>
 #include <ze/geometry/robust_cost.h>
 
@@ -159,18 +159,8 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   {
     line_measurements_noisy.col(i) =
         (bearings_noisy.col(i).cross(bearings_noisy.col(n + i))).normalized();
-    // Since b1xb2 = -(b2xb1) we choose the normal with positive first entry.
-    if (line_measurements_noisy(0, i) < 0.0)
-    {
-      line_measurements_noisy.col(i) *= -1;
-    }
-
     line_measurements_truth.col(i) =
         (bearings_truth.col(i).cross(bearings_truth.col(n + i))).normalized();
-    if (line_measurements_truth(0, i) < 0.0)
-    {
-      line_measurements_truth.col(i) *= -1;
-    }
   }
 
   // Check if error for truth is zero.
