@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ze/common/line.hpp>
 #include <ze/common/transformation.h>
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_impl.h>
+#include <ze/geometry/line.hpp>
 #include <ze/geometry/robust_cost.h>
 #include <ze/geometry/lsq_solver.h>
 

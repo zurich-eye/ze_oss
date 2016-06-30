@@ -22,6 +22,7 @@ set(HEADERS
   include/ze/geometry/align_points.h
   include/ze/geometry/align_poses.h
   include/ze/geometry/clam.h
+  include/ze/geometry/line.hpp
   include/ze/geometry/lsq_solver.h
   include/ze/geometry/lsq_solver-inl.h
   include/ze/geometry/lsq_state.h
@@ -37,6 +38,7 @@ set(SOURCES
   src/align_points.cpp
   src/align_poses.cpp
   src/clam.cpp
+  src/line.cpp
   src/pose_optimizer.cpp
   src/ransac_relative_pose.cpp
   src/triangulation.cpp
@@ -55,6 +57,9 @@ target_link_libraries(test_align_poses ${PROJECT_NAME})
 
 catkin_add_gtest(test_clam test/test_clam.cpp)
 target_link_libraries(test_clam ${PROJECT_NAME})
+
+catkin_add_gtest(test_line test/test_line.cpp)
+target_link_libraries(test_line ${PROJECT_NAME})
 
 catkin_add_gtest(test_lsq_state test/test_lsq_state.cpp)
 target_link_libraries(test_lsq_state ${PROJECT_NAME})
