@@ -54,7 +54,7 @@ TEST(PoseOptimizerTests, testSolver)
   T_B_W.setRandom(); // Random body transformation.
 
   const size_t n = 120;
-  PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
+  PinholeCamera cam = createTestCamera();
   Keypoints px_true = generateRandomKeypoints(cam.size(), 10, n);
 
   Positions pos_C = cam.backProjectVectorized(px_true);
@@ -124,7 +124,7 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   T_B_W.setRandom(); // Random body transformation.
 
   const size_t n = 120;
-  PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
+  PinholeCamera cam = createTestCamera();
   Keypoints endpoints_image = generateRandomKeypoints(cam.size(), 10, 2 * n);
   Positions endpoints_C = cam.backProjectVectorized(endpoints_image);
   // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
