@@ -101,7 +101,7 @@ TEST(impCuUndistortionTexture, equidist32fC1)
   const std::string calib_file =
       ze::joinPath(test_folder, "visensor_22030_swe_params.yaml");
 
-  ze::CameraRig::Ptr rig = ze::CameraRig::loadFromYaml(calib_file);
+  ze::CameraRig::Ptr rig = ze::cameraRigFromYaml(calib_file);
   VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
   for (int i = 0; i < 12; ++i)
