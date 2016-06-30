@@ -324,7 +324,6 @@ void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
     }
   }
 
-
   VectorX mean = results.rowwise().mean();
   VLOG(1) << "Manifold Fwd: " << mean(0) << "\n";
   VLOG(1) << "Manifold Mid: " << mean(1) << "\n";
@@ -360,6 +359,7 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
 {
   std::vector<FloatType> errors;
 
+  //! Evalutes an orientation error wrt. the reference trajectory.
   auto evaluateOrientationError = [this](const std::vector<FloatType> times,
                                   const std::vector<Matrix3> est) -> FloatType
   {
@@ -374,148 +374,124 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
     return error;
   };
 
+  //! Run preintegration from start to end on a given pre integrator
+  //! Returns a pair containing the preintegrator itself and the float error.
+  auto preIntegrate = [&start, &end, &evaluateOrientationError,
+                      &preintegration_runner](PreIntegrator::Ptr pi)
+  {
+    pi->computeAbsolutes(true);
+    preintegration_runner->process(pi, true, start, end);
+
+    return std::make_pair(pi, evaluateOrientationError(pi->times_raw(), pi->R_i_k()));
+  };
 
   VLOG(1) << "Simulate single run for integration drift.";
+  ThreadPool pool(FLAGS_num_threads);
+  std::vector<std::future<std::pair<PreIntegrator::Ptr, FloatType>>> results_future;
 
   // 1) Manifold Fwd
-  PreIntegrator::Ptr pi_manifold_fwd =
-      std::make_shared<ManifoldPreIntegrationState>(
-        gyroscope_noise_covariance,
-        PreIntegrator::FirstOrderForward);
-  pi_manifold_fwd->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_manifold_fwd,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_manifold_fwd->times_raw(),
-                                 pi_manifold_fwd->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<ManifoldPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          PreIntegrator::FirstOrderForward));
+  }));
 
   // 2) Manifold Mid
-  PreIntegrator::Ptr pi_manifold_mid =
-      std::make_shared<ManifoldPreIntegrationState>(
-        gyroscope_noise_covariance,
-        PreIntegrator::FirstOrderMidward);
-  pi_manifold_mid->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_manifold_mid,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_manifold_mid->times_raw(),
-                                 pi_manifold_mid->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<ManifoldPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          PreIntegrator::FirstOrderMidward));
+  }));
 
   // 3) Quaternion FWD
-  PreIntegrator::Ptr pi_quat_fwd =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::FirstOrderForward);
-  pi_quat_fwd->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_quat_fwd,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_fwd->times_raw(),
-                                 pi_quat_fwd->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::FirstOrderForward));
+  }));
 
   // 4) Quaternion Mid
-  PreIntegrator::Ptr pi_quat_mid =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::FirstOrderMidward);
-  pi_quat_mid->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_quat_mid,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_mid->times_raw(),
-                                 pi_quat_mid->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::FirstOrderMidward));
+  }));
 
   // 5) Quaternion RK3
-  PreIntegrator::Ptr pi_quat_rk3 =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::RungeKutta3);
-  pi_quat_rk3->computeAbsolutes(true);
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::RungeKutta3));
+  }));
 
-  preintegration_runner->process(pi_quat_rk3,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_rk3->times_raw(),
-                                 pi_quat_rk3->R_i_k()));
 
   // 6) Quaternion RK4
-  PreIntegrator::Ptr pi_quat_rk4 =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::RungeKutta4);
-  pi_quat_rk4->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_quat_rk4,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_rk4->times_raw(),
-                                 pi_quat_rk4->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::RungeKutta4));
+  }));
 
   // 7) Quaternion CG3
-  PreIntegrator::Ptr pi_quat_cg3 =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::CrouchGrossman3);
-  pi_quat_cg3->computeAbsolutes(true);
-
-  preintegration_runner->process(pi_quat_cg3,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_cg3->times_raw(),
-                                 pi_quat_cg3->R_i_k()));
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::CrouchGrossman3));
+  }));
 
   // 8) Quaternion CG4
-  PreIntegrator::Ptr pi_quat_cg4 =
-      std::make_shared<QuaternionPreIntegrationState>(
-        gyroscope_noise_covariance,
-        QuaternionPreIntegrationState::CrouchGrossman4);
-  pi_quat_cg4->computeAbsolutes(true);
+  results_future.emplace_back(
+        pool.enqueue([&gyroscope_noise_covariance, &preIntegrate]
+  {
+    return preIntegrate(std::make_shared<QuaternionPreIntegrationState>(
+                          gyroscope_noise_covariance,
+                          QuaternionPreIntegrationState::CrouchGrossman4));
+  }));
 
-  preintegration_runner->process(pi_quat_cg4 ,
-                                 true,
-                                 start,
-                                 end);
-  errors.push_back(
-        evaluateOrientationError(pi_quat_cg4->times_raw(),
-                                 pi_quat_cg4->R_i_k()));
+
+  // Extract the results of the simulations
+  std::vector<PreIntegrator::Ptr> result_integrators;
+  for (auto iter = results_future.begin(); iter != results_future.end(); ++iter)
+  {
+    auto value = iter->get();
+
+    result_integrators.push_back(value.first);
+    errors.push_back(value.second);
+  }
 
   if (plot)
   {
-    plotOrientation(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(), "ManifoldFwd", true);
-    plotOrientation(pi_manifold_mid->times_raw(), pi_manifold_mid->R_i_k(), "ManifoldMid");
-    plotOrientation(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k(), "QuatFwd");
-    plotOrientation(pi_quat_mid->times_raw(), pi_quat_mid->R_i_k(), "QuatMid");
-    plotOrientation(pi_quat_rk3->times_raw(), pi_quat_rk3->R_i_k(), "QuatRK3");
-    plotOrientation(pi_quat_rk4->times_raw(), pi_quat_rk4->R_i_k(), "QuatRK4");
-    plotOrientation(pi_quat_cg3->times_raw(), pi_quat_cg3->R_i_k(), "QuatCG3");
-    plotOrientation(pi_quat_cg4->times_raw(), pi_quat_cg4->R_i_k(), "QuatCG4");
+    plotOrientation(result_integrators[0]->times_raw(), result_integrators[0]->R_i_k(), "ManifoldFwd", true);
+    plotOrientation(result_integrators[1]->times_raw(), result_integrators[1]->R_i_k(), "ManifoldMid");
+    plotOrientation(result_integrators[2]->times_raw(), result_integrators[2]->R_i_k(), "QuatFwd");
+    plotOrientation(result_integrators[3]->times_raw(), result_integrators[3]->R_i_k(), "QuatMid");
+    plotOrientation(result_integrators[4]->times_raw(), result_integrators[4]->R_i_k(), "QuatRK3");
+    plotOrientation(result_integrators[5]->times_raw(), result_integrators[5]->R_i_k(), "QuatRK4");
+    plotOrientation(result_integrators[6]->times_raw(), result_integrators[6]->R_i_k(), "QuatCG3");
+    plotOrientation(result_integrators[7]->times_raw(), result_integrators[7]->R_i_k(), "QuatCG4");
 
-    plotOrientationError(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(), "ManifoldFwd");
-    plotOrientationError(pi_manifold_mid->times_raw(), pi_manifold_mid->R_i_k(), "ManifoldMid");
-    plotOrientationError(pi_quat_fwd->times_raw(), pi_quat_fwd->R_i_k(), "QuatFwd");
-    plotOrientationError(pi_quat_mid->times_raw(), pi_quat_mid->R_i_k(), "QuatMid");
-    plotOrientationError(pi_quat_rk3->times_raw(), pi_quat_rk3->R_i_k(), "QuatRK3");
-    plotOrientationError(pi_quat_rk4->times_raw(), pi_quat_rk4->R_i_k(), "QuatRK4");
-    plotOrientationError(pi_quat_cg3->times_raw(), pi_quat_cg3->R_i_k(), "QuatCG3");
-    plotOrientationError(pi_quat_cg4->times_raw(), pi_quat_cg4->R_i_k(), "QuatCG4");
+    plotOrientationError(result_integrators[0]->times_raw(), result_integrators[0]->R_i_k(), "ManifoldFwd");
+    plotOrientationError(result_integrators[1]->times_raw(), result_integrators[1]->R_i_k(), "ManifoldMid");
+    plotOrientationError(result_integrators[2]->times_raw(), result_integrators[2]->R_i_k(), "QuatFwd");
+    plotOrientationError(result_integrators[3]->times_raw(), result_integrators[3]->R_i_k(), "QuatMid");
+    plotOrientationError(result_integrators[4]->times_raw(), result_integrators[4]->R_i_k(), "QuatRK3");
+    plotOrientationError(result_integrators[5]->times_raw(), result_integrators[5]->R_i_k(), "QuatRK4");
+    plotOrientationError(result_integrators[6]->times_raw(), result_integrators[6]->R_i_k(), "QuatCG3");
+    plotOrientationError(result_integrators[7]->times_raw(), result_integrators[7]->R_i_k(), "QuatCG4");
   }
 
   return errors;

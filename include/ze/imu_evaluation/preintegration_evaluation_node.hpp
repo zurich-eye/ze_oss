@@ -68,7 +68,6 @@ public:
       FloatType end,
       PreIntegratorMonteCarlo::Ptr mc_ref);
 
-
   //! Runs a single noisy integration on all channels and shows plots of the
   //! estimates.
   //! Returns the error offset (rotation only) for the different methods
