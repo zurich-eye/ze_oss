@@ -18,7 +18,9 @@ PoseOptimizer::PoseOptimizer(
     std::vector<PoseOptimizerFrameData>& data)
   : LeastSquaresSolver<Transformation, PoseOptimizer>(options)
   , data_(data)
-{}
+{
+  checkData();
+}
 
 //------------------------------------------------------------------------------
 PoseOptimizer::PoseOptimizer(
@@ -32,7 +34,9 @@ PoseOptimizer::PoseOptimizer(
   , T_B_W_prior_(T_B_W_prior)
   , prior_weight_pos_(prior_weight_pos)
   , prior_weight_rot_(prior_weight_rot)
-{}
+{
+  checkData();
+}
 
 //------------------------------------------------------------------------------
 LeastSquaresSolverOptions PoseOptimizer::getDefaultSolverOptions()
@@ -42,6 +46,15 @@ LeastSquaresSolverOptions PoseOptimizer::getDefaultSolverOptions()
   options.max_iter = 10;
   options.eps = 0.000001;
   return options;
+}
+
+void PoseOptimizer::checkData() const
+{
+  DEBUG_CHECK(!data_.empty());
+  for (auto& data_entry : data_)
+  {
+    DEBUG_CHECK_EQ(data_entry.f.cols(), data_entry.kp_idx.size());
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -66,6 +79,12 @@ FloatType PoseOptimizer::evaluateError(
   for (auto& residual_block : data_)
   {
     VLOG(400) << "Process residual block " << residual_block.camera_idx;
+    if (residual_block.kp_idx.size() == 0)
+    {
+      VLOG(40) << "Residual block has no measurements.";
+      continue;
+    }
+
     switch (residual_block.type)
     {
       case PoseOptimizerResidualType::Bearing:
@@ -218,6 +237,12 @@ std::vector<KeypointIndex> getOutlierIndices(
     const Transformation& T_B_W,
     const FloatType pixel_threshold)
 {
+  if (data.kp_idx.size() == 0)
+  {
+    VLOG(40) << "Residual block has no measurements.";
+    return {};
+  }
+
   FloatType chi2;
   VectorX err_norm_vec;
   FloatType error_multiplier = 1.0;

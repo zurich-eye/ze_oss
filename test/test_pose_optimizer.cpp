@@ -54,7 +54,7 @@ TEST(PoseOptimizerTests, testSolver)
 
   const size_t n = 120;
   PinholeCamera cam = createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
-  Keypoints px_true = generateRandomKeypoints(640, 480, 10, n);
+  Keypoints px_true = generateRandomKeypoints(cam.size(), 10, n);
 
   Positions pos_C = cam.backProjectVectorized(px_true);
 
@@ -91,6 +91,7 @@ TEST(PoseOptimizerTests, testSolver)
   // Optimize using bearing vectors:
   PoseOptimizerFrameData data;
   data.f = bearings_noisy;
+  data.kp_idx = KeypointIndices(n, 1);
   data.p_W = pos_W;
   data.T_C_B = T_C_B;
   data.scale = pyr_scale;
