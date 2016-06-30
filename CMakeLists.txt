@@ -59,6 +59,9 @@ target_link_libraries(test_scenario_runner ${PROJECT_NAME})
 catkin_add_gtest(test_manifold_pre_integrator test/test_manifold_pre_integrator.cpp)
 target_link_libraries(test_manifold_pre_integrator ${PROJECT_NAME})
 
+catkin_add_gtest(test_preintegrators test/test_preintegrators.cpp)
+target_link_libraries(test_preintegrators ${PROJECT_NAME})
+
 ##########
 # EXPORT #
 ##########

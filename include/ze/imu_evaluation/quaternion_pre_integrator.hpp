@@ -32,12 +32,12 @@ private:
   preintegrated_orientation_quat_container_t R_i_k_quat_;
 
   //! Forward integration.
-  Quaternion integrateFirstOrderFwd(Quaternion q,
+  inline Quaternion integrateFirstOrderFwd(Quaternion q,
                                     Vector3 w_i,
                                     FloatType dt);
 
   //! Midpoint integration.
-  Quaternion integrateFirstOrderMid(Quaternion q,
+  inline Quaternion integrateFirstOrderMid(Quaternion q,
                                     Vector3 w_i,
                                     Vector3 w_i_1,
                                     FloatType dt);
@@ -46,14 +46,14 @@ private:
   //! Returns the quaternion after preintegration and
   //! the state propagation matrix to propagate the
   //! covariance.
-  std::pair<Quaternion, Matrix3> integrateRK(Quaternion q,
+  inline std::pair<Quaternion, Matrix3> integrateRK(Quaternion q,
                                              Vector3 w_i,
                                              Vector3 w_i_1,
                                              FloatType dt,
                                              uint32_t order);
 
   //! Runge-Kutta Integration
-  Quaternion integrateCrouchGrossman(Quaternion q,
+  inline Quaternion integrateCrouchGrossman(Quaternion q,
                          Vector3 w_i,
                          Vector3 w_i_1,
                          FloatType dt,

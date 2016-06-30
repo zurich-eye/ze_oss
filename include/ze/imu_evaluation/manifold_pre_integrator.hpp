@@ -43,11 +43,11 @@ private:
                             const Eigen::Ref<Vector3>& gyro_measurement);
 
   //! Push a new integration step to the containers.
-  void pushPreIntegrationStepFwd(const FloatType dt,
+  inline void pushPreIntegrationStepFwd(const FloatType dt,
                                  const Eigen::Ref<Vector3>& gyro_measurement);
 
   //! Push the values used for a new pre-integration batch.
-  void pushInitialValuesMid(const FloatType dt,
+  inline void pushInitialValuesMid(const FloatType dt,
                             const Eigen::Ref<Vector3>& gyro_measurement,
                             const Eigen::Ref<Vector3>& gyro_measurement2);
 
