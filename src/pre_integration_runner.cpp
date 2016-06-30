@@ -76,6 +76,14 @@ void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
     // integrator.
     if (t > next_camera_sample)
     {
+      // Show the mean of the rotational velocities.
+      Vector6 mean = imu_measurements.rowwise().mean();
+      Vector6 max = imu_measurements.rowwise().maxCoeff();
+      VLOG(1) << "Average Rotational Velocity: " << mean[3] << ", "
+              << mean[4] << ", " << mean[5];
+      VLOG(1) << "Rotational Velocity Max: " << max[3] << ", "
+              << max[4] << ", " << max[4];
+
       next_camera_sample = t + camera_sampling_time_;
       pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
       times.clear();
@@ -88,6 +96,14 @@ void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
   // Ensure that all results are pushed to the container.
   if (imu_measurements.size() != 0)
   {
+    // Show the mean of the rotational velocities.
+    Vector6 mean = imu_measurements.rowwise().mean();
+    Vector6 max = imu_measurements.rowwise().maxCoeff();
+    VLOG(1) << "Average Rotational Velocity: " << mean[3] << ", "
+            << mean[4] << ", " << mean[5];
+    VLOG(1) << "Rotational Velocity Max: " << max[3] << ", "
+            << max[4] << ", " << max[4];
+
     pre_integrator->pushD_R_i_j(times, imu_measurements.leftCols(times.size()));
   }
 }
