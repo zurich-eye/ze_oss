@@ -11,6 +11,7 @@ include(ze_setup)
 # SETTINGS #
 ############
 include(ze_options)
+message(STATUS "ZE_USE_OPENCV: ${ZE_USE_OPENCV}")
 message(STATUS "ZE_USE_BRISK: ${ZE_USE_BRISK}")
 message(STATUS "ZE_USE_GTSAM: ${ZE_USE_GTSAM}")
 message(STATUS "ZE_SINGLE_PRECISION_FLOAT: ${ZE_SINGLE_PRECISION_FLOAT}")
