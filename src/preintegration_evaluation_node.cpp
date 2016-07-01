@@ -620,12 +620,14 @@ ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrup
     const Matrix3& gyroscope_noise_covariance,
     FloatType start,
     FloatType end,
-    PreIntegratorMonteCarlo::Ptr mc)
+    PreIntegratorMonteCarlo::Ptr mc,
+    bool simplified_covariance)
 {
   VLOG(1) << "Reference Estimates [ManifoldPreIntegrator:Corrupted]";
   PreIntegratorFactory::Ptr preintegrator_factory(
         std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
-                                                        integrator_type));
+                                                        integrator_type,
+                                                        simplified_covariance));
 
   ManifoldPreIntegrationState::Ptr est_integrator = preintegrator_factory->get();
 
@@ -784,7 +786,7 @@ ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
           Vector3::Ones() * parameters_.imu_acc_bias_noise_density,
           Vector3::Ones() * parameters_.imu_gyr_bias_noise_density,
           start,
-          end,
+           end,
           1000); // This is an arbitrary value.
   }
   //! a simple constant bias

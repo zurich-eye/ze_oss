@@ -18,6 +18,7 @@ public:
   ManifoldPreIntegrationState(
       Matrix3 gyro_noise_covariance,
       PreIntegrator::IntegratorType integrator_type,
+      bool useSimpleCovariancePropagation = false,
       const preintegrated_orientation_container_t* D_R_i_k_reference = nullptr);
 
   void doPushD_R_i_j(times_container_t stamps,
@@ -31,6 +32,9 @@ private:
   //! with exactly the same settings as the simulation run to guarantee
   //! index equivalence.
   const preintegrated_orientation_container_t* D_R_i_k_reference_;
+
+  //! Should the simple covariance propgatation be used?
+  bool useSimpleCovariancePropagation_;
 
   void doPushFirstOrderFwd(times_container_t stamps,
                            measurements_container_t measurements);
@@ -69,12 +73,16 @@ public:
 
   //! Optionally provide the reference (non-corrupted) pre-integrated orientation
   //! to inject into the created manifold preintegrators.
+  //! Should a simple covariance propagation be used (e.g. the Jacobian assumed
+  //! close to Identity and neglected)
   ManifoldPreIntegrationFactory(
       Matrix3 gyro_noise_covariance,
       PreIntegrator::IntegratorType integrator_type,
+      bool useSimpleCovariancePropagation = false,
       const preintegrated_orientation_container_t* D_R_i_k_reference = nullptr)
     : PreIntegratorFactory(gyro_noise_covariance, integrator_type)
     , D_R_i_k_reference_(D_R_i_k_reference)
+    , useSimpleCovariancePropagation_(useSimpleCovariancePropagation)
   {
   }
 
@@ -85,19 +93,22 @@ public:
       return std::make_shared<ManifoldPreIntegrationState>(
             gyro_noise_covariance_,
             integrator_type_,
+            useSimpleCovariancePropagation_,
             D_R_i_k_reference_);
     }
     else
     {
       return std::make_shared<ManifoldPreIntegrationState>(
             gyro_noise_covariance_,
-            integrator_type_);
+            integrator_type_,
+            useSimpleCovariancePropagation_);
     }
   }
 
 private:
   //! The optional already pre-integrated (clean, non corrupted) orientations.
   const preintegrated_orientation_container_t* D_R_i_k_reference_;
+  bool useSimpleCovariancePropagation_;
 };
 
 } // namespace ze

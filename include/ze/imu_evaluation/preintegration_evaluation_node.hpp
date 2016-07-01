@@ -57,7 +57,8 @@ public:
       const Matrix3& gyroscope_noise_covariance,
       FloatType start,
       FloatType end,
-      PreIntegratorMonteCarlo::Ptr mc_ref);
+      PreIntegratorMonteCarlo::Ptr mc_ref,
+      bool simplified_covariance = false);
 
   QuaternionPreIntegrationState::Ptr runQuaternion(
       PreIntegrationRunner::Ptr preintegration_runner,

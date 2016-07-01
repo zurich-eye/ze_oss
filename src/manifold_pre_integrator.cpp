@@ -6,9 +6,11 @@ namespace ze {
 ManifoldPreIntegrationState::ManifoldPreIntegrationState(
     Matrix3 gyro_noise_covariance,
     PreIntegrator::IntegratorType integrator_type,
+    bool useSimpleCovariancePropagation,
     const preintegrated_orientation_container_t* D_R_i_k_reference)
   : PreIntegrator(gyro_noise_covariance, integrator_type)
   , D_R_i_k_reference_(D_R_i_k_reference)
+  , useSimpleCovariancePropagation_(useSimpleCovariancePropagation)
 {
 }
 
@@ -139,8 +141,15 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
   }
 
   // Propagate Covariance:
-  Matrix3 J_r = expmapDerivativeSO3(gyro_measurement * dt);
-
+  Matrix3 J_r;
+  if (useSimpleCovariancePropagation_)
+  {
+     J_r = Matrix3::Identity();
+  }
+  else
+  {
+    J_r = expmapDerivativeSO3(gyro_measurement * dt);
+  }
   // Covariance of the discrete process.
   Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
 
@@ -155,7 +164,8 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
   }
 
   covariance_i_k_.push_back(
-        D_R_i_k.transpose() * covariance_i_k_.back() * D_R_i_k
+        increment.transpose() * covariance_i_k_.back() * increment
+
         + J_r * gyro_noise_covariance_d * dt * dt * J_r.transpose());
 
   timers_[IntegrationTimer::integrate].stop();
@@ -197,7 +207,15 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
   }
 
   // Propagate Covariance:
-  Matrix3 J_r = expmapDerivativeSO3((gyro_measurement + gyro_measurement2) * 0.5 * dt);
+  Matrix3 J_r;
+  if (useSimpleCovariancePropagation_)
+  {
+     J_r = Matrix3::Identity();
+  }
+  else
+  {
+    J_r = expmapDerivativeSO3((gyro_measurement + gyro_measurement2) * 0.5 * dt);
+  }
 
   // Covariance of the discrete process.
   Matrix3 gyro_noise_covariance_d = gyro_noise_covariance_ / dt;
@@ -213,7 +231,7 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
   }
 
   covariance_i_k_.push_back(
-        D_R_i_k.transpose() * covariance_i_k_.back() * D_R_i_k
+        increment.transpose() * covariance_i_k_.back() * increment
         + J_r * gyro_noise_covariance_d * dt * dt * J_r.transpose());
 
   timers_[IntegrationTimer::integrate].stop();
