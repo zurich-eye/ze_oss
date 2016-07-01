@@ -124,10 +124,18 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
   // The connection info only contains topics that are available in the bag
   // If a topic is requested that is not avaiable, it does not show up in the info.
   std::vector<const rosbag::ConnectionInfo*> connection_infos =
-      bag_view_->getConnections(); 
-  CHECK(topics.size() == connection_infos.size())
-      << "Not all requested topics founds in bagfile";
-
+      bag_view_->getConnections();
+  if (topics.size() != connection_infos.size())
+  {
+     LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
+     for (const rosbag::ConnectionInfo* info : connection_infos)
+     {
+       LOG(ERROR) << "*) " << info->topic;
+     }
+     LOG(FATAL) << "Not all requested topics founds in bagfile. "
+                << "Is topic_cam0, topic_imu0, etc. set correctly? "
+                << "Maybe removing/adding a slash as prefix solves the problem.";
+  }
 }
 
 size_t DataProviderRosbag::cameraCount() const
