@@ -5,7 +5,7 @@ int main()
   using namespace ze;
 
   // Simple:
-  std::vector<double> v({1, 2, 3, 4});
+  std::vector<FloatType> v({1, 2, 3, 4});
   plt::plot(v);
   plt::show();
 
@@ -36,7 +36,7 @@ int main()
   plt::figure();
 
   // plot multiple curves in a single graph
-  std::vector<double> w({4, 3, 2, 1});
+  std::vector<FloatType> w({4, 3, 2, 1});
   plt::plot(v, "x");
   plt::plot(w, "o");
   plt::show();
