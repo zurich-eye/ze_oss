@@ -29,7 +29,7 @@ int main(int argc, char** argv)
               i, i, i, i;
     visualizer.drawPoints("points", 0, points, ze::Colors::Blue);
 
-    ze::Lines lines;
+    ze::LineMarkers lines;
     lines.push_back(std::make_pair(ze::Position(i, 0, 1), ze::Position(i, 0, 0)));
     lines.push_back(std::make_pair(ze::Position(i, 1, 1), ze::Position(i, 1, 0)));
     lines.push_back(std::make_pair(ze::Position(i, 2, 1), ze::Position(i, 2, 0)));

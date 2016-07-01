@@ -10,7 +10,7 @@
 
 namespace ze {
 
-using Lines = std::vector<std::pair<Position, Position>, Eigen::aligned_allocator<std::pair<Position, Position>>>;
+using LineMarkers = std::vector<std::pair<Position, Position>, Eigen::aligned_allocator<std::pair<Position, Position>>>;
 
 //! Interface class for all visualizations.
 class Visualizer
@@ -62,7 +62,7 @@ public:
   virtual void drawLines(
       const std::string& topic,
       const size_t id,
-      const Lines& lines,
+      const LineMarkers& lines,
       const Color& color,
       const FloatType size = 0.02) = 0;
 

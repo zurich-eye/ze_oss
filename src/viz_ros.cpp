@@ -173,7 +173,7 @@ void VisualizerRos::drawPoints(
 void VisualizerRos::drawLines(
     const std::string& ns,
     const size_t id,
-    const Lines& lines,
+    const LineMarkers& lines,
     const Color& color,
     const FloatType size)
 {

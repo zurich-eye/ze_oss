@@ -66,7 +66,7 @@ public:
   virtual void drawLines(
       const std::string& ns,
       const size_t id,
-      const Lines& lines,
+      const LineMarkers& lines,
       const Color& color,
       const FloatType size = 0.02) override;
 
