@@ -1,0 +1,140 @@
+
+## 1:
+
+Spline order: 5
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12
+
+Manifold Fwd: 0.0394058
+Manifold Mid: 0.00107683
+Quaternion Fwd: 0.0394248
+Quaternion Mid: 0.00112839
+RK3: 0.00688499
+RK4: 0.00109847
+CG3: 0.00104299
+CG4: 0.00105074
+
+## 2: Double Noise
+
+Spline order: 5
+
+--gyroscope_noise_density=0.000372 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00372 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12
+
+Manifold Fwd: 0.0393493
+Manifold Mid: 0.00200063
+Quaternion Fwd: 0.0395241
+Quaternion Mid: 0.001992
+RK3: 0.007136
+RK4: 0.00208381
+CG3: 0.00200145
+CG4: 0.00202421
+
+## 3: Quadruple Noise
+
+Spline order: 5
+
+--gyroscope_noise_density=0.000744 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00744 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12
+
+Manifold Fwd: 0.0394597
+Manifold Mid: 0.00401721
+Quaternion Fwd: 0.0396111
+Quaternion Mid: 0.00410831
+RK3: 0.00768424
+RK4: 0.00386993
+CG3: 0.00403532
+CG4: 0.00398457
+
+## 4: 10x sampling time
+
+Spline order: 5
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.05 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threa ds=12
+
+Manifold Fwd: 0.418478
+Manifold Mid: 0.0424869
+Quaternion Fwd: 0.418429
+Quaternion Mid: 0.0424528
+RK3: 0.0930135
+RK4: 0.0326243
+CG3: 0.0328245
+CG4: 0.0324674
+
+## 5: Spline Order increase
+
+Spline order: 10
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12
+
+Manifold Fwd: 0.0204392
+Manifold Mid: 0.00116234
+Quaternion Fwd: 0.0203719
+Quaternion Mid: 0.00117766
+RK3: 0.00345993
+RK4: 0.0010692
+CG3: 0.00107502
+CG4: 0.00108499
+
+## 6: Spline order increase, more interpolation points, more segments
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=12
+
+Spline order: 10
+
+Manifold Fwd: 0.03174
+Manifold Mid: 0.0031039
+Quaternion Fwd: 0.0318374
+Quaternion Mid: 0.00313399
+RK3: 0.00587262
+RK4: 0.00178501
+CG3: 0.00174976
+CG4: 0.00179947
+
+## 7: Spline order increase, more interpolation points, more segments, less smooting
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=12
+
+Spline order: 10
+
+Manifold Fwd: 0.0972347
+Manifold Mid: 0.01275
+Quaternion Fwd: 0.0972697
+Quaternion Mid: 0.0128355
+RK3: 0.0161293
+RK4: 0.00860189
+CG3: 0.00861394
+CG4: 0.00862777
+
+## 8: Extreme motion (10x rotation)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=true --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12 --trajectory_rotation_factor=10
+
+Manifold Fwd: 0.135967
+Manifold Mid: 0.0290529
+Quaternion Fwd: 0.135978
+Quaternion Mid: 0.0290502
+RK3: 0.0282292
+RK4: 0.0147977
+CG3: 0.0147441
+CG4: 0.0146404
+
+
+Scale hints:
+Average Rotational Velocity: 0.914356, -1.08536, -0.603344
+Rotational Velocity Max: 29.6279, 25.5999, 25.5999
+
+## 9: Extreme motion (5x rotation)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=50 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=true --imu_sampling_time=0.005 --trajectory_lambda=0.0001 --trajectory_num_segments=50 --num_threads=12 --trajectory_rotation_factor=5
+
+Manifold Fwd: 0.0749788
+Manifold Mid: 0.00785299
+Quaternion Fwd: 0.0750557
+Quaternion Mid: 0.00787657
+RK3: 0.0120488
+RK4: 0.00411811
+CG3: 0.00418711
+CG4: 0.00419546
+
+Scale hints:
+Average Rotational Velocity: 0.888753, -0.287144, -0.827493
+Rotational Velocity Max: 15.1382, 14.709, 14.709

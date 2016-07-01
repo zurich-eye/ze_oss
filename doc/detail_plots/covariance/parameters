@@ -1,0 +1,694 @@
+## 1: Standard setup
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold Corr FWD:
+Covariance Offset: 7.42013e-07
+
+Manifold Corr MWD:
+Covariance Offset: 7.42001e-07
+
+Quat FWD:
+Covariance Offset: 7.41973e-07
+
+Quat MWD
+Covariance Offset: 7.41973e-07
+
+Quat RK3
+Covariance Offset: 7.42765e-07
+
+Quat RK4
+Covariance Offset: 7.41974e-07
+
+## 2: More noise
+
+--gyroscope_noise_density=0.00186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 8.21704e-05
+
+Manifold MWD:
+Covariance Offset: 8.21675e-05
+
+Quat FWD:
+Covariance Offset: 8.21019e-05
+
+Quat MWD:
+Covariance Offset: 8.21019e-05
+
+Quat RK3:
+Covariance Offset: 8.2346e-05
+
+Quat RK4:
+Covariance Offset: 8.21021e-05
+
+## 3: Lower sampling rates (20Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.05 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 4.68377e-07
+
+Manifold MWD:
+Covariance Offset: 4.95865e-07
+
+Quat FWD:
+Covariance Offset: 6.472e-07
+
+Quat MWD:
+Covariance Offset: 6.472e-07
+
+Quat RK3:
+Covariance Offset: 3.61947e-06
+
+
+Quat RK4:
+Covariance Offset: 3.52353e-07
+
+## 4: Lower Sampling Rate (100Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.01 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold MWD:
+Covariance Offset: 4.20485e-07
+
+Manifold MWD:
+Covariance Offset: 4.20391e-07
+
+Quat FWD:
+Covariance Offset: 4.22319e-07
+
+Quat MWD:
+Covariance Offset: 4.22319e-07
+
+Quat RK3:
+Covariance Offset: 4.38474e-07
+
+Quat RK4:
+Covariance Offset: 4.22279e-07
+
+## 5: High frequency (1000Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=3000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.001 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 4.10374e-06
+
+Manifold MWD:
+Covariance Offset: 4.10374e-06
+
+Quat Fwd:
+Covariance Offset: 4.10381e-06
+
+Quat MWD:
+Covariance Offset: 4.10381e-06
+
+Quat RK3:
+Covariance Offset: 4.10378e-06
+
+Quat RK4:
+Covariance Offset: 4.10381e-06
+
+## 6: Rotation Multiplier 2x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 5.86244e-07
+
+Manifold MWD:
+Covariance Offset: 5.86208e-07
+
+Quat FWD:
+Covariance Offset: 5.80872e-07
+
+Quat MWD:
+Covariance Offset: 5.80872e-07
+
+Quat RK3:
+Covariance Offset: 8.23784e-07
+
+Quat RK4:
+Covariance Offset: 5.81326e-07
+
+## 7: Rotation Multiplier 4x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 8.50302e-07
+
+Manifold MWD:
+Covariance Offset: 8.50439e-07
+
+Quat FWD:
+Covariance Offset: 8.5574e-07
+
+Quat MWD:
+Covariance Offset: 8.5574e-07
+
+Quat RK3:
+Covariance Offset: 4.25238e-06
+
+Quat RK4:
+Covariance Offset: 8.50033e-07
+
+## 7: Rotation Multiplier 10x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 8.86004e-07
+
+Manifold MWD:
+Covariance Offset: 8.9136e-07
+
+Quat FWD:
+Covariance Offset: 1.0576e-06
+
+Quat MWD:
+Covariance Offset: 1.0576e-06
+
+Quat RK3:
+Covariance Offset: 3.60825e-05
+
+Quat RK4:
+Covariance Offset: 3.11836e-06
+
+## 10: Rotation Multiplier 10x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=true --imu_sampling_time=0.005  --trajectory_interpolation_points=400 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --num_threads=16 --run_type=covariance --trajectory_rotation_factor=10 --time_integration=false
+
+Manifold Corr FWD:
+1.29545e-06
+
+Manifold Corr MWD:
+1.30184e-06
+
+Quat FWD:
+1.53079e-06
+
+Quat MWD:
+1.53079e-06
+
+RK3:
+3.54979e-05
+
+RK4:
+2.60686e-06
+
+
+
+
+
+# DETAIL:
+
+## 1: Standard setup
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold Corr FWD:
+Covariance Offset: 7.42013e-07
+Timings:
+  num_samples: 4999
+  min: 0.000126
+  max: 0.035352
+  sum: 0.757028
+  mean: 0.000151436
+  variance: 3.5284e-07
+  standard_deviation: 0.000594004
+
+Manifold Corr MWD:
+Covariance Offset: 7.42001e-07
+Timings:
+  num_samples: 4999
+  min: 0.000165
+  max: 0.303737
+  sum: 1.47752
+  mean: 0.000295564
+  variance: 1.88618e-05
+  standard_deviation: 0.00434301
+
+Quat FWD:
+Covariance Offset: 7.41973e-07
+Timings:
+  num_samples: 5000
+  min: 0.000152
+  max: 0.035103
+  sum: 1.01898
+  mean: 0.000203796
+  variance: 4.02966e-07
+  standard_deviation: 0.000634796
+
+Quat MWD
+Covariance Offset: 7.41973e-07
+Timings:
+  num_samples: 5000
+  min: 0.000147
+  max: 0.0278
+  sum: 0.872244
+  mean: 0.000174449
+  variance: 2.30201e-07
+  standard_deviation: 0.000479793
+
+Quat RK3
+Covariance Offset: 7.42765e-07
+Timings:
+  num_samples: 5000
+  min: 0.000207
+  max: 0.025512
+  sum: 1.15266
+  mean: 0.000230532
+  variance: 1.92184e-07
+  standard_deviation: 0.000438388
+
+Quat RK4
+Covariance Offset: 7.41974e-07
+Timings:
+  num_samples: 5000
+  min: 0.000214
+  max: 0.032737
+  sum: 1.23236
+  mean: 0.000246473
+  variance: 4.31305e-07
+  standard_deviation: 0.000656738
+
+## 2: More noise
+
+--gyroscope_noise_density=0.00186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.00186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 8.21704e-05
+Timings:
+  num_samples: 4999
+  min: 0.000157
+  max: 0.059401
+  sum: 1.15464
+  mean: 0.000230973
+  variance: 1.09206e-06
+  standard_deviation: 0.00104502
+
+Manifold MWD:
+Covariance Offset: 8.21675e-05
+Timings:
+  num_samples: 4999
+  min: 0.000166
+  max: 0.045376
+  sum: 0.995832
+  mean: 0.000199206
+  variance: 5.87971e-07
+  standard_deviation: 0.000766793
+
+Quat FWD:
+Covariance Offset: 8.21019e-05
+Timings:
+  num_samples: 5000
+  min: 0.000152
+  max: 0.025571
+  sum: 0.893281
+  mean: 0.000178656
+  variance: 2.00695e-07
+  standard_deviation: 0.00044799
+
+Quat MWD:
+Covariance Offset: 8.21019e-05
+Timings:
+  num_samples: 5000
+  min: 0.000158
+  max: 0.026932
+  sum: 0.930217
+  mean: 0.000186043
+  variance: 2.23126e-07
+  standard_deviation: 0.000472362
+
+Quat RK3:
+Covariance Offset: 8.2346e-05
+Timings:
+  num_samples: 5000
+  min: 0.000214
+  max: 0.025011
+  sum: 1.19056
+  mean: 0.000238111
+  variance: 1.90275e-07
+  standard_deviation: 0.000436206
+
+Quat RK4:
+Covariance Offset: 8.21021e-05
+Timings:
+  num_samples: 5000
+  min: 0.000234
+  max: 0.0289
+  sum: 1.30603
+  mean: 0.000261205
+  variance: 2.43245e-07
+  standard_deviation: 0.000493198
+
+## 3: Lower sampling rates (20Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.05 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 4.68377e-07
+Timings:
+  num_samples: 498
+  min: 0.000164
+  max: 0.003625
+  sum: 0.109214
+  mean: 0.000219305
+  variance: 5.02281e-08
+  standard_deviation: 0.000224116
+
+Manifold MWD:
+Covariance Offset: 4.95865e-07
+Timings:
+  num_samples: 498
+  min: 0.000174
+  max: 0.003342
+  sum: 0.111281
+  mean: 0.000223456
+  variance: 4.17417e-08
+  standard_deviation: 0.000204308
+
+Quat FWD:
+Covariance Offset: 6.472e-07
+Timings:
+  num_samples: 499
+  min: 0.000153
+  max: 0.002075
+  sum: 0.097625
+  mean: 0.000195641
+  variance: 2.35498e-08
+  standard_deviation: 0.000153459
+
+Quat MWD:
+Covariance Offset: 6.472e-07
+Timings:
+  num_samples: 499
+  min: 0.000159
+  max: 0.002214
+  sum: 0.102321
+  mean: 0.000205052
+  variance: 2.6063e-08
+  standard_deviation: 0.00016144
+
+Quat RK3:
+Covariance Offset: 3.61947e-06
+Timings:
+  num_samples: 499
+  min: 0.000215
+  max: 0.00371
+  sum: 0.126713
+  mean: 0.000253934
+  variance: 5.13786e-08
+  standard_deviation: 0.000226668
+
+
+Quat RK4:
+Covariance Offset: 3.52353e-07
+Timings:
+  num_samples: 499
+  min: 0.000237
+  max: 0.001883
+  sum: 0.132449
+  mean: 0.000265429
+  variance: 1.60795e-08
+  standard_deviation: 0.000126805
+
+## 4: Lower Sampling Rate (100Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.01 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Covariance Offset [Manifold Corr FWD]: 4.20485e-07
+Timings:
+  num_samples: 2498
+  min: 0.000163
+  max: 0.023165
+  sum: 0.505215
+  mean: 0.000202248
+  variance: 3.53429e-07
+  standard_deviation: 0.000594499
+
+Manifold MWD:
+Covariance Offset: 4.20391e-07
+Timings:
+  num_samples: 2498
+  min: 0.000166
+  max: 0.025403
+  sum: 0.504015
+  mean: 0.000201767
+  variance: 3.6452e-07
+  standard_deviation: 0.000603755
+
+Quat FWD:
+Covariance Offset: 4.22319e-07
+Timings:
+  num_samples: 2499
+  min: 0.000153
+  max: 0.014042
+  sum: 0.45533
+  mean: 0.000182205
+  variance: 1.19355e-07
+  standard_deviation: 0.000345477
+
+Quat MWD:
+Covariance Offset: 4.22319e-07
+Timings:
+  num_samples: 2499
+  min: 0.000158
+  max: 0.013798
+  sum: 0.4727
+  mean: 0.000189156
+  variance: 1.15586e-07
+  standard_deviation: 0.000339979
+
+Quat RK3:
+Covariance Offset: 4.38474e-07
+Timings:
+  num_samples: 2499
+  min: 0.000214
+  max: 0.021113
+  sum: 0.661705
+  mean: 0.000264788
+  variance: 3.67375e-07
+  standard_deviation: 0.000606115
+
+Quat RK4:
+Covariance Offset: 4.22279e-07
+Timings:
+  num_samples: 2499
+  min: 0.000235
+  max: 0.022242
+  sum: 0.670408
+  mean: 0.000268271
+  variance: 3.33632e-07
+  standard_deviation: 0.000577609
+
+## 5: High frequency (1000Hz)
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=3000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.001 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 4.10374e-06
+Timings:
+  num_samples: 24998
+  min: 0.000143
+  max: 0.451123
+  sum: 5.56177
+  mean: 0.000222488
+  variance: 1.50318e-05
+  standard_deviation: 0.00387709
+
+Manifold MWD:
+Covariance Offset: 4.10374e-06
+Timings:
+  num_samples: 24998
+  min: 0.000166
+  max: 0.707228
+  sum: 5.71538
+  mean: 0.000228633
+  variance: 2.34409e-05
+  standard_deviation: 0.00484158
+
+Quat Fwd:
+Covariance Offset: 4.10381e-06
+Timings:
+  num_samples: 24999
+  min: 0.000152
+  max: 0.148691
+  sum: 4.44479
+  mean: 0.000177799
+  variance: 1.21975e-06
+  standard_deviation: 0.00110442
+
+Quat MWD:
+Covariance Offset: 4.10381e-06
+Timings:
+  num_samples: 24999
+  min: 0.000147
+  max: 0.112329
+  sum: 4.29547
+  mean: 0.000171826
+  variance: 6.93766e-07
+  standard_deviation: 0.000832926
+
+Quat RK3:
+Covariance Offset: 4.10378e-06
+Timings:
+  num_samples: 24999
+  min: 0.000206
+  max: 0.351679
+  sum: 6.37202
+  mean: 0.000254891
+  variance: 6.11255e-06
+  standard_deviation: 0.00247236
+
+Quat RK4:
+Covariance Offset: 4.10381e-06
+Timings:
+  num_samples: 24999
+  min: 0.000232
+  max: 0.349739
+  sum: 6.86002
+  mean: 0.000274412
+  variance: 6.23648e-06
+  standard_deviation: 0.00249729
+
+## 6: Rotation Multiplier 2x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset: 5.86244e-07
+Timings:
+  num_samples: 4999
+  min: 0.000208
+  max: 0.065166
+  sum: 1.51491
+  mean: 0.000303043
+  variance: 1.17404e-06
+  standard_deviation: 0.00108353
+
+Manifold MWD:
+Covariance Offset: 5.86208e-07
+Timings:
+  num_samples: 4999
+  min: 0.000166
+  max: 0.049521
+  sum: 1.50572
+  mean: 0.000301204
+  variance: 1.04807e-06
+  standard_deviation: 0.00102375
+
+Quat FWD:
+Covariance Offset: 5.80872e-07
+Timings:
+  num_samples: 5000
+  min: 0.000147
+  max: 0.024393
+  sum: 0.85969
+  mean: 0.000171938
+  variance: 1.83017e-07
+  standard_deviation: 0.000427804
+
+Quat MWD:
+Covariance Offset: 5.80872e-07
+Timings:
+  num_samples: 5000
+  min: 0.000158
+  max: 0.02566
+  sum: 0.920375
+  mean: 0.000184075
+  variance: 1.96914e-07
+  standard_deviation: 0.00044375
+
+Quat RK3:
+Covariance Offset: 8.23784e-07
+Timings:
+  num_samples: 5000
+  min: 0.000213
+  max: 0.024613
+  sum: 1.1868
+  mean: 0.00023736
+  variance: 1.8405e-07
+  standard_deviation: 0.00042901
+
+Quat RK4:
+Covariance Offset: 5.81326e-07
+Timings:
+  num_samples: 5000
+  min: 0.000219
+  max: 0.084475
+  sum: 1.73342
+  mean: 0.000346684
+  variance: 1.94124e-06
+  standard_deviation: 0.00139328
+
+## 7: Rotation Multiplier 4x
+
+--gyroscope_noise_density=0.000186 --monte_carlo_runs=20000 --camera_sampling_time=-1 --accelerometer_noise_density=0.000186 -v=10 --show_trajectory=false --imu_sampling_time=0.005 --trajectory_lambda=0.000001 --trajectory_num_segments=200 --trajectory_interpolation_points=400 --num_threads=16 --time_integration=true
+
+Manifold FWD:
+Covariance Offset [Manifold Corr FWD]: 8.50302e-07
+Timings:
+  num_samples: 4999
+  min: 0.000158
+  max: 0.057378
+  sum: 1.0438
+  mean: 0.000208801
+  variance: 9.21683e-07
+  standard_deviation: 0.000960043
+
+Manifold MWD:
+Covariance Offset: 8.50439e-07
+Timings:
+  num_samples: 4999
+  min: 0.000166
+  max: 0.045034
+  sum: 0.998393
+  mean: 0.000199719
+  variance: 5.97294e-07
+  standard_deviation: 0.000772848
+
+Quat FWD:
+Covariance Offset: 8.5574e-07
+Timings:
+  num_samples: 5000
+  min: 0.000151
+  max: 0.0303
+  sum: 0.917468
+  mean: 0.000183494
+  variance: 3.77152e-07
+  standard_deviation: 0.000614127
+
+Quat MWD:
+Covariance Offset: 8.5574e-07
+Timings:
+  num_samples: 5000
+  min: 0.000158
+  max: 0.027498
+  sum: 0.968878
+  mean: 0.000193776
+  variance: 3.93651e-07
+  standard_deviation: 0.000627416
+
+Quat RK3:
+Covariance Offset: 4.25238e-06
+Timings:
+  num_samples: 5000
+  min: 0.000206
+  max: 0.028961
+  sum: 1.21799
+  mean: 0.000243598
+  variance: 3.14327e-07
+  standard_deviation: 0.000560648
+
+Quat RK4:
+Covariance Offset: 8.50033e-07
+Timings:
+  num_samples: 5000
+  min: 0.000211
+  max: 0.024269
+  sum: 1.17316
+  mean: 0.000234632
+  variance: 1.82576e-07
+  standard_deviation: 0.000427289
