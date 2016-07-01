@@ -165,7 +165,8 @@ def compute_relative_errors(data_dir,
                             filename_result_prefix = 'traj_relative_errors',
                             match_timestamps_offset = 0.0,
                             match_timestamps_max_difference_sec = 0.02,
-                            use_least_squares_alignment = False):
+                            use_least_squares_alignment = False,
+                            segment_align_lsq_translation_only = False):
     logger = logging.getLogger(__name__)
     for segment_length in segment_lengths:
         cmd = "rosrun ze_trajectory_analysis kitti_evaluation" \
@@ -178,11 +179,15 @@ def compute_relative_errors(data_dir,
             + " --offset_sec=" + str(match_timestamps_offset) \
             + " --max_difference_sec=" + str(match_timestamps_max_difference_sec) \
             + " --segment_length=" + str(segment_length) \
-            + " --skip_frames=" + str(skip_frames)
+            + " --skip_frames=" + str(skip_frames) 
             
         if use_least_squares_alignment:
             print("Use least squares alignment")
             cmd += " --least_squares_align"
+    
+        if segment_align_lsq_translation_only:
+            print("Ignore orientation for least squares alignment")
+            cmd += " --least_squares_align_translation_only"
                                            
         logger.info("Executing command: "+cmd)
         os.system(cmd)
@@ -197,19 +202,26 @@ if __name__=='__main__':
                         help='format groundtruth {swe,pose,euroc}')
     parser.add_argument('--format_es', default='pose',
                         help='format estimate {swe,pose,euroc}')
+    parser.add_argument('--segment_lengths', default="10, 40, 90, 160", type=str, 
+                        help='segment lengths for relative evaluation')
     parser.add_argument('--segment_align_lsq', default='False',
                         help='use least squares alignment of segment')
+    parser.add_argument('--segment_align_lsq_translation_only', default='False',
+                        help='use only translation part in least squares alignment of segment')
     parser.add_argument('--plot_size', default=0.2,
                         help='size of circle')
     parser.add_argument('--skip_frames', default=1,
                         help='frames skipped between segment evaluation')
+    parser.add_argument('--plot_errors_along_trajectory',
+                        default=False, action='store_true',
+                        help='Plot relative errors along trajectory')
     options = parser.parse_args()    
     
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
     logger.info('Compute relative errors')
 
-    segment_lengths = [5, 10, 20, 30, 50]
+    segment_lengths = [int(item) for item in options.segment_lengths.split(',')]
 
     if options.data_dir:
         compute_relative_errors(options.data_dir,
@@ -217,9 +229,12 @@ if __name__=='__main__':
                                 skip_frames = int(options.skip_frames),
                                 format_gt = options.format_gt,
                                 format_es = options.format_es,
-                                use_least_squares_alignment = (options.segment_align_lsq=='True'))
+                                use_least_squares_alignment = options.segment_align_lsq=='True',
+                                segment_align_lsq_translation_only = options.segment_align_lsq_translation_only=='True')
 
         plot_relative_errors([options.data_dir], segment_lengths)
         
-        for segment_length in segment_lengths:
-            plot_relative_errors_along_trajectory(options.data_dir, segment_length, float(options.plot_size))
+        if options.plot_errors_along_trajectory:
+            for segment_length in segment_lengths:
+                plot_relative_errors_along_trajectory( \
+                    options.data_dir, segment_length, float(options.plot_size))

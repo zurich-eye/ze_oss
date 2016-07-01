@@ -33,6 +33,7 @@ std::vector<RelativeError> calcSequenceErrors(
     const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation,
     const bool use_least_squares_alignment,
-    const double least_squares_align_range);
+    const double least_squares_align_range,
+    const bool least_squares_align_translation_only);
 
 } // namespace ze

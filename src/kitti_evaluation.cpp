@@ -1,6 +1,7 @@
 #include <ze/trajectory_analysis/kitti_evaluation.h>
 
 #include <ze/geometry/align_poses.h>
+#include <ze/geometry/align_points.h>
 
 namespace ze {
 
@@ -47,7 +48,8 @@ std::vector<RelativeError> calcSequenceErrors(
     const FloatType& segment_length,
     const size_t skip_num_frames_between_segment_evaluation,
     const bool use_least_squares_alignment,
-    const double least_squares_align_range)
+    const double least_squares_align_range,
+    const bool least_squares_align_translation_only)
 {
   // Pre-compute cumulative distances (from ground truth as reference).
   std::vector<FloatType> dist_gt = trajectoryDistances(T_W_A);
@@ -70,16 +72,32 @@ std::vector<RelativeError> calcSequenceErrors(
     Transformation T_A0_B0 = T_W_A[first_frame].inverse() * T_W_B[first_frame];
     if(use_least_squares_alignment && n_align_poses > 1)
     {
-      TransformationVector T_W_es_align(
-            T_W_B.begin() + first_frame, T_W_B.begin() + first_frame + n_align_poses);
-      TransformationVector T_W_gt_align(
-            T_W_A.begin() + first_frame, T_W_A.begin() + first_frame + n_align_poses);
-      VLOG(40) << "T_W_es_align size = " << T_W_es_align.size();
+      if (least_squares_align_translation_only)
+      {
+        Positions p_W_es_align(3, n_align_poses);
+        Positions p_W_gt_align(3, n_align_poses);
+        for (int i = 0; i < n_align_poses; ++i)
+        {
+          p_W_es_align.col(i) = T_W_B.at(first_frame + i).getPosition();
+          p_W_gt_align.col(i) = T_W_A.at(first_frame + i).getPosition();
 
-      const FloatType sigma_pos = 0.05;
-      const FloatType sigma_rot = 5.0 / 180 * M_PI;
-      PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
-      problem.optimize(T_A0_B0);
+          PointAligner problem(p_W_gt_align, p_W_es_align);
+          problem.optimize(T_A0_B0);
+        }
+      }
+      else
+      {
+        TransformationVector T_W_es_align(
+              T_W_B.begin() + first_frame, T_W_B.begin() + first_frame + n_align_poses);
+        TransformationVector T_W_gt_align(
+              T_W_A.begin() + first_frame, T_W_A.begin() + first_frame + n_align_poses);
+        VLOG(40) << "T_W_es_align size = " << T_W_es_align.size();
+
+        const FloatType sigma_pos = 0.05;
+        const FloatType sigma_rot = 5.0 / 180 * M_PI;
+        PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
+        problem.optimize(T_A0_B0);
+      }
     }
 
     // Compute relative rotational and translational errors.
