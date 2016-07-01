@@ -83,11 +83,15 @@ using Position    = Vector3;
 using HomPosition = Vector4;
 using Gradient    = Vector2;
 using Seed        = Vector4;
+using LineMeasurement = Vector3;
 using Keypoints   = Matrix2X;
 using Bearings    = Matrix3X;
 using Positions   = Matrix3X;
 using Gradients   = Matrix2X;
 using Seeds       = Matrix4X;
+//! Normal vector on line end-points bearings, as explained in
+//! ze_geometry/doc/line_parametrization.pdf
+using LineMeasurements = Matrix3X;
 using KeypointLevel = int8_t;
 using KeypointType  = int8_t;
 using KeypointIndex = uint16_t;
