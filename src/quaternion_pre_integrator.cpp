@@ -27,7 +27,7 @@ void QuaternionPreIntegrationState::setInitialOrientation(
 }
 
 //------------------------------------------------------------------------------
-void QuaternionPreIntegrationState::doPushD_R_i_j(
+void QuaternionPreIntegrationState::integrate(
     times_container_t stamps,
     measurements_container_t measurements)
 {
@@ -36,22 +36,22 @@ void QuaternionPreIntegrationState::doPushD_R_i_j(
   switch (integrator_type_)
   {
     case PreIntegrator::FirstOrderForward:
-      doPushFirstOrderFwd(stamps, measurements);
+      integrateFirstOrderFwd(stamps, measurements);
       break;
     case PreIntegrator::FirstOrderMidward:
-      doPushFirstOrderMid(stamps, measurements);
+      integrateFirstOrderMid(stamps, measurements);
       break;
     case PreIntegrator::RungeKutta3:
-      doPushRK(stamps, measurements, 3);
+      integrateRK(stamps, measurements, 3);
       break;
     case PreIntegrator::RungeKutta4:
-      doPushRK(stamps, measurements, 4);
+      integrateRK(stamps, measurements, 4);
       break;
     case PreIntegrator::CrouchGrossman3:
-      doPushCrouchGrossman(stamps, measurements, 3);
+      integrateCrouchGrossman(stamps, measurements, 3);
       break;
     case PreIntegrator::CrouchGrossman4:
-      doPushCrouchGrossman(stamps, measurements, 4);
+      integrateCrouchGrossman(stamps, measurements, 4);
       break;
     default:
       throw std::runtime_error("No valid integrator supplied");
@@ -92,7 +92,7 @@ void QuaternionPreIntegrationState::doPushD_R_i_j(
 }
 
 //------------------------------------------------------------------------------
-Quaternion QuaternionPreIntegrationState::integrateFirstOrderFwd(
+Quaternion QuaternionPreIntegrationState::integrateFirstOrderFwdStep(
     Quaternion q,
     Vector3 w_i,
     FloatType dt)
@@ -101,7 +101,7 @@ Quaternion QuaternionPreIntegrationState::integrateFirstOrderFwd(
 }
 
 //------------------------------------------------------------------------------
-Quaternion QuaternionPreIntegrationState::integrateFirstOrderMid(
+Quaternion QuaternionPreIntegrationState::integrateFirstOrderMidStep(
     Quaternion q,
     Vector3 w_i,
     Vector3 w_i_1,
@@ -199,7 +199,9 @@ std::pair<Quaternion, Matrix3> QuaternionPreIntegrationState::integrateRK(
 
     Vector4 q_4_dot = stateDerivative(w_k4, q_v_3);
 
-    Vector4 q_i_1_v = q_v + dt * (q_1_dot + 2 * q_2_dot + 2 * q_3_dot + q_4_dot) * 1.0/6.0;
+    Vector4 q_i_1_v = q_v + dt *
+                      (q_1_dot + 2.0 * q_2_dot + 2.0 * q_3_dot + q_4_dot)
+                      * 1.0/6.0;
     q_i_1_v.normalize();
 
     ///////////////
@@ -218,7 +220,7 @@ std::pair<Quaternion, Matrix3> QuaternionPreIntegrationState::integrateRK(
     Matrix3 phi_4_dot = covarTransitionDerivative(w_k4, phi_3);
     Matrix3 phi_i_1 = Matrix3::Identity()
                       + dt * 1.0 / 6.0 *
-                      (phi_1_dot + 2 * phi_2_dot + 2 * phi_3_dot + phi_4_dot);
+                      (phi_1_dot + 2.0 * phi_2_dot + 2.0 * phi_3_dot + phi_4_dot);
 
     return std::make_pair<Quaternion, Matrix3>(
           Quaternion(q_i_1_v[0], q_i_1_v[1], q_i_1_v[2], q_i_1_v[3]),
@@ -275,7 +277,7 @@ Quaternion QuaternionPreIntegrationState::integrateCrouchGrossman(
 }
 
 //------------------------------------------------------------------------------
-void QuaternionPreIntegrationState::doPushFirstOrderFwd(
+void QuaternionPreIntegrationState::integrateFirstOrderFwd(
     times_container_t stamps,
     measurements_container_t measurements)
 {
@@ -292,7 +294,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
       D_R_i_k_quat_.push_back(Quaternion());
       if (compute_absolutes_)
       {
-        R_i_k_quat_.push_back(integrateFirstOrderFwd(
+        R_i_k_quat_.push_back(integrateFirstOrderFwdStep(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
@@ -303,7 +305,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
     else
     {
       // Integrate
-      D_R_i_k_quat_.push_back(integrateFirstOrderFwd(
+      D_R_i_k_quat_.push_back(integrateFirstOrderFwdStep(
                                 D_R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
@@ -311,7 +313,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
 
       if (compute_absolutes_)
       {
-        R_i_k_quat_.push_back(integrateFirstOrderFwd(
+        R_i_k_quat_.push_back(integrateFirstOrderFwdStep(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
@@ -334,7 +336,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
 }
 
 //------------------------------------------------------------------------------
-void QuaternionPreIntegrationState::doPushFirstOrderMid(
+void QuaternionPreIntegrationState::integrateFirstOrderMid(
     times_container_t stamps,
     measurements_container_t measurements)
 {
@@ -354,7 +356,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
 
       if(compute_absolutes_)
       {
-        R_i_k_quat_.push_back(integrateFirstOrderMid(
+        R_i_k_quat_.push_back(integrateFirstOrderMidStep(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
@@ -365,7 +367,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
     else
     {
       // Integrate
-      D_R_i_k_quat_.push_back(integrateFirstOrderMid(
+      D_R_i_k_quat_.push_back(integrateFirstOrderMidStep(
                                 D_R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
@@ -373,7 +375,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
       D_R_i_k_quat_.back().normalize();
       if(compute_absolutes_)
       {
-        R_i_k_quat_.push_back(integrateFirstOrderMid(
+        R_i_k_quat_.push_back(integrateFirstOrderMidStep(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
@@ -399,7 +401,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
 }
 
 //------------------------------------------------------------------------------
-void QuaternionPreIntegrationState::doPushRK(
+void QuaternionPreIntegrationState::integrateRK(
     times_container_t stamps,
     measurements_container_t measurements,
     uint32_t order)
@@ -473,7 +475,7 @@ void QuaternionPreIntegrationState::doPushRK(
 }
 
 //------------------------------------------------------------------------------
-void QuaternionPreIntegrationState::doPushCrouchGrossman(
+void QuaternionPreIntegrationState::integrateCrouchGrossman(
     times_container_t stamps,
     measurements_container_t measurements,
     uint32_t order)

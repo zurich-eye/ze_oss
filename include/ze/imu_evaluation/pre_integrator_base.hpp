@@ -48,7 +48,7 @@ public:
   //! This assumes that every pushed batch corresponds to an interval between
   //! two images / keyframes.
   //! The input measurements should be bias corrected.
-  virtual void doPushD_R_i_j(times_container_t imu_stamps,
+  virtual void integrate(times_container_t imu_stamps,
                              measurements_container_t imu_measurements) = 0;
 
   //! Get the result of the pre-integration process.

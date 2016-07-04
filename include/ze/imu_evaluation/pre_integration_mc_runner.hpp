@@ -61,7 +61,7 @@ private:
   std::vector<Matrix3> R_ref_;
 
   //! Estimate the covariance of the experiment set (relative orientation).
-  std::vector<Matrix3> covariance_estimate(
+  std::vector<Matrix3> covarianceEstimates(
       std::vector<Matrix3> D_R_actual,
       std::vector<std::vector<Matrix3>> D_R_mc);
 

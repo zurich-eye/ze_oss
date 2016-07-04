@@ -140,6 +140,8 @@ void PreIntegrationRunnerDataProvider::loadData()
 
       Vector6 measurement;
       // @todo: actually inject into integrators
+      // The below values are the actual values available in the EUROC MH01
+      // Dataset.
       Vector3 gyr_bias;
       gyr_bias << -0.002133, 0.021059, 0.076659;
 

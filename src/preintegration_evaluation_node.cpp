@@ -82,15 +82,6 @@ void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
                                       start,
                                       end);
 
-////  //! A single monte carlo run
-////  PreIntegratorMonteCarlo::Ptr mc2 = runQuaternionMc(
-////                                      preintegration_runner,
-////                                      PreIntegrator::FirstOrderMidward,
-////                                      "Quat MWD",
-////                                      gyroscope_noise_covariance,
-////                                      start,
-////                                      end);
-
   //! Run the pre-integrators:
 
   // 1) Manifold Integration Forward
@@ -112,15 +103,6 @@ void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
                            start,
                            end,
                            mc);
-  // 3) Manifold Integration with clean orientation estimates
-  // Use the corrupted MC simulator to get an unperturbed orientation estimate.
-//  PreIntegrator::Ptr actual_integrator = mc_corrupted_mid->preintegrateActual(start,
-//                                                                              end);
-//  runManifoldClean(preintegration_runner,
-//                   gyroscope_noise_covariance,
-//                   &actual_integrator->D_R_i_k(),
-//                   start,
-//                   end);
 
   // 4) Quaternion Integration: Forward Integration
   QuaternionPreIntegrationState::Ptr state_quat_fwd =
@@ -371,7 +353,7 @@ void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
 
 // -----------------------------------------------------------------------------
 std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
-    PreIntegrationRunner::Ptr preintegration_runner,
+    const PreIntegrationRunner::Ptr& preintegration_runner,
     const Matrix3& gyroscope_noise_covariance,
     FloatType start,
     FloatType end,
@@ -517,54 +499,9 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
   return errors;
 }
 
-
-//// -----------------------------------------------------------------------------
-//PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldClean(
-//    PreIntegrationRunner::Ptr preintegration_runner,
-//    PreIntegrator::IntegratorType integrator_type,
-//    const std::string& name,
-//    const Matrix3& gyroscope_noise_covariance,
-//    const std::vector<Matrix3>* D_R_i_k_reference,
-//    FloatType start,
-//    FloatType end,
-//    PreIntegratorMonteCarlo::Ptr mc_ref)
-//{
-//  PreIntegratorFactory::Ptr preintegrator_factory(
-//        std::make_shared<ManifoldPreIntegrationFactory>(gyroscope_noise_covariance,
-//                                                        integrator_type,
-//                                                        D_R_i_k_reference));
-//  if (!mc_ref)
-//  {
-//    VLOG(1) << "Monte Carlo Simulation [ManifoldPreIntegrator:Clean]";
-//    PreIntegratorMonteCarlo::Ptr mc(
-//          std::make_shared<PreIntegratorMonteCarlo>(
-//            preintegration_runner,
-//            preintegrator_factory,
-//            FLAGS_num_threads));
-//    mc->simulate(FLAGS_monte_carlo_runs, start, end);
-//  }
-
-//  //
-//  ManifoldPreIntegrationState::Ptr est_integrator = preintegrator_factory->get();
-//  preintegration_runner->process(est_integrator,
-//                                 true,
-//                                 start,
-//                                 end);
-
-//  plotCovarianceResults({mc->covariances(),
-//                         est_integrator->covariance_i_k()},
-//                         {"MC" + name, "Est" + name});
-
-//  plotCovarianceError(mc->covariances(),
-//                      est_integrator->covariance_i_k(),
-//                      name);
-
-//  return mc;
-//}
-
 // -----------------------------------------------------------------------------
 PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorruptedMc(
-    PreIntegrationRunner::Ptr preintegration_runner,
+    const PreIntegrationRunner::Ptr& preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
@@ -589,7 +526,7 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorruptedM
 
 // -----------------------------------------------------------------------------
 PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionMc(
-    PreIntegrationRunner::Ptr preintegration_runner,
+    const PreIntegrationRunner::Ptr& preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
@@ -614,13 +551,13 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionMc(
 
 // -----------------------------------------------------------------------------
 ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrupted(
-    PreIntegrationRunner::Ptr preintegration_runner,
+    const PreIntegrationRunner::Ptr& preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
     FloatType start,
     FloatType end,
-    PreIntegratorMonteCarlo::Ptr mc,
+    const PreIntegratorMonteCarlo::Ptr& mc,
     bool simplified_covariance)
 {
   VLOG(1) << "Reference Estimates [ManifoldPreIntegrator:Corrupted]";
@@ -657,13 +594,13 @@ ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrup
 
 // -----------------------------------------------------------------------------
 QuaternionPreIntegrationState::Ptr PreIntegrationEvaluationNode::runQuaternion(
-    PreIntegrationRunner::Ptr preintegration_runner,
+    const PreIntegrationRunner::Ptr& preintegration_runner,
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
     FloatType start,
     FloatType end,
-    PreIntegratorMonteCarlo::Ptr mc)
+    const PreIntegratorMonteCarlo::Ptr& mc)
 {
   VLOG(1) << "Reference Estimates [Quaternion]";
   PreIntegratorFactory::Ptr preintegrator_factory(

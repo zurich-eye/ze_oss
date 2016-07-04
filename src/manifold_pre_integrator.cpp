@@ -15,17 +15,17 @@ ManifoldPreIntegrationState::ManifoldPreIntegrationState(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::doPushD_R_i_j(
+void ManifoldPreIntegrationState::integrate(
     times_container_t stamps,
     measurements_container_t measurements)
 {
   switch (integrator_type_)
   {
     case PreIntegrator::FirstOrderForward:
-      doPushFirstOrderFwd(stamps, measurements);
+      integrateFirstOrderFwd(stamps, measurements);
       break;
     case PreIntegrator::FirstOrderMidward:
-      doPushFirstOrderMid(stamps, measurements);
+      integrateFirstOrderMid(stamps, measurements);
       break;
     default:
       throw std::runtime_error("No valid integrator supplied");
@@ -54,7 +54,7 @@ void ManifoldPreIntegrationState::doPushD_R_i_j(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::doPushFirstOrderFwd(
+void ManifoldPreIntegrationState::integrateFirstOrderFwd(
     times_container_t stamps,
     measurements_container_t measurements)
 {
@@ -70,11 +70,11 @@ void ManifoldPreIntegrationState::doPushFirstOrderFwd(
     // Reset to 0 at every step:
     if (i == 0)
     {
-      pushInitialValuesFwd(dt, gyro_measurement);
+      setInitialValuesFwd(dt, gyro_measurement);
     }
     else
     {
-      pushPreIntegrationStepFwd(dt, gyro_measurement);
+      integrateStepFwd(dt, gyro_measurement);
     }
 
     times_raw_.push_back(stamps[i]);
@@ -82,7 +82,7 @@ void ManifoldPreIntegrationState::doPushFirstOrderFwd(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::doPushFirstOrderMid(
+void ManifoldPreIntegrationState::integrateFirstOrderMid(
     times_container_t stamps,
     measurements_container_t measurements)
 {
@@ -98,11 +98,11 @@ void ManifoldPreIntegrationState::doPushFirstOrderMid(
     // Reset to 0 at every step:
     if (i == 0)
     {
-      pushInitialValuesMid(dt, gyro_measurement, gyro_measurement2);
+      setInitialValuesMid(dt, gyro_measurement, gyro_measurement2);
     }
     else
     {
-      pushPreIntegrationStepMid(dt, gyro_measurement, gyro_measurement2);
+      integrateStepMid(dt, gyro_measurement, gyro_measurement2);
     }
 
     times_raw_.push_back(stamps[i]);
@@ -110,7 +110,7 @@ void ManifoldPreIntegrationState::doPushFirstOrderMid(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::pushInitialValuesFwd(
+void ManifoldPreIntegrationState::setInitialValuesFwd(
     const FloatType dt,
     const Eigen::Ref<Vector3>& gyro_measurement)
 {
@@ -126,7 +126,7 @@ void ManifoldPreIntegrationState::pushInitialValuesFwd(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
+void ManifoldPreIntegrationState::integrateStepFwd(
     const FloatType dt,
     const Eigen::Ref<Vector3>& gyro_measurement)
 {
@@ -172,7 +172,7 @@ void ManifoldPreIntegrationState::pushPreIntegrationStepFwd(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::pushInitialValuesMid(
+void ManifoldPreIntegrationState::setInitialValuesMid(
     const FloatType dt,
     const Eigen::Ref<Vector3>& gyro_measurement,
     const Eigen::Ref<Vector3>& gyro_measurement2)
@@ -189,7 +189,7 @@ void ManifoldPreIntegrationState::pushInitialValuesMid(
 }
 
 //------------------------------------------------------------------------------
-void ManifoldPreIntegrationState::pushPreIntegrationStepMid(
+void ManifoldPreIntegrationState::integrateStepMid(
     const FloatType dt,
     const Eigen::Ref<Vector3>& gyro_measurement,
     const Eigen::Ref<Vector3>& gyro_measurement2)

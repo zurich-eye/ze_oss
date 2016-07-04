@@ -34,7 +34,7 @@ public:
 //      FloatType end);
 
   PreIntegratorMonteCarlo::Ptr runManifoldCorruptedMc(
-      PreIntegrationRunner::Ptr preintegration_runner,
+      const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
@@ -42,7 +42,7 @@ public:
       FloatType end);
 
   PreIntegratorMonteCarlo::Ptr runQuaternionMc(
-      PreIntegrationRunner::Ptr preintegration_runner,
+      const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
@@ -51,29 +51,29 @@ public:
 
   //! Pre-Integration Simulation Runners:
   ManifoldPreIntegrationState::Ptr runManifoldCorrupted(
-      PreIntegrationRunner::Ptr preintegration_runner,
+      const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
       FloatType start,
       FloatType end,
-      PreIntegratorMonteCarlo::Ptr mc_ref,
+      const PreIntegratorMonteCarlo::Ptr& mc_ref,
       bool simplified_covariance = false);
 
   QuaternionPreIntegrationState::Ptr runQuaternion(
-      PreIntegrationRunner::Ptr preintegration_runner,
+      const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
       FloatType start,
       FloatType end,
-      PreIntegratorMonteCarlo::Ptr mc_ref);
+      const PreIntegratorMonteCarlo::Ptr& mc_ref);
 
   //! Runs a single noisy integration on all channels and shows plots of the
   //! estimates.
   //! Returns the error offset (rotation only) for the different methods
   std::vector<FloatType> runDriftEvaluation(
-      PreIntegrationRunner::Ptr preintegration_runner,
+      const PreIntegrationRunner::Ptr& preintegration_runner,
       const Matrix3& gyroscope_noise_covariance,
       FloatType start,
       FloatType end,

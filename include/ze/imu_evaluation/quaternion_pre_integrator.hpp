@@ -23,7 +23,7 @@ public:
   ~QuaternionPreIntegrationState() {}
 
   void setInitialOrientation(Matrix3 initial_orientation) override;
-  void doPushD_R_i_j(times_container_t stamps,
+  void integrate(times_container_t stamps,
                      measurements_container_t measurements);
 private:
   preintegrated_orientation_quat_container_t D_R_i_j_quat_;
@@ -32,12 +32,12 @@ private:
   preintegrated_orientation_quat_container_t R_i_k_quat_;
 
   //! Forward integration.
-  inline Quaternion integrateFirstOrderFwd(Quaternion q,
+  inline Quaternion integrateFirstOrderFwdStep(Quaternion q,
                                     Vector3 w_i,
                                     FloatType dt);
 
   //! Midpoint integration.
-  inline Quaternion integrateFirstOrderMid(Quaternion q,
+  inline Quaternion integrateFirstOrderMidStep(Quaternion q,
                                     Vector3 w_i,
                                     Vector3 w_i_1,
                                     FloatType dt);
@@ -59,14 +59,14 @@ private:
                          FloatType dt,
                          uint32_t order);
 
-  void doPushFirstOrderFwd(times_container_t stamps,
+  void integrateFirstOrderFwd(times_container_t stamps,
                            measurements_container_t measurements);
-  void doPushFirstOrderMid(times_container_t stamps,
+  void integrateFirstOrderMid(times_container_t stamps,
                            measurements_container_t measurements);
-  void doPushRK(times_container_t stamps,
+  void integrateRK(times_container_t stamps,
                  measurements_container_t measurements,
                 uint32_t order = 3);
-  void doPushCrouchGrossman(times_container_t stamps,
+  void integrateCrouchGrossman(times_container_t stamps,
                             measurements_container_t measurements,
                             uint32_t order = 3);
 

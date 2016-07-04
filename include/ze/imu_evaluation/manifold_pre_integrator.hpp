@@ -15,13 +15,15 @@ public:
   //! Set a preintegrated container with reference values for the relative
   //! orientation to use instead of the corrupted pre-integrated rotations
   //! within the container (for covariance propagation).
+  //! Set useSimpleCovariancePropagation to skip the Jacobian calculation for
+  //! noise propagation and use Identity.
   ManifoldPreIntegrationState(
       Matrix3 gyro_noise_covariance,
       PreIntegrator::IntegratorType integrator_type,
       bool useSimpleCovariancePropagation = false,
       const preintegrated_orientation_container_t* D_R_i_k_reference = nullptr);
 
-  void doPushD_R_i_j(times_container_t stamps,
+  void integrate(times_container_t stamps,
                      measurements_container_t measurements);
 
   ~ManifoldPreIntegrationState() {}
@@ -36,28 +38,27 @@ private:
   //! Should the simple covariance propgatation be used?
   bool useSimpleCovariancePropagation_;
 
-  void doPushFirstOrderFwd(times_container_t stamps,
+  void integrateFirstOrderFwd(times_container_t stamps,
                            measurements_container_t measurements);
 
-  void doPushFirstOrderMid(times_container_t stamps,
+  void integrateFirstOrderMid(times_container_t stamps,
                            measurements_container_t measurements);
 
-  //! Push the values used for a new pre-integration batch.
-  void pushInitialValuesFwd(const FloatType dt,
+  //! Set the values used for a new pre-integration batch.
+  void setInitialValuesFwd(const FloatType dt,
                             const Eigen::Ref<Vector3>& gyro_measurement);
 
-  //! Push a new integration step to the containers.
-  inline void pushPreIntegrationStepFwd(const FloatType dt,
-                                 const Eigen::Ref<Vector3>& gyro_measurement);
-
-  //! Push the values used for a new pre-integration batch.
-  inline void pushInitialValuesMid(const FloatType dt,
+  //! Set the values used for a new pre-integration batch.
+  inline void setInitialValuesMid(const FloatType dt,
                             const Eigen::Ref<Vector3>& gyro_measurement,
                             const Eigen::Ref<Vector3>& gyro_measurement2);
 
+  //! Push a new integration step to the containers.
+  inline void integrateStepFwd(const FloatType dt,
+                                 const Eigen::Ref<Vector3>& gyro_measurement);
 
   //! Push a new integration step to the containers.
-  void pushPreIntegrationStepMid(
+  void integrateStepMid(
       const FloatType dt,
       const Eigen::Ref<Vector3>& gyro_measurement,
       const Eigen::Ref<Vector3>& gyro_measurement2);

@@ -39,7 +39,7 @@ void PreIntegrator::pushD_R_i_j(times_container_t imu_stamps,
   measurements_.rightCols(imu_measurements.cols()) = imu_measurements.leftCols(
                                                        imu_measurements.cols());
 
-  doPushD_R_i_j(imu_stamps, imu_measurements);
+  integrate(imu_stamps, imu_measurements);
 
   // Sanity checks:
   if (compute_absolutes_)

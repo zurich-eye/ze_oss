@@ -45,7 +45,7 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
   }
 
   // estimate the variance / covariance
-  covariances_ = covariance_estimate(D_R_ref_, D_R_mc_);
+  covariances_ = covarianceEstimates(D_R_ref_, D_R_mc_);
 }
 
 //------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateCorrupted(
 }
 
 //------------------------------------------------------------------------------
-std::vector<Matrix3> PreIntegratorMonteCarlo::covariance_estimate(
+std::vector<Matrix3> PreIntegratorMonteCarlo::covarianceEstimates(
     std::vector<Matrix3> D_R_actual,
     std::vector<std::vector<Matrix3>> D_R_mc)
 {
