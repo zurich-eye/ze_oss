@@ -74,6 +74,7 @@ std::vector<RelativeError> calcSequenceErrors(
     {
       if (least_squares_align_translation_only)
       {
+        /*
         Positions p_W_es_align(3, n_align_poses);
         Positions p_W_gt_align(3, n_align_poses);
         for (int i = 0; i < n_align_poses; ++i)
@@ -84,6 +85,10 @@ std::vector<RelativeError> calcSequenceErrors(
           PointAligner problem(p_W_gt_align, p_W_es_align);
           problem.optimize(T_A0_B0);
         }
+        */
+        //! @todo: Run closed-form solution of the alignment first. As it is now
+        //!        the alignment does not provide good results.
+        LOG(FATAL) << "Point-based alignment not supported yet.";
       }
       else
       {
