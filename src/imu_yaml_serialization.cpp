@@ -288,7 +288,7 @@ bool convert<std::shared_ptr<ze::ImuRig>>::decode(
         return false;
       }
 
-      Eigen::Matrix4d T_B_S;
+      ze::Matrix4 T_B_S;
       if (!YAML::safeGet(imu_node, "T_B_S", &T_B_S))
       {
         LOG(ERROR) << "Unable to get extrinsic transformation T_B_S for imu " << i;
