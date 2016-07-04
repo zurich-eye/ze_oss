@@ -307,6 +307,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
                                 D_R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
+      D_R_i_k_quat_.back().normalize();
 
       if (compute_absolutes_)
       {
@@ -314,6 +315,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderFwd(
                                 R_i_k_quat_.back(),
                                 measurements.col(i).tail<3>(3),
                                 dt));
+        R_i_k_quat_.back().normalize();
       }
 
       // Covariance Prediction (FWD Integrated)
@@ -368,6 +370,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
                                 dt));
+      D_R_i_k_quat_.back().normalize();
       if(compute_absolutes_)
       {
         R_i_k_quat_.push_back(integrateFirstOrderMid(
@@ -375,6 +378,7 @@ void QuaternionPreIntegrationState::doPushFirstOrderMid(
                                 measurements.col(i).tail<3>(3),
                                 measurements.col(i + 1).tail<3>(3),
                                 dt));
+        R_i_k_quat_.back().normalize();
       }
 
       // Covariance Prediction (MID Integrated)
@@ -439,6 +443,7 @@ void QuaternionPreIntegrationState::doPushRK(
                                  order);
 
       D_R_i_k_quat_.push_back(q_i_1);
+      D_R_i_k_quat_.back().normalize();
 
       if (compute_absolutes_)
       {
@@ -450,6 +455,7 @@ void QuaternionPreIntegrationState::doPushRK(
                                                 dt,
                                                 order);
         R_i_k_quat_.push_back(q_i_1_global);
+        R_i_k_quat_.back().normalize();
       }
 
       // Covariance Prediction
@@ -504,6 +510,7 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
                                 measurements.col(i + 1).tail<3>(3),
                                 dt,
                                 order));
+      D_R_i_k_quat_.back().normalize();
 
       if (compute_absolutes_)
       {
@@ -513,6 +520,7 @@ void QuaternionPreIntegrationState::doPushCrouchGrossman(
                                 measurements.col(i + 1).tail<3>(3),
                                 dt,
                                 order));
+        R_i_k_quat_.back().normalize();
       }
 
       // Covariance Prediction (FWD Integrated)

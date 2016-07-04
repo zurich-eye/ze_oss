@@ -386,7 +386,7 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
     FloatType error = 0;
     for (size_t i = 0; i < est.size(); ++i)
     {
-      Quaternion q1(est[i]);
+      Quaternion q1 = Quaternion::fromApproximateRotationMatrix(est[i]);
       Quaternion q2(trajectory_->orientation(times[i]));
       error += q1.getDisparityAngle(q2) / static_cast<FloatType>(est.size());
     }
