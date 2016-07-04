@@ -30,8 +30,7 @@ TEST(StatisticsTest, testMeasurementCovariance)
   }
 
   Matrix3 cov = measurementCovariance(measurements);
-  Matrix3 ref = Matrix3::Zero();
-  ref(0, 0) = 2.0; ref(1, 1) = 3.0; ref(2, 2) = 4.0;
+  Matrix3 ref = Vector3(2.0, 3.0, 4.0).asDiagonal();
 
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(cov, ref, 1e-1));
 }
