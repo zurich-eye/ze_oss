@@ -24,7 +24,6 @@ DataProviderRosbag::DataProviderRosbag(
   , uses_split_messages_(false)
 {
   VLOG(1) << "Create Dataprovider for synchronized Gyro/Accel";
-  //! @todo: Check if topics exists.
   //! @todo: Display number of messages per topic in the beginning.
 
   loadRosbag(bag_filename);
