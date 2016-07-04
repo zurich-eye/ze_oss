@@ -497,7 +497,7 @@ bool labelPlot(
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format)
 {
-  Eigen::Matrix<double, Eigen::Dynamic, 1> x(y.size());
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> x(y.size());
   for (int i=0; i < x.size(); ++i)
   {
     x(i) = i;
