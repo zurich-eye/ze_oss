@@ -26,7 +26,7 @@ class TrajectoryAnalysis:
         self.reset()
         self.result_dir = utils.check_folder_exists(result_dir)
         self.plot_size = plot_size
-        self.statistics_filename = os.path.join(self.result_dir, 'statistics.yaml')
+        self.statistics_filename = os.path.join(self.result_dir, 'results.yaml')
        
     def reset(self):
         self.data_loaded = False
@@ -248,14 +248,16 @@ class TrajectoryAnalysis:
             stats = yaml.load(open(self.statistics_filename,'r'))
          
         # Compute new statistics
-        stats[label] = dict()
-        stats[label]['rmse']   = float(np.sqrt(np.dot(data_vec,data_vec) / len(data_vec)))
-        stats[label]['mean']   = float(np.mean(data_vec))
-        stats[label]['median'] = float(np.median(data_vec))
-        stats[label]['std']    = float(np.std(data_vec))
-        stats[label]['min']    = float(np.min(data_vec))
-        stats[label]['max']    = float(np.max(data_vec))
-        stats[label]['num_samples'] = int(len(data_vec))
+        if not 'trajectory_align' in stats:
+            stats['trajectory_align'] = dict()
+        stats['trajectory_align'][label] = dict()
+        stats['trajectory_align'][label]['rmse']   = float(np.sqrt(np.dot(data_vec,data_vec) / len(data_vec)))
+        stats['trajectory_align'][label]['mean']   = float(np.mean(data_vec))
+        stats['trajectory_align'][label]['median'] = float(np.median(data_vec))
+        stats['trajectory_align'][label]['std']    = float(np.std(data_vec))
+        stats['trajectory_align'][label]['min']    = float(np.min(data_vec))
+        stats['trajectory_align'][label]['max']    = float(np.max(data_vec))
+        stats['trajectory_align'][label]['num_samples'] = int(len(data_vec))
         
         # Save updated statistics
         with open(self.statistics_filename,'w') as outfile:

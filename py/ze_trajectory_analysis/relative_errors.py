@@ -5,6 +5,7 @@ Zurich Eye
 
 import os
 import logging
+import yaml
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -53,6 +54,9 @@ def plot_relative_errors(data_dirs, segment_lengths):
     dummy_plots_scale = []
     labels = []
     
+    # Relative errors YAML
+    results = dict()
+    
     for idx_exp, data_dir in enumerate(data_dirs):
         
         # The dummy plots are used to create the legends.
@@ -81,6 +85,22 @@ def plot_relative_errors(data_dirs, segment_lengths):
             pb = ax_scale.boxplot(e_scale * 100.0 - 100.0, False, '',
                                 positions=[idx_exp + pos[idx_segment_length]], widths=0.8)
             _set_boxplot_colors(pb, colors[idx_exp])
+            
+            results[segment_length] = dict()
+            results[segment_length]['translation'] = float(np.median(e_pos))
+            results[segment_length]['translation_rel'] = results[segment_length]['translation'] / segment_length * 100.0
+            results[segment_length]['yaw'] = float(np.median(e_yaw * 180.0 / np.pi))
+            results[segment_length]['roll_pitch'] = float(np.median(e_rap * 180.0 / np.pi))
+            results[segment_length]['scale'] = float(np.median(e_scale * 100.0 - 100.0))
+            
+        # save results_file
+        results_file = os.path.join(data_dir, 'results.yaml')
+        stats = dict()        
+        if os.path.exists(results_file):
+            stats = yaml.load(open(results_file,'r'))
+        stats['relative_errors'] = results
+        with open(results_file,'w') as outfile:
+            outfile.write(yaml.dump(stats, default_flow_style=False))
                    
     # create legend
     ax_pos.legend(dummy_plots_yaw, labels, bbox_to_anchor=(0., 1.02, 1., .102),
@@ -102,6 +122,7 @@ def plot_relative_errors(data_dirs, segment_lengths):
     
     #fig.tight_layout()
     fig.savefig(os.path.join(data_dirs[0], 'traj_relative_errors_boxplots.pdf'), bbox_inches="tight")
+
 
 def plot_relative_errors_along_trajectory(data_dir, segment_length, circle_size=0.2):
     ta = TrajectoryAnalysis(result_dir = data_dir)
