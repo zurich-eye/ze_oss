@@ -55,11 +55,17 @@ public:
 
   //! @name: Projection and back-projection operations. The main use of the camera.
   //! @{
-  //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
+  //! Bearing vector from pixel coordinates. Z-component of return value is 1.0.
   virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
   //! Computes pixel coordinates from 3D-point.
   virtual Keypoint project(const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Returns true or false if 3D-point is visible (no occlusion check) and if
+  //! visible the pixel coordinates.
+  virtual std::pair<bool, Keypoint> projectWithCheck(
+      const Eigen::Ref<const Position>& pos,
+      FloatType border_margin = 0.0) const = 0;
 
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;

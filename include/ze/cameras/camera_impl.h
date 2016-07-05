@@ -2,6 +2,7 @@
 
 #include <ze/cameras/camera.h>
 #include <ze/cameras/camera_models.h>
+#include <ze/cameras/camera_utils.h>
 
 namespace ze {
 
@@ -25,6 +26,18 @@ public:
     Distortion::distort(this->distortion_params_.data(), px.data());
     PinholeGeometry::project(this->projection_params_.data(), px.data());
     return px;
+  }
+
+  virtual std::pair<bool, Keypoint> projectWithCheck(
+      const Eigen::Ref<const Position>& pos,
+      FloatType border_margin) const override
+  {
+    if (pos[2] < 0.0)
+    {
+      return std::make_pair(false, Keypoint());
+    }
+    Keypoint px = project(pos);
+    return std::make_pair(isVisibleWithMargin(size(), px, border_margin), px);
   }
 
   virtual Bearing backProject(
