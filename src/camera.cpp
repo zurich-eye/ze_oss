@@ -21,6 +21,56 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
   }
 }
 
+Keypoint Camera::projectHomogeneous(
+    const Eigen::Ref<const HomPosition>& pos_h) const
+{
+  if (pos_h[3] < 0)
+  {
+    return this->project(-pos_h.head<3>());
+  }
+  else
+  {
+    return this->project(pos_h.head<3>());
+  }
+}
+
+std::pair<bool, Keypoint> Camera::projectHomogeneousWithCheck(
+    const Eigen::Ref<const HomPosition>& pos_h,
+    FloatType border_margin) const
+{
+  if (pos_h[3] < 0)
+  {
+    return this->projectWithCheck(-pos_h.head<3>(), border_margin);
+  }
+  else
+  {
+    return this->projectWithCheck(pos_h.head<3>(), border_margin);
+  }
+}
+
+Matrix24 Camera::dProjectHomogeneous_dLandmark(
+    const Eigen::Ref<const HomPosition>& pos_h) const
+{
+  Matrix24 J;
+  if (pos_h[3] < 0)
+  {
+    J.topLeftCorner<2, 3>() = this->dProject_dLandmark(-pos_h.head<3>());
+  }
+  else
+  {
+    J.topLeftCorner<2, 3>() = this->dProject_dLandmark(pos_h.head<3>());
+  }
+  J.bottomRightCorner<2, 1>().setZero();
+  return J;
+}
+
+std::pair<Keypoint, Matrix24> Camera::projectHomogeneousWithJacobian(
+    const Eigen::Ref<const HomPosition>& pos_h) const
+{
+  return std::make_pair(projectHomogeneous(pos_h),
+                        dProjectHomogeneous_dLandmark(pos_h));
+}
+
 Bearings Camera::backProjectVectorized(const Eigen::Ref<const Keypoints>& px_vec) const
 {
   Bearings bearings(3, px_vec.cols());

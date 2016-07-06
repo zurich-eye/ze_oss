@@ -62,17 +62,34 @@ public:
   virtual Keypoint project(const Eigen::Ref<const Position>& pos) const = 0;
 
   //! Returns true or false if 3D-point is visible (no occlusion check) and if
-  //! visible the pixel coordinates.
+  //! visible also returns pixel coordinates.
   virtual std::pair<bool, Keypoint> projectWithCheck(
       const Eigen::Ref<const Position>& pos,
       FloatType border_margin = 0.0) const = 0;
 
+  //! Computes pixel coordinates from 3D-point in homogeneous coordinates.
+  virtual Keypoint projectHomogeneous(const Eigen::Ref<const HomPosition>& pos_h) const;
+
+  //! Returns true or false if homogeneous 3D-point is visible (no occlusion check)
+  //! and if visible also returns the pixel coordinates.
+  virtual std::pair<bool, Keypoint> projectHomogeneousWithCheck(
+      const Eigen::Ref<const HomPosition>& pos_h,
+      FloatType border_margin = 0.0) const;
+
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Computes Jacobian of homogeneous projection w.r.t. homogeneous landmark position.
+  virtual Matrix24 dProjectHomogeneous_dLandmark(
+      const Eigen::Ref<const HomPosition>& pos_h) const;
 
   //! Computes pixel coordinates from 3D point and corresponding Jacobian.
   virtual std::pair<Keypoint, Matrix23> projectWithJacobian(
       const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Computes pixel coordinates from 3D homogeneous point and corresponding Jacobian.
+  virtual std::pair<Keypoint, Matrix24> projectHomogeneousWithJacobian(
+      const Eigen::Ref<const HomPosition>& pos_h) const;
   //! @}
 
   //! @name Block projection and back-projection. Always prefer to avoid cache misses.
