@@ -107,6 +107,7 @@ using Descriptors = Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen
 // Inertial containers.
 using ImuStamps = Eigen::Matrix<int64_t, Eigen::Dynamic, 1>;
 using ImuAccGyrContainer = Matrix6X;
+// Order: Accelerometer, Gyroscope
 using ImuAccGyr = Vector6;
 
 } // namespace ze
