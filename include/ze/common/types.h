@@ -87,6 +87,7 @@ using LineMeasurement = Vector3;
 using Keypoints   = Matrix2X;
 using Bearings    = Matrix3X;
 using Positions   = Matrix3X;
+using HomPositions = Matrix4X;
 using Gradients   = Matrix2X;
 using Seeds       = Matrix4X;
 //! Normal vector on line end-points bearings, as explained in
