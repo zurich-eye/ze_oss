@@ -1,6 +1,9 @@
 #pragma once
 
+#include <gflags/gflags.h>
 #include <ze/data_provider/data_provider_base.hpp>
+
+DECLARE_uint64(num_imus);
 
 namespace ze {
 
