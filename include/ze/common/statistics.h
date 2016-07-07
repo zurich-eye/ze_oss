@@ -44,4 +44,13 @@ inline T normPdf(const T x, const T mean, const T sigma)
   return result;
 }
 
+//! Calculate the covariance of a matrix of measurements. The measurements are
+//! stacked column-wise in the matrix.
+inline const MatrixX measurementCovariance(const Eigen::Ref<MatrixX>& values)
+{
+  MatrixX zero_mean = values.colwise() - values.rowwise().mean();
+
+  return (zero_mean * zero_mean.adjoint()) / (zero_mean.cols() - 1);
+}
+
 } // namespace ze
