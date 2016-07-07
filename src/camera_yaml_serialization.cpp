@@ -145,17 +145,27 @@ bool convert<std::shared_ptr<ze::CameraRig>>::decode(
         LOG(ERROR) << "Unable to retrieve camera " << i;
         return false;
       }
+      cameras.push_back(camera);
 
-      ze::Matrix4 T_B_C;
-      if (!YAML::safeGet(camera_node, "T_B_C", &T_B_C))
+      ze::Matrix4 T_B_C, T_C_B;
+      if (YAML::safeGet(camera_node, "T_B_C", &T_B_C))
       {
-        LOG(ERROR) << "Unable to get extrinsic transformation T_B_C for camera " << i;
+        T_Ci_B.push_back(ze::Transformation(
+                           ze::Quaternion::fromApproximateRotationMatrix(T_B_C.block<3,3>(0,0)),
+                           T_B_C.block<3,1>(0,3)).inverse());
+      }
+      else if (YAML::safeGet(camera_node, "T_C_B", &T_C_B))
+      {
+        T_Ci_B.push_back(ze::Transformation(
+                           ze::Quaternion::fromApproximateRotationMatrix(T_C_B.block<3,3>(0,0)),
+                           T_C_B.block<3,1>(0,3)));
+      }
+      else
+      {
+        LOG(ERROR) << "Unable to get extrinsic transformation T_B_C or T_C_B "
+                   << "for camera " << i;
         return false;
       }
-      cameras.push_back(camera);
-      T_Ci_B.push_back(ze::Transformation(
-                         ze::Quaternion::fromApproximateRotationMatrix(T_B_C.block<3,3>(0,0)),
-                         T_B_C.block<3,1>(0,3)).inverse());
     }
 
     camera_rig.reset(new ze::CameraRig(T_Ci_B, cameras, label));
