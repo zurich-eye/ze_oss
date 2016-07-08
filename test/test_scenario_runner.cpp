@@ -25,11 +25,11 @@ TEST(ScenarioTest, testSplineScenario)
       RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
   RandomVectorSampler<3>::Ptr gyr_noise =
       RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
-  Vector3 gravity(0, 0, -9.81);
+  FloatType gravity_magnitude = 9.81;
 
   // test runner
   ScenarioRunner runner(scenario, bias, acc_noise, gyr_noise,
-                        100, 100, gravity);
+                        100, 100, gravity_magnitude);
 
   for (FloatType t = 10.0; t < 20.0; t += 0.1)
   {

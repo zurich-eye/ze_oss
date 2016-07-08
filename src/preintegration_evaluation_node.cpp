@@ -653,7 +653,7 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
                                        gyro_noise,
                                        1.0 / parameters_.imu_sampling_time,
                                        1.0 / parameters_.imu_sampling_time,
-                                       parameters_.gravity);
+                                       parameters_.gravity_magnitude);
 
   PreIntegrationRunner::Ptr preintegration_runner =
       std::make_shared<PreIntegrationRunner>(

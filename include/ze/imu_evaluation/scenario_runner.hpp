@@ -23,14 +23,14 @@ public:
                  RandomVectorSampler<3>::Ptr gyro_noise,
                  FloatType accelerometer_noise_bandwidth_hz,
                  FloatType gyroscope_noise_bandwidth_hz,
-                 const Vector3& gravity)
+                 FloatType gravity_magnitude)
     : scenario_(scenario)
     , bias_(bias)
     , accelerometer_noise_(accelerometer_noise)
     , gyro_noise_(gyro_noise)
     , accelerometer_noise_bandwidth_hz_sqrt_(sqrt(accelerometer_noise_bandwidth_hz))
     , gyro_noise_bandwidth_hz_sqrt_(sqrt(gyroscope_noise_bandwidth_hz))
-    , gravity_(gravity)
+    , gravity_(Vector3(0, 0, gravity_magnitude))
   {}
 
   //! The gravity vector is fixed along Z axis.
@@ -79,7 +79,7 @@ private:
   const FloatType gyro_noise_bandwidth_hz_sqrt_;
 
   //! The gravity vector in the world frame (negative Z-axis).
-  const Vector3& gravity_;
+  const Vector3 gravity_;
 };
 
 } // namespace ze
