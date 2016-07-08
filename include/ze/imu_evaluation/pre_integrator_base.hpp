@@ -2,7 +2,7 @@
 
 #include <ze/common/types.h>
 #include <ze/common/timer_collection.h>
-#include <ze/imu_evaluation/scenario_runner.hpp>
+#include <ze/imu_simulation/scenario_runner.hpp>
 
 namespace ze {
 

@@ -71,7 +71,7 @@ struct ImuPreIntegrationParameters
 
     p.imu_sampling_time = FLAGS_imu_sampling_time;
     p.camera_sampling_time = FLAGS_camera_sampling_time;
-    p.gravity_magnitude = 9.81
+    p.gravity_magnitude = 9.81;
 
     p.accel_noise_density = FLAGS_accelerometer_noise_density;
     p.gyro_noise_density = FLAGS_gyroscope_noise_density;

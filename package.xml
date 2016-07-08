@@ -16,6 +16,7 @@
   <depend>ze_splines</depend>
   <depend>ze_data_provider</depend>
   <depend>minkindr</depend>
+  <depend>ze_imu_simulation</depend>
 
   <export></export>
 </package>
