@@ -15,6 +15,7 @@
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
 #include <ze/imu_evaluation/pre_integration_mc_runner.hpp>
 #include <ze/imu_simulation/scenario_runner.hpp>
+#include <ze/imu_simulation/evaluation_tools.hpp>
 #include <ze/imu_simulation/scenario.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/csv_trajectory.h>
@@ -34,7 +35,6 @@ DEFINE_string(reference_trajectory_csv, "", "The path to the csv file that conta
 
 namespace ze {
 
-
 // -----------------------------------------------------------------------------
 PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 {
@@ -45,7 +45,6 @@ PreIntegrationEvaluationNode::PreIntegrationEvaluationNode()
 
   parameters_ = ImuPreIntegrationParameters::fromGFlags();
 }
-
 
 // -----------------------------------------------------------------------------
 void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
@@ -245,8 +244,10 @@ void PreIntegrationEvaluationNode::runRealDatasetMain()
   pi_manifold_fwd->computeAbsolutes(true);
   preintegration_runner->process(pi_manifold_fwd);
 
-  plotOrientation(pi_manifold_fwd->times_raw(), pi_manifold_fwd->R_i_k(),
-                  "Manifold FWD");
+  plotOrientation(pi_manifold_fwd->times_raw(),
+                  pi_manifold_fwd->R_i_k(),
+                  "Manifold FWD",
+                  trajectory_);
 
   // Manifold MWD
   PreIntegrator::Ptr pi_manifold_mwd =
@@ -477,23 +478,39 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
 
   if (plot)
   {
-    plotOrientation(result_integrators[0]->times_raw(), result_integrators[0]->R_i_k(), "ManifoldFwd", true);
-    plotOrientation(result_integrators[1]->times_raw(), result_integrators[1]->R_i_k(), "ManifoldMid");
-    plotOrientation(result_integrators[2]->times_raw(), result_integrators[2]->R_i_k(), "QuatFwd");
-    plotOrientation(result_integrators[3]->times_raw(), result_integrators[3]->R_i_k(), "QuatMid");
-    plotOrientation(result_integrators[4]->times_raw(), result_integrators[4]->R_i_k(), "QuatRK3");
-    plotOrientation(result_integrators[5]->times_raw(), result_integrators[5]->R_i_k(), "QuatRK4");
-    plotOrientation(result_integrators[6]->times_raw(), result_integrators[6]->R_i_k(), "QuatCG3");
-    plotOrientation(result_integrators[7]->times_raw(), result_integrators[7]->R_i_k(), "QuatCG4");
+    plotOrientation(result_integrators[0]->times_raw(),
+        result_integrators[0]->R_i_k(), "ManifoldFwd", trajectory_);
+    plotOrientation(result_integrators[1]->times_raw(),
+        result_integrators[1]->R_i_k(), "ManifoldMid");
+    plotOrientation(result_integrators[2]->times_raw(),
+        result_integrators[2]->R_i_k(), "QuatFwd");
+    plotOrientation(result_integrators[3]->times_raw(),
+        result_integrators[3]->R_i_k(), "QuatMid");
+    plotOrientation(result_integrators[4]->times_raw(),
+        result_integrators[4]->R_i_k(), "QuatRK3");
+    plotOrientation(result_integrators[5]->times_raw(),
+        result_integrators[5]->R_i_k(), "QuatRK4");
+    plotOrientation(result_integrators[6]->times_raw(),
+        result_integrators[6]->R_i_k(), "QuatCG3");
+    plotOrientation(result_integrators[7]->times_raw(),
+        result_integrators[7]->R_i_k(), "QuatCG4");
 
-    plotOrientationError(result_integrators[0]->times_raw(), result_integrators[0]->R_i_k(), "ManifoldFwd");
-    plotOrientationError(result_integrators[1]->times_raw(), result_integrators[1]->R_i_k(), "ManifoldMid");
-    plotOrientationError(result_integrators[2]->times_raw(), result_integrators[2]->R_i_k(), "QuatFwd");
-    plotOrientationError(result_integrators[3]->times_raw(), result_integrators[3]->R_i_k(), "QuatMid");
-    plotOrientationError(result_integrators[4]->times_raw(), result_integrators[4]->R_i_k(), "QuatRK3");
-    plotOrientationError(result_integrators[5]->times_raw(), result_integrators[5]->R_i_k(), "QuatRK4");
-    plotOrientationError(result_integrators[6]->times_raw(), result_integrators[6]->R_i_k(), "QuatCG3");
-    plotOrientationError(result_integrators[7]->times_raw(), result_integrators[7]->R_i_k(), "QuatCG4");
+    plotOrientationError(result_integrators[0]->times_raw(),
+        result_integrators[0]->R_i_k(), "ManifoldFwd", trajectory_);
+    plotOrientationError(result_integrators[1]->times_raw(),
+        result_integrators[1]->R_i_k(), "ManifoldMid", trajectory_);
+    plotOrientationError(result_integrators[2]->times_raw(),
+        result_integrators[2]->R_i_k(), "QuatFwd", trajectory_);
+    plotOrientationError(result_integrators[3]->times_raw(),
+        result_integrators[3]->R_i_k(), "QuatMid", trajectory_);
+    plotOrientationError(result_integrators[4]->times_raw(),
+        result_integrators[4]->R_i_k(), "QuatRK3", trajectory_);
+    plotOrientationError(result_integrators[5]->times_raw(),
+        result_integrators[5]->R_i_k(), "QuatRK4", trajectory_);
+    plotOrientationError(result_integrators[6]->times_raw(),
+        result_integrators[6]->R_i_k(), "QuatCG3", trajectory_);
+    plotOrientationError(result_integrators[7]->times_raw(),
+        result_integrators[7]->R_i_k(), "QuatCG4", trajectory_);
   }
 
   return errors;
@@ -646,9 +663,23 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
   Scenario::Ptr scenario = std::make_shared<SplineScenario>(trajectory_);
 
   VLOG(1) << "Initialize scenario runner";
+
+  ImuBias::Ptr bias;
+  if (parameters_.imu_bias_type == "continuous")
+  {
+    bias = generateImuBias(start, end, parameters_.imu_bias_type,
+                           Vector3::Ones() * parameters_.imu_acc_bias_noise_density,
+                           Vector3::Ones() * parameters_.imu_gyr_bias_noise_density);
+  }
+  else
+  {
+    bias = generateImuBias(start, end, parameters_.imu_bias_type,
+                           Vector3::Ones() * parameters_.imu_acc_bias_const,
+                           Vector3::Ones() * parameters_.imu_gyr_bias_const);
+  }
   ScenarioRunner::Ptr scenario_runner =
       std::make_shared<ScenarioRunner>(scenario,
-                                       imuBias(start, end),
+                                       bias,
                                        accel_noise,
                                        gyro_noise,
                                        1.0 / parameters_.imu_sampling_time,
@@ -708,31 +739,6 @@ void PreIntegrationEvaluationNode::loadTrajectory()
   if (FLAGS_show_trajectory)
   {
     showTrajectory();
-  }
-}
-
-// -----------------------------------------------------------------------------
-ImuBias::Ptr PreIntegrationEvaluationNode::imuBias(FloatType start,
-                                                   FloatType end)
-{
-  //! continuous bias model
-  if (parameters_.imu_bias_type == "continuous")
-  {
-
-    return std::make_shared<ContinuousBias>(
-          Vector3::Ones() * parameters_.imu_acc_bias_noise_density,
-          Vector3::Ones() * parameters_.imu_gyr_bias_noise_density,
-          start,
-           end,
-          1000); // This is an arbitrary value.
-  }
-  //! a simple constant bias
-  else
-  {
-    Vector3 accel_bias = Vector3::Ones() * parameters_.imu_acc_bias_const;
-    Vector3 gyro_bias = Vector3::Ones() * parameters_.imu_gyr_bias_const;
-
-    return std::make_shared<ConstantBias>(accel_bias, gyro_bias);
   }
 }
 
@@ -807,119 +813,6 @@ void PreIntegrationEvaluationNode::plotCovarianceError(
   plt::labelPlot(label, dist);
   plt::legend();
   plt::show(false);
-}
-
-//-----------------------------------------------------------------------------
-void PreIntegrationEvaluationNode::plotOrientation(
-    const std::vector<FloatType>& times,
-    const std::vector<Matrix3>& orientation,
-    const std::string& label,
-    const bool plot_reference)
-{
-  CHECK_EQ(times.size(), orientation.size());
-
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
-
-  for (size_t i = 0; i < orientation.size(); ++i)
-  {
-    ze::sm::RotationVector rv(orientation[i]);
-    points.col(i) = rv.getParameters();
-    if (plot_reference)
-    {
-      ref_points.col(i) = trajectory_->eval(times[i]).tail<3>();
-    }
-  }
-  plt::figure("orientation");
-  plt::subplot(3, 1, 1);
-  plt::title("Orientation");
-  plt::labelPlot(label, times, points.row(0));
-  if(plot_reference)
-  {
-    plt::labelPlot("reference", times, ref_points.row(0));
-  }
-  plt::legend();
-
-  plt::subplot(3, 1, 2);
-  plt::labelPlot(label, times, points.row(1));
-  if(plot_reference)
-  {
-    plt::labelPlot("reference", times, ref_points.row(1));
-  }
-  plt::subplot(3, 1, 3);
-  plt::labelPlot(label, times, points.row(2));
-  if(plot_reference)
-  {
-    plt::labelPlot("reference", times, ref_points.row(2));
-  }
-  plt::show(false);
-}
-
-//-----------------------------------------------------------------------------
-void PreIntegrationEvaluationNode::plotOrientationError(
-    const std::vector<FloatType>& times,
-    const std::vector<Matrix3>& est,
-    const std::string& label)
-{
-  CHECK_EQ(times.size(), est.size());
-
-  Eigen::Matrix<FloatType, 1, Eigen::Dynamic> err(1, est.size());
-
-  for (size_t i = 0; i < est.size(); ++i)
-  {
-    Quaternion q1(est[i]);
-    Quaternion q2(trajectory_->orientation(times[i]));
-    err(i) = q1.getDisparityAngle(q2);
-  }
-  plt::figure("orientation_offset");
-  plt::title("Orientation Offset");
-  plt::labelPlot(label, times, err.row(0));
-  plt::legend();
-
-  plt::show(false);
-}
-
-//-----------------------------------------------------------------------------
-void PreIntegrationEvaluationNode::plotImuMeasurements(
-    const std::vector<FloatType>& times,
-    const ImuAccGyrContainer& measurements1,
-    const ImuAccGyrContainer& measurements2)
-{
-  CHECK_EQ(static_cast<int>(times.size()), measurements1.size());
-  CHECK_EQ(static_cast<int>(times.size()), measurements2.size());
-  plt::figure();
-  plt::subplot(3, 1, 1);
-  plt::title("Imu Measurements (Accel)");
-  plt::plot(times, measurements1.row(0));
-  plt::plot(times, measurements2.row(0));
-
-  plt::subplot(3, 1, 2);
-  plt::plot(times, measurements1.row(1));
-  plt::plot(times, measurements2.row(1));
-
-  plt::subplot(3, 1, 3);
-  plt::plot(times, measurements1.row(2));
-  plt::plot(times, measurements2.row(2));
-
-  plt::show(false);
-
-  plt::figure();
-  plt::subplot(3, 1, 1);
-  plt::title("Imu Measurements (Gyro)");
-  plt::plot(times, measurements1.row(3));
-  plt::plot(times, measurements2.row(3));
-
-  plt::subplot(3, 1, 2);
-  plt::plot(times, measurements1.row(4));
-  plt::plot(times, measurements2.row(4));
-
-  plt::subplot(3, 1, 3);
-  plt::plot(times, measurements1.row(5));
-  plt::plot(times, measurements2.row(5));
-
-  plt::show(false);
-
-  VLOG(1) << "Measurements: " << measurements1.size() << "\n";
 }
 
 // -----------------------------------------------------------------------------

@@ -18,9 +18,6 @@ public:
   //! Run pre-integration on a given dataset.
   void runRealDatasetMain();
 
-  //! Return the ImuBias for model and parameters specified in the GFlags.
-  ImuBias::Ptr imuBias(FloatType start, FloatType end);
-
   //! Monte-Carlo Simulation Runners:
   //! Pass an optional MonteCarlo runner to re-use these results
   //! instead of re-running the simulation.
@@ -105,21 +102,6 @@ public:
   void plotCovarianceError(const std::vector<Matrix3> ref,
                              const std::vector<Matrix3> est,
                              const std::string& label);
-
-  //! Plot the estimated / integrated vector of rotation matrices.
-  void plotOrientation(const std::vector<FloatType>& times,
-                       const std::vector<Matrix3>& R_i,
-                       const std::string& label,
-                       const bool plot_reference = false);
-
-  void plotOrientationError(const std::vector<FloatType>& times,
-                              const std::vector<Matrix3>& est,
-                              const std::string& label);
-
-  //! Plot the measurements used to obtain a preintegration state.
-  void plotImuMeasurements(const std::vector<FloatType>& times,
-                           const ImuAccGyrContainer& measurements,
-                           const ImuAccGyrContainer& measurements2);
 
   void shutdown();
 
