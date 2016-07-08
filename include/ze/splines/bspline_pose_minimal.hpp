@@ -20,6 +20,7 @@
 #include <ze/common/transformation.h>
 #include <ze/splines/rotation_vector.hpp>
 #include <ze/splines/operators.hpp>
+#include <ze/common/macros.h>
 
 namespace ze {
 
@@ -37,6 +38,7 @@ template<class ROTATION>
 class BSplinePoseMinimal : public BSpline
 {
  public:
+    ZE_POINTER_TYPEDEFS(BSplinePoseMinimal);
 
     /**
      * Create a spline of the specified order. The resulting B-spline will
