@@ -22,6 +22,7 @@ set(HEADERS
   include/ze/imu/gyroscope_model.h
   include/ze/imu/imu_yaml_serialization.h
   include/ze/imu/imu_buffer.h
+  include/ze/imu/imu_types.hpp
   )
 
 set(SOURCES
