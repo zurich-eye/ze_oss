@@ -58,4 +58,11 @@ inline std::ostream& operator<<(
   return out;
 }
 
+template <typename T, int NumSlotBits, int NumVersionBits>
+inline bool operator<(const VersionedSlotHandle<T, NumSlotBits, NumVersionBits> lhs,
+                      const VersionedSlotHandle<T, NumSlotBits, NumVersionBits> rhs)
+{
+  return lhs.handle < rhs.handle;
+}
+
 } // namespace ze
