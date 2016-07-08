@@ -63,7 +63,7 @@ public:
 
   //! Returns true or false if 3D-point is visible (no occlusion check) and if
   //! visible also returns pixel coordinates.
-  virtual std::pair<bool, Keypoint> projectWithCheck(
+  virtual std::pair<Keypoint, bool> projectWithCheck(
       const Eigen::Ref<const Position>& pos,
       FloatType border_margin = 0.0) const = 0;
 
@@ -72,7 +72,7 @@ public:
 
   //! Returns true or false if homogeneous 3D-point is visible (no occlusion check)
   //! and if visible also returns the pixel coordinates.
-  virtual std::pair<bool, Keypoint> projectHomogeneousWithCheck(
+  virtual std::pair<Keypoint, bool> projectHomogeneousWithCheck(
       const Eigen::Ref<const HomPosition>& pos_h,
       FloatType border_margin = 0.0) const;
 
