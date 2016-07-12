@@ -137,6 +137,39 @@ public:
 #endif
   }
 
+  void testHomogeneousProjection()
+  {
+    Vector3 bearing = cam_.backProject(Vector2(200.0, 300.0));
+    Vector4 hom_position;
+    {
+      // normal case:
+      hom_position << bearing, 1.0;
+      Vector2 px = cam_.projectHomogeneous(hom_position);
+      EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200.0, 300.0), 1e-6));
+    }
+
+    {
+      // point at infinity:
+      hom_position << bearing, 0.0;
+      Vector2 px = cam_.projectHomogeneous(hom_position);
+      EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200.0, 300.0), 1e-6));
+    }
+
+    {
+      // point behind camera.
+      hom_position << bearing, -1.0;
+      Vector2 px = cam_.projectHomogeneous(hom_position);
+      EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200.0, 300.0), 1e-6));
+    }
+
+    {
+      // some arbitrary scaling.
+      hom_position << bearing, 10.0;
+      Vector2 px = cam_.projectHomogeneous(hom_position);
+      EXPECT_TRUE(EIGEN_MATRIX_NEAR(px, Vector2(200.0, 300.0), 1e-6));
+    }
+  }
+
   void testJacobian()
   {
 #ifndef ZE_SINGLE_PRECISION_FLOAT
@@ -151,6 +184,28 @@ public:
 #endif
   }
 
+  void testHomogeneousJacobian()
+  {
+    Vector4 hom_position;
+    hom_position.head<3>() = cam_.backProject(Vector2(200.0, 300.0));
+    hom_position[3] = 1.0;
+    Matrix24 H = cam_.dProjectHomogeneous_dLandmark(hom_position);
+    Matrix24 H_numerical =
+        numericalDerivative<Vector2, Vector4>(
+          std::bind(&Camera::projectHomogeneous, &cam_, std::placeholders::_1),
+          hom_position);
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
+
+    // Opposite direction.
+    hom_position *= -1.0;
+    H = cam_.dProjectHomogeneous_dLandmark(hom_position);
+    H_numerical =
+        numericalDerivative<Vector2, Vector4>(
+          std::bind(&Camera::projectHomogeneous, &cam_, std::placeholders::_1),
+          hom_position);
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
+  }
+
   void testAll()
   {
     {
@@ -162,8 +217,16 @@ public:
       testProjectionSingle();
     }
     {
+      SCOPED_TRACE("HomogeneousProjection");
+      testHomogeneousProjection();
+    }
+    {
       SCOPED_TRACE("Jacobian");
       testJacobian();
+    }
+    {
+      SCOPED_TRACE("HomogeneousJacobian");
+      testHomogeneousJacobian();
     }
   }
 
