@@ -63,6 +63,9 @@ target_link_libraries(test_noise_model ${PROJECT_NAME})
 catkin_add_gtest(test_imu_buffer test/test_imu_buffer.cpp)
 target_link_libraries(test_imu_buffer ${PROJECT_NAME})
 
+catkin_add_gtest(test_imu_types test/test_imu_types.cpp)
+target_link_libraries(test_imu_types ${PROJECT_NAME})
+
 ##########
 # EXPORT #
 ##########
