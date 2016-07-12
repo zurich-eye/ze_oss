@@ -24,7 +24,7 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
 Keypoint Camera::projectHomogeneous(
     const Eigen::Ref<const HomPosition>& pos_h) const
 {
-  if (pos_h[3] < 0)
+  if (pos_h[3] < 0.0)
   {
     return this->project(-pos_h.head<3>());
   }
@@ -34,11 +34,11 @@ Keypoint Camera::projectHomogeneous(
   }
 }
 
-std::pair<bool, Keypoint> Camera::projectHomogeneousWithCheck(
+std::pair<Keypoint, bool> Camera::projectHomogeneousWithCheck(
     const Eigen::Ref<const HomPosition>& pos_h,
     FloatType border_margin) const
 {
-  if (pos_h[3] < 0)
+  if (pos_h[3] < 0.0)
   {
     return this->projectWithCheck(-pos_h.head<3>(), border_margin);
   }
@@ -52,7 +52,7 @@ Matrix24 Camera::dProjectHomogeneous_dLandmark(
     const Eigen::Ref<const HomPosition>& pos_h) const
 {
   Matrix24 J;
-  if (pos_h[3] < 0)
+  if (pos_h[3] < 0.0)
   {
     J.topLeftCorner<2, 3>() = this->dProject_dLandmark(-pos_h.head<3>());
   }

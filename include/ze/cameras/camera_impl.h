@@ -28,16 +28,16 @@ public:
     return px;
   }
 
-  virtual std::pair<bool, Keypoint> projectWithCheck(
+  virtual std::pair<Keypoint, bool> projectWithCheck(
       const Eigen::Ref<const Position>& pos,
       FloatType border_margin) const override
   {
     if (pos[2] < 0.0)
     {
-      return std::make_pair(false, Keypoint());
+      return std::make_pair(Keypoint(), false);
     }
     Keypoint px = project(pos);
-    return std::make_pair(isVisibleWithMargin(size(), px, border_margin), px);
+    return std::make_pair(px, isVisibleWithMargin(size(), px, border_margin));
   }
 
   virtual Bearing backProject(
