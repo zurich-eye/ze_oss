@@ -195,15 +195,6 @@ public:
           std::bind(&Camera::projectHomogeneous, &cam_, std::placeholders::_1),
           hom_position);
     EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
-
-    // Opposite direction.
-    hom_position *= -1.0;
-    H = cam_.dProjectHomogeneous_dLandmark(hom_position);
-    H_numerical =
-        numericalDerivative<Vector2, Vector4>(
-          std::bind(&Camera::projectHomogeneous, &cam_, std::placeholders::_1),
-          hom_position);
-    EXPECT_TRUE(EIGEN_MATRIX_NEAR(H, H_numerical, 1e-6));
   }
 
   void testAll()
