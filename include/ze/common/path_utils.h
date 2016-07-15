@@ -41,4 +41,9 @@ inline std::string joinPath(const std::string& s1, const std::string& s2,
   return joinPath(joinPath(s1, s2), joinPath(s3, s4));
 }
 
+inline std::string getFileName(const std::string& path)
+{
+  return path.substr(path.find_last_of('/') + 1);
+}
+
 } // namespace ze
