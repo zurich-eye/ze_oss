@@ -1,6 +1,6 @@
-#include <imp/cu_imgproc/cu_undistortion.cuh>
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_core/cu_linearmemory.cuh>
+#include <imp/cu_imgproc/cu_undistortion.cuh>
 
 namespace ze {
 namespace cu {
