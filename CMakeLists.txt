@@ -28,7 +28,9 @@ set(CU_HDRS
   include/imp/cu_imgproc/cu_rof_denoising.cuh
   include/imp/cu_imgproc/cu_tvl1_denoising.cuh
   include/imp/cu_imgproc/str_tex_decomposer.hpp
+  include/imp/cu_imgproc/cu_remap.cuh
   include/imp/cu_imgproc/cu_undistortion.cuh
+  include/imp/cu_imgproc/cu_stereo_rectification.cuh
   )
 
 set(CU_SRCS
@@ -42,6 +44,7 @@ set(CU_SRCS
   src/cu_tvl1_denoising.cu
   src/str_tex_decomposer.cpp
   src/cu_undistortion.cu
+  src/cu_stereo_rectification.cu
   )
 
 #cuda_compile(CU_OBJ ${CU_SRCS} ${CU_HDRS})

@@ -10,29 +10,30 @@ namespace cu {
 template<typename CameraModel,
          typename DistortionModel,
          typename Pixel>
-class ImageUndistorter
+class StereoRectifier
 {
 public:
-  ImageUndistorter(
+  StereoRectifier(
       Size2u img_size,
       Eigen::VectorXf& camera_params,
-      Eigen::VectorXf& dist_coeffs);
+      Eigen::VectorXf& dist_coeffs,
+      Eigen::Matrix3f& inv_H);
 
-  ~ImageUndistorter() = default;
+  ~StereoRectifier() = default;
 
-  void undistort(
+  void rectify(
       ImageGpu<Pixel>& dst,
       const ImageGpu<Pixel>& src) const;
 
-  const ImageGpu32fC2& getUndistortionMap() const;
+  const ImageGpu32fC2& getUndistortRectifyMap() const;
 
 private:
-  ImageGpu32fC2 undistortion_map_;
+  ImageGpu32fC2 undistort_rectify_map_;
   Fragmentation<16, 16> fragm_;
 };
 
-using EquidistUndistort32fC1 = cu::ImageUndistorter<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
-using RadTanUndistort32fC1 = cu::ImageUndistorter<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
+using EquidistStereoRectifier32fC1 = cu::StereoRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
+using RadTanStereoRectifier32fC1 = cu::StereoRectifier<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace

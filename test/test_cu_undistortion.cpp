@@ -24,9 +24,9 @@ TEST(impCuUndistortionTexture, radTan32fC1_zeroDistortion)
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
 
-  Eigen::RowVectorXf cam_params(4);
+  Eigen::VectorXf cam_params(4);
   cam_params << 471.690643292, 471.765601046, 371.087464172, 228.63874151;
-  Eigen::RowVectorXf dist_coeffs(4);
+  Eigen::VectorXf dist_coeffs(4);
   dist_coeffs << 0, 0, 0, 0;
 
   cu::ImageGpu32fC1 gpu_src(*cv_img);
@@ -68,9 +68,9 @@ TEST(impCuUndistortionTexture, equidist32fC1_testMap)
   VLOG(2) << "loaded image " << path
           << ", size " << cv_img->size();
 
-  Eigen::RowVectorXf cam_params(4);
+  Eigen::VectorXf cam_params(4);
   cam_params << 471.690643292, 471.765601046, 371.087464172, 228.63874151;
-  Eigen::RowVectorXf dist_coeffs(4);
+  Eigen::VectorXf dist_coeffs(4);
   dist_coeffs << 0.00676530475436, -0.000811126898338, 0.0166458761987, -0.0172655346139;
 
   cu::EquidistUndistort32fC1 undistorter(
@@ -125,12 +125,12 @@ TEST(impCuUndistortionTexture, equidist32fC1)
       cu::ImageGpu32fC1 gpu_src(*cv_img);
       cu::ImageGpu32fC1 gpu_dst(cv_img->size());
       // Camera parameters
-      Eigen::RowVectorXf cam_params(4);
+      Eigen::VectorXf cam_params(4);
       for (int cp = 0; cp < 4; ++cp)
       {
         cam_params(cp) = rig->at(lr).projectionParameters()(cp);
       }
-      Eigen::RowVectorXf dist_coeffs(4);
+      Eigen::VectorXf dist_coeffs(4);
       for (int dc = 0; dc < 4; ++dc)
       {
         dist_coeffs(dc) = rig->at(lr).distortionParameters()(dc);
