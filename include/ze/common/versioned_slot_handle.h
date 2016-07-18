@@ -58,6 +58,7 @@ inline std::ostream& operator<<(
   return out;
 }
 
+//! Compares the handle as an integer. I.e. Compare slot number first, then version.
 template <typename T, int NumSlotBits, int NumVersionBits>
 inline bool operator<(const VersionedSlotHandle<T, NumSlotBits, NumVersionBits> lhs,
                       const VersionedSlotHandle<T, NumSlotBits, NumVersionBits> rhs)
