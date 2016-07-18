@@ -56,6 +56,33 @@ inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
 }
 
 // -----------------------------------------------------------------------------
+// Quaternion utils
+
+// Plus matrix for a quaternion. q_A x q_B = plus(q_A) * q_B.coeffs().
+inline Matrix4 plusMatrix(const Eigen::Quaternion<FloatType>& q_A)
+{
+  const Vector4& q = q_A.coeffs();
+  Matrix4 Q;
+  Q(0,0) =  q[3]; Q(0,1) = -q[2]; Q(0,2) =  q[1]; Q(0,3) =  q[0];
+  Q(1,0) =  q[2]; Q(1,1) =  q[3]; Q(1,2) = -q[0]; Q(1,3) =  q[1];
+  Q(2,0) = -q[1]; Q(2,1) =  q[0]; Q(2,2) =  q[3]; Q(2,3) =  q[2];
+  Q(3,0) = -q[0]; Q(3,1) = -q[1]; Q(3,2) = -q[2]; Q(3,3) =  q[3];
+  return Q;
+}
+
+// Opposite-Plus matrix for a quaternion q_A x q_B = oplus(q_B) * q_B.coeffs().
+inline Matrix4 oplusMatrix(const Eigen::Quaternion<FloatType>& q_B)
+{
+  const Vector4& q = q_B.coeffs();
+  Matrix4 Q;
+  Q(0,0) =  q[3]; Q(0,1) =  q[2]; Q(0,2) = -q[1]; Q(0,3) =  q[0];
+  Q(1,0) = -q[2]; Q(1,1) =  q[3]; Q(1,2) =  q[0]; Q(1,3) =  q[1];
+  Q(2,0) =  q[1]; Q(2,1) = -q[0]; Q(2,2) =  q[3]; Q(2,3) =  q[2];
+  Q(3,0) = -q[0]; Q(3,1) = -q[1]; Q(3,2) = -q[2]; Q(3,3) =  q[3];
+  return Q;
+}
+
+// -----------------------------------------------------------------------------
 // Type traits used for optimization
 template<typename T> struct traits;
 
