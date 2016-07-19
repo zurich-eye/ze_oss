@@ -58,4 +58,18 @@ TEST(TransformationTests, testExpLog)
   }
 }
 
+TEST(TransformationTests, quaternionMatrices)
+{
+  Eigen::Quaterniond q_AB, q_BC, q_AC_plus, q_AC_oplus, q_AC_quatmult;
+  q_AB.coeffs() = Eigen::Vector4d::Random().normalized();
+  q_BC.coeffs() = Eigen::Vector4d::Random().normalized();
+  q_AC_quatmult = q_AB * q_BC;
+  q_AC_plus.coeffs() = ze::quaternionPlusMatrix(q_AB) * q_BC.coeffs();
+  q_AC_oplus.coeffs() = ze::quaternionOplusMatrix(q_BC) * q_AB.coeffs();
+
+  Eigen::Vector3d v_C = Eigen::Vector3d::Random();
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(q_AC_quatmult * v_C, q_AC_plus * v_C));
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(q_AC_quatmult * v_C, q_AC_oplus * v_C));
+}
+
 ZE_UNITTEST_ENTRYPOINT

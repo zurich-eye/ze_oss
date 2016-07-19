@@ -58,10 +58,10 @@ inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
 // -----------------------------------------------------------------------------
 // Quaternion utils
 
-// Plus matrix for a quaternion. q_A x q_B = plus(q_A) * q_B.coeffs().
-inline Matrix4 plusMatrix(const Eigen::Quaternion<FloatType>& q_A)
+//! Plus matrix for a quaternion. q_AB x q_BC = plus(q_AB) * q_BC.coeffs().
+inline Matrix4 quaternionPlusMatrix(const Eigen::Quaternion<FloatType>& q_AB)
 {
-  const Vector4& q = q_A.coeffs();
+  const Vector4& q = q_AB.coeffs();
   Matrix4 Q;
   Q(0,0) =  q[3]; Q(0,1) = -q[2]; Q(0,2) =  q[1]; Q(0,3) =  q[0];
   Q(1,0) =  q[2]; Q(1,1) =  q[3]; Q(1,2) = -q[0]; Q(1,3) =  q[1];
@@ -70,10 +70,10 @@ inline Matrix4 plusMatrix(const Eigen::Quaternion<FloatType>& q_A)
   return Q;
 }
 
-// Opposite-Plus matrix for a quaternion q_A x q_B = oplus(q_B) * q_B.coeffs().
-inline Matrix4 oplusMatrix(const Eigen::Quaternion<FloatType>& q_B)
+//! Opposite-Plus matrix for a quaternion q_AB x q_BC = oplus(q_BC) * q_AB.coeffs().
+inline Matrix4 quaternionOplusMatrix(const Eigen::Quaternion<FloatType>& q_BC)
 {
-  const Vector4& q = q_B.coeffs();
+  const Vector4& q = q_BC.coeffs();
   Matrix4 Q;
   Q(0,0) =  q[3]; Q(0,1) =  q[2]; Q(0,2) = -q[1]; Q(0,3) =  q[0];
   Q(1,0) = -q[2]; Q(1,1) =  q[3]; Q(1,2) =  q[0]; Q(1,3) =  q[1];
