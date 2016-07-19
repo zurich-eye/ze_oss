@@ -11,7 +11,7 @@
 TEST(ImuYamlSerialization, testYamlLoading)
 {
   std::string data_dir = ze::getTestDataDir("imu_models");
-  std::string yaml_file = data_dir + "/zurich_eye_one.yaml";
+  std::string yaml_file = ze::joinPath(data_dir, "/zurich_eye_one.yaml");
   ASSERT_TRUE(ze::fileExists(yaml_file));
 
   ze::ImuRig::Ptr rig = ze::ImuRig::loadFromYaml(yaml_file);
