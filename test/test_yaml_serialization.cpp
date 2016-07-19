@@ -16,10 +16,25 @@ TEST(ImuYamlSerialization, testYamlLoading)
 
   ze::ImuRig::Ptr rig = ze::ImuRig::loadFromYaml(yaml_file);
 
-  EXPECT_EQ(rig->size(), 2);
+  EXPECT_EQ(rig->size(), 3);
   EXPECT_STREQ(rig->label().c_str(), "zuricheyeonetest");
   EXPECT_STREQ(rig->at(0).label().c_str(), "bmx0");
+  EXPECT_EQ(ze::ImuIntrinsicType::ScaleMisalignment,
+            rig->at(0).accelerometerModel()->intrinsicModel()->type());
+  EXPECT_EQ(ze::ImuIntrinsicType::ScaleMisalignment,
+            rig->at(0).gyroscopeModel()->intrinsicModel()->type());
+
   EXPECT_STREQ(rig->at(1).label().c_str(), "bmx1");
+  EXPECT_EQ(ze::ImuIntrinsicType::ScaleMisalignmentSizeEffect,
+            rig->at(1).accelerometerModel()->intrinsicModel()->type());
+  EXPECT_EQ(ze::ImuIntrinsicType::ScaleMisalignmentGSensitivity,
+            rig->at(1).gyroscopeModel()->intrinsicModel()->type());
+
+  EXPECT_STREQ(rig->at(2).label().c_str(), "bmx2");
+  EXPECT_EQ(ze::ImuIntrinsicType::Calibrated,
+            rig->at(2).accelerometerModel()->intrinsicModel()->type());
+  EXPECT_EQ(ze::ImuIntrinsicType::Calibrated,
+            rig->at(2).gyroscopeModel()->intrinsicModel()->type());
 }
 
 ZE_UNITTEST_ENTRYPOINT
