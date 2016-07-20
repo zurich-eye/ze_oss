@@ -70,6 +70,12 @@ TEST(TransformationTests, quaternionMatrices)
   Eigen::Vector3d v_C = Eigen::Vector3d::Random();
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(q_AC_quatmult * v_C, q_AC_plus * v_C));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(q_AC_quatmult * v_C, q_AC_oplus * v_C));
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(
+                (q_AC_quatmult.inverse() * q_AC_plus).coeffs(),
+                Eigen::Quaterniond::Identity().coeffs()));
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(
+                (q_AC_quatmult.inverse() * q_AC_oplus).coeffs(),
+                Eigen::Quaterniond::Identity().coeffs()));
 }
 
 ZE_UNITTEST_ENTRYPOINT
