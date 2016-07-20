@@ -13,18 +13,17 @@ class AccelerometerModel
 public:
   ZE_POINTER_TYPEDEFS(AccelerometerModel);
 
-  typedef Eigen::Matrix<FloatType, 3, 1> measurement_t;
+  typedef Eigen::Matrix<FloatType, -1, 1> measurement_t;
 
   AccelerometerModel() = delete;
 
   AccelerometerModel(ImuIntrinsicModel::Ptr intrinsicModel,
                      ImuNoiseModel::Ptr noiseModel);
 
-  //! distort in place
-  void distort(Eigen::Ref<measurement_t> in) const;
-
-  //! undistort in place
-  void undistort(Eigen::Ref<measurement_t> in) const;
+  Vector3 distort(const Eigen::Ref<const measurement_t>& a,
+                  const Eigen::Ref<const measurement_t>& w) const;
+  Vector3 undistort(const Eigen::Ref<const measurement_t>& a,
+                    const Eigen::Ref<const measurement_t>& w) const;
 
   // getters
   inline const ImuNoiseModel::Ptr noiseModel() const { return noiseModel_; }

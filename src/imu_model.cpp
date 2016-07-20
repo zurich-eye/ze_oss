@@ -25,16 +25,22 @@ ImuModel::Ptr ImuModel::loadFromYaml(const std::string& path)
   return ImuModel::Ptr();
 }
 
-void ImuModel::distort(Eigen::Ref<measurement_t> in) const
+Vector6 ImuModel::distort(const Eigen::Ref<const measurement_t>& primary,
+                          const Eigen::Ref<const measurement_t>& secondary) const
 {
-  accelerometerModel_->distort(in.head<3>());
-  gyroscopeModel_->distort(in.tail<3>());
+  Vector6 out;
+  out.head<3>() = accelerometerModel_->distort(primary, secondary);
+  out.tail<3>() = gyroscopeModel_->distort(secondary, primary);
+  return out;
 }
 
-void ImuModel::undistort(Eigen::Ref<measurement_t> in) const
+Vector6 ImuModel::undistort(const Eigen::Ref<const measurement_t>& primary,
+                            const Eigen::Ref<const measurement_t>& secondary) const
 {
-  accelerometerModel_->undistort(in.head<3>());
-  gyroscopeModel_->undistort(in.tail<3>());
+  Vector6 out;
+  out.head<3>() = accelerometerModel_->undistort(primary, secondary);
+  out.tail<3>() = gyroscopeModel_->undistort(secondary, primary);
+  return out;
 }
 
 } // namespace ze

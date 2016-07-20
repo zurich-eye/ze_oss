@@ -4,6 +4,7 @@
 
 #include <ze/common/logging.hpp>
 #include <ze/common/macros.h>
+#include <ze/common/matrix.h>
 #include <ze/common/types.h>
 
 namespace ze {
@@ -23,21 +24,22 @@ class ImuIntrinsicModel
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModel);
 
+  typedef Eigen::Matrix<FloatType, -1, 1> primary_measurement_t;
+  typedef Eigen::Matrix<FloatType, -1, 1> secondary_measurement_t;
+
   explicit ImuIntrinsicModel(ImuIntrinsicType type);
   ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range);
-
-  typedef Eigen::Matrix<FloatType, 3, 1> measurement_t;
 
   static constexpr FloatType UndefinedRange = -1.;
 
   inline ImuIntrinsicType type() const { return type_; }
   std::string typeAsString() const;
 
-  //! distort in place
-  virtual void distort(Eigen::Ref<measurement_t> in) const = 0;
+  virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
+                          const Eigen::Ref<const secondary_measurement_t>& secondary) const = 0;
 
-  //! undistort in place
-  virtual void undistort(Eigen::Ref<measurement_t> in) const = 0;
+  virtual Vector3 undistort(const Eigen::Ref<const primary_measurement_t>& primary,
+                            const Eigen::Ref<const secondary_measurement_t>& secondary) const = 0;
 
   // getters
   inline FloatType delay() const { return delay_; }
@@ -57,14 +59,17 @@ public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelCalibrated);
   static constexpr ImuIntrinsicType Type = ImuIntrinsicType::Calibrated;
 
+  using ImuIntrinsicModel::primary_measurement_t;
+  using ImuIntrinsicModel::secondary_measurement_t;
+
   ImuIntrinsicModelCalibrated();
   ImuIntrinsicModelCalibrated(FloatType delay, FloatType range);
 
-  //! distort in place
-  virtual void distort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
+			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 
-  //! undistort in place
-  virtual void undistort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 undistort(const Eigen::Ref<const primary_measurement_t>& primary,
+			    const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 };
 
 //------------------------------------------------------------------------------
@@ -75,15 +80,18 @@ public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModelScaleMisalignment);
   static constexpr ImuIntrinsicType Type = ImuIntrinsicType::ScaleMisalignment;
 
+  using ImuIntrinsicModel::primary_measurement_t;
+  using ImuIntrinsicModel::secondary_measurement_t;
+
   //! delay, range, bias, scale misalignment matrix
   ImuIntrinsicModelScaleMisalignment(FloatType delay, FloatType range,
                                      const Vector3& b, const Matrix3& M);
 
-  //! distort in place
-  virtual void distort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
+			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 
-  //! undistort in place
-  virtual void undistort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 undistort(const Eigen::Ref<const primary_measurement_t>& primary,
+			    const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 
   // getters
   inline const Vector3& b() const { return b_; }
@@ -105,17 +113,21 @@ public:
   static constexpr ImuIntrinsicType Type =
       ImuIntrinsicType::ScaleMisalignmentGSensitivity;
 
+  using ImuIntrinsicModel::primary_measurement_t;
+  using ImuIntrinsicModel::secondary_measurement_t;
+
   //! delay, range, bias, scale misalignment matrix, g-sensitivity matrix
   ImuIntrinsicModelScaleMisalignmentGSensitivity(FloatType delay,
                                                  FloatType range,
                                                  const Vector3& b,
                                                  const Matrix3& M,
                                                  const Matrix3& Ma);
-  //! distort in place
-  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
-  //! undistort in place
-  virtual void undistort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
+			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
+
+  virtual Vector3 undistort(const Eigen::Ref<const primary_measurement_t>& primary,
+			    const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 
   // getters
   inline const Vector3& b() const { return b_; }
@@ -125,6 +137,7 @@ public:
 private:
   Vector3 b_;
   Matrix3 M_;
+  Matrix3 M_inverse_;
   Matrix3 Ma_;
 };
 
@@ -137,17 +150,21 @@ public:
   static constexpr ImuIntrinsicType Type =
       ImuIntrinsicType::ScaleMisalignmentSizeEffect;
 
+  using ImuIntrinsicModel::primary_measurement_t;
+  using ImuIntrinsicModel::secondary_measurement_t;
+
   //! delay, range, bias, scale misalignment matrix, accel. column position vectors
   ImuIntrinsicModelScaleMisalignmentSizeEffect(FloatType delay,
                                                FloatType range,
                                                const Vector3& b,
                                                const Matrix3& M,
                                                const Matrix3& R);
-  //! distort in place
-  virtual void distort(Eigen::Ref<measurement_t> in) const;
 
-  //! undistort in place
-  virtual void undistort(Eigen::Ref<measurement_t> in) const;
+  virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
+			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
+
+  virtual Vector3 undistort(const Eigen::Ref<const primary_measurement_t>& primary,
+			    const Eigen::Ref<const secondary_measurement_t>& secondary) const;
 
   // getters
   inline const Vector3& b() const { return b_; }
@@ -157,6 +174,7 @@ public:
 private:
   Vector3 b_;
   Matrix3 M_;
+  Matrix3 M_inverse_;
   Matrix3 R_;
 };
 

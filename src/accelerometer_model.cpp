@@ -9,14 +9,18 @@ AccelerometerModel::AccelerometerModel(
 {
 }
 
-void AccelerometerModel::distort(Eigen::Ref<measurement_t> in) const
+Vector3 AccelerometerModel::distort(const Eigen::Ref<const measurement_t>& a,
+                                 const Eigen::Ref<const measurement_t>& w)
+const
 {
-  intrinsicModel_->distort(in);
+  return intrinsicModel_->distort(a, w);
 }
 
-void AccelerometerModel::undistort(Eigen::Ref<measurement_t> in) const
+Vector3 AccelerometerModel::undistort(const Eigen::Ref<const measurement_t>& a,
+                                   const Eigen::Ref<const measurement_t>& w)
+const
 {
-  intrinsicModel_->undistort(in);
+  return intrinsicModel_->undistort(a, w);
 }
 
 } // namespace ze
