@@ -82,11 +82,11 @@ std::pair<ImuStamps, ImuAccGyrContainer>
 ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
     int64_t stamp_from, int64_t stamp_to)
 {
-  //Takes gyroscope timestamps and interpolates acclerometer measurements to
-  // same times.
+  //Takes gyroscope timestamps and interpolates accelerometer measurements at
+  // same times. Rectifies all measurements.
   CHECK_GE(stamp_from, 0u);
   CHECK_LT(stamp_from, stamp_to);
-  ImuAccGyrContainer values;
+  ImuAccGyrContainer rectified_measurements;
   ImuStamps stamps;
 
   std::lock_guard<std::mutex> gyr_lock(gyr_buffer_.mutex());
@@ -95,7 +95,8 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
   if(gyr_buffer_.times().size() < 2)
   {
     LOG(WARNING) << "Buffer has less than 2 entries.";
-    return std::make_pair(stamps, values); // return empty means unsuccessful.
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
   }
 
   const time_t oldest_stamp = gyr_buffer_.times().front();
@@ -103,12 +104,14 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
   if(stamp_from < oldest_stamp)
   {
     LOG(WARNING) << "Requests older timestamp than in buffer.";
-    return std::make_pair(stamps, values); // return empty means unsuccessful.
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
   }
   if(stamp_to > newest_stamp)
   {
     LOG(WARNING) << "Requests newer timestamp than in buffer.";
-    return std::make_pair(stamps, values); // return empty means unsuccessful.
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
   }
 
   auto it_from_before = gyr_buffer_.iterator_equal_or_before(stamp_from);
@@ -120,19 +123,20 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
   if(it_from_after == it_to_before)
   {
     LOG(WARNING) << "Not enough data for interpolation";
-    return std::make_pair(stamps, values); // return empty means unsuccessful.
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
   }
 
   // resize containers
   size_t range = it_to_before.index() - it_from_after.index() + 3;
-  values.resize(Eigen::NoChange, range);
+  rectified_measurements.resize(Eigen::NoChange, range);
   stamps.resize(range);
 
   // first element
   VectorX w = GyroInterp::interpolate(&gyr_buffer_, stamp_from, it_from_before);
   VectorX a = AccelInterp::interpolate(&acc_buffer_, stamp_from);
   stamps(0) = stamp_from;
-  values.col(0) = imu_model_->undistort(a, w);
+  rectified_measurements.col(0) = imu_model_->undistort(a, w);
 
   // this is a real edge case where we hit the two consecutive timestamps
   //  with from and to.
@@ -143,7 +147,7 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
       w = GyroInterp::interpolate(&gyr_buffer_, (*it), it);
       a = AccelInterp::interpolate(&acc_buffer_, (*it));
       stamps(col) = (*it);
-      values.col(col) = imu_model_->undistort(a, w);
+      rectified_measurements.col(col) = imu_model_->undistort(a, w);
       ++col;
     }
   }
@@ -152,9 +156,9 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
   w = GyroInterp::interpolate(&gyr_buffer_, stamp_to, it_to_before);
   a = AccelInterp::interpolate(&acc_buffer_, stamp_to);
   stamps(range - 1) = stamp_to;
-  values.col(range - 1) = imu_model_->undistort(a, w);
+  rectified_measurements.col(range - 1) = imu_model_->undistort(a, w);
 
-  return std::make_pair(stamps, values);
+  return std::make_pair(stamps, rectified_measurements);
 }
 
 template<int BufferSize, typename GyroInterp, typename AccelInterp>
