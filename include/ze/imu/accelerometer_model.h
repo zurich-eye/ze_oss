@@ -13,13 +13,17 @@ class AccelerometerModel
 public:
   ZE_POINTER_TYPEDEFS(AccelerometerModel);
 
-  typedef Eigen::Matrix<FloatType, -1, 1> measurement_t;
+  typedef VectorX measurement_t;
 
   AccelerometerModel() = delete;
 
   AccelerometerModel(ImuIntrinsicModel::Ptr intrinsicModel,
                      ImuNoiseModel::Ptr noiseModel);
 
+  //! These models may depend on both angular and linear quantities as well as
+  //! higher order time derivatives of the quantities. A measurement is
+  //! composed exclusively of either angular or linear quantities and features
+  //! time derivatives in increasing order starting from 0.
   Vector3 distort(const Eigen::Ref<const measurement_t>& a,
                   const Eigen::Ref<const measurement_t>& w) const;
   Vector3 undistort(const Eigen::Ref<const measurement_t>& a,

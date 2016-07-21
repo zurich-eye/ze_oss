@@ -13,13 +13,13 @@ GyroscopeModel::GyroscopeModel(
 }
 
 Vector3 GyroscopeModel::distort(const Eigen::Ref<const measurement_t>& w,
-                             const Eigen::Ref<const measurement_t>& a) const
+                                const Eigen::Ref<const measurement_t>& a) const
 {
   return intrinsicModel_->distort(w, a);
 }
 
 Vector3 GyroscopeModel::undistort(const Eigen::Ref<const measurement_t>& w,
-                               const Eigen::Ref<const measurement_t>& a) const
+                                  const Eigen::Ref<const measurement_t>& a) const
 {
   return intrinsicModel_->undistort(w, a);
 }

@@ -24,8 +24,15 @@ class ImuIntrinsicModel
 public:
   ZE_POINTER_TYPEDEFS(ImuIntrinsicModel);
 
-  typedef Eigen::Matrix<FloatType, -1, 1> primary_measurement_t;
-  typedef Eigen::Matrix<FloatType, -1, 1> secondary_measurement_t;
+  //! The inertial measurement models potentially depend on angular as well as
+  //! linear quantities. Depending on whether a gyroscope or an accelerometer
+  //! is modelled, the roles might be reversed. Accordingly, the 'primary'
+  //! refers to the domain of the measurement that is being modelled (angular
+  //! or linear) and the secondary on a measurement of the other domain
+  //! respectively.
+
+  typedef VectorX primary_measurement_t;
+  typedef VectorX secondary_measurement_t;
 
   explicit ImuIntrinsicModel(ImuIntrinsicType type);
   ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range);
@@ -116,6 +123,7 @@ public:
   using ImuIntrinsicModel::primary_measurement_t;
   using ImuIntrinsicModel::secondary_measurement_t;
 
+  //! This model applies exclusively to gyroscopes.
   //! delay, range, bias, scale misalignment matrix, g-sensitivity matrix
   ImuIntrinsicModelScaleMisalignmentGSensitivity(FloatType delay,
                                                  FloatType range,
@@ -153,6 +161,7 @@ public:
   using ImuIntrinsicModel::primary_measurement_t;
   using ImuIntrinsicModel::secondary_measurement_t;
 
+  //! This model applies exclusively to accelerometers.
   //! delay, range, bias, scale misalignment matrix, accel. column position vectors
   ImuIntrinsicModelScaleMisalignmentSizeEffect(FloatType delay,
                                                FloatType range,

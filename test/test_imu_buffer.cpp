@@ -130,12 +130,12 @@ TEST(ImuBufferTest, testDifferentiation)
 
   std::lock_guard<std::mutex> lock(buffer.mutex());
 
-  //test differentiation between suport points.
+  //test differentiation between support points.
   m = InterpolatorDifferentiatorLinear::interpolate<RingBuffer_t>(&buffer, 15.);  ref << 2.5 * Vector3::Ones(), .5 * Vector3::Ones();
   ref << 2.5 * Vector3::Ones(), .5 * Vector3::Ones();
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(ref, m, 1e-10));
 
-  //test differentiation at suport point.
+  //test differentiation at support point.
   //the expected derivative is the one of the segment starting with this point.
   m = InterpolatorDifferentiatorLinear::interpolate<RingBuffer_t>(&buffer, 20.);
   ref << 5. * Vector3::Ones(), 1. * Vector3::Ones();

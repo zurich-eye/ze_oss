@@ -16,7 +16,7 @@ class ImuModel
 public:
   ZE_POINTER_TYPEDEFS(ImuModel);
 
-  typedef Eigen::Matrix<FloatType, -1, 1> measurement_t;
+  typedef VectorX measurement_t;
 
   ImuModel() = delete;
 

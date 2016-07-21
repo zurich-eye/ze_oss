@@ -12,17 +12,21 @@ class GyroscopeModel
 public:
   ZE_POINTER_TYPEDEFS(GyroscopeModel);
 
-  typedef Eigen::Matrix<FloatType, -1, 1> measurement_t;
+  typedef VectorX measurement_t;
 
   GyroscopeModel() = delete;
 
   GyroscopeModel(ImuIntrinsicModel::Ptr intrinsicModel,
                  ImuNoiseModel::Ptr noiseModel);
 
+  //! These models may depend on both angular and linear quantities as well as
+  //! higher order time derivatives of the quantities. A measurement is
+  //! composed exclusively of either angular or linear quantities and features
+  //! time derivatives in increasing order starting from 0.
   Vector3 distort(const Eigen::Ref<const measurement_t>& w,
-               const Eigen::Ref<const measurement_t>& a) const;
+                  const Eigen::Ref<const measurement_t>& a) const;
   Vector3 undistort(const Eigen::Ref<const measurement_t>& w,
-                 const Eigen::Ref<const measurement_t>& a) const;
+                    const Eigen::Ref<const measurement_t>& a) const;
 
   // getters
   inline const ImuNoiseModel::Ptr noiseModel() const { return noiseModel_; }

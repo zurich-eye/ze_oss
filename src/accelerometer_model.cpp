@@ -10,14 +10,14 @@ AccelerometerModel::AccelerometerModel(
 }
 
 Vector3 AccelerometerModel::distort(const Eigen::Ref<const measurement_t>& a,
-                                 const Eigen::Ref<const measurement_t>& w)
+                                    const Eigen::Ref<const measurement_t>& w)
 const
 {
   return intrinsicModel_->distort(a, w);
 }
 
 Vector3 AccelerometerModel::undistort(const Eigen::Ref<const measurement_t>& a,
-                                   const Eigen::Ref<const measurement_t>& w)
+                                      const Eigen::Ref<const measurement_t>& w)
 const
 {
   return intrinsicModel_->undistort(a, w);

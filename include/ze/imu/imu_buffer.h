@@ -11,16 +11,16 @@ struct InterpolatorDifferentiatorLinear
 {
   typedef Vector6 return_t;
 
-  //The name could be more descriptive, but the current naming allows for using
-  //the interpolators defined in ringbuffer.h
+  //! The name could be more descriptive, but the current naming allows for
+  //! using the interpolators defined in ringbuffer.h
   template<typename Ringbuffer_T>
   static return_t interpolate(
       Ringbuffer_T* buffer,
       int64_t time,
-      typename Ringbuffer_T::timering_t::iterator it_before)
+      const typename Ringbuffer_T::timering_t::iterator it_before)
   {
     // the end value
-    auto it_after = it_before + 1;
+    const auto it_after = it_before + 1;
     if (it_after == buffer->times().end())
     {
       LOG(WARNING) << "Interpolation hit end of buffer.";
@@ -42,7 +42,7 @@ struct InterpolatorDifferentiatorLinear
       Ringbuffer_T* buffer,
       int64_t time)
   {
-    auto it_before = buffer->iterator_equal_or_before(time);
+    const auto it_before = buffer->iterator_equal_or_before(time);
     // caller should check the bounds:
     CHECK(it_before != buffer->times().end());
 
