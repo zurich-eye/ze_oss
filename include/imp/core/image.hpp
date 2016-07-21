@@ -151,7 +151,7 @@ public:
       {
         for (uint32_t x=0; x<this->width(); ++x)
         {
-          (*this)[y][x] = from.pixel(y,x);
+          (*this)[y][x] = from.pixel(x, y);
         }
       }
     }
