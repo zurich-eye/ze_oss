@@ -24,6 +24,15 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignment)
   EXPECT_EQ(10, model->range());
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(b, model->b()));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(M, model->M()));
+
+  Vector3 primary = Vector3::Random();
+  Vector3 secondary = Vector3::Random();
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(primary, model->undistort(
+      model->distort(primary, secondary), secondary)));
+
+  //make sure that inputs actually get altered.
+  EXPECT_FALSE(EIGEN_MATRIX_EQUAL_DOUBLE(model->distort(
+      primary, secondary), model->undistort(primary, secondary)));
 }
 
 TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentGSensitivity)
@@ -44,6 +53,15 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentGSensitivity)
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(b, model->b()));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(M, model->M()));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(Ma, model->Ma()));
+
+  Vector3 primary = Vector3::Random();
+  Vector3 secondary = Vector3::Random();
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(primary, model->undistort(
+      model->distort(primary, secondary), secondary)));
+
+  //make sure that inputs actually get altered.
+  EXPECT_FALSE(EIGEN_MATRIX_EQUAL_DOUBLE(model->distort(
+      primary, secondary), model->undistort(primary, secondary)));
 }
 
 TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentSizeEffect)
@@ -63,6 +81,15 @@ TEST(IntrinsicModelTests, testIntrinsicModelScaleMisalignmentSizeEffect)
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(b, model->b()));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(M, model->M()));
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(R, model->R()));
+
+  Vector3 primary = Vector3::Random();
+  Vector6 secondary = Vector6::Random();
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL_DOUBLE(primary, model->undistort(
+      model->distort(primary, secondary), secondary)));
+
+  //make sure that inputs actually get altered.
+  EXPECT_FALSE(EIGEN_MATRIX_EQUAL_DOUBLE(model->distort(
+      primary, secondary), model->undistort(primary, secondary)));
 }
 
 ZE_UNITTEST_ENTRYPOINT
