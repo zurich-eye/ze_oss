@@ -46,8 +46,8 @@ bool ImuBuffer<BufferSize, GyroInterp, AccelInterp>::get(int64_t time,
     return false;
   }
 
-  auto gyro_before = gyr_buffer_.iterator_equal_or_before(time);
-  auto acc_before = acc_buffer_.iterator_equal_or_before(time);
+  const auto gyro_before = gyr_buffer_.iterator_equal_or_before(time);
+  const auto acc_before = acc_buffer_.iterator_equal_or_before(time);
 
   if (gyro_before == gyr_buffer_.times().end()
       || acc_before == acc_buffer_.times().end()) {
@@ -101,26 +101,26 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
 
   const time_t oldest_stamp = gyr_buffer_.times().front();
   const time_t newest_stamp = gyr_buffer_.times().back();
-  if(stamp_from < oldest_stamp)
+  if (stamp_from < oldest_stamp)
   {
     LOG(WARNING) << "Requests older timestamp than in buffer.";
     // return empty means unsuccessful.
     return std::make_pair(stamps, rectified_measurements);
   }
-  if(stamp_to > newest_stamp)
+  if (stamp_to > newest_stamp)
   {
     LOG(WARNING) << "Requests newer timestamp than in buffer.";
     // return empty means unsuccessful.
     return std::make_pair(stamps, rectified_measurements);
   }
 
-  auto it_from_before = gyr_buffer_.iterator_equal_or_before(stamp_from);
-  auto it_to_after = gyr_buffer_.iterator_equal_or_after(stamp_to);
+  const auto it_from_before = gyr_buffer_.iterator_equal_or_before(stamp_from);
+  const auto it_to_after = gyr_buffer_.iterator_equal_or_after(stamp_to);
   CHECK(it_from_before != gyr_buffer_.times().end());
   CHECK(it_to_after != gyr_buffer_.times().end());
-  auto it_from_after = it_from_before + 1;
-  auto it_to_before = it_to_after - 1;
-  if(it_from_after == it_to_before)
+  const auto it_from_after = it_from_before + 1;
+  const auto it_to_before = it_to_after - 1;
+  if (it_from_after == it_to_before)
   {
     LOG(WARNING) << "Not enough data for interpolation";
     // return empty means unsuccessful.
@@ -128,7 +128,7 @@ ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
   }
 
   // resize containers
-  size_t range = it_to_before.index() - it_from_after.index() + 3;
+  const size_t range = it_to_before.index() - it_from_after.index() + 3;
   rectified_measurements.resize(Eigen::NoChange, range);
   stamps.resize(range);
 
