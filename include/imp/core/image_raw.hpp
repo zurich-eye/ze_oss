@@ -70,7 +70,7 @@ public:
    * @param width Image width.
    * @param height Image height.
    * @param pitch Length of a row in bytes (including padding).
-   * @param use_ext_data_pointer Flagg if the image should be copied (true) or if the data is just safed as 'reference' (false)
+   * @param use_ext_data_pointer Flag controling whether the image should be copied (false) or if the data is just referenced (true)
    */
   ImageRaw(Pixel* data, uint32_t width, uint32_t height,
            uint32_t pitch, bool use_ext_data_pointer = false,
