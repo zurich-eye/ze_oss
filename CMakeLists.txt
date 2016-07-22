@@ -55,6 +55,9 @@ target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
 catkin_add_gtest(test_image test/test_image.cpp)
 target_link_libraries(test_image ${PROJECT_NAME})
 
+catkin_add_gtest(test_copy test/test_copy.cpp)
+target_link_libraries(test_copy ${PROJECT_NAME})
+
 cs_install()
 cs_export()
 
