@@ -1,7 +1,8 @@
+#include <gtest/gtest.h>
+
 #include <imp/core/image.hpp>
 #include <imp/core/image_raw.hpp>
 #include <ze/common/random.hpp>
-#include <ze/common/test_entrypoint.h>
 
 namespace ze {
 ImageRaw8uC1 generateRandomImage(size_t width, size_t height)
@@ -69,5 +70,3 @@ TEST(IMPCoreTestSuite, testCopy8uC1DifferentBytes)
     }
   }
 }
-
-ZE_UNITTEST_ENTRYPOINT
