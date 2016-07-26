@@ -111,17 +111,4 @@ using ImuAccGyrContainer = Matrix6X;
 // Order: Accelerometer, Gyroscope
 using ImuAccGyr = Vector6;
 
-//------------------------------------------------------------------------------
-// Localization States.
-enum class LocalizationState : int {
-  // No reference map has been set, localization is not performed.
-  kUninitialized,
-  // Baseframe transformation has not yet been initialized.
-  kNotLocalized,
-  // Baseframe was initialized and global map matching is performed.
-  kLocalized,
-  // Map matching is performed using map tracking.
-  kMapTracking
-};
-
 } // namespace ze
