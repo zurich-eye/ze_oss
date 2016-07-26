@@ -19,9 +19,9 @@ public:
     PrimitiveTypeWrapperImpl& operator=(T v) {value=v; notify(); return *this;}
     PrimitiveTypeWrapperImpl& operator+=(T v) {value+=v; notify(); return *this;}
     PrimitiveTypeWrapperImpl& operator-=(T v) {value-=v; notify(); return *this;}
-    PrimitiveTypeWrapperImpl& operator*=(T v) {value*=value; notify(); return *this;}
-    PrimitiveTypeWrapperImpl& operator/=(T v) {value/=value; notify(); return *this;}
-    PrimitiveTypeWrapperImpl& operator%=(T v) {value%=value; notify(); return *this;}
+    PrimitiveTypeWrapperImpl& operator*=(T v) {value*=v; notify(); return *this;}
+    PrimitiveTypeWrapperImpl& operator/=(T v) {value/=v; notify(); return *this;}
+    PrimitiveTypeWrapperImpl& operator%=(T v) {value%=v; notify(); return *this;}
     PrimitiveTypeWrapperImpl& operator++() {++value; notify(); return *this;}
     PrimitiveTypeWrapperImpl& operator--() {--value; notify(); return *this;}
     PrimitiveTypeWrapperImpl operator++(int) {notify(); return PrimitiveTypeWrapperImpl(value++);}
@@ -77,7 +77,12 @@ private:
 
     ChangeEventCallback<T> change_cb_;
 
-  void notify() { /*change_cb_ &&*/ change_cb_(value); }
+  void notify()
+  {
+    if (change_cb_) {
+      change_cb_(value);
+    }
+  }
 };
 typedef PrimitiveTypeWrapperImpl<int> intWrapper;
 typedef PrimitiveTypeWrapperImpl<unsigned> uintWrapper;

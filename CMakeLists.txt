@@ -30,8 +30,8 @@ target_link_libraries(ze_pangolin_test_node ${PROJECT_NAME} ${X11_LIBRARIES})
 ##########
 # GTESTS #
 ##########
-#catkin_add_gtest(test_aslam_conversion test/test_aslam_conversion.cpp)
-#target_link_libraries(test_aslam_conversion ${PROJECT_NAME})
+catkin_add_gtest(test_type_watches test/test_type_watches.cpp)
+target_link_libraries(test_type_watches ${PROJECT_NAME})
 
 ##########
 # EXPORT #
