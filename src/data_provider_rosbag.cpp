@@ -131,6 +131,11 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
      {
        LOG(ERROR) << "*) " << info->topic;
      }
+     LOG(ERROR) << "Requested " << topics.size() << " topics:";
+     for (const std::string topic : topics)
+     {
+       LOG(ERROR) << "*) " << topic;
+     }
      LOG(FATAL) << "Not all requested topics founds in bagfile. "
                 << "Is topic_cam0, topic_imu0, etc. set correctly? "
                 << "Maybe removing/adding a slash as prefix solves the problem.";
