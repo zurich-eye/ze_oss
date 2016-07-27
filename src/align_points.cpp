@@ -71,6 +71,7 @@ Transformation PointAligner::alignSE3(
 {
   CHECK_NE(pts_A.cols(), 0u);
   CHECK_EQ(pts_A.cols(), pts_B.cols());
+  // Compute T_B_A using the method by Horn (closed-form)
   const Vector3 mean_pts_A = pts_A.rowwise().mean();
   const Vector3 mean_pts_B = pts_B.rowwise().mean();
   Matrix3 sigma = Matrix3::Zero();
@@ -96,6 +97,20 @@ Transformation PointAligner::alignSE3(
   const Matrix3 R_A_B = svd_U * svd_S * svd_V.transpose();
   const Position t_A_B = mean_pts_A - R_A_B * mean_pts_B;
   return Transformation(t_A_B, Quaternion(R_A_B)).inverse();
+}
+
+std::pair<FloatType, Transformation> PointAligner::alignSim3(
+    const Positions& pts_A, const Positions& pts_B)
+{
+  CHECK_NE(pts_A.cols(), 0u);
+  CHECK_EQ(pts_A.cols(), pts_B.cols());
+  // Compute T_B_A using the method by Horn (closed-form)
+  const Vector3 mean_pts_A = pts_A.rowwise().mean();
+  const Vector3 mean_pts_B = pts_B.rowwise().mean();
+
+
+  //Matrix3 c = 1.0 /
+  //@todo (MPI)
 }
 
 } // namespace ze

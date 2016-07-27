@@ -25,11 +25,20 @@ public:
       HessianMatrix* H,
       GradientVector* g);
 
-  //! Compute LSQ alignment in SE3
+  //! Compute LSQ alignment in SE3 (closed form solution by Horn)
   //! @param pts_A A vector of N points in the 'A' reference system (3xN)
   //! @param pts_B A vector of N points in the 'B' reference system (3xN)
   //! @return T_B_A such that ||T_B_A * pts_A - pts_B|| is minimized
   static Transformation alignSE3(
+      const Positions& pts_A, const Positions& pts_B);
+
+  //! Compute LSQ alignment in Sim3 (close form solution by S. Umeyama:
+  //! Least-Squares Estimation of Transformation Parameters Between Two Point
+  //! Patterns, IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.)
+  //! @param pts_A A vector of N points in the 'A' reference system (3xN)
+  //! @param pts_B A vector of N points in the 'B' reference system (3xN)
+  //! @return <s, T_B_A> such that ||s*T_B_A * pts_A - pts_B|| is minimized
+  static std::pair<FloatType, Transformation> alignSim3(
       const Positions& pts_A, const Positions& pts_B);
 
 private:
