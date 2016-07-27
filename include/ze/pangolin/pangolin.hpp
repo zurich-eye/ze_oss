@@ -17,7 +17,6 @@ public:
                   int height = 480);
   ~PangolinPlotter();
 
-  //! Log some data.
   template<typename Scalar>
   void log(Scalar value)
   {
@@ -35,9 +34,7 @@ private:
 
   //! A data logger object to send data to.
   pangolin::DataLog data_log_;
-
   std::shared_ptr<pangolin::Plotter> plotter_;
-
   std::unique_ptr<std::thread> thread_;
   std::mutex stop_mutex_;
   bool stop_requested_ = false;

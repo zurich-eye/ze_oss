@@ -16,7 +16,7 @@ using ChangeEventCallback = std::function<void(Scalar)>;
 template<class T>
 class PrimitiveTypeWrapperImpl {
 public:
-  typedef T value_type;
+  using value_type = T;
 
   PrimitiveTypeWrapperImpl()
     : value_()
@@ -46,7 +46,7 @@ public:
   }
 
   //! A string constructor to name the context / window of pangolin.
-  PrimitiveTypeWrapperImpl(const std::string& member_name = "Default")
+  PrimitiveTypeWrapperImpl(const std::string& member_name)
     : plotter_(std::make_shared<ze::PangolinPlotter>(member_name))
   {
     initialize();
@@ -128,7 +128,8 @@ private:
   //! Notifiy helper function that calls the callback if defined.
   void notify()
   {
-    if (change_cb_) {
+    if (change_cb_)
+    {
       change_cb_(value_);
     }
   }
@@ -141,6 +142,7 @@ private:
                                       std::placeholders::_1));
   }
 };
+
 typedef PrimitiveTypeWrapperImpl<int> intWrapper;
 typedef PrimitiveTypeWrapperImpl<unsigned> uintWrapper;
 typedef PrimitiveTypeWrapperImpl<short> shortWrapper;
