@@ -15,6 +15,7 @@ public:
   PangolinPlotter(const std::string& window_title = "",
                   int width = 640,
                   int height = 480);
+  ~PangolinPlotter();
 
   //! Log some data.
   template<typename Scalar>
@@ -38,6 +39,11 @@ private:
   std::shared_ptr<pangolin::Plotter> plotter_;
 
   std::unique_ptr<std::thread> thread_;
+  std::mutex stop_mutex_;
+  bool stop_requested_ = false;
+
+  void requestStop();
+  bool isStopRequested();
 };
 
 } // namespace ze

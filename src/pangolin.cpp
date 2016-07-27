@@ -13,6 +13,12 @@ PangolinPlotter::PangolinPlotter(const std::string& window_title,
   thread_.reset(new std::thread(&PangolinPlotter::loop, this));
 }
 
+PangolinPlotter::~PangolinPlotter()
+{
+  requestStop();
+  thread_->join();
+}
+
 void PangolinPlotter::loop()
 {
   // Create OpenGL window and switch to context.
@@ -26,6 +32,7 @@ void PangolinPlotter::loop()
   pangolin::DisplayBase().AddDisplay(*plotter_);
 
   while(!pangolin::ShouldQuit())
+  while(!isStopRequested())
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Swap frames and Process Events
@@ -33,6 +40,18 @@ void PangolinPlotter::loop()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(40));
   }
+}
+
+void PangolinPlotter::requestStop()
+{
+  std::lock_guard<std::mutex> lock(stop_mutex_);
+  stop_requested_ = true;
+}
+
+bool PangolinPlotter::isStopRequested()
+{
+   std::lock_guard<std::mutex> lock(stop_mutex_);
+   return stop_requested_;
 }
 
 } // namespace ze

@@ -25,7 +25,7 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # EXECUTABLES #
 ###############
 cs_add_executable(ze_pangolin_test_node src/pangolin_test_node.cpp)
-target_link_libraries(ze_pangolin_test_node ${PROJECT_NAME} ${X11_LIBRARIES})
+target_link_libraries(ze_pangolin_test_node ${PROJECT_NAME})
 
 ##########
 # GTESTS #
