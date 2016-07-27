@@ -37,8 +37,7 @@ template<typename TimerEnum>
 class TimerCollection
 {
 public:
-  using Timers = std::array<TimerStatistics,
-                            static_cast<uint32_t>(TimerEnum::dimension)>;
+  using Timers = std::array<TimerStatistics, static_cast<uint32_t>(TimerEnum::dimension)>;
   using TimerNames = std::vector<std::string>;
 
   TimerCollection() = delete;
@@ -71,7 +70,7 @@ public:
   constexpr size_t size() const noexcept { return timers_.size(); }
 
   //! Saves timings to file in YAML format.
-  inline void saveToFile(const std::string& directory, const std::string& filename)
+  inline void saveToFile(const std::string& directory, const std::string& filename) const
   {
     std::ofstream fs;
     CHECK(isDir(directory));
