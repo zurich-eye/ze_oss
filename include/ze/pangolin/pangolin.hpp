@@ -12,7 +12,7 @@ class PangolinPlotter
 {
 public:
   //! Creates a new pangolin window
-  PangolinPlotter(const std::string& window_title,
+  PangolinPlotter(const std::string& window_title = "",
                   int width = 640,
                   int height = 480);
 

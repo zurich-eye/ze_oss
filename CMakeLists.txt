@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.3)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-find_package(X11)
+include(ze_setup)
 
 #############
 # LIBRARIES #

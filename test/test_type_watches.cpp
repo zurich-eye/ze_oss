@@ -6,8 +6,8 @@
 
 #define ASSERT_OPERATOR(TYPE, LHS, RHS, OP)       \
 {                                                 \
-  PrimitiveTypeWrapperImpl<TYPE> wrappedLhs(LHS); \
-  PrimitiveTypeWrapperImpl<TYPE> wrappedRhs(RHS); \
+  PrimitiveTypeWrapperImpl<TYPE> wrappedLhs(LHS, false); \
+  PrimitiveTypeWrapperImpl<TYPE> wrappedRhs(RHS, false); \
   TYPE plainLhs = LHS;                            \
   TYPE plainRhs = RHS;                            \
   TYPE result = plainLhs OP plainRhs;             \

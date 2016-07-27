@@ -6,8 +6,8 @@ PangolinPlotter::PangolinPlotter(const std::string& window_title,
                                  int width,
                                  int height)
   : window_title_(window_title)
-  , height_(height)
   , width_(width)
+  , height_(height)
 {
   // Thread out a pangolin loop.
   thread_.reset(new std::thread(&PangolinPlotter::loop, this));
