@@ -11,6 +11,10 @@
 
 DEFINE_int32(data_source_stop_after_n_frames, -1,
              "How many frames should be processed?");
+DEFINE_double(data_source_start_time_s, 0.0,
+              "Start time in seconds");
+DEFINE_double(data_source_stop_time_s, 0.0,
+              "Stop time in seconds");
 
 namespace ze {
 
@@ -117,6 +121,23 @@ void DataProviderRosbag::loadRosbag(const std::string& bag_filename)
 void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
 {
   bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics)));
+  if (FLAGS_data_source_start_time_s != 0.0 ||
+      FLAGS_data_source_stop_time_s != 0.0)
+  {
+    CHECK_GE(FLAGS_data_source_start_time_s, 0);
+    CHECK_GE(FLAGS_data_source_stop_time_s, 0);
+    const double absolute_time_offset = bag_view_->getBeginTime().toSec();
+    ros::Time absolute_start_time =
+        FLAGS_data_source_start_time_s == 0.0 ?
+          ros::TIME_MIN : ros::Time(absolute_time_offset + FLAGS_data_source_start_time_s);
+    ros::Time absolute_stop_time =
+        FLAGS_data_source_stop_time_s == 0.0 ?
+          ros::TIME_MAX : ros::Time(absolute_time_offset + FLAGS_data_source_stop_time_s);
+    CHECK_GT(absolute_stop_time, absolute_start_time);
+    bag_view_.reset(
+          new rosbag::View(*bag_, rosbag::TopicQuery(topics),
+                           absolute_start_time, absolute_stop_time));
+  }
   bag_view_it_ = bag_view_->begin();
 
   // Ensure that topics exist
@@ -126,14 +147,14 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
       bag_view_->getConnections();
   if (topics.size() != connection_infos.size())
   {
-     LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
-     for (const rosbag::ConnectionInfo* info : connection_infos)
-     {
-       LOG(ERROR) << "*) " << info->topic;
-     }
-     LOG(FATAL) << "Not all requested topics founds in bagfile. "
-                << "Is topic_cam0, topic_imu0, etc. set correctly? "
-                << "Maybe removing/adding a slash as prefix solves the problem.";
+    LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
+    for (const rosbag::ConnectionInfo* info : connection_infos)
+    {
+      LOG(ERROR) << "*) " << info->topic;
+    }
+    LOG(FATAL) << "Not all requested topics founds in bagfile. "
+               << "Is topic_cam0, topic_imu0, etc. set correctly? "
+               << "Maybe removing/adding a slash as prefix solves the problem.";
   }
 }
 
