@@ -69,4 +69,32 @@ TEST(AlignPosesTest, testOptimization)
   EXPECT_LT(T_err.log().norm(), tol);
 }
 
+TEST(AlignPosesTest, testAlignSE3)
+{
+  using namespace ze;
+
+  const size_t n_points = 100;
+
+  // Generate random points.
+  Positions p_B(3, n_points);
+  for (size_t i = 0; i < n_points; ++i)
+  {
+    p_B.col(i) = Vector3::Random();
+  }
+
+  // Random transformation between trajectories.
+  Transformation T_A_B;
+  T_A_B.setRandom();
+
+  // Compute transformed points.
+  Positions p_A = T_A_B.transformVectorized(p_B);
+
+  // Align trajectories
+  Transformation T_A_B_estimate = PointAligner::alignSE3(p_B, p_A);
+
+  // Compute error.
+  Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
+  EXPECT_LT(T_err.log().norm(), tol);
+}
+
 ZE_UNITTEST_ENTRYPOINT
