@@ -72,20 +72,16 @@ Transformation PointAligner::alignSE3(
   CHECK_GE(pts_A.cols(), 0u);
   CHECK_EQ(pts_A.cols(), pts_B.cols());
 
-  // Compute T_B_A using the method by Horn (closed-form)
+  // Compute T_B_A using the method by K. S. Arun et al.:
+  // Least-Squares Fitting of Two 3-D Point Sets
+  // IEEE Trans. Pattern Anal. Mach. Intell., 9, NO. 5, SEPTEMBER 1987
   const Vector3 mean_pts_A = pts_A.rowwise().mean();
   const Vector3 mean_pts_B = pts_B.rowwise().mean();
-  Matrix3 sigma = Matrix3::Zero();
-  for (int column_index = 0;
-       column_index < pts_A.cols();
-       ++column_index)
-  {
-    sigma +=
-        (pts_A.block<3, 1>(0, column_index) - mean_pts_A) *
-        (pts_B.block<3, 1>(0, column_index) - mean_pts_B)
-        .transpose();
-  }
-  sigma /= static_cast<double>(pts_A.cols());
+  const Positions zero_centered_A = pts_A.colwise() - mean_pts_A;
+  const Positions zero_centered_B = pts_B.colwise() - mean_pts_B;
+  const FloatType n = static_cast<FloatType>(pts_A.cols());
+  const Matrix3 sigma =
+      zero_centered_A * zero_centered_B.transpose() / n;
 
   Eigen::JacobiSVD<Matrix3> svd(sigma, Eigen::ComputeFullU | Eigen::ComputeFullV);
   const int rank = svd.rank();
@@ -98,7 +94,6 @@ Transformation PointAligner::alignSE3(
   {
     svd_S(2, 2) = -1.0;
   }
-
   const Matrix3 R_A_B = svd_U * svd_S * svd_V.transpose();
   const Position t_A_B = mean_pts_A - R_A_B * mean_pts_B;
   return Transformation(t_A_B, Quaternion(R_A_B)).inverse();
@@ -122,15 +117,18 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
   zero_centered_B.colwise() -= mean_pts_B;
 
   const FloatType n = static_cast<FloatType>(pts_A.cols());
-  const Matrix3 c = 1.0 / n * zero_centered_A * zero_centered_B.transpose();
+  const Matrix3 c = zero_centered_A * zero_centered_B.transpose() / n;
   const FloatType sigma2 = 1.0 / n * (zero_centered_B.array() * zero_centered_B.array()).sum();
 
   Eigen::JacobiSVD<Matrix3> svd(c, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  const int rank = svd.rank();
+  CHECK_GE(rank, 2);
   const Matrix3 svd_U = svd.matrixU();
   const Matrix3 svd_V = svd.matrixV();
   const Matrix3 svd_D = svd.singularValues().asDiagonal();
   Matrix3 S = Matrix3::Identity();
-  if (svd_U.determinant() * svd_V.determinant() < 0.0)
+  if ((rank > 2 && c.determinant() < 0.0) ||
+      (rank == 2 && svd_U.determinant() * svd_V.determinant() < 0.0))
   {
     S(2, 2) = -1.0;
   }

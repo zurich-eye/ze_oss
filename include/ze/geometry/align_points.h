@@ -25,7 +25,9 @@ public:
       HessianMatrix* H,
       GradientVector* g);
 
-  //! Compute LSQ alignment in SE3 (closed form solution by Horn)
+  //! Compute LSQ alignment in SE3 (closed form solution by K. S. Arun et al.:
+  // Least-Squares Fitting of Two 3-D Point Sets, IEEE Trans. Pattern Anal.
+  // Mach. Intell., 9, NO. 5, SEPTEMBER 1987)
   //! @param pts_A A vector of N points in the 'A' reference system (3xN)
   //! @param pts_B A vector of N points in the 'B' reference system (3xN)
   //! @return T_B_A such that ||T_B_A * pts_A - pts_B|| is minimized
