@@ -2,6 +2,9 @@
 
 namespace ze {
 
+//! Ensure the global static pointer exists.
+PangolinPlotter* PangolinPlotter::instance_ = nullptr;
+
 PangolinPlotter::PangolinPlotter(const std::string& window_title,
                                  int width,
                                  int height)
@@ -24,21 +27,61 @@ void PangolinPlotter::loop()
   // Create OpenGL window and switch to context.
   pangolin::CreateWindowAndBind(window_title_, width_, height_);
 
-  // Create plotter and listen to data log.
-  plotter_ = std::make_shared<pangolin::Plotter>(&data_log_);
-  // plotter.SetBounds(0.0, 1.0, 0.0, 1.0);
-  plotter_->Track("$i");
-
-  pangolin::DisplayBase().AddDisplay(*plotter_);
-
   while(!isStopRequested())
   {
+    // If the addition of a logger was requested, process the request.
+    if (add_logger_)
+    {
+      data_logs_[new_logger_identifier_] = std::make_shared<pangolin::DataLog>();
+
+      // Set the labels before adding the data_log to the plotter
+      std::vector<std::string> labels = {new_logger_identifier_};
+      data_logs_.at(new_logger_identifier_)->SetLabels(labels);
+
+      plotters_[new_logger_identifier_] = std::make_shared<pangolin::Plotter>(
+                                data_logs_.at(new_logger_identifier_).get());
+      // plotter.SetBounds(0.0, 1.0, 0.0, 1.0);
+      plotters_[new_logger_identifier_]->Track("$i");
+
+      // Add the new plotter to the pangolin window.
+      pangolin::Display("multi")
+          .SetLayout(pangolin::LayoutEqual)
+          .AddDisplay(*plotters_[new_logger_identifier_]);
+
+      VLOG(3) << "Add plotter display for: " << new_logger_identifier_;
+
+      add_logger_ = false;
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Swap frames and Process Events
     pangolin::FinishFrame();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    std::this_thread::sleep_for(std::chrono::milliseconds(thread_sleep_ms_));
   }
+}
+
+std::shared_ptr<pangolin::DataLog>& PangolinPlotter::getLoggerOrCreate(
+    const std::string& identifier)
+{
+  // As the visualization runs in a separate thread, the gl context is not accessible
+  // form within this function. We request the thread to add a new plotter and
+  // wait for it to be ready.
+  if (data_logs_.find(identifier) == data_logs_.end())
+  {
+    add_logger_ = true;
+    new_logger_identifier_ = identifier;
+
+    while(add_logger_)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(thread_sleep_ms_));
+    }
+    CHECK(data_logs_.find(identifier) != data_logs_.end())
+        << "A pangolin plotter that was requested to be added and confirmed"
+           "does actually not exist.";
+  }
+
+  return data_logs_.at(identifier);
 }
 
 void PangolinPlotter::requestStop()

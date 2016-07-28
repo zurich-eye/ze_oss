@@ -5,10 +5,11 @@
 class Sample
 {
 public:
-  void increment() { ++value; }
+  void increment() { ++value; --value_another; }
 private:
   //int value;
   PANGOLIN_WATCH(int, value);
+  PANGOLIN_WATCH(int, value_another);
 };
 
 int main( int /*argc*/, char* argv[] )
@@ -27,9 +28,11 @@ int main( int /*argc*/, char* argv[] )
 
   std::shared_ptr<Sample> sample(std::make_shared<Sample>());
 
+  int i = 15;
   while(true)
   {
     sample->increment();
+    PANGOLIN_WATCH_EXPR(i++, double, T);
     sleep(1u);
   }
 

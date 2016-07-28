@@ -19,35 +19,34 @@ public:
   using value_type = T;
 
   PrimitiveTypeWrapperImpl()
-    : value_()
+    : member_name_("Default")
   {
   }
 
   PrimitiveTypeWrapperImpl(T v)
     : value_(v)
-    , plotter_(std::make_shared<ze::PangolinPlotter>("Default"))
+    , member_name_("Default")
   {
     initialize();
   }
 
   PrimitiveTypeWrapperImpl(T v, bool watch)
-    : value_(v)
+    : PrimitiveTypeWrapperImpl(v)
   {
     if (watch)
     {
-      plotter_ = std::make_shared<ze::PangolinPlotter>("Default");
       initialize();
     }
   }
 
   PrimitiveTypeWrapperImpl(const PrimitiveTypeWrapperImpl<T>& rhs)
-    : value_(rhs.value_)
+    : PrimitiveTypeWrapperImpl(rhs.value_)
   {
   }
 
   //! A string constructor to name the context / window of pangolin.
   PrimitiveTypeWrapperImpl(const std::string& member_name)
-    : plotter_(std::make_shared<ze::PangolinPlotter>(member_name))
+    : member_name_(member_name)
   {
     initialize();
   }
@@ -56,7 +55,7 @@ public:
 
   void change_callback(T value)
   {
-    plotter_->log(value);
+    ze::PangolinPlotter::instance()->log(member_name_, value);
   }
 
   // Modifiers
@@ -120,7 +119,7 @@ public:
 
 private:
   T value_;
-  std::shared_ptr<ze::PangolinPlotter> plotter_;
+  const std::string member_name_;
 
   //! A callback triggered when the primitive changes.
   ChangeEventCallback<T> change_cb_;

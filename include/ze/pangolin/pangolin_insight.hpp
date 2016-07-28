@@ -11,12 +11,15 @@ namespace ze {
 namespace internal {
 
 template<typename Scalar>
-using PangolinInsight = PrimitiveTypeWrapperImpl<Scalar>;
+using PangolinInsightWatch = PrimitiveTypeWrapperImpl<Scalar>;
 
 }
 }
 
 //! Watch a class member variable.
-#define PANGOLIN_WATCH(TYPE, MEMBER_NAME)                         \
-  ze::internal::PangolinInsight<TYPE> MEMBER_NAME =               \
-    ze::internal::PangolinInsight<TYPE>(#MEMBER_NAME)
+#define PANGOLIN_WATCH(TYPE, MEMBER_NAME)                             \
+  ze::internal::PangolinInsightWatch<TYPE> MEMBER_NAME =              \
+    ze::internal::PangolinInsightWatch<TYPE>(#MEMBER_NAME)
+
+#define PANGOLIN_WATCH_EXPR(VALUE, TYPE, NAME)                        \
+  ze::PangolinPlotter::instance()->log<TYPE>(#NAME, VALUE)
