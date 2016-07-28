@@ -1,12 +1,12 @@
 #include <cmath>
 #include <functional>
-#include <random>
 #include <utility>
 
 #include <ze/common/numerical_derivative.h>
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/transformation.h>
 #include <ze/common/types.h>
+#include <ze/common/random.hpp>
 #include <ze/geometry/align_points.h>
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
@@ -95,6 +95,36 @@ TEST(AlignPosesTest, testAlignSE3)
   // Compute error.
   Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
   EXPECT_LT(T_err.log().norm(), tol);
+}
+
+TEST(AlignPosesTest, testAlignSim3)
+{
+  using namespace ze;
+
+  const size_t n_points = 100;
+
+  // Generate random points.
+  Positions p_B(3, n_points);
+  for (size_t i = 0; i < n_points; ++i)
+  {
+    p_B.col(i) = Vector3::Random();
+  }
+  FloatType scale = sampleUniformRealDistribution<FloatType>(false, 0.1, 100.0);
+
+  // Random transformation between trajectories.
+  Transformation T_A_B;
+  T_A_B.setRandom();
+
+  // Compute transformed points.
+  Positions p_A = scale * T_A_B.transformVectorized(p_B);
+
+  // Align trajectories
+  std::pair<FloatType, Transformation> sim3_estimate = PointAligner::alignSim3(p_B, p_A);
+
+  // Compute error.
+  Transformation T_err = sim3_estimate.second.inverse() * sim3_estimate.second;
+  EXPECT_LT(T_err.log().norm(), tol);
+  EXPECT_LT(std::abs(scale - sim3_estimate.first), tol);
 }
 
 ZE_UNITTEST_ENTRYPOINT
