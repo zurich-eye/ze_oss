@@ -69,14 +69,14 @@ double PointAligner::evaluateError(
 Transformation PointAligner::alignSE3(
     const Positions& pts_A, const Positions& pts_B)
 {
-  CHECK_NE(pts_A.cols(), 0u);
+  CHECK_GE(pts_A.cols(), 0u);
   CHECK_EQ(pts_A.cols(), pts_B.cols());
 
   // Compute T_B_A using the method by Horn (closed-form)
   const Vector3 mean_pts_A = pts_A.rowwise().mean();
   const Vector3 mean_pts_B = pts_B.rowwise().mean();
   Matrix3 sigma = Matrix3::Zero();
-  for (int column_index = 0u;
+  for (int column_index = 0;
        column_index < pts_A.cols();
        ++column_index)
   {
@@ -122,8 +122,8 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
   zero_centered_B.colwise() -= mean_pts_B;
 
   const FloatType n = static_cast<FloatType>(pts_A.cols());
-  Matrix3 c = 1.0 / n * zero_centered_A * zero_centered_B.transpose();
-  FloatType sigma2 = 1.0 / n * (zero_centered_B.array() * zero_centered_B.array()).sum();
+  const Matrix3 c = 1.0 / n * zero_centered_A * zero_centered_B.transpose();
+  const FloatType sigma2 = 1.0 / n * (zero_centered_B.array() * zero_centered_B.array()).sum();
 
   Eigen::JacobiSVD<Matrix3> svd(c, Eigen::ComputeFullU | Eigen::ComputeFullV);
   const Matrix3 svd_U = svd.matrixU();
@@ -135,9 +135,9 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
     S(2, 2) = -1.0;
   }
 
-  Matrix3 R_A_B = svd_U * S * svd_V;
-  FloatType s = 1.0 / sigma2 * (svd_D * S).trace();
-  Vector3 t_A_B = mean_pts_A - s * R_A_B * mean_pts_B;
+  const Matrix3 R_A_B = svd_U * S * svd_V;
+  const FloatType s = 1.0 / sigma2 * (svd_D * S).trace();
+  const Vector3 t_A_B = mean_pts_A - s * R_A_B * mean_pts_B;
   return std::pair<FloatType, Transformation>(
         1.0/s, Transformation(t_A_B, Quaternion(R_A_B)).inverse());
 }
