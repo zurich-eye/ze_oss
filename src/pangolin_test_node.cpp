@@ -1,4 +1,5 @@
 #include <ze/pangolin/pangolin.hpp>
+#include <ze/common/types.h>
 #include <ze/pangolin/type_watches.hpp>
 #include <ze/pangolin/pangolin_insight.hpp>
 
@@ -27,12 +28,15 @@ int main( int /*argc*/, char* argv[] )
 //  }
 
   std::shared_ptr<Sample> sample(std::make_shared<Sample>());
+  ze::Vector3 vector; vector.setRandom();
 
   int i = 15;
   while(true)
   {
     sample->increment();
     PANGOLIN_WATCH_EXPR(i++, double, T);
+    PANGOLIN_WATCH_EXPR(vector, ze::Vector3, vector);
+    vector.setRandom();
     sleep(1u);
   }
 

@@ -3,6 +3,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <ze/common/types.h>
 #include <ze/common/logging.hpp>
 #include <pangolin/pangolin.h>
 
@@ -21,6 +22,18 @@ public:
   void log(const std::string& identifier, Scalar value)
   {
     getLoggerOrCreate(identifier)->Log(value);
+  }
+
+  // Specializations for eigen vector types.
+  void log(const std::string& identifier, VectorX value)
+  {
+    std::vector<float> values;
+    values.resize(value.size());
+    for (int i = 0; i < value.size(); ++i)
+    {
+      values[i] = value[i];
+    }
+    getLoggerOrCreate(identifier)->Log(values);
   }
 
   //! Singleton accessor.
