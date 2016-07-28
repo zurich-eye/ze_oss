@@ -126,17 +126,22 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
   {
     CHECK_GE(FLAGS_data_source_start_time_s, 0);
     CHECK_GE(FLAGS_data_source_stop_time_s, 0);
-    const double absolute_time_offset = bag_view_->getBeginTime().toSec();
-    ros::Time absolute_start_time =
-        FLAGS_data_source_start_time_s == 0.0 ?
-          ros::TIME_MIN : ros::Time(absolute_time_offset + FLAGS_data_source_start_time_s);
-    ros::Time absolute_stop_time =
-        FLAGS_data_source_stop_time_s == 0.0 ?
-          ros::TIME_MAX : ros::Time(absolute_time_offset + FLAGS_data_source_stop_time_s);
+    const ros::Time absolute_time_offset = bag_view_->getBeginTime();
+    const ros::Duration data_source_start_time(FLAGS_data_source_start_time_s);
+    const ros::Time absolute_start_time =
+        data_source_start_time.isZero() ?
+          ros::TIME_MIN : absolute_time_offset + data_source_start_time;
+    const ros::Time absolute_end_time = bag_view_->getEndTime();
+    const ros::Duration data_source_stop_time(FLAGS_data_source_stop_time_s);
+    const ros::Time absolute_stop_time =
+        data_source_stop_time.isZero() ?
+          ros::TIME_MAX : absolute_time_offset + data_source_stop_time;
     CHECK_GT(absolute_stop_time, absolute_start_time);
-    bag_view_.reset(
-          new rosbag::View(*bag_, rosbag::TopicQuery(topics),
-                           absolute_start_time, absolute_stop_time));
+    CHECK_LT(absolute_stop_time, absolute_end_time);
+    bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics),
+                                     absolute_start_time, absolute_stop_time));
+    VLOG(1) << "Absolute start time set to " << absolute_start_time;
+    VLOG(1) << "Absolute stop time set to " << absolute_stop_time;
   }
   bag_view_it_ = bag_view_->begin();
 
