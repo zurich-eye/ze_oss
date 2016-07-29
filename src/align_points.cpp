@@ -4,7 +4,6 @@
 #include <numeric>
 #include <algorithm>
 #include <ze/common/logging.hpp>
-
 #include <ze/common/matrix.h>
 #include <ze/common/stl_utils.h>
 
@@ -66,6 +65,8 @@ double PointAligner::evaluateError(
   return chi2;
 }
 
+
+
 Transformation PointAligner::alignSE3(
     const Positions& pts_A, const Positions& pts_B)
 {
@@ -75,28 +76,30 @@ Transformation PointAligner::alignSE3(
   // Compute T_B_A using the method by K. S. Arun et al.:
   // Least-Squares Fitting of Two 3-D Point Sets
   // IEEE Trans. Pattern Anal. Mach. Intell., 9, NO. 5, SEPTEMBER 1987
-  const Vector3 mean_pts_A = pts_A.rowwise().mean();
-  const Vector3 mean_pts_B = pts_B.rowwise().mean();
-  const Positions zero_centered_A = pts_A.colwise() - mean_pts_A;
-  const Positions zero_centered_B = pts_B.colwise() - mean_pts_B;
-  const FloatType n = static_cast<FloatType>(pts_A.cols());
-  const Matrix3 sigma =
-      zero_centered_A * zero_centered_B.transpose() / n;
+  const Position mean_pts_A = pts_A.rowwise().mean();
+  const Position mean_pts_B = pts_B.rowwise().mean();
+  const Positions zero_mean_pts_A = pts_A.colwise() - mean_pts_A;
+  const Positions zero_mean_pts_B = pts_B.colwise() - mean_pts_B;
+  const Matrix3 Sigma_AB =
+      (zero_mean_pts_B * zero_mean_pts_A.transpose()) / (pts_A.cols() - 1);
 
-  Eigen::JacobiSVD<Matrix3> svd(sigma, Eigen::ComputeFullU | Eigen::ComputeFullV);
-  const int rank = svd.rank();
-  CHECK_GE(rank, 2);
+  Eigen::JacobiSVD<Matrix3> svd(
+        Sigma_AB, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  const int rank_Sigma_AB = svd.rank();
+  CHECK_GE(rank_Sigma_AB, 2);
   const Matrix3 svd_U = svd.matrixU();
   const Matrix3 svd_V = svd.matrixV();
-  Matrix3 svd_S = Matrix3::Identity();
-  if ((rank > 2 && sigma.determinant() < 0.0) ||
-      (rank == 2 && svd_U.determinant() * svd_V.determinant() < 0.0))
+  Matrix3 S = Matrix3::Identity();
+  if ((rank_Sigma_AB == 3 &&
+       Sigma_AB.determinant() < 0.0) ||
+      (rank_Sigma_AB == 2 &&
+       svd_U.determinant() * svd_V.determinant() < 0.0))
   {
-    svd_S(2, 2) = -1.0;
+    S(2, 2) = -1.0;
   }
-  const Matrix3 R_A_B = svd_U * svd_S * svd_V.transpose();
-  const Position t_A_B = mean_pts_A - R_A_B * mean_pts_B;
-  return Transformation(t_A_B, Quaternion(R_A_B)).inverse();
+  const Matrix3 R_B_A = svd_U * S * svd_V.transpose();
+  const Position t_B_A = mean_pts_B - R_B_A * mean_pts_A;
+  return Transformation(t_B_A, Quaternion(R_B_A));
 }
 
 std::pair<FloatType, Transformation> PointAligner::alignSim3(
@@ -109,35 +112,36 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
   // S. Umeyama: Least-Squares Estimation
   // of Transformation Parameters Between Two Point Patterns,
   // IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.
-  const Vector3 mean_pts_A = pts_A.rowwise().mean();
-  const Vector3 mean_pts_B = pts_B.rowwise().mean();
-  Positions zero_centered_A = pts_A;
-  Positions zero_centered_B = pts_B;
-  zero_centered_A.colwise() -= mean_pts_A;
-  zero_centered_B.colwise() -= mean_pts_B;
-
   const FloatType n = static_cast<FloatType>(pts_A.cols());
-  const Matrix3 c = zero_centered_A * zero_centered_B.transpose() / n;
-  const FloatType sigma2 = 1.0 / n * (zero_centered_B.array() * zero_centered_B.array()).sum();
+  const Position mean_pts_A = pts_A.rowwise().mean();
+  const Position mean_pts_B = pts_B.rowwise().mean();
+  const Positions zero_mean_pts_A = pts_A.colwise() - mean_pts_A;
+  const Positions zero_mean_pts_B = pts_B.colwise() - mean_pts_B;
+  const Matrix3 Sigma_AB =
+      (zero_mean_pts_B * zero_mean_pts_A.transpose()) / (n - 1);
+  const FloatType sigma_sq_A =
+      (zero_mean_pts_A * zero_mean_pts_A.transpose()).sum() / n;
 
-  Eigen::JacobiSVD<Matrix3> svd(c, Eigen::ComputeFullU | Eigen::ComputeFullV);
-  const int rank = svd.rank();
-  CHECK_GE(rank, 2);
+  Eigen::JacobiSVD<Matrix3> svd(
+        Sigma_AB, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  const int rank_Sigma_AB = svd.rank();
+  CHECK_GE(rank_Sigma_AB, 2);
   const Matrix3 svd_U = svd.matrixU();
   const Matrix3 svd_V = svd.matrixV();
   const Matrix3 svd_D = svd.singularValues().asDiagonal();
   Matrix3 S = Matrix3::Identity();
-  if ((rank > 2 && c.determinant() < 0.0) ||
-      (rank == 2 && svd_U.determinant() * svd_V.determinant() < 0.0))
+  if ((rank_Sigma_AB == 3 &&
+       Sigma_AB.determinant() < 0.0) ||
+      (rank_Sigma_AB == 2 &&
+       svd_U.determinant() * svd_V.determinant() < 0.0))
   {
     S(2, 2) = -1.0;
   }
-
-  const Matrix3 R_A_B = svd_U * S * svd_V;
-  const FloatType s = 1.0 / sigma2 * (svd_D * S).trace();
-  const Vector3 t_A_B = mean_pts_A - s * R_A_B * mean_pts_B;
+  const Matrix3 R_B_A = svd_U * S * svd_V.transpose();
+  const FloatType c = (svd_D * S).trace() / sigma_sq_A;
+  const Vector3 t_B_A = mean_pts_B - c * R_B_A * mean_pts_A;
   return std::pair<FloatType, Transformation>(
-        1.0/s, Transformation(t_A_B, Quaternion(R_A_B)).inverse());
+        c, Transformation(t_B_A, Quaternion(R_B_A)));
 }
 
 } // namespace ze
