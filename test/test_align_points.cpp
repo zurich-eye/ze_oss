@@ -116,15 +116,17 @@ TEST(AlignPosesTest, testAlignSim3)
   T_A_B.setRandom();
 
   // Compute transformed points.
-  Positions p_A = scale * T_A_B.transformVectorized(p_B);
+  Positions p_A = (scale * (T_A_B.getRotation().rotateVectorized(p_B))).colwise() + T_A_B.getPosition();
 
   // Align trajectories
   std::pair<FloatType, Transformation> sim3_estimate = PointAligner::alignSim3(p_B, p_A);
+  Transformation T_A_B_estimate = sim3_estimate.second;
+  FloatType scale_estimate = sim3_estimate.first;
 
   // Compute error.
-  Transformation T_err = sim3_estimate.second.inverse() * sim3_estimate.second;
+  Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
   EXPECT_LT(T_err.log().norm(), tol);
-  EXPECT_LT(std::abs(scale - sim3_estimate.first), tol);
+  EXPECT_LT(std::abs(scale - scale_estimate), tol);
 }
 
 ZE_UNITTEST_ENTRYPOINT
