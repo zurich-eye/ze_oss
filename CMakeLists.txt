@@ -12,6 +12,10 @@ include(ze_setup)
 include(ze_macros_cuda)
 find_cuda()
 
+# TODO (MPI) to be removed after debugging
+find_package(OpenCV REQUIRED) ############
+##########################################
+
 set(HEADERS
   )
 
@@ -68,6 +72,14 @@ target_link_libraries(test_cu_str_tex_decomp ${PROJECT_NAME})
 
 catkin_add_gtest(test_cu_undistortion test/test_cu_undistortion.cpp)
 target_link_libraries(test_cu_undistortion ${PROJECT_NAME})
+
+catkin_add_gtest(test_cu_stereo_rectifier test/test_cu_stereo_rectifier.cpp)
+target_link_libraries(test_cu_stereo_rectifier ${PROJECT_NAME})
+
+# TODO (MPI) to be removed after debugging ###################
+cs_add_executable(main test/main.cpp)                        #
+target_link_libraries(main ${PROJECT_NAME} ${OpenCV_LIBS})   #
+##############################################################
 
 ##########
 # EXPORT #

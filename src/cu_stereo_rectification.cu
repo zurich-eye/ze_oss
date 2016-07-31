@@ -15,6 +15,7 @@ void k_computeUndistortRectifyMap(
     std::uint32_t width,
     std::uint32_t height,
     const float* d_cam_params,
+    const float* d_orig_cam_params,
     const float* d_dist_coeffs,
     const float* d_inv_H)
 {
@@ -31,7 +32,7 @@ void k_computeUndistortRectifyMap(
     px[0] = x / w;
     px[1] = y / w;
     DistortionModel::distort(d_dist_coeffs, px);
-    CameraModel::project(d_cam_params, px);
+    CameraModel::project(d_orig_cam_params, px);
     dst[v*dst_stride + u][0] = px[0];
     dst[v*dst_stride + u][1] = px[1];
   }
@@ -42,20 +43,19 @@ template <typename CameraModel,
           typename Pixel>
 StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
     Size2u img_size,
-    Eigen::VectorXf& camera_params,
-    Eigen::VectorXf& dist_coeffs,
+    Eigen::Vector4f& camera_params,
+    Eigen::Vector4f &orig_camera_params,
+    Eigen::Vector4f& dist_coeffs,
     Eigen::Matrix3f& inv_H)
   : undistort_rectify_map_(img_size),
     fragm_(img_size)
 {
-
-  //! @todo
   ze::LinearMemory32fC1 h_cam_params(
         reinterpret_cast<Pixel32fC1*>(camera_params.data()),
-        camera_params.rows(), true);
+        4, true);
   ze::LinearMemory32fC1 h_dist_coeffs(
         reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()),
-        dist_coeffs.rows(), true);
+        4, true);
   ze::LinearMemory32fC1 h_inv_H(
         reinterpret_cast<Pixel32fC1*>(inv_H.data()),
         9, true);
@@ -63,6 +63,11 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
   cu::LinearMemory32fC1 d_inv_H(h_inv_H);
+
+  ze::LinearMemory32fC1 h_orig_cam_params(
+        reinterpret_cast<Pixel32fC1*>(orig_camera_params.data()),
+        4, true);
+  cu::LinearMemory32fC1 d_orig_cam_params(h_orig_cam_params);
 
   k_computeUndistortRectifyMap<CameraModel, DistortionModel>
       <<<
@@ -72,6 +77,7 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
            undistort_rectify_map_.width(),
            undistort_rectify_map_.height(),
            d_cam_params.cuData(),
+           d_orig_cam_params.cuData(),
            d_dist_coeffs.cuData(),
            d_inv_H.cuData());
 }
@@ -79,12 +85,12 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
 template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
-void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(
-    ImageGpu<Pixel>& dst,
+void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(ImageGpu<Pixel>& dst,
     const ImageGpu<Pixel>& src) const
 {
   CHECK_EQ(src.size(), dst.size());
   CHECK_EQ(src.size(), undistort_rectify_map_.size());
+
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();

@@ -13,16 +13,14 @@ template<typename CameraModel,
 class StereoRectifier
 {
 public:
-  StereoRectifier(
-      Size2u img_size,
-      Eigen::VectorXf& camera_params,
-      Eigen::VectorXf& dist_coeffs,
+  StereoRectifier(Size2u img_size,
+      Eigen::Vector4f& camera_params, Eigen::Vector4f &orig_camera_params,
+      Eigen::Vector4f& dist_coeffs,
       Eigen::Matrix3f& inv_H);
 
   ~StereoRectifier() = default;
 
-  void rectify(
-      ImageGpu<Pixel>& dst,
+  void rectify(ImageGpu<Pixel>& dst,
       const ImageGpu<Pixel>& src) const;
 
   const ImageGpu32fC2& getUndistortRectifyMap() const;
