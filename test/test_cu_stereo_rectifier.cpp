@@ -11,9 +11,7 @@ using namespace ze;
 
 TEST(impCuStereoRectifierTexture, equidist32fC1)
 {
-  const double tolerance_on_sad{0.0014};   // Tolerance in SAD/nelems
-  const double tolerance_on_sad_max{0.5};  // Tolerance on max of SAD
-
+  constexpr float c_map_tolearance{0.001};
   const std::string test_folder =
       ze::joinPath(ze::getTestDataDir("imp_cu_imgproc"), "stereo_rectifier");
   const std::string calib_file =
@@ -31,63 +29,69 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
   Eigen::Vector4f left_distortion =
       rig->at(0).distortionParameters().cast<float>();
 
-  Eigen::Vector4f right_intrinsics;
-  right_intrinsics << 972.2670826175212, 972.2670826175212, 654.0978851318359, 482.1916770935059;
-
-  Eigen::Vector4f original_right_intrinsics =
-      rig->at(1).projectionParameters().cast<float>();
-  Eigen::Vector4f right_distortion =
-      rig->at(1).distortionParameters().cast<float>();
-
   Eigen::Matrix3f left_H;
   left_H << 0.9999716948470486, 0.002684020348481424, -0.007028907417937792,
       -0.002697713727894102, 0.9999944805267602, -0.001939395951741348,
       0.007023663243873155, 0.00195830303687577, 0.9999734162485783;
-
-  Eigen::Matrix3f right_H;
-  right_H << 0.9999948321132365, 0.002852364833028826, -0.001483159357336634,
-      -0.002849468937719842, 0.9999940370862417, 0.001950978916686848,
-      0.001488715417037233, -0.001946742617730308, 0.9999969969552845;
 
   const std::string left_img_path = ze::joinPath(test_folder, "left01.png");
   ImageCv32fC1::Ptr cv_left_img;
   cvBridgeLoad(cv_left_img, left_img_path, PixelOrder::gray);
   VLOG(2) << "loaded image " << left_img_path
           << ", size " << cv_left_img->size();
-  const std::string right_img_path = ze::joinPath(test_folder, "right01.png");
-  ImageCv32fC1::Ptr cv_right_img;
-  cvBridgeLoad(cv_right_img, right_img_path, PixelOrder::gray);
-  VLOG(2) << "loaded image " << right_img_path
-          << ", size " << cv_right_img->size();
+
+  const size_t img_width = cv_left_img->width();
+  const size_t img_height = cv_left_img->height();
+  const size_t img_n_elems = img_width * img_height;
+
 
   // Allocate GPU memory
   cu::ImageGpu32fC1 gpu_left_src(*cv_left_img);
   cu::ImageGpu32fC1 gpu_left_dst(cv_left_img->size());
 
-  cu::ImageGpu32fC1 gpu_right_src(*cv_right_img);
-  cu::ImageGpu32fC1 gpu_right_dst(cv_right_img->size());
-
   Eigen::Matrix3f left_H_inv = left_H.inverse();
-  Eigen::Matrix3f right_H_inv = right_H.inverse();
 
-  // Allocate rectifiers
+  // Allocate rectifier
   cu::RadTanStereoRectifier32fC1 left_rectifier(
         gpu_left_src.size(), left_intrinsics, original_left_intrinsics,
         left_distortion, left_H_inv);
-  cu::RadTanStereoRectifier32fC1 right_rectifier(
-        gpu_right_src.size(), right_intrinsics, original_right_intrinsics,
-        right_distortion, right_H_inv);
 
-  // Stereo rectify
-  left_rectifier.rectify(gpu_left_dst, gpu_left_src);
-  right_rectifier.rectify(gpu_right_dst, gpu_right_src);
+  ImageCv32fC2 left_map(left_rectifier.getUndistortRectifyMap());
+  CHECK_EQ(cv_left_img->size(), left_map.size());
 
-  ImageCv32fC1 cv_left_img_out(gpu_left_dst);
-  ImageCv32fC1 cv_right_img_out(gpu_right_dst);
+  // Read ground-truth maps
+  const std::string gt_left_map_x_path =
+      joinPath(test_folder, "map_x_left01.bin");
+  const std::string gt_left_map_y_path =
+      joinPath(test_folder, "map_y_left01.bin");
 
-  cv::imshow("CUDA_RECTIFIED_LEFT", cv_left_img_out.cvMat());
-  cv::imshow("CUDA_RECTIFIED_RIGHT", cv_right_img_out.cvMat());
-  cv::waitKey();
+  CHECK(fileExists(gt_left_map_x_path));
+  CHECK(fileExists(gt_left_map_y_path));
+
+  std::ifstream gt_left_map_x_file(gt_left_map_x_path, std::ofstream::binary);
+  std::ifstream gt_left_map_y_file(gt_left_map_y_path, std::ofstream::binary);
+  CHECK(gt_left_map_x_file.is_open());
+  CHECK(gt_left_map_y_file.is_open());
+
+  std::unique_ptr<float[]> gt_map_x(new float[img_n_elems]);
+  std::unique_ptr<float[]> gt_map_y(new float[img_n_elems]);
+
+  gt_left_map_x_file.read(
+        reinterpret_cast<char*>(gt_map_x.get()), img_n_elems*sizeof(float));
+  gt_left_map_y_file.read(
+        reinterpret_cast<char*>(gt_map_y.get()), img_n_elems*sizeof(float));
+
+  // Compare computed map with ground-truth map
+  for (uint32_t y = 0; y < img_height; ++y)
+  {
+    for (uint32_t x = 0; x < img_width; ++x)
+    {
+      EXPECT_NEAR(
+            gt_map_x.get()[y*img_width+x], left_map(x, y)[0], c_map_tolearance);
+      EXPECT_NEAR(
+            gt_map_y.get()[y*img_width+x], left_map(x, y)[1], c_map_tolearance);
+    }
+  }
 }
 
 ZE_UNITTEST_ENTRYPOINT
