@@ -14,20 +14,22 @@ class StereoRectifier
 {
 public:
   StereoRectifier(Size2u img_size,
-      Eigen::Vector4f& camera_params, Eigen::Vector4f &orig_camera_params,
-      Eigen::Vector4f& dist_coeffs,
-      Eigen::Matrix3f& inv_H);
+                  Eigen::Vector4f& camera_params,
+                  Eigen::Vector4f &orig_camera_params,
+                  Eigen::Vector4f& dist_coeffs);
 
   ~StereoRectifier() = default;
 
   void rectify(ImageGpu<Pixel>& dst,
-      const ImageGpu<Pixel>& src) const;
+               const ImageGpu<Pixel>& src) const;
 
   const ImageGpu32fC2& getUndistortRectifyMap() const;
+  const Eigen::Matrix3f& getInvH() const;
 
 private:
   ImageGpu32fC2 undistort_rectify_map_;
   Fragmentation<16, 16> fragm_;
+  Eigen::Matrix3f inv_H_;
 };
 
 using EquidistStereoRectifier32fC1 = cu::StereoRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;

@@ -1,6 +1,15 @@
 #include <opencv2/opencv.hpp>
+#include <Eigen/Eigen>
+#include <ze/common/transformation.h>
+#include <ze/common/types.h>
 
 using namespace cv;
+
+void rectifyHorizontalStereo(const ze::Transformation& T_L_R)
+{
+  Eigen::AngleAxis<ze::FloatType> avg_rotation(T_L_R.getEigenQuaternion());
+  avg_rotation = avg_rotation * -0.5;
+}
 
 int main (int argc, char** argv)
 {

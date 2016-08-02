@@ -44,16 +44,11 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
   const size_t img_height = cv_left_img->height();
   const size_t img_n_elems = img_width * img_height;
 
-
-  // Allocate GPU memory
-  cu::ImageGpu32fC1 gpu_left_src(*cv_left_img);
-  cu::ImageGpu32fC1 gpu_left_dst(cv_left_img->size());
-
   Eigen::Matrix3f left_H_inv = left_H.inverse();
 
   // Allocate rectifier
   cu::RadTanStereoRectifier32fC1 left_rectifier(
-        gpu_left_src.size(), left_intrinsics, original_left_intrinsics,
+        cv_left_img->size(), left_intrinsics, original_left_intrinsics,
         left_distortion, left_H_inv);
 
   ImageCv32fC2 left_map(left_rectifier.getUndistortRectifyMap());

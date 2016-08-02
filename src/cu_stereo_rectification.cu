@@ -45,8 +45,7 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
     Size2u img_size,
     Eigen::Vector4f& camera_params,
     Eigen::Vector4f &orig_camera_params,
-    Eigen::Vector4f& dist_coeffs,
-    Eigen::Matrix3f& inv_H)
+    Eigen::Vector4f& dist_coeffs)
   : undistort_rectify_map_(img_size),
     fragm_(img_size)
 {
@@ -57,7 +56,7 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
         reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()),
         4, true);
   ze::LinearMemory32fC1 h_inv_H(
-        reinterpret_cast<Pixel32fC1*>(inv_H.data()),
+        reinterpret_cast<Pixel32fC1*>(inv_H_.data()),
         9, true);
 
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
@@ -113,6 +112,14 @@ template <typename CameraModel,
 const ImageGpu32fC2& StereoRectifier<CameraModel, DistortionModel, Pixel>::getUndistortRectifyMap() const
 {
   return undistort_rectify_map_;
+}
+
+template <typename CameraModel,
+          typename DistortionModel,
+          typename Pixel>
+const Eigen::Matrix3f& StereoRectifier<CameraModel, DistortionModel, Pixel>::getInvH() const
+{
+  return inv_H_;
 }
 
 // Explicit template instantiations
