@@ -10,7 +10,7 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
-find_package(OpenCV REQUIRED core highgui imgproc)
+find_package(OpenCV REQUIRED core highgui imgproc calib3d)
 list(APPEND catkin_LIBRARIES ${OpenCV_LIBS})
 
 set(HEADERS
