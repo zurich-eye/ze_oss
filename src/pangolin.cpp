@@ -66,7 +66,7 @@ std::shared_ptr<pangolin::DataLog>& PangolinPlotter::getLoggerOrCreate(
     const std::string& identifier)
 {
   // As the visualization runs in a separate thread, the gl context is not accessible
-  // form within this function. We request the thread to add a new plotter and
+  // from within this function. We request the thread to add a new plotter and
   // wait for it to be ready.
   if (data_logs_.find(identifier) == data_logs_.end())
   {

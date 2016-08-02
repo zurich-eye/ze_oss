@@ -118,7 +118,10 @@ public:
   }
 
 private:
+  //! The value wrapped by the object.
   T value_;
+  //! The identifier / variable name wrapped in the object and also used for
+  //! identification of the plot wrt. to pangolin.
   const std::string member_name_;
 
   //! A callback triggered when the primitive changes.
