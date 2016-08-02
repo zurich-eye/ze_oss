@@ -152,14 +152,19 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
       bag_view_->getConnections();
   if (topics.size() != connection_infos.size())
   {
-    LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
-    for (const rosbag::ConnectionInfo* info : connection_infos)
-    {
-      LOG(ERROR) << "*) " << info->topic;
-    }
-    LOG(FATAL) << "Not all requested topics founds in bagfile. "
-               << "Is topic_cam0, topic_imu0, etc. set correctly? "
-               << "Maybe removing/adding a slash as prefix solves the problem.";
+     LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
+     for (const rosbag::ConnectionInfo* info : connection_infos)
+     {
+       LOG(ERROR) << "*) " << info->topic;
+     }
+     LOG(ERROR) << "Requested " << topics.size() << " topics:";
+     for (const std::string topic : topics)
+     {
+       LOG(ERROR) << "*) " << topic;
+     }
+     LOG(FATAL) << "Not all requested topics founds in bagfile. "
+                << "Is topic_cam0, topic_imu0, etc. set correctly? "
+                << "Maybe removing/adding a slash as prefix solves the problem.";
   }
 }
 
