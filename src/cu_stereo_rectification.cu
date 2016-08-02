@@ -2,6 +2,7 @@
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_imgproc/cu_remap.cuh>
 #include <imp/cu_imgproc/cu_stereo_rectification.cuh>
+#include <opencv2/calib3d/calib3d.hpp>  //! @todo (MPI) get rid of OpenCV dependency
 
 namespace ze {
 namespace cu {
@@ -44,29 +45,29 @@ template <typename CameraModel,
 StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
     Size2u img_size,
     Eigen::Vector4f& camera_params,
-    Eigen::Vector4f &orig_camera_params,
-    Eigen::Vector4f& dist_coeffs)
-  : undistort_rectify_map_(img_size),
-    fragm_(img_size)
+    Eigen::Vector4f& transformed_camera_params,
+    Eigen::Vector4f& dist_coeffs,
+    Eigen::Matrix3f& inv_H)
+  : undistort_rectify_map_(img_size)
+  , fragm_(img_size)
 {
+  // Upload to GPU
   ze::LinearMemory32fC1 h_cam_params(
         reinterpret_cast<Pixel32fC1*>(camera_params.data()),
+        4, true);
+  ze::LinearMemory32fC1 h_transformed_cam_params(
+        reinterpret_cast<Pixel32fC1*>(transformed_camera_params.data()),
         4, true);
   ze::LinearMemory32fC1 h_dist_coeffs(
         reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()),
         4, true);
   ze::LinearMemory32fC1 h_inv_H(
-        reinterpret_cast<Pixel32fC1*>(inv_H_.data()),
+        reinterpret_cast<Pixel32fC1*>(inv_H.data()),
         9, true);
-
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
+  cu::LinearMemory32fC1 d_transformed_cam_params(h_transformed_cam_params);
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
   cu::LinearMemory32fC1 d_inv_H(h_inv_H);
-
-  ze::LinearMemory32fC1 h_orig_cam_params(
-        reinterpret_cast<Pixel32fC1*>(orig_camera_params.data()),
-        4, true);
-  cu::LinearMemory32fC1 d_orig_cam_params(h_orig_cam_params);
 
   k_computeUndistortRectifyMap<CameraModel, DistortionModel>
       <<<
@@ -76,7 +77,7 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
            undistort_rectify_map_.width(),
            undistort_rectify_map_.height(),
            d_cam_params.cuData(),
-           d_orig_cam_params.cuData(),
+           d_transformed_cam_params.cuData(),
            d_dist_coeffs.cuData(),
            d_inv_H.cuData());
 }
@@ -84,7 +85,8 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
 template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
-void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(ImageGpu<Pixel>& dst,
+void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(
+    ImageGpu<Pixel>& dst,
     const ImageGpu<Pixel>& src) const
 {
   CHECK_EQ(src.size(), dst.size());
@@ -93,6 +95,7 @@ void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(ImageGpu<Pixe
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
+
   k_remap
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -114,17 +117,85 @@ const ImageGpu32fC2& StereoRectifier<CameraModel, DistortionModel, Pixel>::getUn
   return undistort_rectify_map_;
 }
 
-template <typename CameraModel,
-          typename DistortionModel,
-          typename Pixel>
-const Eigen::Matrix3f& StereoRectifier<CameraModel, DistortionModel, Pixel>::getInvH() const
-{
-  return inv_H_;
-}
-
 // Explicit template instantiations
 template class StereoRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
 template class StereoRectifier<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
+
+template <typename CameraModel,
+          typename DistortionModel,
+          typename Pixel>
+HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalStereoPairRectifier(
+    Size2u img_size,
+    Eigen::Vector4f& left_camera_params,
+    Eigen::Vector4f& left_dist_coeffs,
+    Eigen::Vector4f& right_camera_params,
+    Eigen::Vector4f& right_dist_coeffs,
+    Eigen::Matrix3f& R_l_r,
+    Eigen::Vector3f& t_l_r)
+{
+  //! Currently the rectifying homography H and the
+  //! transformed camera parameters are computed using
+  //! cv::stereoRectify
+  //! @todo (MPI) get rid of OpenCV dependency
+  cv::Mat_<double> cv_left_cam_params(3, 3);
+  cv_left_cam_params << left_camera_params(0),
+      left_camera_params(1), left_camera_params(2), left_camera_params(3);
+
+  cv::Mat_<double> cv_left_dist_coeffs(1, 4);
+  cv_left_dist_coeffs << left_dist_coeffs(0),
+      left_dist_coeffs(1), left_dist_coeffs(2), left_dist_coeffs(3);
+
+  cv::Mat_<double> cv_right_cam_params(3, 3);
+  cv_right_cam_params << right_camera_params(0),
+      right_camera_params(1), right_camera_params(2), right_camera_params(3);
+
+  cv::Mat_<double> cv_right_dist_coeffs(1, 4);
+  cv_right_dist_coeffs << right_dist_coeffs(0),
+      right_dist_coeffs(1), right_dist_coeffs(2), right_dist_coeffs(3);
+
+  cv::Mat_<double> cv_R_l_r;
+  cv_R_l_r << R_l_r(0, 0), R_l_r(0, 1), R_l_r(0, 2),
+      R_l_r(1, 0), R_l_r(1, 1), R_l_r(1, 2),
+      R_l_r(2, 0), R_l_r(2, 1), R_l_r(2, 2);
+
+  cv::Mat_<double> cv_t_l_r;
+  cv_t_l_r << t_l_r(0), t_l_r(1), t_l_r(2);
+
+  // Allocate OpenCV results
+  cv::Mat left_H;
+  cv::Mat right_H;
+  cv::Mat left_P;
+  cv::Mat right_P;
+  cv::Mat disp_to_depth_Q;
+
+  cv::stereoRectify(cv_left_cam_params, cv_left_dist_coeffs,
+                    cv_right_cam_params, cv_right_dist_coeffs,
+                    cv::Size(img_size.width(), img_size.height()),
+                    cv_R_l_r, cv_t_l_r,
+                    left_H, right_H,
+                    left_P, right_P,
+                    disp_to_depth_Q,
+                    cv::CALIB_ZERO_DISPARITY, 0,
+                    cv::Size(img_size.width(), img_size.height()));
+
+}
+
+template <typename CameraModel,
+          typename DistortionModel,
+          typename Pixel>
+void HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::rectify(
+    ImageGpu<Pixel>& left_dst,
+    ImageGpu<Pixel>& right_dst,
+    const ImageGpu<Pixel>& left_src,
+    const ImageGpu<Pixel>& right_src) const
+{
+  left_rectifier_->rectify(left_dst, left_src);
+  right_rectifier_->rectify(right_dst, right_src);
+}
+
+// Explicit template instantiations
+template class HorizontalStereoPairRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
+template class HorizontalStereoPairRectifier<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
 } // cu namespace
 } // ze namespace
