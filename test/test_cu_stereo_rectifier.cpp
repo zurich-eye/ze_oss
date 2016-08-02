@@ -1,5 +1,5 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
-#include <imp/cu_imgproc/cu_stereo_rectification.cuh>
+#include <imp/cu_imgproc/horizontal_stereo_pair_rectifier.hpp>
 
 #include <ze/cameras/camera_rig.h>
 #include <ze/common/benchmark.h>
@@ -87,6 +87,59 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
             gt_map_y.get()[y*img_width+x], left_map(x, y)[1], c_map_tolearance);
     }
   }
+}
+
+TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
+{
+  constexpr float c_map_tolearance{0.001};
+  const std::string test_folder =
+      ze::joinPath(ze::getTestDataDir("imp_cu_imgproc"), "stereo_rectifier");
+  const std::string calib_file =
+      ze::joinPath(test_folder, "stereo_parameters.yaml");
+
+  ze::CameraRig::Ptr rig = ze::cameraRigFromYaml(calib_file);
+  VLOG(2) << "loaded camera rig from yaml file " << calib_file;
+
+  Eigen::Vector4f left_intrinsics =
+      rig->at(0).projectionParameters().cast<float>();
+  Eigen::Vector4f left_distortion =
+      rig->at(0).distortionParameters().cast<float>();
+
+  const std::string left_img_path = ze::joinPath(test_folder, "left01.png");
+  ImageCv32fC1::Ptr cv_left_img;
+  cvBridgeLoad(cv_left_img, left_img_path, PixelOrder::gray);
+  VLOG(2) << "loaded image " << left_img_path
+          << ", size " << cv_left_img->size();
+
+  Eigen::Vector4f right_intrinsics =
+      rig->at(1).projectionParameters().cast<float>();
+  Eigen::Vector4f right_distortion =
+      rig->at(1).distortionParameters().cast<float>();
+
+  const std::string right_img_path = ze::joinPath(test_folder, "right01.png");
+  ImageCv32fC1::Ptr cv_right_img;
+  cvBridgeLoad(cv_right_img, right_img_path, PixelOrder::gray);
+  VLOG(2) << "loaded image " << right_img_path
+          << ", size " << cv_right_img->size();
+
+  const size_t img_width = cv_left_img->width();
+  const size_t img_height = cv_left_img->height();
+  const size_t img_n_elems = img_width * img_height;
+
+  ze::Transformation T_C0_B = rig->T_C_B(0);
+  ze::Transformation T_C1_B = rig->T_C_B(1);
+  ze::Transformation T_C0_C1 = T_C0_B * T_C1_B.inverse();
+  // Allocate rectifier
+  ze::Position t = T_C0_C1.getPosition();
+  Eigen::Vector3f t_l_r(t(0), t(1), t(2));
+  cu::HorizontalStereoPairRectifierEquidist32fC1 rectifier(
+        cv_left_img->size(),
+        left_intrinsics,
+        left_distortion,
+        right_intrinsics,
+        right_distortion,
+        T_C0_C1.getRotationMatrix(),
+        t_l_r);
 }
 
 ZE_UNITTEST_ENTRYPOINT

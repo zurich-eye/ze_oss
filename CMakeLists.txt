@@ -13,13 +13,15 @@ include(ze_macros_cuda)
 find_cuda()
 
 # TODO (MPI) to be removed after debugging
-find_package(OpenCV REQUIRED) ############
+# find_package(OpenCV REQUIRED) ############
 ##########################################
 
 set(HEADERS
+  include/imp/cu_imgproc/horizontal_stereo_pair_rectifier.hpp
   )
 
 set(SOURCES
+  src/horizontal_stereo_pair_rectifier.cpp
   )
 
 set(CU_HDRS
@@ -53,10 +55,12 @@ set(CU_SRCS
 
 #cuda_compile(CU_OBJ ${CU_SRCS} ${CU_HDRS})
 
+cs_add_library(rectification_wrapper ${SOURCES} ${HEADERS})
+
 cs_cuda_add_library(${PROJECT_NAME}
-   ${CU_SRCS} ${CU_HDRS} ${SOURCES} ${HEADERS}
+   ${CU_SRCS} ${CU_HDRS}
    )
-#target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} rectification_wrapper)
 
 ##########
 # GTESTS #

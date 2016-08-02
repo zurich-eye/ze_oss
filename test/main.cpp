@@ -5,15 +5,8 @@
 
 using namespace cv;
 
-void rectifyHorizontalStereo(const ze::Transformation& T_L_R)
-{
-  Eigen::AngleAxis<ze::FloatType> avg_rotation(T_L_R.getEigenQuaternion());
-  avg_rotation = avg_rotation * -0.5;
-}
-
 int main (int argc, char** argv)
 {
-
   Mat left_img = imread("/opt/matlab/toolbox/vision/visiondata/calibration/stereo/left/left01.png", CV_LOAD_IMAGE_GRAYSCALE);
   Mat right_img = imread("/opt/matlab/toolbox/vision/visiondata/calibration/stereo/right/right01.png", CV_LOAD_IMAGE_GRAYSCALE);
 
