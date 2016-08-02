@@ -15,7 +15,7 @@ void CSVTrajectory::readHeader(const std::string& in_file_path)
   {
     std::string line;
     getline(in_str_, line);
-    CHECK_EQ(line, header_);
+    CHECK_EQ(line.substr(0, header_.size()), header_);
   }
 }
 
@@ -57,7 +57,7 @@ PositionSeries::PositionSeries()
   order_["ty"] = 2;
   order_["tz"] = 3;
 
-  header_ = "# timestamp, tx, ty, tz";
+  header_ = "# timestamp, x, y, z";
   num_tokens_in_line_ = 4u;
 }
 
