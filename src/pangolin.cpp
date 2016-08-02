@@ -70,6 +70,8 @@ std::shared_ptr<pangolin::DataLog>& PangolinPlotter::getLoggerOrCreate(
   // wait for it to be ready.
   if (data_logs_.find(identifier) == data_logs_.end())
   {
+    std::lock_guard<std::mutex> lock(add_logger_mutex_);
+
     add_logger_ = true;
     new_logger_identifier_ = identifier;
 
@@ -78,7 +80,7 @@ std::shared_ptr<pangolin::DataLog>& PangolinPlotter::getLoggerOrCreate(
       std::this_thread::sleep_for(std::chrono::milliseconds(thread_sleep_ms_));
     }
     CHECK(data_logs_.find(identifier) != data_logs_.end())
-        << "A pangolin plotter that was requested to be added and confirmed"
+        << "A pangolin plotter (" << identifier << ") that was requested to be added and confirmed"
            "does actually not exist.";
   }
 

@@ -76,6 +76,7 @@ private:
   //! a new logger/plotter should be created.
   std::string new_logger_identifier_;
   bool add_logger_ = false;
+  std::mutex add_logger_mutex_;
 
   //! Maps from identifiers to plotters and data-logs.
   std::map<std::string, std::shared_ptr<pangolin::Plotter>> plotters_;
