@@ -3,7 +3,8 @@
 namespace ze {
 
 //! Ensure the global static pointer exists.
-PangolinPlotter* PangolinPlotter::instance_ = nullptr;
+std::atomic<PangolinPlotter*> PangolinPlotter::instance_;
+std::mutex PangolinPlotter::instance_mutex_;
 
 PangolinPlotter::PangolinPlotter(const std::string& window_title,
                                  int width,
