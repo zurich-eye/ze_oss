@@ -195,7 +195,4 @@ TEST(ThreadsafeQueueTest, testMultithreadedDynamicSizeWaiting)
   queue.shutdown();
 }
 
-
-
-
 ZE_UNITTEST_ENTRYPOINT
