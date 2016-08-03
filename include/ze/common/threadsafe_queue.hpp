@@ -93,7 +93,7 @@ public:
   {
     lock_t lock(mutex_);
     queue_.push(value);
-    condition_empty_.notify_one();
+    condition_empty_.notify_all();
   }
 
   //! Return the size of the queue.
@@ -122,7 +122,7 @@ public:
                          [&]() { return queue_.size() < max_queue_size || shutdown_; });
     if (queue_.size() >= max_queue_size)
     {
-      CHECK(shutdown_);
+      DEBUG_CHECK(shutdown_);
       return false;
     }
 
@@ -159,8 +159,7 @@ public:
 
     if (queue_.empty())
     {
-
-      CHECK(shutdown_);
+      DEBUG_CHECK(shutdown_);
       return std::make_pair(DataType(), false);
     }
     DataType data = queue_.front();
