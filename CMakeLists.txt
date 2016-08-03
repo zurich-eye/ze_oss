@@ -57,6 +57,7 @@ set(HEADERS
   include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
   include/ze/common/thread_pool.hpp
+  include/ze/common/threadsafe_queue.hpp
   include/ze/common/time_conversions.h
   include/ze/common/timer.h
   include/ze/common/timer_collection.h
