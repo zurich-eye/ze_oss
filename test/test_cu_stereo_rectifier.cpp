@@ -6,9 +6,52 @@
 #include <ze/common/test_entrypoint.h>
 #include <ze/common/test_utils.h>
 
+namespace ze {
+
+void testRectificationMapAgainstFile(
+    const ImageCv32fC2& map,
+    const std::string& map_x_file_path,
+    const std::string& map_y_file_path,
+    float tolerance)
+{
+  CHECK(fileExists(map_x_file_path));
+  CHECK(fileExists(map_y_file_path));
+
+  std::ifstream map_x_file(map_x_file_path, std::ofstream::binary);
+  std::ifstream map_y_file(map_y_file_path, std::ofstream::binary);
+  CHECK(map_x_file.is_open());
+  CHECK(map_y_file.is_open());
+
+  const size_t map_width = map.width();
+  const size_t map_height = map.height();
+  const size_t map_n_elems = map_width * map_height;
+
+  std::unique_ptr<float[]> gt_map_x(new float[map_n_elems]);
+  std::unique_ptr<float[]> gt_map_y(new float[map_n_elems]);
+
+  map_x_file.read(
+        reinterpret_cast<char*>(gt_map_x.get()), map_n_elems*sizeof(float));
+  map_y_file.read(
+        reinterpret_cast<char*>(gt_map_y.get()), map_n_elems*sizeof(float));
+
+  // Compare computed map with ground-truth map
+  for (uint32_t y = 0; y < map_height; ++y)
+  {
+    for (uint32_t x = 0; x < map_width; ++x)
+    {
+      EXPECT_NEAR(
+            gt_map_x.get()[y*map_width+x], map(x, y)[0], tolerance);
+      EXPECT_NEAR(
+            gt_map_y.get()[y*map_width+x], map(x, y)[1], tolerance);
+    }
+  }
+}
+
+} // ze namespace
+
 using namespace ze;
 
-TEST(impCuStereoRectifierTexture, equidist32fC1)
+TEST(impCuStereoRectifierTexture, radTan32fC1)
 {
   constexpr float c_map_tolearance{0.001};
   const std::string test_folder =
@@ -39,10 +82,6 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
   VLOG(2) << "loaded image " << left_img_path
           << ", size " << cv_left_img->size();
 
-  const size_t img_width = cv_left_img->width();
-  const size_t img_height = cv_left_img->height();
-  const size_t img_n_elems = img_width * img_height;
-
   Eigen::Matrix3f left_H_inv = left_H.inverse();
 
   // Allocate rectifier
@@ -53,42 +92,18 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
   ImageCv32fC2 left_map(left_rectifier.getUndistortRectifyMap());
   CHECK_EQ(cv_left_img->size(), left_map.size());
 
-  // Read ground-truth maps
+  // Test against ground-truth maps
   const std::string gt_left_map_x_path =
-      joinPath(test_folder, "map_x_left01.bin");
+      joinPath(test_folder, "map_x_left.bin");
   const std::string gt_left_map_y_path =
-      joinPath(test_folder, "map_y_left01.bin");
-
-  CHECK(fileExists(gt_left_map_x_path));
-  CHECK(fileExists(gt_left_map_y_path));
-
-  std::ifstream gt_left_map_x_file(gt_left_map_x_path, std::ofstream::binary);
-  std::ifstream gt_left_map_y_file(gt_left_map_y_path, std::ofstream::binary);
-  CHECK(gt_left_map_x_file.is_open());
-  CHECK(gt_left_map_y_file.is_open());
-
-  std::unique_ptr<float[]> gt_map_x(new float[img_n_elems]);
-  std::unique_ptr<float[]> gt_map_y(new float[img_n_elems]);
-
-  gt_left_map_x_file.read(
-        reinterpret_cast<char*>(gt_map_x.get()), img_n_elems*sizeof(float));
-  gt_left_map_y_file.read(
-        reinterpret_cast<char*>(gt_map_y.get()), img_n_elems*sizeof(float));
-
-  // Compare computed map with ground-truth map
-  for (uint32_t y = 0; y < img_height; ++y)
-  {
-    for (uint32_t x = 0; x < img_width; ++x)
-    {
-      EXPECT_NEAR(
-            gt_map_x.get()[y*img_width+x], left_map(x, y)[0], c_map_tolearance);
-      EXPECT_NEAR(
-            gt_map_y.get()[y*img_width+x], left_map(x, y)[1], c_map_tolearance);
-    }
-  }
+      joinPath(test_folder, "map_y_left.bin");
+  testRectificationMapAgainstFile(left_map,
+                                  gt_left_map_x_path,
+                                  gt_left_map_y_path,
+                                  c_map_tolearance);
 }
 
-TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
+TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
 {
   constexpr float c_map_tolearance{0.001};
   const std::string test_folder =
@@ -99,7 +114,7 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
   ze::CameraRig::Ptr rig = ze::cameraRigFromYaml(calib_file);
   VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
-  Eigen::Vector4f left_intrinsics =
+  Eigen::Vector4f left_cam_params =
       rig->at(0).projectionParameters().cast<float>();
   Eigen::Vector4f left_distortion =
       rig->at(0).distortionParameters().cast<float>();
@@ -110,7 +125,7 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
   VLOG(2) << "loaded image " << left_img_path
           << ", size " << cv_left_img->size();
 
-  Eigen::Vector4f right_intrinsics =
+  Eigen::Vector4f right_cam_params =
       rig->at(1).projectionParameters().cast<float>();
   Eigen::Vector4f right_distortion =
       rig->at(1).distortionParameters().cast<float>();
@@ -121,24 +136,27 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
   VLOG(2) << "loaded image " << right_img_path
           << ", size " << cv_right_img->size();
 
-  const size_t img_width = cv_left_img->width();
-  const size_t img_height = cv_left_img->height();
-  const size_t img_n_elems = img_width * img_height;
-
   ze::Transformation T_C0_B = rig->T_C_B(0);
   ze::Transformation T_C1_B = rig->T_C_B(1);
   ze::Transformation T_C0_C1 = T_C0_B * T_C1_B.inverse();
   Eigen::Matrix3f R_l_r = T_C0_C1.getRotationMatrix().cast<float>();
   Eigen::Vector3f t_l_r = T_C0_C1.getPosition().cast<float>();
+
   // Allocate rectifier
+  Eigen::Vector4f transformed_left_cam_params;
+  Eigen::Vector4f transformed_right_cam_params;
+  float horizontal_offset;
   cu::HorizontalStereoPairRectifierRadTan32fC1 rectifier(
         cv_left_img->size(),
-        left_intrinsics,
+        left_cam_params,
+        transformed_left_cam_params,
         left_distortion,
-        right_intrinsics,
+        right_cam_params,
+        transformed_right_cam_params,
         right_distortion,
         R_l_r,
-        t_l_r);
+        t_l_r,
+        horizontal_offset);
 
   // Download maps from GPU
   ImageCv32fC2 left_map(rectifier.getLeftCameraUndistortRectifyMap());
@@ -146,39 +164,24 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
   ImageCv32fC2 right_map(rectifier.getRightCameraUndistortRectifyMap());
   CHECK_EQ(cv_right_img->size(), right_map.size());
 
-  // Read ground-truth maps
+  // Test against ground-truth maps
   const std::string gt_left_map_x_path =
-      joinPath(test_folder, "map_x_left01.bin");
+      joinPath(test_folder, "map_x_left.bin");
   const std::string gt_left_map_y_path =
-      joinPath(test_folder, "map_y_left01.bin");
+      joinPath(test_folder, "map_y_left.bin");
+  const std::string gt_right_map_x_path =
+      joinPath(test_folder, "map_x_right.bin");
+  const std::string gt_right_map_y_path =
+      joinPath(test_folder, "map_y_right.bin");
 
-  CHECK(fileExists(gt_left_map_x_path));
-  CHECK(fileExists(gt_left_map_y_path));
-
-  std::ifstream gt_left_map_x_file(gt_left_map_x_path, std::ofstream::binary);
-  std::ifstream gt_left_map_y_file(gt_left_map_y_path, std::ofstream::binary);
-  CHECK(gt_left_map_x_file.is_open());
-  CHECK(gt_left_map_y_file.is_open());
-
-  std::unique_ptr<float[]> gt_left_map_x(new float[img_n_elems]);
-  std::unique_ptr<float[]> gt_left_map_y(new float[img_n_elems]);
-
-  gt_left_map_x_file.read(
-        reinterpret_cast<char*>(gt_left_map_x.get()), img_n_elems*sizeof(float));
-  gt_left_map_y_file.read(
-        reinterpret_cast<char*>(gt_left_map_y.get()), img_n_elems*sizeof(float));
-
-  // Compare computed map with ground-truth map
-  for (uint32_t y = 0; y < img_height; ++y)
-  {
-    for (uint32_t x = 0; x < img_width; ++x)
-    {
-      EXPECT_NEAR(
-            gt_left_map_x.get()[y*img_width+x], left_map(x, y)[0], c_map_tolearance);
-      EXPECT_NEAR(
-            gt_left_map_y.get()[y*img_width+x], left_map(x, y)[1], c_map_tolearance);
-    }
-  }
+  testRectificationMapAgainstFile(left_map,
+                                  gt_left_map_x_path,
+                                  gt_left_map_y_path,
+                                  c_map_tolearance);
+  testRectificationMapAgainstFile(right_map,
+                                  gt_right_map_x_path,
+                                  gt_right_map_y_path,
+                                  c_map_tolearance);
 }
 
 ZE_UNITTEST_ENTRYPOINT
