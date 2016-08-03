@@ -8,6 +8,8 @@
 namespace ze {
 namespace cu {
 
+//! @todo (MPI) test constant memory fo camera/dist parameters
+//! maybe also for the rectifying homography
 template<typename CameraModel,
          typename DistortionModel>
 __global__
@@ -70,6 +72,7 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
   cu::LinearMemory32fC1 d_inv_H(h_inv_H);
 
+  // Compute map
   k_computeUndistortRectifyMap<CameraModel, DistortionModel>
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -93,10 +96,12 @@ void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(
   CHECK_EQ(src.size(), dst.size());
   CHECK_EQ(src.size(), undistort_rectify_map_.size());
 
+  // Attach texture
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
 
+  // Execute remapping
   k_remap
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -128,11 +133,14 @@ template <typename CameraModel,
 HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalStereoPairRectifier(
     Size2u img_size,
     Eigen::Vector4f& left_camera_params,
+    Eigen::Vector4f& transformed_left_cam_params,
     Eigen::Vector4f& left_dist_coeffs,
     Eigen::Vector4f& right_camera_params,
+    Eigen::Vector4f& transformed_right_cam_params,
     Eigen::Vector4f& right_dist_coeffs,
     Eigen::Matrix3f& R_l_r,
-    Eigen::Vector3f& t_l_r)
+    Eigen::Vector3f& t_l_r,
+    float& horizontal_offset)
 {
   //! Currently the rectifying homography H and the
   //! transformed camera parameters are computed using
@@ -181,15 +189,14 @@ HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalSt
                     cv::CALIB_ZERO_DISPARITY, 0,
                     cv::Size(img_size.width(), img_size.height()));
 
+  // Copy results from the OpenCV data structures
   Eigen::Matrix3f left_H;
   Eigen::Matrix3f right_H;
-  Eigen::Vector4f transformed_left_cam_params;
-  Eigen::Vector4f transformed_right_cam_params;
 
   for (uint8_t n = 0; n < 9; ++n)
   {
-    uint8_t i = n/3;
-    uint8_t j = n%3;
+    const uint8_t i = n/3;
+    const uint8_t j = n%3;
     left_H(i, j) = cv_left_H.at<double>(i, j);
     right_H(i, j) = cv_right_H.at<double>(i, j);
   }
@@ -203,6 +210,10 @@ HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalSt
   transformed_right_cam_params(2) = cv_right_P.at<double>(0, 2);
   transformed_right_cam_params(3) = cv_right_P.at<double>(1, 2);
 
+  // Copy the horizontal offset (Tx) from OpeCV camera projection matrix P
+  horizontal_offset = cv_right_P.at<double>(0, 3) / cv_right_P.at<double>(0, 0);
+
+  // Allocate rectifiers for the left and right cameras
   Eigen::Matrix3f inv_left_H = left_H.inverse();
   Eigen::Matrix3f inv_right_H = right_H.inverse();
   left_rectifier_.reset(
