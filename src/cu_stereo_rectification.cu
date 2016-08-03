@@ -17,7 +17,7 @@ void k_computeUndistortRectifyMap(
     std::uint32_t width,
     std::uint32_t height,
     const float* d_cam_params,
-    const float* d_orig_cam_params,
+    const float* d_transformed_cam_params,
     const float* d_dist_coeffs,
     const float* d_inv_H)
 {
@@ -27,14 +27,14 @@ void k_computeUndistortRectifyMap(
   if (u < width && v < height)
   {
     float px[2]{static_cast<float>(u), static_cast<float>(v)};
-    CameraModel::backProject(d_cam_params, px);
+    CameraModel::backProject(d_transformed_cam_params, px);
     const float x = d_inv_H[0]*px[0]+d_inv_H[3]*px[1]+d_inv_H[6];
     const float y = d_inv_H[1]*px[0]+d_inv_H[4]*px[1]+d_inv_H[7];
     const float w = d_inv_H[2]*px[0]+d_inv_H[5]*px[1]+d_inv_H[8];
     px[0] = x / w;
     px[1] = y / w;
     DistortionModel::distort(d_dist_coeffs, px);
-    CameraModel::project(d_orig_cam_params, px);
+    CameraModel::project(d_cam_params, px);
     dst[v*dst_stride + u][0] = px[0];
     dst[v*dst_stride + u][1] = px[1];
   }
