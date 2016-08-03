@@ -7,12 +7,20 @@
 namespace ze {
 namespace cu {
 
+//! \brief A StereoRectifier can rectify images using the GPU
 template<typename CameraModel,
          typename DistortionModel,
          typename Pixel>
 class StereoRectifier
 {
 public:
+  //! \brief StereoRectifier
+  //! \param img_size The size of the images to rectify.
+  //! \param camera_params The camera parameters [fx, fy, cx, cy]^T.
+  //! \param transformed_camera_params The camera parameters
+  //! [fx, fy, cx, cy]^T in the rectified reference frame.
+  //! \param dist_coeffs Camera distortion coefficients.
+  //! \param inv_H Inverse of the rectifying homography.
   StereoRectifier(Size2u img_size,
                   Eigen::Vector4f& camera_params,
                   Eigen::Vector4f& transformed_camera_params,
@@ -21,40 +29,68 @@ public:
 
   ~StereoRectifier() = default;
 
+  //! \brief Rectify
+  //! \param dst Destination image to store rectification result in GPU memory.
+  //! \param src The image to rectify in GPU memory
   void rectify(ImageGpu<Pixel>& dst,
                const ImageGpu<Pixel>& src) const;
 
+  //! \brief Retrieves the computed undistortion-rectification map
   const ImageGpu32fC2& getUndistortRectifyMap() const;
 
 private:
-  ImageGpu32fC2 undistort_rectify_map_;
-  Fragmentation<16, 16> fragm_;
+  ImageGpu32fC2 undistort_rectify_map_;   //!< The (2-channels) undistortion-rectification map
+  Fragmentation<16, 16> fragm_;           //!< CUDA thread grid config
 };
 
 using EquidistStereoRectifier32fC1 = StereoRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
 using RadTanStereoRectifier32fC1 = StereoRectifier<PinholeGeometry, RadialTangentialDistortion, Pixel32fC1>;
 
+//! A HorizontalStereoPairRectifier is used to rectify images acquired by a fully calibrated
+//! camera pair in horizontal stereo setting. The left camera is used as reference.
 template<typename CameraModel,
          typename DistortionModel,
          typename Pixel>
 class HorizontalStereoPairRectifier
 {
 public:
+  //! \brief HorizontalStereoPairRectifier
+  //! \param img_size The size of the images to rectify.
+  //! \param left_camera_params The camera parameters [fx, fy, cx, cy]^T for the left camera
+  //! \param transformed_left_cam_params The output camera parameters [fx, fy, cx, cy]^T
+  //! for the left camera in the rectified reference frame.
+  //! \param left_dist_coeffs The distortion coefficients for the left camera
+  //! \param right_camera_params The camera parameters [fx, fy, cx, cy]^T for the right camera
+  //! \param transformed_right_cam_params The output camera parameters [fx, fy, cx, cy]^T
+  //! for the right camera in the rectified reference frame.
+  //! \param right_dist_coeffs The distortion coefficients for the right camera.
+  //! \param R_l_r Rotation from "Right" to "Left" reference system.
+  //! \param t_l_r translation from "Right" to "Left" reference system.
+  //! \param horizontal_offset Output horizontal offset in the rectified reference system.
   HorizontalStereoPairRectifier(Size2u img_size,
                                 Eigen::Vector4f& left_camera_params,
+                                Eigen::Vector4f& transformed_left_cam_params,
                                 Eigen::Vector4f& left_dist_coeffs,
                                 Eigen::Vector4f& right_camera_params,
+                                Eigen::Vector4f& transformed_right_cam_params,
                                 Eigen::Vector4f& right_dist_coeffs,
                                 Eigen::Matrix3f& R_l_r,
-                                Eigen::Vector3f& t_l_r);
+                                Eigen::Vector3f& t_l_r,
+                                float& horizontal_offset);
 
   ~HorizontalStereoPairRectifier() = default;
 
+  //! Rectify
+  //! \param left_dst Destination image to store the rectified left camera image in GPU memory.
+  //! \param right_dst Destination image to store the rectified right camera image in GPU memory.
+  //! \param left_src The left source image in GPU memory
+  //! \param right_src The right source image in GPU memory
   void rectify(ImageGpu<Pixel>& left_dst,
                ImageGpu<Pixel>& right_dst,
                const ImageGpu<Pixel>& left_src,
                const ImageGpu<Pixel>& right_src) const;
 
+  //! \brief Retrieves the computed undistortion-rectification maps
   const ImageGpu32fC2& getLeftCameraUndistortRectifyMap() const;
   const ImageGpu32fC2& getRightCameraUndistortRectifyMap() const;
 
