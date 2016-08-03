@@ -52,10 +52,13 @@ namespace ze {
  * @brief Class that implements a threadsafe FIFO queue.
  * @tparam QueueType Datatype that is safed in the queue.
  */
-template<typename QueueType>
+template<typename DataType>
 class ThreadSafeQueue
 {
 public:
+  using mutex_t = std::mutex;
+  using lock_t = std::unique_lock<mutex_t>;
+
   ThreadSafeQueue() = default;
 
   //! Notify all waiting threads. Only used in destructor and when shutting down.
@@ -86,9 +89,9 @@ public:
   }
 
   //! Push non-blocking to the queue.
-  void push(const QueueType& value)
+  void push(const DataType& value)
   {
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
     queue_.push(value);
     condition_empty_.notify_one();
   }
@@ -96,14 +99,14 @@ public:
   //! Return the size of the queue.
   size_t size() const
   {
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
     return queue_.size();
   }
 
   //! Return true if the queue is empty.
   bool empty() const
   {
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
     return queue_.empty();
   }
 
@@ -111,9 +114,9 @@ public:
   //! \param[in] value New entry in queue.
   //! \param[in] max_queue_size Maximum queue size.
   //! \return False if shutdown is requested.
-  bool pushBlockingIfFull(const QueueType& value, size_t max_queue_size)
+  bool pushBlockingIfFull(const DataType& value, size_t max_queue_size)
   {
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
 
     condition_full_.wait(lock,
                          [&]() { return queue_.size() < max_queue_size || shutdown_; });
@@ -132,11 +135,9 @@ public:
   //! \param[in] value New entry in queue.
   //! \param[in] max_queue_size Maximum queue size.
   //! \return True if oldest was dropped because queue was full.
-  bool pushNonBlockingDroppingIfFull(
-      const QueueType& value,
-      size_t max_queue_size)
+  bool pushNonBlockingDroppingIfFull(const DataType& value, size_t max_queue_size)
   {
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
     bool result = false;
     if (queue_.size() >= max_queue_size)
     {
@@ -149,78 +150,71 @@ public:
   }
 
   //! Get the oldest entry still in the queue. Blocking if queue is empty.
-  //! @param[out] value Oldest entry in queue.
   //! @return False if shutdown is requested.
-  bool popBlocking(QueueType* value)
+  std::pair<DataType, bool> popBlocking()
   {
-    CHECK_NOTNULL(value);
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
 
-    condition_empty_.wait(lock, [&](){ return !queue_.empty() || shutdown_; });
+    condition_empty_.wait(lock, [&](){ return !(queue_.empty() && !shutdown_); });
 
     if (queue_.empty())
     {
-      CHECK(shutdown_);
-      return false;
-    }
 
-    *value = queue_.front();
+      CHECK(shutdown_);
+      return std::make_pair(DataType(), false);
+    }
+    DataType data = queue_.front();
     queue_.pop();
-    condition_full_.notify_all();  // Notify that space is available.
-    return true;
+    condition_full_.notify_all(); // Notify that space is available.
+    return std::make_pair(data, true);
   }
 
   //! Get the oldest entry still in the queue. If queue is empty value is not altered.
-  //! @param[out] value Oldest entry in queue if queue was not empty.
   //! @return True if queue was not empty.
-  bool popNonBlocking(QueueType* value)
+  std::pair<DataType, bool> popNonBlocking()
   {
-    CHECK_NOTNULL(value);
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
     if (queue_.empty())
     {
-      return false;
+      return std::make_pair(DataType(), false);
     }
-    *value = queue_.front();
+    DataType data = queue_.front();
     queue_.pop();
-    condition_full_.notify_all();  // Notify that space is available.
-    return true;
+    condition_full_.notify_all(); // Notify that space is available.
+    return std::make_pair(data, true);
   }
 
   //! @brief Get the oldest entry still in the queue. If the queue is empty wait for a given
   //!        amount of time. If during this time an entry was pushed alter the value. If the
   //!        queue is still empty, the value is not altered and it will return false
-  //! @param[out] value Oldest entry in queue if queue was not empty.
   //! @param  timeout_nanoseconds Maximum amount of time to wait for an entry if queue is empty.
   //! @return True if value was updated. False if queue was empty and no new entry was pushed
   //!         during the given timeout.
-  bool popTimeout(QueueType* value, int64_t timeout_nanoseconds)
+  std::pair<DataType, bool> popTimeout(int64_t timeout_nanoseconds)
   {
-    CHECK_NOTNULL(value);
-    std::lock_guard lock(mutex_);
+    lock_t lock(mutex_);
 
     auto wait_until = std::chrono::system_clock::now()
                       + std::chrono::nanoseconds(timeout_nanoseconds);
     condition_empty_.wait_until(lock,
                                 wait_until,
-                                [&](){ return !queue_.empty() || shutdown_; });
+                                [&](){ return !(queue_.empty() && !shutdown_); });
 
     if (queue_.empty())
     {
-      return false;
+      return std::make_pair(DataType(), false);
     }
-
-    *value = queue_.front();
+    DataType data = queue_.front();
     queue_.pop();
     condition_full_.notify_all(); // Notify that space is available.
-    return true;
+    return std::make_pair(data, true);
   }
 
 private:
-  mutable std::mutex mutex_;
+  mutable mutex_t mutex_;
   mutable std::condition_variable condition_empty_;  //!< Signal that queue is not empty.
   mutable std::condition_variable condition_full_;   //!< Signal when an element is popped.
-  std::queue<QueueType> queue_;
+  std::queue<DataType> queue_;
   std::atomic_bool shutdown_ { false };              //!< Flag if shutdown is requested.
 };
 

@@ -129,6 +129,9 @@ target_link_libraries(test_transformation ${PROJECT_NAME})
 catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
 target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
+catkin_add_gtest(test_threadsafe_queue test/test_threadsafe_queue.cpp)
+target_link_libraries(test_threadsafe_queue ${PROJECT_NAME})
+
 catkin_add_gtest(test_versioned_slot_handle test/test_versioned_slot_handle.cpp)
 target_link_libraries(test_versioned_slot_handle ${PROJECT_NAME})
 
