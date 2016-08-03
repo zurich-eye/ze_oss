@@ -56,8 +56,9 @@ set(HEADERS
   include/ze/common/test_entrypoint.h
   include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
+  include/ze/common/test_thread_blocking.hpp
   include/ze/common/thread_pool.hpp
-  include/ze/common/threadsafe_queue.hpp
+  include/ze/common/thread_safe_fifo.hpp
   include/ze/common/time_conversions.h
   include/ze/common/timer.h
   include/ze/common/timer_collection.h
@@ -75,6 +76,7 @@ set(SOURCES
   src/random.cpp
   src/signal_handler.cpp
   src/test_utils.cpp
+  src/test_thread_blocking.cpp
   src/thread_pool.cpp
   )
 
@@ -129,8 +131,8 @@ target_link_libraries(test_transformation ${PROJECT_NAME})
 catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
 target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
-catkin_add_gtest(test_threadsafe_queue test/test_threadsafe_queue.cpp)
-target_link_libraries(test_threadsafe_queue ${PROJECT_NAME})
+catkin_add_gtest(test_thread_safe_fifo test/test_thread_safe_fifo.cpp)
+target_link_libraries(test_thread_safe_fifo ${PROJECT_NAME})
 
 catkin_add_gtest(test_versioned_slot_handle test/test_versioned_slot_handle.cpp)
 target_link_libraries(test_versioned_slot_handle ${PROJECT_NAME})
