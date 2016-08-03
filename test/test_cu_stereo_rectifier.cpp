@@ -47,7 +47,7 @@ TEST(impCuStereoRectifierTexture, equidist32fC1)
 
   // Allocate rectifier
   cu::RadTanStereoRectifier32fC1 left_rectifier(
-        cv_left_img->size(), left_intrinsics, original_left_intrinsics,
+        cv_left_img->size(), original_left_intrinsics, left_intrinsics,
         left_distortion, left_H_inv);
 
   ImageCv32fC2 left_map(left_rectifier.getUndistortRectifyMap());
@@ -131,7 +131,7 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairEquidist32fC1)
   Eigen::Matrix3f R_l_r = T_C0_C1.getRotationMatrix().cast<float>();
   Eigen::Vector3f t_l_r = T_C0_C1.getPosition().cast<float>();
   // Allocate rectifier
-  cu::HorizontalStereoPairRectifierEquidist32fC1 rectifier(
+  cu::HorizontalStereoPairRectifierRadTan32fC1 rectifier(
         cv_left_img->size(),
         left_intrinsics,
         left_distortion,
