@@ -22,6 +22,7 @@ set(HEADERS
   include/ze/geometry/align_points.h
   include/ze/geometry/align_poses.h
   include/ze/geometry/clam.h
+  include/ze/geometry/epipolar_geometry.hpp
   include/ze/geometry/line.hpp
   include/ze/geometry/lsq_solver.h
   include/ze/geometry/lsq_solver-inl.h
@@ -75,6 +76,9 @@ target_link_libraries(test_robust_cost ${PROJECT_NAME})
 
 catkin_add_gtest(test_triangulation test/test_triangulation.cpp)
 target_link_libraries(test_triangulation ${PROJECT_NAME})
+
+cs_add_executable(debug_main test/debug_main.cpp)
+target_link_libraries(debug_main ${PROJECT_NAME})
 
 ##########
 # EXPORT #
