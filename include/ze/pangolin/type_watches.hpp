@@ -55,7 +55,7 @@ public:
 
   void change_callback(T value)
   {
-    ze::PangolinPlotter::instance()->log(member_name_, value);
+    ze::PangolinPlotter::instance().log(member_name_, value);
   }
 
   // Modifiers

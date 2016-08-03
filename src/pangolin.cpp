@@ -2,10 +2,6 @@
 
 namespace ze {
 
-//! Ensure the global static pointer exists.
-std::atomic<PangolinPlotter*> PangolinPlotter::instance_;
-std::mutex PangolinPlotter::instance_mutex_;
-
 PangolinPlotter::PangolinPlotter(const std::string& window_title,
                                  int width,
                                  int height)
@@ -21,6 +17,16 @@ PangolinPlotter::~PangolinPlotter()
 {
   requestStop();
   thread_->join();
+}
+
+PangolinPlotter& PangolinPlotter::instance(
+    const std::string& window_title,
+    int width,
+    int height)
+{
+  // Although this does not appear to be thread safe, it is as of cpp11.
+  static PangolinPlotter instance(window_title, width, height);
+  return instance;
 }
 
 void PangolinPlotter::loop()

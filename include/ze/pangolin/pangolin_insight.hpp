@@ -22,4 +22,4 @@ using PangolinInsightWatch = PrimitiveTypeWrapperImpl<Scalar>;
     ze::internal::PangolinInsightWatch<TYPE>(#MEMBER_NAME)
 
 #define PANGOLIN_WATCH_EXPR(VALUE, TYPE, NAME)                        \
-  ze::PangolinPlotter::instance()->log<TYPE>(#NAME, VALUE)
+  ze::PangolinPlotter::instance().log<TYPE>(#NAME, VALUE)

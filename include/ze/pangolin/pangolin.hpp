@@ -45,27 +45,11 @@ public:
   }
 
   //! Singleton accessor.
-  static PangolinPlotter* instance(
+  static PangolinPlotter& instance(
       const std::string& window_title = "",
       int width = 640,
-      int height = 480)
-  {
-    PangolinPlotter* tmp = instance_.load(std::memory_order_acquire);
-    if (tmp == nullptr)
-    {
-      std::lock_guard<std::mutex> lock(instance_mutex_);
-      tmp = instance_.load(std::memory_order_relaxed);
-      if (tmp == nullptr)
-      {
-        tmp = new PangolinPlotter(
-                      window_title,
-                      width,
-                      height);
-        instance_.store(tmp, std::memory_order_release);
-      }
-    }
-    return instance_;
-  }
+      int height = 480);
+
 private:
   //! The window title, also used as window context.
   const std::string window_title_;
@@ -89,10 +73,6 @@ private:
   void requestStop();
   bool isStopRequested();
   const uint thread_sleep_ms_ = 40;
-
-  //! The singleton instance of a pangolin plotter.
-  static std::atomic<PangolinPlotter*> instance_;
-  static std::mutex instance_mutex_;
 
   //! Creates a new pangolin window
   PangolinPlotter(const std::string& window_title = "",
