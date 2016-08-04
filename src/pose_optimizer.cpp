@@ -79,7 +79,7 @@ FloatType PoseOptimizer::evaluateError(
   for (auto& residual_block : data_)
   {
     VLOG(400) << "Process residual block " << residual_block.camera_idx;
-    if (residual_block.kp_idx.size() == 0)
+    if (residual_block.kp_idx.size() == 0 && residual_block.lines_W.empty())
     {
       VLOG(40) << "Residual block has no measurements.";
       continue;
@@ -92,6 +92,9 @@ FloatType PoseOptimizer::evaluateError(
         break;
       case PoseOptimizerResidualType::UnitPlane:
         chi2 += evaluateUnitPlaneErrors(T_B_W, iter_ == 0, residual_block, H, g).first;
+        break;
+      case PoseOptimizerResidualType::Line:
+        chi2 += evaluateLineErrors(T_B_W, iter_ == 0, residual_block, H, g).first;
         break;
       default:
         LOG(FATAL) << "Residual type not implemented.";
@@ -228,6 +231,61 @@ std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
   // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
   return std::make_pair(FloatType{0.5} * weights.dot(uv_err.colwise().squaredNorm()),
                         uv_err_norm);
+}
+
+//------------------------------------------------------------------------------
+std::pair<FloatType, VectorX> evaluateLineErrors(
+    const Transformation& T_B_W,
+    const bool first_iteration,
+    PoseOptimizerFrameData& data,
+    PoseOptimizer::HessianMatrix* H,
+    PoseOptimizer::GradientVector* g)
+{
+  const Transformation T_C_W = data.T_C_B * T_B_W;
+  const Matrix3 R_C_W = T_C_W.getRotationMatrix();
+  const Vector3 camera_pos_W = T_C_W.inverse().getPosition();
+  // Compute error.
+  const Matrix3X line_measurements_W = R_C_W.transpose() * data.line_measurements_C;
+  const size_t n = data.line_measurements_C.cols();
+  Matrix2X error(2, n);
+  for (size_t i = 0; i < n; ++i)
+  {
+    error.col(i) = data.lines_W[i].calculateMeasurementError(line_measurements_W.col(i),
+                                                             camera_pos_W);
+  }
+  VectorX error_norm = error.colwise().norm();
+
+  // At the first iteration, compute the scale of the error.
+  if (first_iteration)
+  {
+    data.measurement_sigma = PoseOptimizer::ScaleEstimator::compute(error_norm);
+  }
+
+  // Robust cost function.
+  VectorX weights(n);
+  weights.setOnes();
+
+  // Instead of whitening the error and the Jacobian, we apply sigma to the weights:
+  // weights.array() /= (data.measurement_sigma * data.measurement_sigma);
+
+  if (H && g)
+  {
+    for (size_t i = 0; i < n; ++i)
+    {
+      // Jacobian computation.
+      Matrix26 J = dLineMeasurement_dPose(T_B_W, data.T_C_B,
+                                          line_measurements_W.col(i),
+                                          data.lines_W[i].anchorPoint(),
+                                          data.lines_W[i].direction());
+
+      // Compute Hessian and Gradient Vector.
+      H->noalias() += J.transpose() * J * weights(i);
+      g->noalias() -= J.transpose() * error.col(i) * weights(i);
+    }
+  }
+
+  return std::make_pair(FloatType{0.5} * weights.dot(error.colwise().squaredNorm()),
+                        error_norm);
 }
 
 //------------------------------------------------------------------------------

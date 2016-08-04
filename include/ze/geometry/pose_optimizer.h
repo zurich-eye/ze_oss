@@ -3,6 +3,7 @@
 #include <ze/common/transformation.h>
 #include <ze/cameras/camera_utils.h>
 #include <ze/cameras/camera_impl.h>
+#include <ze/geometry/line.hpp>
 #include <ze/geometry/robust_cost.h>
 #include <ze/geometry/lsq_solver.h>
 
@@ -12,7 +13,8 @@ enum class PoseOptimizerResidualType
 {
   Bearing,
   UnitPlane,
-  UnitPlaneEdgelet
+  UnitPlaneEdgelet,
+  Line
 };
 
 //! Data required by the pose-optimizer per frame.
@@ -33,12 +35,19 @@ struct PoseOptimizerFrameData
   //! At which level was the keypoint extracted.
   VectorX scale;
 
+  //! Line measurements. The normalized plane normals through the camera and
+  //! the measured endpoints.
+  LineMeasurements line_measurements_C;
+
   //! Measurements bookkeeping: Corresponding indices. (Not used by the actual algorithm).
   KeypointIndices kp_idx;
 
   //! Landmark positions. Each column corresponds to a bearing measurement.
   //! @todo(cfo): Use inverse depth parametrization or homogeneous points.
   Positions p_W;
+
+  //! Line. Each entry corresponds to a line measurement.
+  Lines lines_W;
 
   //! Extrinsic transformation between camera and body (i.e., imu) frame.
   Transformation T_C_B;
@@ -121,6 +130,13 @@ std::pair<FloatType, VectorX> evaluateBearingErrors(
 //! Returns sum of chi2 errors (weighted and whitened errors) and
 //! a vector of withened errors for each error term (used for outlier removal).
 std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
+    const Transformation& T_B_W,
+    const bool compute_measurement_sigma,
+    PoseOptimizerFrameData& data,
+    PoseOptimizer::HessianMatrix* H,
+    PoseOptimizer::GradientVector* g);
+
+std::pair<FloatType, VectorX> evaluateLineErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
