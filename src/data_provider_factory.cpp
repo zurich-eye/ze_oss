@@ -98,8 +98,18 @@ DataProviderBase::Ptr loadDataProviderFromGflags(const uint32_t num_cams)
     }
     case 2: // Rostopic
     {
-      data_provider.reset(new DataProviderRostopic(imu_topics,
-                                                   cam_topics));
+      // Use the split imu dataprovider
+      if (FLAGS_num_accels != 0 && FLAGS_num_gyros != 0)
+      {
+        data_provider.reset(new DataProviderRostopic(acc_topics,
+                                                     gyr_topics,
+                                                     cam_topics));
+      }
+      else
+      {
+        data_provider.reset(new DataProviderRostopic(imu_topics,
+                                                     cam_topics));
+      }
 
       break;
     }
