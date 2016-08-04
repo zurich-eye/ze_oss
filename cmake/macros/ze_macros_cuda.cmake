@@ -69,6 +69,9 @@ macro(find_cuda)
   elseif(CUDA_VERSION_STRING STREQUAL "7.5")
     # CUDA 7.5
     add_definitions(-DCUDA_VERSION_75)
+  elseif(CUDA_VERSION_STRING STREQUAL "8.0")
+    # CUDA 8.0
+    add_definitions(-DCUDA_VERSION_80)
   else()
     message(FATAL_ERROR "unknown CUDA version. some things might not be tested.")
   endif()
