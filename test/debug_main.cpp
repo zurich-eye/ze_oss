@@ -1,5 +1,6 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <ze/cameras/camera_rig.h>
+#include <ze/cameras/camera_models.h>
 #include <ze/common/benchmark.h>
 #include <ze/common/file_utils.h>
 #include <ze/common/test_entrypoint.h>
@@ -51,15 +52,17 @@ int main(int argc, char** argv)
   Matrix3 left_H;
   Matrix3 right_H;
 
-  computeHorizontalStereoParameters(cv_left_img->size(),
-                                    left_cam_params,
-                                    left_distortion,
-                                    right_cam_params,
-                                    right_distortion,
-                                    T_L_R,
-                                    left_H,
-                                    right_H,
-                                    transformed_left_cam_params,
-                                    transformed_right_cam_params,
-                                    horizontal_offset);
+  computeHorizontalStereoParameters
+      <PinholeGeometry, RadialTangentialDistortion>(
+        cv_left_img->size(),
+        left_cam_params,
+        left_distortion,
+        right_cam_params,
+        right_distortion,
+        T_L_R,
+        left_H,
+        right_H,
+        transformed_left_cam_params,
+        transformed_right_cam_params,
+        horizontal_offset);
 }
