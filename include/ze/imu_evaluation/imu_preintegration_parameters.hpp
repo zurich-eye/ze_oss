@@ -1,6 +1,7 @@
 #pragma once
 
-namespace ze {
+#include <gflags/gflags.h>
+
 
 DEFINE_string(trajectory_source, "", "Path to file to load curve from, default: generate random curve");
 
@@ -31,6 +32,8 @@ DEFINE_double(imu_gyr_bias_const, 0, "Value of constant gyroscope bias.");
 // A series of visualization controls:
 DEFINE_bool(show_trajectory, true, "Show the trajectory that was loaded / generated.");
 DEFINE_int32(num_threads, 16, "Number of threads to take for the monte-carlo simulations");
+
+namespace ze {
 
 //! A parameter structure to regroup all simulation parameters.
 struct ImuPreIntegrationParameters
