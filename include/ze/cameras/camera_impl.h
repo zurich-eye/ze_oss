@@ -2,6 +2,7 @@
 
 #include <ze/cameras/camera.h>
 #include <ze/cameras/camera_models.h>
+#include <ze/cameras/camera_utils.h>
 
 namespace ze {
 
@@ -25,6 +26,18 @@ public:
     Distortion::distort(this->distortion_params_.data(), px.data());
     PinholeGeometry::project(this->projection_params_.data(), px.data());
     return px;
+  }
+
+  virtual std::pair<Keypoint, bool> projectWithCheck(
+      const Eigen::Ref<const Position>& pos,
+      FloatType border_margin) const override
+  {
+    if (pos[2] < 0.0)
+    {
+      return std::make_pair(Keypoint(), false);
+    }
+    Keypoint px = project(pos);
+    return std::make_pair(px, isVisibleWithMargin(size(), px, border_margin));
   }
 
   virtual Bearing backProject(
@@ -129,6 +142,22 @@ inline EquidistantCamera createEquidistantCamera(
   return EquidistantCamera(width, height, CameraType::PinholeEquidistant,
                            (Vector4() << fx, fy, cx, cy).finished(),
                            (Vector4() << k1, k2, k3, k4).finished());
+}
+
+inline Camera::Ptr createEquidistantCameraShared(
+    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
+    FloatType k1, FloatType k2, FloatType k3, FloatType k4)
+{
+  return std::make_shared<EquidistantCamera>(
+        width, height, CameraType::PinholeEquidistant,
+        (Vector4() << fx, fy, cx, cy).finished(),
+        (Vector4() << k1, k2, k3, k4).finished());
+}
+
+//! Returns camera with some reasonable parameters.
+inline PinholeCamera createTestPinholeCamera()
+{
+  return createPinholeCamera(640, 480, 329.11, 329.11, 320.0, 240.0);
 }
 
 } // namespace ze

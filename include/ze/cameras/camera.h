@@ -3,7 +3,12 @@
 #include <string>
 #include <memory>
 #include <ze/common/logging.hpp>
+#pragma diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+// Eigen 3.2.7 uses std::binder1st and std::binder2nd which are deprecated since c++11
+// Fix is in 3.3 devel (http://eigen.tuxfamily.org/bz/show_bug.cgi?id=872).
 #include <Eigen/Core>
+#pragma diagnostic pop
 
 #include <imp/core/image.hpp>
 #include <imp/core/size.hpp>
@@ -52,18 +57,41 @@ public:
 
   //! @name: Projection and back-projection operations. The main use of the camera.
   //! @{
-  //! Vearing vector from pixel coordinates. Z-component of return value is 1.0.
+  //! Bearing vector from pixel coordinates. Z-component of return value is 1.0.
   virtual Bearing backProject(const Eigen::Ref<const Keypoint>& px) const = 0;
 
   //! Computes pixel coordinates from 3D-point.
   virtual Keypoint project(const Eigen::Ref<const Position>& pos) const = 0;
 
+  //! Returns true or false if 3D-point is visible (no occlusion check) and if
+  //! visible also returns pixel coordinates.
+  virtual std::pair<Keypoint, bool> projectWithCheck(
+      const Eigen::Ref<const Position>& pos,
+      FloatType border_margin = 0.0) const = 0;
+
+  //! Computes pixel coordinates from 3D-point in homogeneous coordinates.
+  virtual Keypoint projectHomogeneous(const Eigen::Ref<const HomPosition>& pos_h) const;
+
+  //! Returns true or false if homogeneous 3D-point is visible (no occlusion check)
+  //! and if visible also returns the pixel coordinates.
+  virtual std::pair<Keypoint, bool> projectHomogeneousWithCheck(
+      const Eigen::Ref<const HomPosition>& pos_h,
+      FloatType border_margin = 0.0) const;
+
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Computes Jacobian of homogeneous projection w.r.t. homogeneous landmark position.
+  virtual Matrix24 dProjectHomogeneous_dLandmark(
+      const Eigen::Ref<const HomPosition>& pos_h) const;
 
   //! Computes pixel coordinates from 3D point and corresponding Jacobian.
   virtual std::pair<Keypoint, Matrix23> projectWithJacobian(
       const Eigen::Ref<const Position>& pos) const = 0;
+
+  //! Computes pixel coordinates from 3D homogeneous point and corresponding Jacobian.
+  virtual std::pair<Keypoint, Matrix24> projectHomogeneousWithJacobian(
+      const Eigen::Ref<const HomPosition>& pos_h) const;
   //! @}
 
   //! @name Block projection and back-projection. Always prefer to avoid cache misses.
