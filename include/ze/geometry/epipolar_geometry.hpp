@@ -34,7 +34,7 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
   return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
 }
 
-inline void computeHorizontalStereoParameters(Size2i& img_size,
+inline void computeHorizontalStereoParameters(const Size2u& img_size,
                                               Vector4& left_camera_parameters,
                                               Vector4& left_distortion_coefficients,
                                               Vector4& right_camera_parameters,
@@ -48,7 +48,7 @@ inline void computeHorizontalStereoParameters(Size2i& img_size,
 {
   Quaternion avg_rotation =
       Quaternion::exp(-0.5*Quaternion::log(T_L_R.getRotation()));
-  Vector3 transformed_t = avg_rotation.rotate(T_L_R.getPosition());
+  Vector3 transformed_t = -avg_rotation.rotate(T_L_R.getPosition());
   Vector3 e1 = transformed_t / transformed_t.norm();
   Vector3 e2(-transformed_t(1), transformed_t(0), 0);
   e2 = e2 / e2.norm();
@@ -61,8 +61,10 @@ inline void computeHorizontalStereoParameters(Size2i& img_size,
   left_H = R * avg_rotation.getRotationMatrix().transpose();
   right_H = R * avg_rotation.getRotationMatrix();
 
-  std::cout << "left_H: " << std::endl << left_H;
-  std::cout << "right_H: " << std::endl << right_H;
+
+  std::cout << "left_H: " << std::endl << left_H << std::endl;
+  std::cout << "right_H: " << std::endl << right_H << std::endl;
+  std::cout << "T_L_R: " << std::endl << T_L_R << std::endl;
 }
 
 } // namespace ze
