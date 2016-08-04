@@ -34,19 +34,35 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
   return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
 }
 
-inline void computeHorizontalStereoParameters(Size2i img_size,
+inline void computeHorizontalStereoParameters(Size2i& img_size,
                                               Vector4& left_camera_parameters,
                                               Vector4& left_distortion_coefficients,
                                               Vector4& right_camera_parameters,
                                               Vector4& right_distortion_coefficients,
-                                              Transformation T_L_R,
-                                              Matrix3 left_H,
-                                              Matrix3 right_H,
-                                              Vector4 transformed_left_camera_parameters,
-                                              Vector4 transformed_right_camera_parameters,
+                                              Transformation& T_L_R,
+                                              Matrix3& left_H,
+                                              Matrix3& right_H,
+                                              Vector4& transformed_left_camera_parameters,
+                                              Vector4& transformed_right_camera_parameters,
                                               float& horizontal_offset)
 {
-  Quaternion avg_rotation = Quaternion::exp(-0.5*Quaternion::log(T_L_R.getRotation()));
+  Quaternion avg_rotation =
+      Quaternion::exp(-0.5*Quaternion::log(T_L_R.getRotation()));
+  Vector3 transformed_t = avg_rotation.rotate(T_L_R.getPosition());
+  Vector3 e1 = transformed_t / transformed_t.norm();
+  Vector3 e2(-transformed_t(1), transformed_t(0), 0);
+  e2 = e2 / e2.norm();
+  Vector3 e3 = e1.cross(e2);
+  Matrix3 R;
+  R.row(0) = e1.transpose();
+  R.row(1) = e2.transpose();
+  R.row(2) = e3.transpose();
+
+  left_H = R * avg_rotation.getRotationMatrix().transpose();
+  right_H = R * avg_rotation.getRotationMatrix();
+
+  std::cout << "left_H: " << std::endl << left_H;
+  std::cout << "right_H: " << std::endl << right_H;
 }
 
 } // namespace ze
