@@ -68,6 +68,7 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   //std::cout << "T_L_R: " << std::endl << T_L_R << std::endl;
   const Vector4* camera_parameter_ptrs[2] = {&left_camera_parameters, &right_camera_parameters};
   const Vector4* distortion_coefficient_ptrs[2] = {&left_distortion_coefficients, &right_distortion_coefficients};
+  const Matrix3* homography_ptrs[2] = {&left_H, &right_H};
 
   double nx = img_size[0];
   double ny = img_size[1];
@@ -77,6 +78,7 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
+    const Matrix3& H = *homography_ptrs[i];
     // std::cout << "k: " << std::endl << camera_parameters << std::endl;
     // std::cout << "d: " << std::endl << distortion_coefficients << std::endl;
     FloatType fc = camera_parameters(1);
@@ -95,21 +97,22 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
+    const Matrix3& H = *homography_ptrs[i];
 
     Matrix34 img_corners;
     img_corners << 0, nx, nx, 0,
         0, 0, ny, ny,
         1, 1, 1, 1;
 
-    Vector4 temp_left_cam_params;
-    temp_left_cam_params << fc_new, fc_new, 0, 0;
+    Vector4 temp_cam_params;
+    temp_cam_params << fc_new, fc_new, 0, 0;
     for (int8_t c = 0; c < 4; ++c)
     {
       CameraModel::backProject(camera_parameters.data(), img_corners.col(c).data());
       DistortionModel::undistort(distortion_coefficients.data(), img_corners.col(c).data());
-      img_corners.col(c) = left_H * img_corners.col(c);
+      img_corners.col(c) = H * img_corners.col(c);
       img_corners.col(c) /= img_corners.col(c)(2);
-      CameraModel::project(temp_left_cam_params.data(), img_corners.col(c).data());
+      CameraModel::project(temp_cam_params.data(), img_corners.col(c).data());
     }
     // std::cout << img_corners << std::endl;
 
