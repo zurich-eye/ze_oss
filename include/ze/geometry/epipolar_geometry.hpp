@@ -54,12 +54,13 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     for( x = 0; x < N; ++x )
     {
       pts.col(k++) =
-          Vector3(x * img_size[0] / (N-1),
-          y * img_size[1] / (N-1),
+          Vector3(static_cast<FloatType>(x) * static_cast<FloatType>(img_size[0]) / static_cast<FloatType>(N-1),
+          static_cast<FloatType>(y) * static_cast<FloatType>(img_size[1]) / static_cast<FloatType>(N-1),
           1);
     }
   }
-  for (int8_t c = 0; c < 4; ++c)
+
+  for (int c = 0; c < N*N; ++c)
   {
     CameraModel::backProject(camera_parameters.data(),
                              pts.col(c).data());
@@ -71,14 +72,14 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
                          pts.col(c).data());
   }
 
-  FloatType inner_x_left{std::numeric_limits<FloatType>::min()};
+  FloatType inner_x_left{-std::numeric_limits<FloatType>::max()};
   FloatType inner_x_right{std::numeric_limits<FloatType>::max()};
-  FloatType inner_y_top{std::numeric_limits<FloatType>::min()};
+  FloatType inner_y_top{-std::numeric_limits<FloatType>::max()};
   FloatType inner_y_bottom{std::numeric_limits<FloatType>::max()};
   FloatType outer_x_left{std::numeric_limits<FloatType>::max()};
-  FloatType outer_x_right{std::numeric_limits<FloatType>::min()};
+  FloatType outer_x_right{-std::numeric_limits<FloatType>::max()};
   FloatType outer_y_top{std::numeric_limits<FloatType>::max()};
-  FloatType outer_y_bottom{std::numeric_limits<FloatType>::min()};
+  FloatType outer_y_bottom{-std::numeric_limits<FloatType>::max()};
 
   for (y = k = 0; y < N; y++)
   {
@@ -147,8 +148,8 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   left_H = R * avg_rotation.getRotationMatrix().transpose();
   right_H = R * avg_rotation.getRotationMatrix();
 
-  //std::cout << "left_H: " << std::endl << left_H << std::endl;
-  //std::cout << "right_H: " << std::endl << right_H << std::endl;
+  std::cout << "left_H: " << std::endl << left_H << std::endl;
+  std::cout << "right_H: " << std::endl << right_H << std::endl;
   //std::cout << "T_L_R: " << std::endl << T_L_R << std::endl;
   const Vector4* const camera_parameter_ptrs[2] = {&left_camera_parameters, &right_camera_parameters};
   const Vector4* const distortion_coefficient_ptrs[2] = {&left_distortion_coefficients, &right_distortion_coefficients};
@@ -162,7 +163,6 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
-    const Matrix3& H = *homography_ptrs[i];
     // std::cout << "k: " << std::endl << camera_parameters << std::endl;
     // std::cout << "d: " << std::endl << distortion_coefficients << std::endl;
     FloatType fc = camera_parameters(1);
@@ -174,7 +174,7 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
     }
     fc_new = std::min(fc_new, fc);
   }
-  std::cout << "fc_new: " << std::endl << fc_new << std::endl;
+  // std::cout << "fc_new: " << std::endl << fc_new << std::endl;
 
   Matrix22 cc_new;
   for (int8_t i = 0; i < 2; ++i)
@@ -198,15 +198,13 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
       img_corners.col(c) /= img_corners.col(c)(2);
       CameraModel::project(temp_cam_params.data(), img_corners.col(c).data());
     }
-    // std::cout << img_corners << std::endl;
-
     cc_new.col(i) = Vector2((img_size[0] - 1) / 2, (img_size[1] - 1) / 2);
     cc_new.col(i) -= img_corners.block(0, 0, 2, 4).rowwise().mean();
-
-    // std::cout << "cc_new: " << std::endl << cc_new.col(i) << std::endl;
-
   }
   cc_new.col(0) = cc_new.col(1) = cc_new.rowwise().mean();
+
+  transformed_left_camera_parameters << fc_new, fc_new, cc_new(0, 0), cc_new(1, 0);
+  transformed_right_camera_parameters << fc_new, fc_new, cc_new(0, 1), cc_new(1, 1);
 
   std::pair<Rect, Rect> left_inner_outer =
       innerAndOuterRectangles<CameraModel, DistortionModel>(
@@ -222,14 +220,18 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
         right_distortion_coefficients,
         right_H);
 
+  std::cout << "left inner rect: " << std::endl << left_inner_outer.first << std::endl;
+  std::cout << "left outer rect: " << std::endl << left_inner_outer.second << std::endl;
+  std::cout << "right inner rect: " << std::endl << right_inner_outer.first << std::endl;
+  std::cout << "right outer rect: " << std::endl << right_inner_outer.second << std::endl;
+
   FloatType s0 =
       std::max(
         std::max(
           std::max(
-            cc_new(0, 0)/(cc_new(0, 0) - left_inner_outer.first.x()), cc_new(1, 0)/(cc_new(0, 0) - left_inner_outer.first.y())),
+            cc_new(0, 0)/(cc_new(0, 0) - left_inner_outer.first.x()), cc_new(1, 0)/(cc_new(1, 0) - left_inner_outer.first.y())),
           (nx - cc_new(0, 0))/(left_inner_outer.first.x() + left_inner_outer.first.width() - cc_new(0, 0))),
         (ny - cc_new(1, 0))/(left_inner_outer.first.y() + left_inner_outer.first.height() - cc_new(1, 0)));
-
 
   s0 =
       std::max(
@@ -241,9 +243,7 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
           (ny - cc_new(1, 1))/(right_inner_outer.first.y() + right_inner_outer.first.height() - cc_new(1, 1))),
         s0);
 
-  //std::cout << "avg cc_new: " << std::endl << cc_new.rowwise().sum() * 0.5 << std::endl;
   fc_new *= s0;
-  std::cout << "s: " << std::endl << s0 << std::endl;
   std::cout << "fc_new: " << std::endl << fc_new << std::endl;
   std::cout << "cc_new: " << std::endl << cc_new << std::endl;
 }
