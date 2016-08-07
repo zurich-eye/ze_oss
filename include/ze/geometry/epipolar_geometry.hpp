@@ -7,6 +7,8 @@
 
 namespace ze {
 
+using Rect = Roi<FloatType, 2>;
+
 // ----------------------------------------------------------------------------
 //! Compute essential matrix from given camera transformation
 inline Matrix3 essentialMatrix(const Transformation& T)
@@ -32,6 +34,88 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
       0, 0, 1;
 
   return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
+}
+
+template<typename CameraModel,
+         typename DistortionModel>
+inline std::pair<Rect, Rect> innerAndOuterRectangles(
+    const Size2u& img_size,
+    Vector4& camera_parameters,
+    Vector4& transformed_camera_parameters,
+    Vector4& distortion_coefficients,
+    Matrix3& H)
+{
+  constexpr int N{9};
+  Matrix3X pts(3, N*N);
+
+  int x, y, k;
+  for( y = k = 0; y < N; ++y )
+  {
+    for( x = 0; x < N; ++x )
+    {
+      pts.col(k++) =
+          Vector3(x * img_size[0] / (N-1),
+          y * img_size[1] / (N-1),
+          1);
+    }
+  }
+  for (int8_t c = 0; c < 4; ++c)
+  {
+    CameraModel::backProject(camera_parameters.data(),
+                             pts.col(c).data());
+    DistortionModel::undistort(distortion_coefficients.data(),
+                               pts.col(c).data());
+    pts.col(c) = H * pts.col(c);
+    pts.col(c) /= pts.col(c)(2);
+    CameraModel::project(transformed_camera_parameters.data(),
+                         pts.col(c).data());
+  }
+
+  FloatType inner_x_left{std::numeric_limits<FloatType>::min()};
+  FloatType inner_x_right{std::numeric_limits<FloatType>::max()};
+  FloatType inner_y_top{std::numeric_limits<FloatType>::min()};
+  FloatType inner_y_bottom{std::numeric_limits<FloatType>::max()};
+  FloatType outer_x_left{std::numeric_limits<FloatType>::max()};
+  FloatType outer_x_right{std::numeric_limits<FloatType>::min()};
+  FloatType outer_y_top{std::numeric_limits<FloatType>::max()};
+  FloatType outer_y_bottom{std::numeric_limits<FloatType>::min()};
+
+  for (y = k = 0; y < N; y++)
+  {
+    for (x = 0; x < N; x++)
+    {
+      const Vector3& pt = pts.col(k++);
+      outer_x_left = std::min(outer_x_left, pt.x());
+      outer_x_right = std::max(outer_x_right, pt.x());
+      outer_y_top = std::min(outer_y_top, pt.y());
+      outer_y_bottom = std::max(outer_y_bottom, pt.y());
+
+      if (x == 0)
+      {
+        inner_x_left = std::max(inner_x_left, pt.x());
+      }
+      if (x == N-1)
+      {
+        inner_x_right = std::min(inner_x_right, pt.x());
+      }
+      if(y == 0)
+      {
+        inner_y_top = std::max(inner_y_top, pt.y());
+      }
+      if(y == N-1)
+      {
+        inner_y_bottom = std::min(inner_y_bottom, pt.y());
+      }
+    }
+  }
+  Rect inner(inner_x_left, inner_y_top,
+             inner_x_right - inner_x_left,
+             inner_y_bottom - inner_y_top);
+  Rect outer(outer_x_left, outer_y_top,
+             outer_x_right - outer_x_left,
+             outer_y_bottom - outer_y_top);
+
+  return std::pair<Rect, Rect>(inner, outer);
 }
 
 template<typename CameraModel,
@@ -66,12 +150,12 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   //std::cout << "left_H: " << std::endl << left_H << std::endl;
   //std::cout << "right_H: " << std::endl << right_H << std::endl;
   //std::cout << "T_L_R: " << std::endl << T_L_R << std::endl;
-  const Vector4* camera_parameter_ptrs[2] = {&left_camera_parameters, &right_camera_parameters};
-  const Vector4* distortion_coefficient_ptrs[2] = {&left_distortion_coefficients, &right_distortion_coefficients};
-  const Matrix3* homography_ptrs[2] = {&left_H, &right_H};
+  const Vector4* const camera_parameter_ptrs[2] = {&left_camera_parameters, &right_camera_parameters};
+  const Vector4* const distortion_coefficient_ptrs[2] = {&left_distortion_coefficients, &right_distortion_coefficients};
+  const Matrix3* const homography_ptrs[2] = {&left_H, &right_H};
 
-  double nx = img_size[0];
-  double ny = img_size[1];
+  FloatType nx = img_size[0];
+  FloatType ny = img_size[1];
 
   FloatType fc_new = std::numeric_limits<FloatType>::max();
   for (int8_t i = 0; i < 2; ++i)
@@ -119,10 +203,49 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
     cc_new.col(i) = Vector2((img_size[0] - 1) / 2, (img_size[1] - 1) / 2);
     cc_new.col(i) -= img_corners.block(0, 0, 2, 4).rowwise().mean();
 
-   // std::cout << "cc_new: " << std::endl << cc_new.col(i) << std::endl;
+    // std::cout << "cc_new: " << std::endl << cc_new.col(i) << std::endl;
 
   }
+  cc_new.col(0) = cc_new.col(1) = cc_new.rowwise().mean();
+
+  std::pair<Rect, Rect> left_inner_outer =
+      innerAndOuterRectangles<CameraModel, DistortionModel>(
+        img_size, left_camera_parameters,
+        transformed_left_camera_parameters,
+        left_distortion_coefficients,
+        left_H);
+
+  std::pair<Rect, Rect> right_inner_outer =
+      innerAndOuterRectangles<CameraModel, DistortionModel>(
+        img_size, right_camera_parameters,
+        transformed_right_camera_parameters,
+        right_distortion_coefficients,
+        right_H);
+
+  FloatType s0 =
+      std::max(
+        std::max(
+          std::max(
+            cc_new(0, 0)/(cc_new(0, 0) - left_inner_outer.first.x()), cc_new(1, 0)/(cc_new(0, 0) - left_inner_outer.first.y())),
+          (nx - cc_new(0, 0))/(left_inner_outer.first.x() + left_inner_outer.first.width() - cc_new(0, 0))),
+        (ny - cc_new(1, 0))/(left_inner_outer.first.y() + left_inner_outer.first.height() - cc_new(1, 0)));
+
+
+  s0 =
+      std::max(
+        std::max(
+          std::max(
+            std::max(
+              cc_new(0, 1)/(cc_new(0, 1) - right_inner_outer.first.x()), cc_new(1, 1)/(cc_new(1, 1) - right_inner_outer.first.y())),
+            (nx - cc_new(0, 1))/(right_inner_outer.first.x() + right_inner_outer.first.width() - cc_new(0, 1))),
+          (ny - cc_new(1, 1))/(right_inner_outer.first.y() + right_inner_outer.first.height() - cc_new(1, 1))),
+        s0);
+
   //std::cout << "avg cc_new: " << std::endl << cc_new.rowwise().sum() * 0.5 << std::endl;
+  fc_new *= s0;
+  std::cout << "s: " << std::endl << s0 << std::endl;
+  std::cout << "fc_new: " << std::endl << fc_new << std::endl;
+  std::cout << "cc_new: " << std::endl << cc_new << std::endl;
 }
 
 } // namespace ze
