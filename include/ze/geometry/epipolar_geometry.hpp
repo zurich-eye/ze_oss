@@ -36,6 +36,7 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
   return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
 }
 
+//! \brief Compute inner
 template<typename CameraModel,
          typename DistortionModel>
 inline std::pair<Rect, Rect> innerAndOuterRectangles(
@@ -54,9 +55,14 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     for( x = 0; x < N; ++x )
     {
       pts.col(k++) =
-          Vector3(static_cast<FloatType>(x) * static_cast<FloatType>(img_size[0]) / static_cast<FloatType>(N-1),
-          static_cast<FloatType>(y) * static_cast<FloatType>(img_size[1]) / static_cast<FloatType>(N-1),
-          1);
+          Vector3(
+            static_cast<FloatType>(x) *
+              static_cast<FloatType>(img_size[0]) /
+              static_cast<FloatType>(N-1),
+            static_cast<FloatType>(y) *
+              static_cast<FloatType>(img_size[1]) /
+              static_cast<FloatType>(N-1),
+            1);
     }
   }
 
