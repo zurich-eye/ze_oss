@@ -7,8 +7,6 @@
 
 namespace ze {
 
-using Rect = Roi<FloatType, 2>;
-
 // ----------------------------------------------------------------------------
 //! Compute essential matrix from given camera transformation
 inline Matrix3 essentialMatrix(const Transformation& T)
@@ -36,7 +34,23 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
   return (K0.inverse().transpose() * essentialMatrix(T_cam0_cam1) * K1.inverse());
 }
 
-//! \brief Compute inner
+// ----------------------------------------------------------------------------
+//! Stereo Rectification
+
+using Rect = Roi<FloatType, 2>;
+
+//! \brief Compute inner and outer rectangles.
+//!
+//! The inner rectangle is inscribed in the undistorted-rectified image.
+//! The outer rectangle is circumscribed about the undistorted-rectified image.
+//! \param img_size The size of the original (distorted) image.
+//! \param camera_parameters Vector of intrinsic parameters [fx, fy, cx, cy]
+//! for the original image.
+//! \param transformed_camera_parameters Vector of intrinsic parameters [fx', fy', cx', cy']
+//! for the undistorted-rectified image.
+//! \param distortion_coefficients Vector of distortion coefficients.
+//! \param H Rectifying homography matrix.
+//! \return A pair containing the rectangles inner (first) and outer (second).
 template<typename CameraModel,
          typename DistortionModel>
 inline std::pair<Rect, Rect> innerAndOuterRectangles(
@@ -46,8 +60,9 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     Vector4& distortion_coefficients,
     Matrix3& H)
 {
-  constexpr int N{9};
-  Matrix3X pts(3, N*N);
+  //! Sample the image in N*N locations
+  constexpr int N{9};   //!< Number of sampling point for each image dimension
+  Matrix3X pts(3, N*N); //!< Sampling points
 
   int x, y, k;
   for( y = k = 0; y < N; ++y )
@@ -66,6 +81,15 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     }
   }
 
+  //! For every sampling point (u,v) compute the corresponding (u', v')
+  //! in the undistorted-rectified image:
+  //! x" = (u - cx)/fx
+  //! y" = (v - cy)/fy
+  //! (x', y') = undistort(distortion_coefficients, (x", y"))
+  //! [X Y W]^T = H*[x' y' 1]^T
+  //! x = X / W, y = Y / W
+  //! u' = x * fx' + cx'
+  //! v' = y * fy' + cy'
   for (int c = 0; c < N*N; ++c)
   {
     CameraModel::backProject(camera_parameters.data(),
@@ -78,6 +102,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
                          pts.col(c).data());
   }
 
+  //! Rectangles are specified by two points.
   FloatType inner_x_left{-std::numeric_limits<FloatType>::max()};
   FloatType inner_x_right{std::numeric_limits<FloatType>::max()};
   FloatType inner_y_top{-std::numeric_limits<FloatType>::max()};
@@ -87,6 +112,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   FloatType outer_y_top{std::numeric_limits<FloatType>::max()};
   FloatType outer_y_bottom{-std::numeric_limits<FloatType>::max()};
 
+  //! Iterate over the sampling points and adjust the rectangle bounds.
   for (y = k = 0; y < N; y++)
   {
     for (x = 0; x < N; x++)
@@ -115,6 +141,8 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
       }
     }
   }
+
+  //! Compute and return the rectangles.
   Rect inner(inner_x_left, inner_y_top,
              inner_x_right - inner_x_left,
              inner_y_bottom - inner_y_top);
@@ -125,6 +153,24 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   return std::pair<Rect, Rect>(inner, outer);
 }
 
+//!\brief Compute rectification parameters for a horizontal stereo pair
+//!
+//! The function is specific for the horizontal-stereo case.
+//! \param img_size The size of the original (distorted) image.
+//! \param left_camera_parameters Vector of intrinsic parameters [fx, fy, cx, cy]
+//! for the left camera of the stereo pair.
+//! \param left_distortion_coefficients Vector of distortion coefficients
+//! for the left camera of the stereo pair.
+//! \param right_camera_parameters Vector of intrinsic parameters [fx, fy, cx, cy]
+//! for the right camera of the stereo pair.
+//! \param right_distortion_coefficients Vector of distortion coefficients
+//! for the left camera of the stereo pair.
+//! \param T_L_R Stereo extrinsic parameters, i.e. the transformation right-to-left.
+//! \param left_H Output rectifying homography for the left camera.
+//! \param right_H Output rectifying homography for the right camera.
+//! \param transformed_left_camera_parameters Output transformed parameters for the left camera.
+//! \param transformed_right_camera_parameters Output transformed parameters for the right camera.
+//! \param horizontal_offset Output displacement for the rectified stereo pair.
 template<typename CameraModel,
          typename DistortionModel>
 inline void computeHorizontalStereoParameters(const Size2u& img_size,
@@ -137,40 +183,46 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
                                               Matrix3& right_H,
                                               Vector4& transformed_left_camera_parameters,
                                               Vector4& transformed_right_camera_parameters,
-                                              float& horizontal_offset)
+                                              FloatType& horizontal_offset)
 {
-  Quaternion avg_rotation =
+  //! Compute the recification homographies as in
+  //! Trucco, Verry: Introductory techniques for 3D computer vision,
+  //! Prentice Hall 1998, page 160.
+  const Quaternion avg_rotation =
       Quaternion::exp(-0.5*Quaternion::log(T_L_R.getRotation()));
-  Vector3 transformed_t = avg_rotation.rotate(-T_L_R.getPosition());
-  Vector3 e1 = transformed_t / transformed_t.norm();
+  const Vector3 transformed_t = avg_rotation.rotate(-T_L_R.getPosition());
+  const Vector3 e1 = transformed_t / transformed_t.norm();
   Vector3 e2(-transformed_t(1), transformed_t(0), 0);
   e2 = e2 / e2.norm();
-  Vector3 e3 = e1.cross(e2);
-  Matrix3 R;
-  R.row(0) = e1.transpose();
-  R.row(1) = e2.transpose();
-  R.row(2) = e3.transpose();
+  const Vector3 e3 = e1.cross(e2);
+  Matrix3 rect_R;
+  rect_R.row(0) = e1.transpose();
+  rect_R.row(1) = e2.transpose();
+  rect_R.row(2) = e3.transpose();
 
-  left_H = R * avg_rotation.getRotationMatrix().transpose();
-  right_H = R * avg_rotation.getRotationMatrix();
+  //! Rotate both cameras according to the average rotation.
+  left_H = rect_R * avg_rotation.getRotationMatrix().transpose();
+  right_H = rect_R * avg_rotation.getRotationMatrix();
 
-  std::cout << "left_H: " << std::endl << left_H << std::endl;
-  std::cout << "right_H: " << std::endl << right_H << std::endl;
-  //std::cout << "T_L_R: " << std::endl << T_L_R << std::endl;
-  const Vector4* const camera_parameter_ptrs[2] = {&left_camera_parameters, &right_camera_parameters};
-  const Vector4* const distortion_coefficient_ptrs[2] = {&left_distortion_coefficients, &right_distortion_coefficients};
-  const Matrix3* const homography_ptrs[2] = {&left_H, &right_H};
+  //! The images rectified according to left_H and right_H will not be contained
+  //! in the same region of the image plane as the original image.
+  //! Here we alter the focal lengths and the principal point to keep
+  //! all points within the original image size.
+  const Vector4* const camera_parameter_ptrs[2] = {&left_camera_parameters,
+                                                   &right_camera_parameters};
+  const Vector4* const distortion_coefficient_ptrs[2] = {&left_distortion_coefficients,
+                                                         &right_distortion_coefficients};
+  const Matrix3* const homography_ptrs[2] = {&left_H,
+                                             &right_H};
 
-  FloatType nx = img_size[0];
-  FloatType ny = img_size[1];
+  const FloatType nx = img_size[0];
+  const FloatType ny = img_size[1];
 
   FloatType fc_new = std::numeric_limits<FloatType>::max();
   for (int8_t i = 0; i < 2; ++i)
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
-    // std::cout << "k: " << std::endl << camera_parameters << std::endl;
-    // std::cout << "d: " << std::endl << distortion_coefficients << std::endl;
     FloatType fc = camera_parameters(1);
     if (distortion_coefficients(0) < 0)
     {
@@ -180,7 +232,6 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
     }
     fc_new = std::min(fc_new, fc);
   }
-  // std::cout << "fc_new: " << std::endl << fc_new << std::endl;
 
   Matrix22 cc_new;
   for (int8_t i = 0; i < 2; ++i)
@@ -204,7 +255,7 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
       img_corners.col(c) /= img_corners.col(c)(2);
       CameraModel::project(temp_cam_params.data(), img_corners.col(c).data());
     }
-    cc_new.col(i) = Vector2((img_size[0] - 1) / 2, (img_size[1] - 1) / 2);
+    cc_new.col(i) = Vector2((nx - 1) / 2, (ny - 1) / 2);
     cc_new.col(i) -= img_corners.block(0, 0, 2, 4).rowwise().mean();
   }
   cc_new.col(0) = cc_new.col(1) = cc_new.rowwise().mean();
@@ -212,46 +263,45 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   transformed_left_camera_parameters << fc_new, fc_new, cc_new(0, 0), cc_new(1, 0);
   transformed_right_camera_parameters << fc_new, fc_new, cc_new(0, 1), cc_new(1, 1);
 
-  std::pair<Rect, Rect> left_inner_outer =
+  std::pair<Rect, Rect> l_rects =
       innerAndOuterRectangles<CameraModel, DistortionModel>(
         img_size, left_camera_parameters,
         transformed_left_camera_parameters,
         left_distortion_coefficients,
         left_H);
 
-  std::pair<Rect, Rect> right_inner_outer =
+  std::pair<Rect, Rect> r_rects =
       innerAndOuterRectangles<CameraModel, DistortionModel>(
         img_size, right_camera_parameters,
         transformed_right_camera_parameters,
         right_distortion_coefficients,
         right_H);
 
-  std::cout << "left inner rect: " << std::endl << left_inner_outer.first << std::endl;
-  std::cout << "left outer rect: " << std::endl << left_inner_outer.second << std::endl;
-  std::cout << "right inner rect: " << std::endl << right_inner_outer.first << std::endl;
-  std::cout << "right outer rect: " << std::endl << right_inner_outer.second << std::endl;
+  //! @todo (MPI) support new image size.
+  //! @todo (MPI) support different scales in [0, 1].
+  //! Currently only scale = 0 is supported, through s0.
 
   FloatType s0 =
       std::max(
         std::max(
           std::max(
-            cc_new(0, 0)/(cc_new(0, 0) - left_inner_outer.first.x()), cc_new(1, 0)/(cc_new(1, 0) - left_inner_outer.first.y())),
-          (nx - cc_new(0, 0))/(left_inner_outer.first.x() + left_inner_outer.first.width() - cc_new(0, 0))),
-        (ny - cc_new(1, 0))/(left_inner_outer.first.y() + left_inner_outer.first.height() - cc_new(1, 0)));
+            cc_new(0, 0)/(cc_new(0, 0) - l_rects.first.x()), cc_new(1, 0)/(cc_new(1, 0) - l_rects.first.y())),
+          (nx - cc_new(0, 0))/(l_rects.first.x() + l_rects.first.width() - cc_new(0, 0))),
+        (ny - cc_new(1, 0))/(l_rects.first.y() + l_rects.first.height() - cc_new(1, 0)));
 
   s0 =
       std::max(
         std::max(
           std::max(
             std::max(
-              cc_new(0, 1)/(cc_new(0, 1) - right_inner_outer.first.x()), cc_new(1, 1)/(cc_new(1, 1) - right_inner_outer.first.y())),
-            (nx - cc_new(0, 1))/(right_inner_outer.first.x() + right_inner_outer.first.width() - cc_new(0, 1))),
-          (ny - cc_new(1, 1))/(right_inner_outer.first.y() + right_inner_outer.first.height() - cc_new(1, 1))),
+              cc_new(0, 1)/(cc_new(0, 1) - r_rects.first.x()), cc_new(1, 1)/(cc_new(1, 1) - r_rects.first.y())),
+            (nx - cc_new(0, 1))/(r_rects.first.x() + r_rects.first.width() - cc_new(0, 1))),
+          (ny - cc_new(1, 1))/(r_rects.first.y() + r_rects.first.height() - cc_new(1, 1))),
         s0);
 
-  fc_new *= s0;
-  std::cout << "fc_new: " << std::endl << fc_new << std::endl;
-  std::cout << "cc_new: " << std::endl << cc_new << std::endl;
+  transformed_left_camera_parameters(0) = transformed_left_camera_parameters(1) =
+      transformed_right_camera_parameters(0) = transformed_right_camera_parameters(1) = fc_new * s0;
+  horizontal_offset = transformed_t(0) * s0;
 }
 
 } // namespace ze
