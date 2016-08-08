@@ -63,15 +63,15 @@ TEST(impCuStereoRectifierTexture, radTan32fC1)
   VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
   // use 3x3 submatrix returned in left_P, right_P
-  Eigen::Vector4f left_intrinsics;
+  Vector4 left_intrinsics;
   left_intrinsics << 972.2670826175212, 972.2670826175212, 654.0978851318359, 482.1916770935059;
 
-  Eigen::Vector4f original_left_intrinsics =
-      rig->at(0).projectionParameters().cast<float>();
-  Eigen::Vector4f left_distortion =
-      rig->at(0).distortionParameters().cast<float>();
+  Vector4 original_left_intrinsics =
+      rig->at(0).projectionParameters();
+  Vector4 left_distortion =
+      rig->at(0).distortionParameters();
 
-  Eigen::Matrix3f left_H;
+  Matrix3 left_H;
   left_H << 0.9999716948470486, 0.002684020348481424, -0.007028907417937792,
       -0.002697713727894102, 0.9999944805267602, -0.001939395951741348,
       0.007023663243873155, 0.00195830303687577, 0.9999734162485783;
@@ -82,7 +82,7 @@ TEST(impCuStereoRectifierTexture, radTan32fC1)
   VLOG(2) << "loaded image " << left_img_path
           << ", size " << cv_left_img->size();
 
-  Eigen::Matrix3f left_H_inv = left_H.inverse();
+  Matrix3 left_H_inv = left_H.inverse();
 
   // Allocate rectifier
   cu::RadTanStereoRectifier32fC1 left_rectifier(
@@ -103,9 +103,10 @@ TEST(impCuStereoRectifierTexture, radTan32fC1)
                                   c_map_tolearance);
 }
 
+
 TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
 {
-  constexpr float c_map_tolearance{0.001};
+  constexpr float c_map_tolearance{1.0f};
   const std::string test_folder =
       ze::joinPath(ze::getTestDataDir("imp_cu_imgproc"), "stereo_rectifier");
   const std::string calib_file =
@@ -114,10 +115,10 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   ze::CameraRig::Ptr rig = ze::cameraRigFromYaml(calib_file);
   VLOG(2) << "loaded camera rig from yaml file " << calib_file;
 
-  Eigen::Vector4f left_cam_params =
-      rig->at(0).projectionParameters().cast<float>();
-  Eigen::Vector4f left_distortion =
-      rig->at(0).distortionParameters().cast<float>();
+  Vector4 left_cam_params =
+      rig->at(0).projectionParameters();
+  Vector4 left_distortion =
+      rig->at(0).distortionParameters();
 
   const std::string left_img_path = ze::joinPath(test_folder, "left01.png");
   ImageCv32fC1::Ptr cv_left_img;
@@ -125,10 +126,10 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   VLOG(2) << "loaded image " << left_img_path
           << ", size " << cv_left_img->size();
 
-  Eigen::Vector4f right_cam_params =
-      rig->at(1).projectionParameters().cast<float>();
-  Eigen::Vector4f right_distortion =
-      rig->at(1).distortionParameters().cast<float>();
+  Vector4 right_cam_params =
+      rig->at(1).projectionParameters();
+  Vector4 right_distortion =
+      rig->at(1).distortionParameters();
 
   const std::string right_img_path = ze::joinPath(test_folder, "right01.png");
   ImageCv32fC1::Ptr cv_right_img;
@@ -139,13 +140,11 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   ze::Transformation T_C0_B = rig->T_C_B(0);
   ze::Transformation T_C1_B = rig->T_C_B(1);
   ze::Transformation T_C0_C1 = T_C0_B * T_C1_B.inverse();
-  Eigen::Matrix3f R_l_r = T_C0_C1.getRotationMatrix().cast<float>();
-  Eigen::Vector3f t_l_r = T_C0_C1.getPosition().cast<float>();
 
   // Allocate rectifier
-  Eigen::Vector4f transformed_left_cam_params;
-  Eigen::Vector4f transformed_right_cam_params;
-  float horizontal_offset;
+  Vector4 transformed_left_cam_params;
+  Vector4 transformed_right_cam_params;
+  FloatType horizontal_offset;
   cu::HorizontalStereoPairRectifierRadTan32fC1 rectifier(
         cv_left_img->size(),
         left_cam_params,
@@ -154,8 +153,7 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
         right_cam_params,
         transformed_right_cam_params,
         right_distortion,
-        R_l_r,
-        t_l_r,
+        T_C0_C1,
         horizontal_offset);
 
   // Download maps from GPU
@@ -183,5 +181,6 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
                                   gt_right_map_y_path,
                                   c_map_tolearance);
 }
+
 
 ZE_UNITTEST_ENTRYPOINT

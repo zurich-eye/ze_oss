@@ -3,6 +3,7 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
 #include <ze/cameras/camera_models.h>
+#include <ze/geometry/epipolar_geometry.hpp>
 
 namespace ze {
 namespace cu {
@@ -22,10 +23,10 @@ public:
   //! \param dist_coeffs Camera distortion coefficients.
   //! \param inv_H Inverse of the rectifying homography.
   StereoRectifier(Size2u img_size,
-                  Eigen::Vector4f& camera_params,
-                  Eigen::Vector4f& transformed_camera_params,
-                  Eigen::Vector4f& dist_coeffs,
-                  Eigen::Matrix3f& inv_H);
+                  Vector4& camera_params,
+                  Vector4& transformed_camera_params,
+                  Vector4& dist_coeffs,
+                  Matrix3& inv_H);
 
   ~StereoRectifier() = default;
 
@@ -68,19 +69,18 @@ public:
   //! \param t_l_r translation from "Right" to "Left" reference system.
   //! \param horizontal_offset Output horizontal offset in the rectified reference system.
   HorizontalStereoPairRectifier(Size2u img_size,
-                                Eigen::Vector4f& left_camera_params,
-                                Eigen::Vector4f& transformed_left_cam_params,
-                                Eigen::Vector4f& left_dist_coeffs,
-                                Eigen::Vector4f& right_camera_params,
-                                Eigen::Vector4f& transformed_right_cam_params,
-                                Eigen::Vector4f& right_dist_coeffs,
-                                Eigen::Matrix3f& R_l_r,
-                                Eigen::Vector3f& t_l_r,
-                                float& horizontal_offset);
+                                Vector4& left_camera_params,
+                                Vector4& transformed_left_cam_params,
+                                Vector4& left_dist_coeffs,
+                                Vector4& right_camera_params,
+                                Vector4& transformed_right_cam_params,
+                                Vector4& right_dist_coeffs,
+                                Transformation& T_L_R,
+                                FloatType& horizontal_offset);
 
   ~HorizontalStereoPairRectifier() = default;
 
-  //! Rectify
+  //! \brief Run rectification
   //! \param left_dst Destination image to store the rectified left camera image in GPU memory.
   //! \param right_dst Destination image to store the rectified right camera image in GPU memory.
   //! \param left_src The left source image in GPU memory
