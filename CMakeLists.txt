@@ -6,6 +6,7 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
+
 ############
 # SETTINGS #
 ############
@@ -85,7 +86,6 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 ##########
 # GTESTS #
 ##########
-
 catkin_add_gtest(test_benchmark test/test_benchmark.cpp)
 target_link_libraries(test_benchmark ${PROJECT_NAME})
 
