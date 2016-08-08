@@ -1,4 +1,3 @@
-#include <Eigen/LU>
 #include <imp/cu_core/cu_linearmemory.cuh>
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_imgproc/cu_remap.cuh>
@@ -54,12 +53,13 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
   : undistort_rectify_map_(img_size)
   , fragm_(img_size)
 {
-  // Upload to GPU
+  //! Upload to GPU
+  //! Convert to float
   Eigen::Vector4f cp_flt = camera_params.cast<float>();
   Eigen::Vector4f tcp_flt = transformed_camera_params.cast<float>();
   Eigen::Vector4f dist_flt = dist_coeffs.cast<float>();
   Eigen::Matrix3f inv_H_flt = inv_H.cast<float>();
-
+  //! Copy to host LinearMemory
   ze::LinearMemory32fC1 h_cam_params(
         reinterpret_cast<Pixel32fC1*>(cp_flt.data()),
         4, true);
@@ -72,12 +72,13 @@ StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
   ze::LinearMemory32fC1 h_inv_H(
         reinterpret_cast<Pixel32fC1*>(inv_H_flt.data()),
         9, true);
+  //! Copy to device LinearMemory
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
   cu::LinearMemory32fC1 d_transformed_cam_params(h_transformed_cam_params);
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
   cu::LinearMemory32fC1 d_inv_H(h_inv_H);
 
-  // Compute map
+  //! Compute map
   k_computeUndistortRectifyMap<CameraModel, DistortionModel>
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -106,7 +107,7 @@ void StereoRectifier<CameraModel, DistortionModel, Pixel>::rectify(
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
 
-  // Execute remapping
+  //! Execute remapping
   k_remap
       <<<
         fragm_.dimGrid, fragm_.dimBlock
@@ -163,7 +164,7 @@ HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalSt
         transformed_right_cam_params,
         horizontal_offset);
 
-  // Allocate rectifiers for the left and right cameras
+  //! Allocate rectifiers for the left and right cameras
   Matrix3 inv_left_H = left_H.inverse();
   Matrix3 inv_right_H = right_H.inverse();
   left_rectifier_.reset(
