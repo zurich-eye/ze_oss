@@ -61,23 +61,23 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     Matrix3& H)
 {
   //! Sample the image in N*N locations
-  constexpr int N{9};   //!< Number of sampling point for each image dimension
-  Matrix3X pts(3, N*N); //!< Sampling points
+  constexpr int num_pts{9}; //!< Number of sampling point for each image dimension
+  Matrix3X pts(3, num_pts*num_pts);     //!< Sampling points
 
   int x, y, k;
-  for( y = k = 0; y < N; ++y )
+  for( y = k = 0; y < num_pts; ++y )
   {
-    for( x = 0; x < N; ++x )
+    for( x = 0; x < num_pts; ++x )
     {
       pts.col(k++) =
           Vector3(
             static_cast<FloatType>(x) *
-              static_cast<FloatType>(img_size[0]) /
-              static_cast<FloatType>(N-1),
-            static_cast<FloatType>(y) *
-              static_cast<FloatType>(img_size[1]) /
-              static_cast<FloatType>(N-1),
-            1);
+            static_cast<FloatType>(img_size[0]) /
+          static_cast<FloatType>(num_pts-1),
+          static_cast<FloatType>(y) *
+          static_cast<FloatType>(img_size[1]) /
+          static_cast<FloatType>(num_pts-1),
+          1);
     }
   }
 
@@ -90,7 +90,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   //! x = X / W, y = Y / W
   //! u' = x * fx' + cx'
   //! v' = y * fy' + cy'
-  for (int c = 0; c < N*N; ++c)
+  for (int c = 0; c < num_pts*num_pts; ++c)
   {
     CameraModel::backProject(camera_parameters.data(),
                              pts.col(c).data());
@@ -113,9 +113,9 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   FloatType outer_y_bottom{-std::numeric_limits<FloatType>::max()};
 
   //! Iterate over the sampling points and adjust the rectangle bounds.
-  for (y = k = 0; y < N; y++)
+  for (y = k = 0; y < num_pts; y++)
   {
-    for (x = 0; x < N; x++)
+    for (x = 0; x < num_pts; x++)
     {
       const Vector3& pt = pts.col(k++);
       outer_x_left = std::min(outer_x_left, pt.x());
@@ -127,7 +127,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
       {
         inner_x_left = std::max(inner_x_left, pt.x());
       }
-      if (x == N-1)
+      if (x == num_pts - 1)
       {
         inner_x_right = std::min(inner_x_right, pt.x());
       }
@@ -135,7 +135,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
       {
         inner_y_top = std::max(inner_y_top, pt.y());
       }
-      if(y == N-1)
+      if(y == num_pts - 1)
       {
         inner_y_bottom = std::min(inner_y_bottom, pt.y());
       }
@@ -279,28 +279,31 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
 
   //! @todo (MPI) support new image size.
   //! @todo (MPI) support different scales in [0, 1].
-  //! Currently only scale = 0 is supported, through s0.
+  //! Currently only scale = 0 is supported (s0).
 
   FloatType s0 =
       std::max(
         std::max(
           std::max(
-            cc_new(0, 0)/(cc_new(0, 0) - l_rects.first.x()), cc_new(1, 0)/(cc_new(1, 0) - l_rects.first.y())),
+            cc_new(0, 0)/(cc_new(0, 0) - l_rects.first.x()),
+            cc_new(1, 0)/(cc_new(1, 0) - l_rects.first.y())),
           (nx - cc_new(0, 0))/(l_rects.first.x() + l_rects.first.width() - cc_new(0, 0))),
         (ny - cc_new(1, 0))/(l_rects.first.y() + l_rects.first.height() - cc_new(1, 0)));
 
-  s0 =
-      std::max(
+  s0 = std::max(
         std::max(
           std::max(
             std::max(
-              cc_new(0, 1)/(cc_new(0, 1) - r_rects.first.x()), cc_new(1, 1)/(cc_new(1, 1) - r_rects.first.y())),
+              cc_new(0, 1)/(cc_new(0, 1) - r_rects.first.x()),
+              cc_new(1, 1)/(cc_new(1, 1) - r_rects.first.y())),
             (nx - cc_new(0, 1))/(r_rects.first.x() + r_rects.first.width() - cc_new(0, 1))),
           (ny - cc_new(1, 1))/(r_rects.first.y() + r_rects.first.height() - cc_new(1, 1))),
         s0);
 
-  transformed_left_camera_parameters(0) = transformed_left_camera_parameters(1) =
-      transformed_right_camera_parameters(0) = transformed_right_camera_parameters(1) = fc_new * s0;
+  transformed_left_camera_parameters(0) =
+      transformed_left_camera_parameters(1) =
+      transformed_right_camera_parameters(0) =
+      transformed_right_camera_parameters(1) = fc_new * s0;
   horizontal_offset = transformed_t(0) * s0;
 }
 
