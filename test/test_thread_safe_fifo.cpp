@@ -158,10 +158,14 @@ public:
   void operator()()
   {
     TestObjectPtr obj;
-    while (run_) {
+    while (true) {
       bool result = queue_.timedRead(obj, 100);
       if (!result)
       {
+        if (!run_)
+        {
+          break;
+        }
         continue;
       }
       EXPECT_TRUE(obj.get() != nullptr);
@@ -210,6 +214,7 @@ void runThreadTest()
 
   unsigned total = c1 + c2;
   EXPECT_EQ(4 * c_num_objects_per_thread, total);
+  EXPECT_TRUE(queue.empty());
 }
 
 } // unnamed namespace
