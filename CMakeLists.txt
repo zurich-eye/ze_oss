@@ -6,8 +6,6 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
-find_package(Threads REQUIRED)
-
 ############
 # SETTINGS #
 ############
@@ -88,67 +86,62 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # GTESTS #
 ##########
 
-set(TEST_LIBRARIES
-  ${PROJECT_NAME}
-  ${CMAKE_THREAD_LIBS_INIT}
-)
-
 catkin_add_gtest(test_benchmark test/test_benchmark.cpp)
-target_link_libraries(test_benchmark ${TEST_LIBRARIES})
+target_link_libraries(test_benchmark ${PROJECT_NAME})
 
 catkin_add_gtest(test_buffer test/test_buffer.cpp)
-target_link_libraries(test_buffer ${TEST_LIBRARIES})
+target_link_libraries(test_buffer ${PROJECT_NAME})
 
 catkin_add_gtest(test_manifold test/test_manifold.cpp)
-target_link_libraries(test_manifold ${TEST_LIBRARIES})
+target_link_libraries(test_manifold ${PROJECT_NAME})
 
 catkin_add_gtest(test_matrix test/test_matrix.cpp)
-target_link_libraries(test_matrix ${TEST_LIBRARIES})
+target_link_libraries(test_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_numerical_derivative test/test_numerical_derivative.cpp)
-target_link_libraries(test_numerical_derivative ${TEST_LIBRARIES})
+target_link_libraries(test_numerical_derivative ${PROJECT_NAME})
 
 catkin_add_gtest(test_random test/test_random.cpp)
-target_link_libraries(test_random ${TEST_LIBRARIES})
+target_link_libraries(test_random ${PROJECT_NAME})
 
 catkin_add_gtest(test_random_matrix test/test_random_matrix.cpp)
-target_link_libraries(test_random_matrix ${TEST_LIBRARIES})
+target_link_libraries(test_random_matrix ${PROJECT_NAME})
 
 catkin_add_gtest(test_running_statistics test/test_running_statistics.cpp)
-target_link_libraries(test_running_statistics ${TEST_LIBRARIES})
+target_link_libraries(test_running_statistics ${PROJECT_NAME})
 
 catkin_add_gtest(test_statistics test/test_statistics.cpp)
-target_link_libraries(test_statistics ${TEST_LIBRARIES})
+target_link_libraries(test_statistics ${PROJECT_NAME})
 
 catkin_add_gtest(test_stl_utils test/test_stl_utils.cpp)
-target_link_libraries(test_stl_utils ${TEST_LIBRARIES})
+target_link_libraries(test_stl_utils ${PROJECT_NAME})
 
 catkin_add_gtest(test_string_utils test/test_string_utils.cpp)
-target_link_libraries(test_string_utils ${TEST_LIBRARIES})
+target_link_libraries(test_string_utils ${PROJECT_NAME})
 
 catkin_add_gtest(test_test_utils test/test_test_utils.cpp)
-target_link_libraries(test_test_utils ${TEST_LIBRARIES})
+target_link_libraries(test_test_utils ${PROJECT_NAME})
 
 catkin_add_gtest(test_timer test/test_timer.cpp)
-target_link_libraries(test_timer ${TEST_LIBRARIES})
+target_link_libraries(test_timer ${PROJECT_NAME})
 
 catkin_add_gtest(test_transformation test/test_transformation.cpp)
-target_link_libraries(test_transformation ${TEST_LIBRARIES})
+target_link_libraries(test_transformation ${PROJECT_NAME})
 
 catkin_add_gtest(test_thread_pool test/test_thread_pool.cpp)
-target_link_libraries(test_thread_pool ${TEST_LIBRARIES})
+target_link_libraries(test_thread_pool ${PROJECT_NAME})
 
 catkin_add_gtest(test_thread_safe_fifo test/test_thread_safe_fifo.cpp)
-target_link_libraries(test_thread_safe_fifo ${TEST_LIBRARIES})
+target_link_libraries(test_thread_safe_fifo ${PROJECT_NAME})
 
 catkin_add_gtest(test_versioned_slot_handle test/test_versioned_slot_handle.cpp)
-target_link_libraries(test_versioned_slot_handle ${TEST_LIBRARIES})
+target_link_libraries(test_versioned_slot_handle ${PROJECT_NAME})
 
 catkin_add_gtest(test_ring_view test/test_ring_view.cpp)
-target_link_libraries(test_ring_view ${TEST_LIBRARIES})
+target_link_libraries(test_ring_view ${PROJECT_NAME})
 
 catkin_add_gtest(test_ringbuffer test/test_ringbuffer.cpp)
-target_link_libraries(test_ringbuffer ${TEST_LIBRARIES})
+target_link_libraries(test_ringbuffer ${PROJECT_NAME})
 
 ##########
 # EXPORT #
