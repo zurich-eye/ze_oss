@@ -11,14 +11,14 @@ namespace ze {
 //! Compute essential matrix from given camera transformation
 inline Matrix3 essentialMatrix(const Transformation& T)
 {
-  return ze::skewSymmetric(T.getPosition()) * T.getRotationMatrix();
+  return skewSymmetric(T.getPosition()) * T.getRotationMatrix();
 }
 
 // ----------------------------------------------------------------------------
 //! Compute fundamental matrix from given camera transformation
 inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
-                                 const ze::VectorX& projection_parameteres0,
-                                 const ze::VectorX& projection_parameteres1)
+                                 const VectorX& projection_parameteres0,
+                                 const VectorX& projection_parameteres1)
 {
   CHECK_EQ(projection_parameteres0.size(), 4u);
   CHECK_EQ(projection_parameteres1.size(), 4u);
