@@ -36,7 +36,7 @@ inline void openOutputFileStream(
 {
   CHECK_NOTNULL(fs);
   fs->open(filename.c_str(), std::ios::out);
-  CHECK(*fs);
+  CHECK(*fs) << "Failed to open filestream " << filename;
   CHECK(fs->is_open()) << "Failed to open file: " << filename;
 }
 
