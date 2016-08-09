@@ -58,18 +58,21 @@ template <typename CameraModel,
           typename Pixel>
 ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
     Size2u img_size,
-    Eigen::RowVectorXf& camera_params,
-    Eigen::RowVectorXf& dist_coeffs)
+    const VectorX& camera_params,
+    const VectorX& dist_coeffs)
   : undistortion_map_(img_size),
     fragm_(img_size)
 {
+  // Cast to float and allocate host linear memory
+  Eigen::VectorXf cp_flt = camera_params.cast<float>();
+  Eigen::VectorXf dist_flt = dist_coeffs.cast<float>();
   ze::LinearMemory32fC1 h_cam_params(
-        reinterpret_cast<Pixel32fC1*>(camera_params.data()),
-        camera_params.cols(), true);
+        reinterpret_cast<Pixel32fC1*>(cp_flt.data()),
+        camera_params.rows(), true);
   ze::LinearMemory32fC1 h_dist_coeffs(
-        reinterpret_cast<Pixel32fC1*>(dist_coeffs.data()),
-        dist_coeffs.cols(), true);
-
+        reinterpret_cast<Pixel32fC1*>(dist_flt.data()),
+        dist_coeffs.rows(), true);
+  // Copy to device linear memory
   cu::LinearMemory32fC1 d_cam_params(h_cam_params);
   cu::LinearMemory32fC1 d_dist_coeffs(h_dist_coeffs);
 

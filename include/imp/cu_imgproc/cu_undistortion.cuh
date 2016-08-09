@@ -15,8 +15,8 @@ class ImageUndistorter
 public:
   ImageUndistorter(
       Size2u img_size,
-      Eigen::RowVectorXf& camera_params,
-      Eigen::RowVectorXf& dist_coeffs);
+      const VectorX& camera_params,
+      const VectorX& dist_coeffs);
 
   ~ImageUndistorter() = default;
 
