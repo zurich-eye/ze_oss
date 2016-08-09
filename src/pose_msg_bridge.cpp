@@ -17,4 +17,22 @@ Transformation poseMsgTotransformation(
   return Transformation(p, q);
 }
 
+geometry_msgs::PoseStamped transformationToPoseStampedMsg(
+    const Transformation& T, int64_t stamp)
+{
+  geometry_msgs::PoseStamped m;
+  m.header.stamp = ros::Time().fromNSec(stamp);
+  Vector3 p = T.getPosition();
+  m.pose.position.x = p.x();
+  m.pose.position.y = p.y();
+  m.pose.position.z = p.z();
+  Quaternion q = T.getRotation();
+  m.pose.orientation.x = q.x();
+  m.pose.orientation.y = q.y();
+  m.pose.orientation.z = q.z();
+  m.pose.orientation.w = q.w();
+  return m;
+}
+
+
 } // ze namespace
