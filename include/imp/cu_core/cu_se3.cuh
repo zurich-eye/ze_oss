@@ -2,9 +2,9 @@
 #define IMP_CU_SE3_CUH
 
 #include <ostream>
-//#include <imp/cuda_toolkit/helper_math.h>
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_matrix.cuh>
+#include <ze/common/transformation.h>
 
 namespace ze
 {
@@ -33,36 +33,25 @@ public:
     data_(2, 3) = 0 ;
   }
 
+  __host__ __forceinline__
+  SE3(const Transformation& T)
+  {
+    const Quaternion q = T.getRotation();
+    const Vector3 t = T.getPosition();
+
+    initializeFromQuaternionAndTranslation(
+          static_cast<Type>(q.w()), static_cast<Type>(q.x()),
+          static_cast<Type>(q.y()), static_cast<Type>(q.z()),
+          static_cast<Type>(t.x()), static_cast<Type>(t.y()),
+          static_cast<Type>(t.z()));
+  }
+
   /// Constructor from a normalized quaternion and a translation vector
   __host__ __device__ __forceinline__
   SE3(Type qw, Type qx, Type qy, Type qz, Type tx, Type ty, Type tz)
   {
-    const Type x  = 2*qx;
-    const Type y  = 2*qy;
-    const Type z  = 2*qz;
-    const Type wx = x*qw;
-    const Type wy = y*qw;
-    const Type wz = z*qw;
-    const Type xx = x*qx;
-    const Type xy = y*qx;
-    const Type xz = z*qx;
-    const Type yy = y*qy;
-    const Type yz = z*qy;
-    const Type zz = z*qz;
-
-    data_(0, 0) = 1-(yy+zz);
-    data_(0, 1) = xy-wz;
-    data_(0, 2) = xz+wy;
-    data_(1, 0) = xy+wz;
-    data_(1, 1) = 1-(xx+zz);
-    data_(1, 2) = yz-wx;
-    data_(2, 0) = xz-wy;
-    data_(2, 1) = yz+wx;
-    data_(2, 2) = 1-(xx+yy);
-
-    data_(0, 3) = tx;
-    data_(1, 3) = ty;
-    data_(2, 3) = tz;
+    initializeFromQuaternionAndTranslation(qw, qx, qy, qz,
+                                           tx, ty, tz);
   }
 
   /// Construct from C arrays
@@ -169,6 +158,38 @@ public:
   }
 
 private:
+  __host__ __device__ __forceinline__
+  void initializeFromQuaternionAndTranslation(
+      Type qw, Type qx, Type qy, Type qz,
+      Type tx, Type ty, Type tz)
+  {
+    const Type x  = 2*qx;
+    const Type y  = 2*qy;
+    const Type z  = 2*qz;
+    const Type wx = x*qw;
+    const Type wy = y*qw;
+    const Type wz = z*qw;
+    const Type xx = x*qx;
+    const Type xy = y*qx;
+    const Type xz = z*qx;
+    const Type yy = y*qy;
+    const Type yz = z*qy;
+    const Type zz = z*qz;
+
+    data_(0, 0) = 1-(yy+zz);
+    data_(0, 1) = xy-wz;
+    data_(0, 2) = xz+wy;
+    data_(1, 0) = xy+wz;
+    data_(1, 1) = 1-(xx+zz);
+    data_(1, 2) = yz-wx;
+    data_(2, 0) = xz-wy;
+    data_(2, 1) = yz+wx;
+    data_(2, 2) = 1-(xx+yy);
+
+    data_(0, 3) = tx;
+    data_(1, 3) = ty;
+    data_(2, 3) = tz;
+  }
   ze::cu::Matrix<Type, 3, 4> data_;
 };
 
