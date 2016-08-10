@@ -64,7 +64,6 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   constexpr int num_pts{9}; //!< Number of sampling point for each image dimension
   Matrix3X pts(3, num_pts*num_pts);     //!< Sampling points
 
-  // int x, y, k;
   for (int y = 0, k = 0; y < num_pts; ++y)
   {
     for (int x = 0; x < num_pts; ++x)
@@ -202,7 +201,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
 
   //! The images rectified according to left_H and right_H will not be contained
   //! in the same region of the image plane as the original image.
-  //! Here we alter the focal lengths and the principal point to keep
+  //! Here we alter the focal lengths and the principal points to keep
   //! all points within the original image size.
   const Vector4* const camera_parameter_ptrs[2] = {&left_camera_parameters,
                                                    &right_camera_parameters};
@@ -214,22 +213,22 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   const FloatType nx = img_size[0];
   const FloatType ny = img_size[1];
 
-  FloatType fc_new = std::numeric_limits<FloatType>::max();
+  FloatType transformed_focal_length = std::numeric_limits<FloatType>::max();
   for (int8_t i = 0; i < 2; ++i)
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
-    FloatType fc = camera_parameters(1);
+    FloatType focal_length = camera_parameters(1);
     if (distortion_coefficients(0) < 0)
     {
-      fc *= 1 + distortion_coefficients(0)*
+      focal_length *= 1 + distortion_coefficients(0)*
           (nx * nx + ny * ny) /
-          (4 * fc * fc);
+          (4 * focal_length * focal_length);
     }
-    fc_new = std::min(fc_new, fc);
+    transformed_focal_length = std::min(transformed_focal_length, focal_length);
   }
 
-  Matrix22 cc_new;
+  Matrix22 transformed_principal_point;
   for (int8_t i = 0; i < 2; ++i)
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
@@ -242,7 +241,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
         1, 1, 1, 1;
 
     Vector4 temp_cam_params;
-    temp_cam_params << fc_new, fc_new, 0, 0;
+    temp_cam_params << transformed_focal_length, transformed_focal_length, 0, 0;
     for (int8_t c = 0; c < 4; ++c)
     {
       CameraModel::backProject(camera_parameters.data(), img_corners.col(c).data());
@@ -251,15 +250,23 @@ computeHorizontalStereoParameters(const Size2u& img_size,
       img_corners.col(c) /= img_corners.col(c)(2);
       CameraModel::project(temp_cam_params.data(), img_corners.col(c).data());
     }
-    cc_new.col(i) = Vector2((nx - 1) / 2, (ny - 1) / 2);
-    cc_new.col(i) -= img_corners.block(0, 0, 2, 4).rowwise().mean();
+    transformed_principal_point.col(i) = Vector2((nx - 1) / 2, (ny - 1) / 2);
+    transformed_principal_point.col(i) -= img_corners.block(0, 0, 2, 4).rowwise().mean();
   }
-  cc_new.col(0) = cc_new.col(1) = cc_new.rowwise().mean();
+  transformed_principal_point.col(0) =
+      transformed_principal_point.col(1) =
+      transformed_principal_point.rowwise().mean();
 
   Vector4 transformed_left_camera_parameters;
   Vector4 transformed_right_camera_parameters;
-  transformed_left_camera_parameters << fc_new, fc_new, cc_new(0, 0), cc_new(1, 0);
-  transformed_right_camera_parameters << fc_new, fc_new, cc_new(0, 1), cc_new(1, 1);
+  transformed_left_camera_parameters << transformed_focal_length,
+      transformed_focal_length,
+      transformed_principal_point(0, 0),
+      transformed_principal_point(1, 0);
+  transformed_right_camera_parameters << transformed_focal_length,
+      transformed_focal_length,
+      transformed_principal_point(0, 1),
+      transformed_principal_point(1, 1);
 
   std::pair<Rect, Rect> l_rects =
       innerAndOuterRectangles<CameraModel, DistortionModel>(
@@ -275,33 +282,39 @@ computeHorizontalStereoParameters(const Size2u& img_size,
         right_distortion_coefficients,
         right_H);
 
-  //! @todo (MPI) support new image size.
+  //! Determine s0, i.e. the scaling factor based on inner rectangles from both images.
   //! @todo (MPI) support different scales in [0, 1].
   //! Currently only scale = 0 is supported (s0).
+  //! Left image
+  FloatType s0 = std::max(
+        transformed_principal_point(0, 0) / (transformed_principal_point(0, 0) - l_rects.first.x()),
+        transformed_principal_point(1, 0) / (transformed_principal_point(1, 0) - l_rects.first.y()));
 
-  FloatType s0 =
-      std::max(
-        std::max(
-          std::max(
-            cc_new(0, 0)/(cc_new(0, 0) - l_rects.first.x()),
-            cc_new(1, 0)/(cc_new(1, 0) - l_rects.first.y())),
-          (nx - cc_new(0, 0))/(l_rects.first.x() + l_rects.first.width() - cc_new(0, 0))),
-        (ny - cc_new(1, 0))/(l_rects.first.y() + l_rects.first.height() - cc_new(1, 0)));
+  s0 = std::max(s0,
+                (nx - transformed_principal_point(0, 0)) /
+                (l_rects.first.x() + l_rects.first.width() - transformed_principal_point(0, 0)));
 
+  s0 = std::max(s0,
+                (ny - transformed_principal_point(1, 0)) /
+                (l_rects.first.y() + l_rects.first.height() - transformed_principal_point(1, 0)));
+
+  //! Right image
   s0 = std::max(
-        std::max(
-          std::max(
-            std::max(
-              cc_new(0, 1)/(cc_new(0, 1) - r_rects.first.x()),
-              cc_new(1, 1)/(cc_new(1, 1) - r_rects.first.y())),
-            (nx - cc_new(0, 1))/(r_rects.first.x() + r_rects.first.width() - cc_new(0, 1))),
-          (ny - cc_new(1, 1))/(r_rects.first.y() + r_rects.first.height() - cc_new(1, 1))),
-        s0);
+        transformed_principal_point(0, 1) / (transformed_principal_point(0, 1) - r_rects.first.x()),
+        transformed_principal_point(1, 1) / (transformed_principal_point(1, 1) - r_rects.first.y()));
+
+  s0 = std::max(s0,
+                (nx - transformed_principal_point(0, 1)) /
+                (r_rects.first.x() + r_rects.first.width() - transformed_principal_point(0, 1)));
+
+  s0 = std::max(s0,
+                (ny - transformed_principal_point(1, 1)) /
+                (r_rects.first.y() + r_rects.first.height() - transformed_principal_point(1, 1)));
 
   transformed_left_camera_parameters(0) =
       transformed_left_camera_parameters(1) =
       transformed_right_camera_parameters(0) =
-      transformed_right_camera_parameters(1) = fc_new * s0;
+      transformed_right_camera_parameters(1) = transformed_focal_length * s0;
 
   const FloatType horizontal_offset = transformed_t(0) * s0;
 
