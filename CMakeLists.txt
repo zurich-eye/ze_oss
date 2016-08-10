@@ -31,6 +31,7 @@ set(CU_HDRS
   include/imp/cu_imgproc/cu_remap.cuh
   include/imp/cu_imgproc/cu_undistortion.cuh
   include/imp/cu_imgproc/cu_stereo_rectification.cuh
+  include/imp/cu_imgproc/cu_horizontal_stereo_pair_rectifier.cuh
   )
 
 set(CU_SRCS
@@ -45,6 +46,7 @@ set(CU_SRCS
   src/str_tex_decomposer.cpp
   src/cu_undistortion.cu
   src/cu_stereo_rectification.cu
+  src/cu_horizontal_stereo_pair_rectifier.cu
   )
 
 cs_cuda_add_library(${PROJECT_NAME}

@@ -1,5 +1,6 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/cu_imgproc/cu_stereo_rectification.cuh>
+#include <imp/cu_imgproc/cu_horizontal_stereo_pair_rectifier.cuh>
 #include <ze/cameras/camera_rig.h>
 #include <ze/common/benchmark.h>
 #include <ze/common/file_utils.h>

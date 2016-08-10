@@ -13,8 +13,8 @@ void k_remap(
     size_t dst_stride,
     const Pixel32fC2* map,
     size_t map_stride,
-    std::uint32_t width,
-    std::uint32_t height,
+    int32_t width,
+    int32_t height,
     Texture2D src)
 {
   const int x = blockIdx.x*blockDim.x + threadIdx.x;
