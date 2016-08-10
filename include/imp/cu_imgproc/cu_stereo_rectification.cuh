@@ -22,11 +22,11 @@ public:
   //! [fx, fy, cx, cy]^T in the rectified reference frame.
   //! \param dist_coeffs Camera distortion coefficients.
   //! \param inv_H Inverse of the rectifying homography.
-  StereoRectifier(Size2u img_size,
-                  Vector4& camera_params,
-                  Vector4& transformed_camera_params,
-                  Vector4& dist_coeffs,
-                  Matrix3& inv_H);
+  StereoRectifier(const Size2u& img_size,
+                  const Vector4& camera_params,
+                  const Vector4& transformed_camera_params,
+                  const Vector4& dist_coeffs,
+                  const Matrix3& inv_H);
 
   ~StereoRectifier() = default;
 
@@ -56,27 +56,26 @@ class HorizontalStereoPairRectifier
 {
 public:
   //! \brief HorizontalStereoPairRectifier
+  //! \param transformed_left_cam_params The output left camera parameters [fx, fy, cx, cy]^T
+  //! \param transformed_right_cam_params The output right camera parameters [fx, fy, cx, cy]^T
+  //! \param horizontal_offset Output horizontal offset in the rectified reference system.
   //! \param img_size The size of the images to rectify.
   //! \param left_camera_params The camera parameters [fx, fy, cx, cy]^T for the left camera
-  //! \param transformed_left_cam_params The output camera parameters [fx, fy, cx, cy]^T
   //! for the left camera in the rectified reference frame.
   //! \param left_dist_coeffs The distortion coefficients for the left camera
   //! \param right_camera_params The camera parameters [fx, fy, cx, cy]^T for the right camera
-  //! \param transformed_right_cam_params The output camera parameters [fx, fy, cx, cy]^T
   //! for the right camera in the rectified reference frame.
   //! \param right_dist_coeffs The distortion coefficients for the right camera.
-  //! \param R_l_r Rotation from "Right" to "Left" reference system.
-  //! \param t_l_r translation from "Right" to "Left" reference system.
-  //! \param horizontal_offset Output horizontal offset in the rectified reference system.
-  HorizontalStereoPairRectifier(Size2u img_size,
-                                Vector4& left_camera_params,
-                                Vector4& transformed_left_cam_params,
-                                Vector4& left_dist_coeffs,
-                                Vector4& right_camera_params,
+  //! \param T_l_r transformation from "Right" to "Left" reference system.
+  HorizontalStereoPairRectifier(Vector4& transformed_left_cam_params,
                                 Vector4& transformed_right_cam_params,
-                                Vector4& right_dist_coeffs,
-                                Transformation& T_L_R,
-                                FloatType& horizontal_offset);
+                                FloatType& horizontal_offset,
+                                const Size2u& img_size,
+                                const Vector4& left_camera_params,
+                                const Vector4& left_dist_coeffs,
+                                const Vector4& right_camera_params,
+                                const Vector4& right_dist_coeffs,
+                                const Transformation& T_L_R);
 
   ~HorizontalStereoPairRectifier() = default;
 

@@ -146,15 +146,15 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   Vector4 transformed_right_cam_params;
   FloatType horizontal_offset;
   cu::HorizontalStereoPairRectifierRadTan32fC1 rectifier(
+        transformed_left_cam_params,
+        transformed_right_cam_params,
+        horizontal_offset,
         cv_left_img->size(),
         left_cam_params,
-        transformed_left_cam_params,
         left_distortion,
         right_cam_params,
-        transformed_right_cam_params,
         right_distortion,
-        T_C0_C1,
-        horizontal_offset);
+        T_C0_C1);
 
   // Download maps from GPU
   ImageCv32fC2 left_map(rectifier.getLeftCameraUndistortRectifyMap());

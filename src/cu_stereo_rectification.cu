@@ -45,16 +45,15 @@ template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 StereoRectifier<CameraModel, DistortionModel, Pixel>::StereoRectifier(
-    Size2u img_size,
-    Vector4& camera_params,
-    Vector4& transformed_camera_params,
-    Vector4& dist_coeffs,
-    Matrix3& inv_H)
+    const Size2u& img_size,
+    const Vector4& camera_params,
+    const Vector4& transformed_camera_params,
+    const Vector4& dist_coeffs,
+    const Matrix3& inv_H)
   : undistort_rectify_map_(img_size)
   , fragm_(img_size)
 {
-  //! Upload to GPU
-  //! Convert to float
+  //! Convert to float and upload to GPU
   Eigen::Vector4f cp_flt = camera_params.cast<float>();
   Eigen::Vector4f tcp_flt = transformed_camera_params.cast<float>();
   Eigen::Vector4f dist_flt = dist_coeffs.cast<float>();
@@ -137,36 +136,32 @@ template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalStereoPairRectifier(
-    Size2u img_size,
-    Vector4& left_camera_params,
     Vector4& transformed_left_cam_params,
-    Vector4& left_dist_coeffs,
-    Vector4& right_camera_params,
     Vector4& transformed_right_cam_params,
-    Vector4& right_dist_coeffs,
-    Transformation& T_L_R,
-    FloatType& horizontal_offset)
+    FloatType& horizontal_offset,
+    const Size2u& img_size,
+    const Vector4& left_camera_params,
+    const Vector4& left_dist_coeffs,
+    const Vector4& right_camera_params,
+    const Vector4& right_dist_coeffs,
+    const Transformation& T_L_R)
 {
   Matrix3 left_H;
   Matrix3 right_H;
 
-  computeHorizontalStereoParameters
-      <CameraModel, DistortionModel>(
-        img_size,
-        left_camera_params,
-        left_dist_coeffs,
-        right_camera_params,
-        right_dist_coeffs,
-        T_L_R,
-        left_H,
-        right_H,
-        transformed_left_cam_params,
-        transformed_right_cam_params,
-        horizontal_offset);
+  std::tie(left_H, right_H,
+           transformed_left_cam_params,
+           transformed_right_cam_params, horizontal_offset) =
+      computeHorizontalStereoParameters <CameraModel, DistortionModel>(img_size,
+                                                                       left_camera_params,
+                                                                       left_dist_coeffs,
+                                                                       right_camera_params,
+                                                                       right_dist_coeffs,
+                                                                       T_L_R);
 
   //! Allocate rectifiers for the left and right cameras
-  Matrix3 inv_left_H = left_H.inverse();
-  Matrix3 inv_right_H = right_H.inverse();
+  const Matrix3 inv_left_H = left_H.inverse();
+  const Matrix3 inv_right_H = right_H.inverse();
   left_rectifier_.reset(
         new StereoRectifier<CameraModel, DistortionModel, Pixel>(
           img_size, left_camera_params, transformed_left_cam_params, left_dist_coeffs, inv_left_H));
