@@ -183,5 +183,4 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
                                   c_map_tolearance);
 }
 
-
 ZE_UNITTEST_ENTRYPOINT
