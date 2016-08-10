@@ -40,7 +40,7 @@ public:
 
 private:
   ImageGpu32fC2 undistort_rectify_map_;   //!< The (2-channels) undistortion-rectification map
-  Fragmentation<16, 16> fragm_;           //!< CUDA thread grid config
+  Fragmentation<16, 16> fragm_;           //!< @todo (MPI) opptimize CUDA thread grid config
 };
 
 using EquidistStereoRectifier32fC1 = StereoRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;
