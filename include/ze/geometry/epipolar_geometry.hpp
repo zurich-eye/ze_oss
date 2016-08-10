@@ -165,11 +165,11 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
 //! \param right_distortion_coefficients Vector of distortion coefficients
 //! for the left camera of the stereo pair.
 //! \param T_L_R Stereo extrinsic parameters, i.e. the transformation right-to-left.
-//! \param left_H Output rectifying homography for the left camera.
-//! \param right_H Output rectifying homography for the right camera.
-//! \param transformed_left_camera_parameters Output transformed parameters for the left camera.
-//! \param transformed_right_camera_parameters Output transformed parameters for the right camera.
-//! \param horizontal_offset Output displacement for the rectified stereo pair.
+//! \return left_H rectifying homography for the left camera.
+//! \return right_H rectifying homography for the right camera.
+//! \return transformed_left_camera_parameters Output transformed parameters for the left camera.
+//! \return transformed_right_camera_parameters Output transformed parameters for the right camera.
+//! \return horizontal_offset Output displacement for the rectified stereo pair.
 template<typename CameraModel,
          typename DistortionModel>
 inline std::tuple<Matrix3, Matrix3, Vector4, Vector4, FloatType>
