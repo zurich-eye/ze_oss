@@ -55,19 +55,19 @@ template<typename CameraModel,
          typename DistortionModel>
 inline std::pair<Rect, Rect> innerAndOuterRectangles(
     const Size2u& img_size,
-    Vector4& camera_parameters,
-    Vector4& transformed_camera_parameters,
-    Vector4& distortion_coefficients,
-    Matrix3& H)
+    const Vector4& camera_parameters,
+    const Vector4& transformed_camera_parameters,
+    const Vector4& distortion_coefficients,
+    const Matrix3& H)
 {
-  //! Sample the image in N*N locations
+  //! Sample the image in num_pts*num_pts locations
   constexpr int num_pts{9}; //!< Number of sampling point for each image dimension
   Matrix3X pts(3, num_pts*num_pts);     //!< Sampling points
 
-  int x, y, k;
-  for( y = k = 0; y < num_pts; ++y )
+  // int x, y, k;
+  for (int y = 0, k = 0; y < num_pts; ++y)
   {
-    for( x = 0; x < num_pts; ++x )
+    for (int x = 0; x < num_pts; ++x)
     {
       pts.col(k++) =
           Vector3(
@@ -90,7 +90,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   //! x = X / W, y = Y / W
   //! u' = x * fx' + cx'
   //! v' = y * fy' + cy'
-  for (int c = 0; c < num_pts*num_pts; ++c)
+  for (int c = 0; c < num_pts * num_pts; ++c)
   {
     CameraModel::backProject(camera_parameters.data(),
                              pts.col(c).data());
@@ -113,9 +113,9 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   FloatType outer_y_bottom{-std::numeric_limits<FloatType>::max()};
 
   //! Iterate over the sampling points and adjust the rectangle bounds.
-  for (y = k = 0; y < num_pts; y++)
+  for (int y = 0, k = 0; y < num_pts; y++)
   {
-    for (x = 0; x < num_pts; x++)
+    for (int x = 0; x < num_pts; x++)
     {
       const Vector3& pt = pts.col(k++);
       outer_x_left = std::min(outer_x_left, pt.x());
@@ -131,11 +131,11 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
       {
         inner_x_right = std::min(inner_x_right, pt.x());
       }
-      if(y == 0)
+      if (y == 0)
       {
         inner_y_top = std::max(inner_y_top, pt.y());
       }
-      if(y == num_pts - 1)
+      if (y == num_pts - 1)
       {
         inner_y_bottom = std::min(inner_y_bottom, pt.y());
       }
@@ -173,17 +173,13 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
 //! \param horizontal_offset Output displacement for the rectified stereo pair.
 template<typename CameraModel,
          typename DistortionModel>
-inline void computeHorizontalStereoParameters(const Size2u& img_size,
-                                              Vector4& left_camera_parameters,
-                                              Vector4& left_distortion_coefficients,
-                                              Vector4& right_camera_parameters,
-                                              Vector4& right_distortion_coefficients,
-                                              Transformation& T_L_R,
-                                              Matrix3& left_H,
-                                              Matrix3& right_H,
-                                              Vector4& transformed_left_camera_parameters,
-                                              Vector4& transformed_right_camera_parameters,
-                                              FloatType& horizontal_offset)
+inline std::tuple<Matrix3, Matrix3, Vector4, Vector4, FloatType>
+computeHorizontalStereoParameters(const Size2u& img_size,
+                                  const Vector4& left_camera_parameters,
+                                  const Vector4& left_distortion_coefficients,
+                                  const Vector4& right_camera_parameters,
+                                  const Vector4& right_distortion_coefficients,
+                                  const Transformation& T_L_R)
 {
   //! Compute the recification homographies as in
   //! Trucco, Verry: Introductory techniques for 3D computer vision,
@@ -201,8 +197,8 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   rect_R.row(2) = e3.transpose();
 
   //! Rotate both cameras according to the average rotation.
-  left_H = rect_R * avg_rotation.getRotationMatrix().transpose();
-  right_H = rect_R * avg_rotation.getRotationMatrix();
+  const Matrix3 left_H = rect_R * avg_rotation.getRotationMatrix().transpose();
+  const Matrix3 right_H = rect_R * avg_rotation.getRotationMatrix();
 
   //! The images rectified according to left_H and right_H will not be contained
   //! in the same region of the image plane as the original image.
@@ -260,6 +256,8 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
   }
   cc_new.col(0) = cc_new.col(1) = cc_new.rowwise().mean();
 
+  Vector4 transformed_left_camera_parameters;
+  Vector4 transformed_right_camera_parameters;
   transformed_left_camera_parameters << fc_new, fc_new, cc_new(0, 0), cc_new(1, 0);
   transformed_right_camera_parameters << fc_new, fc_new, cc_new(0, 1), cc_new(1, 1);
 
@@ -304,7 +302,14 @@ inline void computeHorizontalStereoParameters(const Size2u& img_size,
       transformed_left_camera_parameters(1) =
       transformed_right_camera_parameters(0) =
       transformed_right_camera_parameters(1) = fc_new * s0;
-  horizontal_offset = transformed_t(0) * s0;
+
+  const FloatType horizontal_offset = transformed_t(0) * s0;
+
+  return std::make_tuple(left_H,
+                         right_H,
+                         transformed_left_camera_parameters,
+                         transformed_right_camera_parameters,
+                         horizontal_offset);
 }
 
 } // namespace ze
