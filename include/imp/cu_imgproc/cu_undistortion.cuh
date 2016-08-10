@@ -14,7 +14,7 @@ class ImageUndistorter
 {
 public:
   ImageUndistorter(
-      Size2u img_size,
+      const Size2u& img_size,
       const VectorX& camera_params,
       const VectorX& dist_coeffs);
 

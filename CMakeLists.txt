@@ -28,7 +28,10 @@ set(CU_HDRS
   include/imp/cu_imgproc/cu_rof_denoising.cuh
   include/imp/cu_imgproc/cu_tvl1_denoising.cuh
   include/imp/cu_imgproc/str_tex_decomposer.hpp
+  include/imp/cu_imgproc/cu_remap.cuh
   include/imp/cu_imgproc/cu_undistortion.cuh
+  include/imp/cu_imgproc/cu_stereo_rectification.cuh
+  include/imp/cu_imgproc/cu_horizontal_stereo_pair_rectifier.cuh
   )
 
 set(CU_SRCS
@@ -42,14 +45,14 @@ set(CU_SRCS
   src/cu_tvl1_denoising.cu
   src/str_tex_decomposer.cpp
   src/cu_undistortion.cu
+  src/cu_stereo_rectification.cu
+  src/cu_horizontal_stereo_pair_rectifier.cu
   )
 
-#cuda_compile(CU_OBJ ${CU_SRCS} ${CU_HDRS})
-
 cs_cuda_add_library(${PROJECT_NAME}
-   ${CU_SRCS} ${CU_HDRS} ${SOURCES} ${HEADERS}
+   ${CU_SRCS} ${CU_HDRS}
+   ${SOURCES} ${HEADERS}
    )
-#target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES} ${catkin_LIBRARIES})
 
 ##########
 # GTESTS #
@@ -65,6 +68,9 @@ target_link_libraries(test_cu_str_tex_decomp ${PROJECT_NAME})
 
 catkin_add_gtest(test_cu_undistortion test/test_cu_undistortion.cpp)
 target_link_libraries(test_cu_undistortion ${PROJECT_NAME})
+
+catkin_add_gtest(test_cu_stereo_rectifier test/test_cu_stereo_rectifier.cpp)
+target_link_libraries(test_cu_stereo_rectifier ${PROJECT_NAME})
 
 ##########
 # EXPORT #

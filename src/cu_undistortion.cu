@@ -1,6 +1,7 @@
-#include <imp/cu_imgproc/cu_undistortion.cuh>
-#include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_core/cu_linearmemory.cuh>
+#include <imp/cu_core/cu_texture.cuh>
+#include <imp/cu_imgproc/cu_remap.cuh>
+#include <imp/cu_imgproc/cu_undistortion.cuh>
 
 namespace ze {
 namespace cu {
@@ -11,8 +12,8 @@ __global__
 void k_computeUndistortionMap(
     Pixel32fC2* dst,
     size_t dst_stride,
-    std::uint32_t width,
-    std::uint32_t height,
+    uint32_t width,
+    uint32_t height,
     const float* d_cam_params,
     const float* d_dist_coeffs)
 {
@@ -30,34 +31,11 @@ void k_computeUndistortionMap(
   }
 }
 
-template<typename T>
-__global__
-void k_undistort(
-    Pixel1<T>* dst,
-    size_t dst_stride,
-    const Pixel32fC2* map,
-    size_t map_stride,
-    std::uint32_t width,
-    std::uint32_t height,
-    Texture2D src)
-{
-  const int x = blockIdx.x*blockDim.x + threadIdx.x;
-  const int y = blockIdx.y*blockDim.y + threadIdx.y;
-
-  if (x < width && y < height)
-  {
-    Pixel1<T> val;
-    const Pixel32fC2& px = map[y*map_stride+x];
-    tex2DFetch(val, src, px[0], px[1]);
-    dst[y*dst_stride+x] = val;
-  }
-}
-
 template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 ImageUndistorter<CameraModel, DistortionModel, Pixel>::ImageUndistorter(
-    Size2u img_size,
+    const Size2u& img_size,
     const VectorX& camera_params,
     const VectorX& dist_coeffs)
   : undistortion_map_(img_size),
@@ -99,7 +77,7 @@ void ImageUndistorter<CameraModel, DistortionModel, Pixel>::undistort(
   std::shared_ptr<Texture2D> src_tex =
       src.genTexture(false, cudaFilterModeLinear);
   IMP_CUDA_CHECK();
-  k_undistort
+  k_remap
       <<<
         fragm_.dimGrid, fragm_.dimBlock
       >>> (dst.data(),
