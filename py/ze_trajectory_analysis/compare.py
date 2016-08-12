@@ -146,9 +146,9 @@ def plot_trajectory(trace_dir, experiments):
     ax_traj_side.yaxis.grid(ls='--', color='0.7')
     
     for i, exp in enumerate(experiments):
-        D = yaml.load(open(os.path.join(exp, 'params.yaml'), 'r'))
+        D = yaml.load(open(os.path.join(exp, 'job.yaml'), 'r'))
         data = np.genfromtxt(os.path.join(exp, 'trajectory.csv'), delimiter=',', skip_header=1, dtype=np.float64)
-        ax_traj_top.plot(data[:,0], data[:,1], linestyle='-', label=D['experiment_label'])
+        ax_traj_top.plot(data[:,0], data[:,1], linestyle='-', label=D['experiment_name'].replace("_", ""))
         ax_traj_side.plot(data[:,0], data[:,2], linestyle='-')
         #if i == 0:
         #    ax_traj_top.plot(data[:,3], data[:,4], color='black', linestyle='-', label='Groundtruth')
@@ -174,11 +174,11 @@ def plot_translation_errors(trace_dir, experiments):
     set_colors(ax_trans_error_z, len(experiments))    
     
     for i, exp in enumerate(experiments):
-        D = yaml.load(open(os.path.join(exp, 'params.yaml'), 'r'))
+        D = yaml.load(open(os.path.join(exp, 'job.yaml'), 'r'))
         data = np.genfromtxt(os.path.join(exp, 'translation_error.csv'), delimiter=',', skip_header=1, dtype=np.float64)
-        ax_trans_error_x.plot(data[:,0], data[:,1], linestyle='-', label='r'+D['experiment_label'])
-        ax_trans_error_y.plot(data[:,0], data[:,2], linestyle='-', label='r'+D['experiment_label'])
-        ax_trans_error_z.plot(data[:,0], data[:,3], linestyle='-', label='r'+D['experiment_label'])
+        ax_trans_error_x.plot(data[:,0], data[:,1], linestyle='-', label='r'+D['experiment_name'].replace("_", ""))
+        ax_trans_error_y.plot(data[:,0], data[:,2], linestyle='-', label='r'+D['experiment_name'].replace("_", ""))
+        ax_trans_error_z.plot(data[:,0], data[:,3], linestyle='-', label='r'+D['experiment_name'].replace("_", ""))
         
     fig_trans_error.tight_layout()
     ax_trans_error_x.legend()
@@ -197,11 +197,11 @@ def plot_relative_errors(trace_dir, experiments):
     set_colors(ax_rel_3, len(experiments)) 
     
     for i, exp in enumerate(experiments):
-        D = yaml.load(open(os.path.join(exp, 'params.yaml'), 'r'))
-        data = np.genfromtxt(os.path.join(exp, 'relative_error.csv'), delimiter=',', skip_header=2, dtype=np.float64)
-        ax_rel_1.plot(data[:,0], linestyle='-', label=D['experiment_label'])
-        ax_rel_2.plot(data[:,2], linestyle='-', label=D['experiment_label'])
-        ax_rel_3.plot(data[:,3], linestyle='-', label=D['experiment_label'])
+        D = yaml.load(open(os.path.join(exp, 'job.yaml'), 'r'))
+        data = np.genfromtxt(os.path.join(exp, 'traj_relative_errors_10.csv'), delimiter=',', skip_header=2, dtype=np.float64)
+        ax_rel_1.plot(data[:,0], linestyle='-', label=D['experiment_name'].replace("_", ""))
+        ax_rel_2.plot(data[:,2], linestyle='-', label=D['experiment_name'].replace("_", ""))
+        ax_rel_3.plot(data[:,3], linestyle='-', label=D['experiment_name'].replace("_", ""))
         
     fig_relative_errors.tight_layout()
     ax_rel_1.legend()
@@ -218,12 +218,12 @@ def plot_rms_errors(trace_dir, experiments):
     set_colors(ax_rms_2, len(experiments)) 
     max_x = 0
     for i, exp in enumerate(experiments):
-        D = yaml.load(open(os.path.join(exp, 'params.yaml'), 'r'))
+        D = yaml.load(open(os.path.join(exp, 'job.yaml'), 'r'))
         data_trans = np.genfromtxt(os.path.join(exp, 'translation_error.csv'), delimiter=',', skip_header=1, dtype=np.float64)
         data_rot = np.genfromtxt(os.path.join(exp, 'orientation_error.csv'), delimiter=',', skip_header=1, dtype=np.float64)
         rms_trans = np.sqrt(np.sum(data_trans[:,1:4]**2,1))
         rms_rot   = np.sqrt(np.sum(data_rot[:,1:4]**2,1))
-        ax_rms_1.plot(data_trans[:,0], rms_trans, linestyle='-', label=D['experiment_label'])
+        ax_rms_1.plot(data_trans[:,0], rms_trans, linestyle='-', label=D['experiment_name'].replace("_", ""))
         ax_rms_2.plot(data_trans[:,0], rms_rot,   linestyle='-')
         max_x = max(max_x, data_trans[-1,0])
     fig_relative_errors.tight_layout()
@@ -249,6 +249,8 @@ if __name__=='__main__':
     trace_dir = args.trace_dir
     experiments = [experiment for experiment in args.reference.split(',')]
     experiments.insert(-1, args.trace_dir)
-    
 
-    
+    plot_rms_errors(trace_dir, experiments)
+    plot_relative_errors(trace_dir, experiments)
+    plot_translation_errors(trace_dir, experiments)
+    plot_trajectory(trace_dir, experiments)
