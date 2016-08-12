@@ -16,7 +16,7 @@ class ImuModel
 public:
   ZE_POINTER_TYPEDEFS(ImuModel);
 
-  typedef Eigen::Matrix<FloatType, 6, 1> measurement_t;
+  typedef VectorX measurement_t;
 
   ImuModel() = delete;
 
@@ -31,11 +31,10 @@ public:
   std::string label() const { return label_; }
   std::string id() const { return id_; }
 
-  //! distort in place
-  void distort(Eigen::Ref<measurement_t> in) const;
-
-  //! undistort in place
-  void undistort(Eigen::Ref<measurement_t> in) const;
+  Vector6 distort(const Eigen::Ref<const measurement_t>& primary,
+                  const Eigen::Ref<const measurement_t>& secondary) const;
+  Vector6 undistort(const Eigen::Ref<const measurement_t>& primary,
+                    const Eigen::Ref<const measurement_t>& secondary) const;
 
   // getters
   inline const AccelerometerModel::Ptr accelerometerModel() const

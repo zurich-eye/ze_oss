@@ -115,4 +115,31 @@ TEST(ImuBufferTest, testOldestAndNewestTimestamp)
 
 }
 
+TEST(ImuBufferTest, testDifferentiation)
+{
+
+  using namespace ze;
+  typedef Ringbuffer<FloatType, 3, 100> RingBuffer_t;
+  VectorX m;
+  Vector6 ref;
+
+  RingBuffer_t buffer;
+  buffer.insert(10., Vector3::Zero());
+  buffer.insert(20., 5. * Vector3::Ones());
+  buffer.insert(30., 15. * Vector3::Ones());
+
+  std::lock_guard<std::mutex> lock(buffer.mutex());
+
+  //test differentiation between support points.
+  m = InterpolatorDifferentiatorLinear::interpolate<RingBuffer_t>(&buffer, 15.);  ref << 2.5 * Vector3::Ones(), .5 * Vector3::Ones();
+  ref << 2.5 * Vector3::Ones(), .5 * Vector3::Ones();
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(ref, m, 1e-10));
+
+  //test differentiation at support point.
+  //the expected derivative is the one of the segment starting with this point.
+  m = InterpolatorDifferentiatorLinear::interpolate<RingBuffer_t>(&buffer, 20.);
+  ref << 5. * Vector3::Ones(), 1. * Vector3::Ones();
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(ref, m, 1e-10));
+}
+
 ZE_UNITTEST_ENTRYPOINT

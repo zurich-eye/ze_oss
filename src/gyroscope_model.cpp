@@ -12,14 +12,16 @@ GyroscopeModel::GyroscopeModel(
 {
 }
 
-void GyroscopeModel::distort(Eigen::Ref<measurement_t> in) const
+Vector3 GyroscopeModel::distort(const Eigen::Ref<const measurement_t>& w,
+                                const Eigen::Ref<const measurement_t>& a) const
 {
-  intrinsicModel_->distort(in);
+  return intrinsicModel_->distort(w, a);
 }
 
-void GyroscopeModel::undistort(Eigen::Ref<measurement_t> in) const
+Vector3 GyroscopeModel::undistort(const Eigen::Ref<const measurement_t>& w,
+                                  const Eigen::Ref<const measurement_t>& a) const
 {
-  intrinsicModel_->undistort(in);
+  return intrinsicModel_->undistort(w, a);
 }
 
 } // namespace ze

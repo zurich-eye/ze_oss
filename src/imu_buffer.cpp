@@ -2,16 +2,16 @@
 
 namespace ze {
 
-template<int BufferSize, typename Interpolator>
-ImuBuffer<BufferSize, Interpolator>::ImuBuffer(ImuModel::Ptr imu_model)
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+ImuBuffer<BufferSize, GyroInterp, AccelInterp>::ImuBuffer(ImuModel::Ptr imu_model)
   : imu_model_(imu_model)
   , gyro_delay_(secToNanosec(imu_model->gyroscopeModel()->intrinsicModel()->delay()))
   , accel_delay_(secToNanosec(imu_model->accelerometerModel()->intrinsicModel()->delay()))
 {
 }
 
-template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertImuMeasurement(
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+void ImuBuffer<BufferSize, GyroInterp, AccelInterp>::insertImuMeasurement(
     int64_t time, const ImuAccGyr value)
 {
   acc_buffer_.insert(correctStampAccel(time), value.head<3>(3));
@@ -19,82 +19,151 @@ void ImuBuffer<BufferSize, Interpolator>::insertImuMeasurement(
 }
 
 
-template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertGyroscopeMeasurement(
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+void ImuBuffer<BufferSize, GyroInterp, AccelInterp>::insertGyroscopeMeasurement(
     int64_t time, const Vector3 value)
 {
   gyr_buffer_.insert(correctStampGyro(time), value);
 }
 
-template<int BufferSize, typename Interpolator>
-void ImuBuffer<BufferSize, Interpolator>::insertAccelerometerMeasurement(
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+void ImuBuffer<BufferSize, GyroInterp, AccelInterp>::insertAccelerometerMeasurement(
     int64_t time, const Vector3 value)
 {
   acc_buffer_.insert(correctStampAccel(time), value);
 }
 
-template<int BufferSize, typename Interpolator>
-bool ImuBuffer<BufferSize, Interpolator>::get(int64_t time,
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+bool ImuBuffer<BufferSize, GyroInterp, AccelInterp>::get(int64_t time,
                                               Eigen::Ref<ImuAccGyr> out)
 {
-  if (!acc_buffer_.getValueInterpolated(time, out.head<3>(3)) ||
-      !gyr_buffer_.getValueInterpolated(time, out.tail<3>(3)))
+  std::lock_guard<std::mutex> gyr_lock(gyr_buffer_.mutex());
+  std::lock_guard<std::mutex> acc_lock(acc_buffer_.mutex());
+
+  if (time > gyr_buffer_.times().back()
+      || time > acc_buffer_.times().back())
   {
     return false;
   }
 
-  imu_model_->undistort(out);
+  const auto gyro_before = gyr_buffer_.iterator_equal_or_before(time);
+  const auto acc_before = acc_buffer_.iterator_equal_or_before(time);
 
+  if (gyro_before == gyr_buffer_.times().end()
+      || acc_before == acc_buffer_.times().end()) {
+    return false;
+  }
+
+  VectorX w = GyroInterp::interpolate(&gyr_buffer_, time, gyro_before);
+  VectorX a = AccelInterp::interpolate(&acc_buffer_, time, acc_before);
+
+  out = imu_model_->undistort(a, w);
   return true;
 }
 
-template<int BufferSize, typename Interpolator>
-bool ImuBuffer<BufferSize, Interpolator>::getAccelerometerDistorted(
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+bool ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getAccelerometerDistorted(
     int64_t time,
     Eigen::Ref<Vector3> out)
 {
   return acc_buffer_.getValueInterpolated(time, out);
 }
 
-template<int BufferSize, typename Interpolator>
-bool ImuBuffer<BufferSize, Interpolator>::getGyroscopeDistorted(
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
+bool ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getGyroscopeDistorted(
     int64_t time,
     Eigen::Ref<Vector3> out)
 {
   return gyr_buffer_.getValueInterpolated(time, out);
 }
 
-template<int BufferSize, class Interpolator>
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
 std::pair<ImuStamps, ImuAccGyrContainer>
-ImuBuffer<BufferSize, Interpolator>::getBetweenValuesInterpolated(
+ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getBetweenValuesInterpolated(
     int64_t stamp_from, int64_t stamp_to)
 {
-  // Takes the gyroscope time as reference and samples the accelerometer
-  // measurements to fit
+  //Takes gyroscope timestamps and interpolates accelerometer measurements at
+  // same times. Rectifies all measurements.
+  CHECK_GE(stamp_from, 0u);
+  CHECK_LT(stamp_from, stamp_to);
+  ImuAccGyrContainer rectified_measurements;
   ImuStamps stamps;
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> gyr_measurements;
 
-  std::tie(stamps, gyr_measurements) =
-      gyr_buffer_.template getBetweenValuesInterpolated<Interpolator>(
-        stamp_from, stamp_to);
+  std::lock_guard<std::mutex> gyr_lock(gyr_buffer_.mutex());
+  std::lock_guard<std::mutex> acc_lock(acc_buffer_.mutex());
 
-  ImuAccGyrContainer imu_measurements(6, stamps.size());
-  if (stamps.size() == 0)
+  if(gyr_buffer_.times().size() < 2)
   {
-    // return an empty set:
-    return std::make_pair(stamps, imu_measurements);
+    LOG(WARNING) << "Buffer has less than 2 entries.";
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
   }
 
-  // resample the accelerometer measurement at the gyro timestamps
-  imu_measurements.topRows<3>() = acc_buffer_.getValuesInterpolated(stamps);
-  imu_measurements.bottomRows<3>() = gyr_measurements;
+  const time_t oldest_stamp = gyr_buffer_.times().front();
+  const time_t newest_stamp = gyr_buffer_.times().back();
+  if (stamp_from < oldest_stamp)
+  {
+    LOG(WARNING) << "Requests older timestamp than in buffer.";
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
+  }
+  if (stamp_to > newest_stamp)
+  {
+    LOG(WARNING) << "Requests newer timestamp than in buffer.";
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
+  }
 
-  return std::make_pair(stamps, imu_measurements);
+  const auto it_from_before = gyr_buffer_.iterator_equal_or_before(stamp_from);
+  const auto it_to_after = gyr_buffer_.iterator_equal_or_after(stamp_to);
+  CHECK(it_from_before != gyr_buffer_.times().end());
+  CHECK(it_to_after != gyr_buffer_.times().end());
+  const auto it_from_after = it_from_before + 1;
+  const auto it_to_before = it_to_after - 1;
+  if (it_from_after == it_to_before)
+  {
+    LOG(WARNING) << "Not enough data for interpolation";
+    // return empty means unsuccessful.
+    return std::make_pair(stamps, rectified_measurements);
+  }
+
+  // resize containers
+  const size_t range = it_to_before.index() - it_from_after.index() + 3;
+  rectified_measurements.resize(Eigen::NoChange, range);
+  stamps.resize(range);
+
+  // first element
+  VectorX w = GyroInterp::interpolate(&gyr_buffer_, stamp_from, it_from_before);
+  VectorX a = AccelInterp::interpolate(&acc_buffer_, stamp_from);
+  stamps(0) = stamp_from;
+  rectified_measurements.col(0) = imu_model_->undistort(a, w);
+
+  // this is a real edge case where we hit the two consecutive timestamps
+  //  with from and to.
+  size_t col = 1;
+  if (range > 2)
+  {
+    for (auto it=it_from_before+1; it!=it_to_after; ++it) {
+      w = GyroInterp::interpolate(&gyr_buffer_, (*it), it);
+      a = AccelInterp::interpolate(&acc_buffer_, (*it));
+      stamps(col) = (*it);
+      rectified_measurements.col(col) = imu_model_->undistort(a, w);
+      ++col;
+    }
+  }
+
+  // last element
+  w = GyroInterp::interpolate(&gyr_buffer_, stamp_to, it_to_before);
+  a = AccelInterp::interpolate(&acc_buffer_, stamp_to);
+  stamps(range - 1) = stamp_to;
+  rectified_measurements.col(range - 1) = imu_model_->undistort(a, w);
+
+  return std::make_pair(stamps, rectified_measurements);
 }
 
-template<int BufferSize, class Interpolator>
+template<int BufferSize, typename GyroInterp, typename AccelInterp>
 std::tuple<int64_t, int64_t, bool>
-ImuBuffer<BufferSize, Interpolator>::getOldestAndNewestStamp() const
+ImuBuffer<BufferSize, GyroInterp, AccelInterp>::getOldestAndNewestStamp() const
 {
   std::tuple<int64_t, int64_t, bool> accel =
       acc_buffer_.getOldestAndNewestStamp();
@@ -127,5 +196,9 @@ template class ImuBuffer<2000, InterpolatorLinear>;
 template class ImuBuffer<5000, InterpolatorLinear>;
 template class ImuBuffer<2000, InterpolatorNearest>;
 template class ImuBuffer<5000, InterpolatorNearest>;
+template class ImuBuffer<2000, InterpolatorDifferentiatorLinear,
+InterpolatorLinear>;
+template class ImuBuffer<5000, InterpolatorDifferentiatorLinear,
+InterpolatorLinear>;
 
 } // namespace ze

@@ -45,16 +45,24 @@ ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated(FloatType delay, FloatT
 {
 }
 
-void ImuIntrinsicModelCalibrated::undistort(Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelCalibrated::undistort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
-  //! The calibrated model assumes that all relevant deterministic effects have been taken care of by the manufacturer.
-  //! Hence, the mapping would be an identity.
+  //! The calibrated model assumes that all relevant deterministic effects have
+  //! been taken care of by the manufacturer. Hence, the mapping is an identity.
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  return primary.head<3>();
 }
 
-void ImuIntrinsicModelCalibrated::distort(Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelCalibrated::distort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
+  //! The calibrated model assumes that all relevant deterministic effects have
+  //! been taken care of by the manufacturer. Hence, the mapping is an identity.
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  return primary.head<3>();
 }
 
 //------------------------------------------------------------------------------
@@ -69,18 +77,24 @@ ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
   , M_(M)
   , M_inverse_(M.inverse())
 {
-	CHECK(std::fabs(M_.determinant()) > 1.e-10)
-	  << "M must be invertible. Its determinant evaluates to " << M_.determinant();
+  CHECK(std::fabs(M_.determinant()) > 1.e-10)
+    << "M must be invertible. Its determinant evaluates to " << M_.determinant();
 }
 
-void ImuIntrinsicModelScaleMisalignment::undistort(Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignment::undistort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  in = M_inverse_ * (in - b_);
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  return M_inverse_ * (primary.head<3>() - b_);
 }
 
-void ImuIntrinsicModelScaleMisalignment::distort(Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignment::distort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  in = M_ * in + b_;
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  return M_ * primary.head<3>() + b_;
 }
 
 //------------------------------------------------------------------------------
@@ -94,21 +108,33 @@ ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignme
   : ImuIntrinsicModel(Type, delay, range)
   , b_(b)
   , M_(M)
+  , M_inverse_(M.inverse())
   , Ma_(Ma)
 {
+  CHECK(std::fabs(M_.determinant()) > 1.e-10)
+    << "M must be invertible. Its determinant evaluates to " << M_.determinant();
 }
 
-void ImuIntrinsicModelScaleMisalignmentGSensitivity::undistort(
-    Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignmentGSensitivity::undistort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
-  //! This model would need linear accelerations in addition to angular velocities.
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  CHECK_GE(secondary.rows(), 3) << "Secondary model input has incorrect size.";
+  Vector3 a = secondary.head<3>();
+  Vector3 w = primary.head<3>();
+  return M_inverse_ * (w - Ma_ * a - b_);
 }
 
-void ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
-    Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  CHECK_GE(secondary.rows(), 3) << "Secondary model input has incorrect size.";
+  Vector3 a = secondary.head<3>();
+  Vector3 w = primary.head<3>();
+  return M_ * w + Ma_ * a + b_;
 }
 
 //------------------------------------------------------------------------------
@@ -122,21 +148,35 @@ ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignment
   : ImuIntrinsicModel(Type, delay, range)
   , b_(b)
   , M_(M)
+  , M_inverse_(M.inverse())
   , R_(R)
 {
+  CHECK(std::fabs(M_.determinant()) > 1.e-10)
+    << "M must be invertible. Its determinant evaluates to " << M_.determinant();
 }
 
-void ImuIntrinsicModelScaleMisalignmentSizeEffect::undistort(
-    Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignmentSizeEffect::undistort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
-  //! This model would need angular accelerations in addition.
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  CHECK_GE(secondary.rows(), 6) << "Secondary model input has incorrect size.";
+  Vector3 a = primary.head<3>();
+  Vector3 w = secondary.head<3>();
+  Vector3 w_dot = secondary.segment<3>(3);
+  return M_inverse_ * (a - b_) - (skewSymmetric(w_dot) * R_ + skewSymmetric(w) * skewSymmetric(w) * R_).diagonal();
 }
 
-void ImuIntrinsicModelScaleMisalignmentSizeEffect::distort(
-    Eigen::Ref<measurement_t> in) const
+Vector3 ImuIntrinsicModelScaleMisalignmentSizeEffect::distort(
+    const Eigen::Ref<const primary_measurement_t>& primary,
+    const Eigen::Ref<const secondary_measurement_t>& secondary) const
 {
-  //! @todo
+  CHECK_GE(primary.rows(), 3) << "Primary model input has incorrect size.";
+  CHECK_GE(secondary.rows(), 6) << "Secondary model input has incorrect size.";
+  Vector3 a = primary.head<3>();
+  Vector3 w = secondary.head<3>();
+  Vector3 w_dot = secondary.segment<3>(3);
+  return M_ * (a + (skewSymmetric(w_dot) * R_ + skewSymmetric(w) * skewSymmetric(w) * R_).diagonal()) + b_;
 }
 
 } // namespace ze

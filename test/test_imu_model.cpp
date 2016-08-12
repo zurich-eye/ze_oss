@@ -42,10 +42,12 @@ TEST(ImuModelTest, testUndistortion)
 
   ImuModel model(a_model, g_model);
 
-  ImuModel::measurement_t measurement;
-  measurement << 1., 2., 3., 4., 5., 6.;
-  model.undistort(measurement);
-  EXPECT_EQ(measurement, (ImuModel::measurement_t() << 3., 2., 1., 6., 5., 4.).finished());
+  Vector3 gyro_measurement;
+  Vector3 accel_measurement;
+  accel_measurement << 1., 2., 3.;
+  gyro_measurement << 4., 5., 6.;
+  Vector6 undistorted_measurement = model.undistort(accel_measurement, gyro_measurement);
+  EXPECT_EQ(undistorted_measurement, (Vector6() << 3., 2., 1., 6., 5., 4.).finished());
 
   EXPECT_EQ(a_model, model.accelerometerModel());
   EXPECT_EQ(g_model, model.gyroscopeModel());
