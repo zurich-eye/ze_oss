@@ -54,7 +54,7 @@ struct InterpolatorNearest
   {
     auto it_before = buffer->iterator_equal_or_before(time);
     // caller should check the bounds:
-    CHECK_NE(it_before, buffer->times_.end());
+    CHECK(it_before != buffer->times_.end());
 
     return interpolate(buffer, time, it_before);
   }
@@ -92,7 +92,7 @@ struct InterpolatorLinear
   {
     auto it_before = buffer->iterator_equal_or_before(time);
     // caller should check the bounds:
-    CHECK_NE(it_before, buffer->times_.end());
+    CHECK(it_before != buffer->times_.end());
 
     return interpolate(buffer, time, it_before);
   }
@@ -248,6 +248,8 @@ public:
   //! returns an iterator to the first element in the times_ ring that
   //! is greater or equal to stamp
   inline typename timering_t::iterator lower_bound(time_t stamp);
+
+  inline std::mutex& mutex() {return mutex_;}
 
 protected:
   mutable std::mutex mutex_;
