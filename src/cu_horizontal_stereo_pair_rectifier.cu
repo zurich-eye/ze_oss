@@ -7,67 +7,64 @@ template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::HorizontalStereoPairRectifier(
-    Vector4& transformed_left_cam_params,
-    Vector4& transformed_right_cam_params,
+    Vector4& transformed_cam0_params,
+    Vector4& transformed_cam1_params,
     FloatType& horizontal_offset,
     const Size2u& img_size,
-    const Vector4& left_camera_params,
-    const Vector4& left_dist_coeffs,
-    const Vector4& right_camera_params,
-    const Vector4& right_dist_coeffs,
-    const Transformation& T_L_R)
+    const Vector4& cam0_params,
+    const Vector4& cam0_dist_coeffs,
+    const Vector4& cam1_params,
+    const Vector4& cam1_dist_coeffs,
+    const Transformation& T_cam1_cam0)
 {
-  Matrix3 left_H;
-  Matrix3 right_H;
+  Matrix3 cam0_H;
+  Matrix3 cam1_H;
 
-  std::tie(left_H, right_H,
-           transformed_left_cam_params,
-           transformed_right_cam_params, horizontal_offset) =
+  std::tie(cam0_H, cam1_H,
+           transformed_cam0_params,
+           transformed_cam1_params, horizontal_offset) =
       computeHorizontalStereoParameters <CameraModel, DistortionModel>(img_size,
-                                                                       left_camera_params,
-                                                                       left_dist_coeffs,
-                                                                       right_camera_params,
-                                                                       right_dist_coeffs,
-                                                                       T_L_R);
+                                                                       cam0_params,
+                                                                       cam0_dist_coeffs,
+                                                                       cam1_params,
+                                                                       cam1_dist_coeffs,
+                                                                       T_cam1_cam0);
 
-  //! Allocate rectifiers for the left and right cameras
-  const Matrix3 inv_left_H = left_H.inverse();
-  const Matrix3 inv_right_H = right_H.inverse();
-  left_rectifier_.reset(
+  //! Allocate rectifiers
+  const Matrix3 inv_cam0_H = cam0_H.inverse();
+  const Matrix3 inv_cam1_H = cam1_H.inverse();
+  rectifiers_[0].reset(
         new StereoRectifier<CameraModel, DistortionModel, Pixel>(
-          img_size, left_camera_params, transformed_left_cam_params, left_dist_coeffs, inv_left_H));
-  right_rectifier_.reset(
+          img_size, cam0_params, transformed_cam0_params,
+          cam0_dist_coeffs, inv_cam0_H));
+  rectifiers_[1].reset(
         new StereoRectifier<CameraModel, DistortionModel, Pixel>(
-          img_size, right_camera_params, transformed_right_cam_params, right_dist_coeffs, inv_right_H));
+          img_size, cam1_params, transformed_cam1_params,
+          cam1_dist_coeffs, inv_cam1_H));
 }
 
 template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
 void HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::rectify(
-    ImageGpu<Pixel>& left_dst,
-    ImageGpu<Pixel>& right_dst,
-    const ImageGpu<Pixel>& left_src,
-    const ImageGpu<Pixel>& right_src) const
+    ImageGpu<Pixel>& cam0_dst,
+    ImageGpu<Pixel>& cam1_dst,
+    const ImageGpu<Pixel>& cam0_src,
+    const ImageGpu<Pixel>& cam1_src) const
 {
-  left_rectifier_->rectify(left_dst, left_src);
-  right_rectifier_->rectify(right_dst, right_src);
+  rectifiers_[0]->rectify(cam0_dst, cam0_src);
+  rectifiers_[1]->rectify(cam1_dst, cam1_src);
 }
 
 template <typename CameraModel,
           typename DistortionModel,
           typename Pixel>
-const ImageGpu32fC2& HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::getLeftCameraUndistortRectifyMap() const
+const ImageGpu32fC2& HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::getUndistortRectifyMap(
+    int8_t cam_idx) const
 {
-  return left_rectifier_->getUndistortRectifyMap();
-}
-
-template <typename CameraModel,
-          typename DistortionModel,
-          typename Pixel>
-const ImageGpu32fC2& HorizontalStereoPairRectifier<CameraModel, DistortionModel, Pixel>::getRightCameraUndistortRectifyMap() const
-{
-  return right_rectifier_->getUndistortRectifyMap();
+  CHECK_GE(cam_idx, 0);
+  CHECK_LE(cam_idx, 1);
+  return rectifiers_[cam_idx]->getUndistortRectifyMap();
 }
 
 // Explicit template instantiations

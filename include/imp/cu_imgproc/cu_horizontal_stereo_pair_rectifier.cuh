@@ -7,7 +7,7 @@ namespace ze {
 namespace cu {
 
 //! A HorizontalStereoPairRectifier is used to rectify images acquired by a fully calibrated
-//! camera pair in horizontal stereo setting. The left camera is used as reference.
+//! camera pair in horizontal stereo setting.
 template<typename CameraModel,
          typename DistortionModel,
          typename Pixel>
@@ -15,46 +15,45 @@ class HorizontalStereoPairRectifier
 {
 public:
   //! \brief HorizontalStereoPairRectifier
-  //! \param transformed_left_cam_params The output left camera parameters [fx, fy, cx, cy]^T
-  //! \param transformed_right_cam_params The output right camera parameters [fx, fy, cx, cy]^T
+  //! \param transformed_cam0_params The output camera 0 parameters [fx, fy, cx, cy]^T
+  //! in the rectified reference frame.
+  //! \param transformed_cam1_params The output camera 1 parameters [fx, fy, cx, cy]^T
+  //! in the rectified reference frame.
   //! \param horizontal_offset Output horizontal offset in the rectified reference system.
   //! \param img_size The size of the images to rectify.
-  //! \param left_camera_params The camera parameters [fx, fy, cx, cy]^T for the left camera
-  //! for the left camera in the rectified reference frame.
-  //! \param left_dist_coeffs The distortion coefficients for the left camera
-  //! \param right_camera_params The camera parameters [fx, fy, cx, cy]^T for the right camera
-  //! for the right camera in the rectified reference frame.
-  //! \param right_dist_coeffs The distortion coefficients for the right camera.
-  //! \param T_l_r transformation from "Right" to "Left" reference system.
-  HorizontalStereoPairRectifier(Vector4& transformed_left_cam_params,
-                                Vector4& transformed_right_cam_params,
+  //! \param cam0_params The camera parameters [fx, fy, cx, cy]^T for the camera 0
+  //! \param cam0_dist_coeffs The distortion coefficients for the camera 0
+  //! \param cam1_params The camera parameters [fx, fy, cx, cy]^T for the camera 1
+  //! \param cam1_dist_coeffs The distortion coefficients for the camera 1.
+  //! \param T_cam1_cam0 transformation from cam0 to cam1 reference system.
+  HorizontalStereoPairRectifier(Vector4& transformed_cam0_params,
+                                Vector4& transformed_cam1_params,
                                 FloatType& horizontal_offset,
                                 const Size2u& img_size,
-                                const Vector4& left_camera_params,
-                                const Vector4& left_dist_coeffs,
-                                const Vector4& right_camera_params,
-                                const Vector4& right_dist_coeffs,
-                                const Transformation& T_L_R);
+                                const Vector4& cam0_params,
+                                const Vector4& cam0_dist_coeffs,
+                                const Vector4& cam1_params,
+                                const Vector4& cam1_dist_coeffs,
+                                const Transformation& T_cam1_cam0);
 
   ~HorizontalStereoPairRectifier() = default;
 
   //! \brief Run rectification
-  //! \param left_dst Destination image to store the rectified left camera image in GPU memory.
-  //! \param right_dst Destination image to store the rectified right camera image in GPU memory.
-  //! \param left_src The left source image in GPU memory
-  //! \param right_src The right source image in GPU memory
-  void rectify(ImageGpu<Pixel>& left_dst,
-               ImageGpu<Pixel>& right_dst,
-               const ImageGpu<Pixel>& left_src,
-               const ImageGpu<Pixel>& right_src) const;
+  //! \param cam0_dst Destination image to store the rectified camera 0 image in GPU memory.
+  //! \param cam1_dst Destination image to store the rectified camera 1 image in GPU memory.
+  //! \param cam0_src The source camera 0 image in GPU memory
+  //! \param cam1_src The source camera 1 image in GPU memory
+  void rectify(ImageGpu<Pixel>& cam0_dst,
+               ImageGpu<Pixel>& cam1_dst,
+               const ImageGpu<Pixel>& cam0_src,
+               const ImageGpu<Pixel>& cam1_src) const;
 
   //! \brief Retrieves the computed undistortion-rectification maps
-  const ImageGpu32fC2& getLeftCameraUndistortRectifyMap() const;
-  const ImageGpu32fC2& getRightCameraUndistortRectifyMap() const;
+  //! \param cam_idx Camera index in (0, 1)
+  const ImageGpu32fC2& getUndistortRectifyMap(int8_t cam_idx) const;
 
 private:
-  std::unique_ptr<StereoRectifier<CameraModel, DistortionModel, Pixel>> left_rectifier_;
-  std::unique_ptr<StereoRectifier<CameraModel, DistortionModel, Pixel>> right_rectifier_;
+  std::unique_ptr<StereoRectifier<CameraModel, DistortionModel, Pixel>> rectifiers_[2];
 };
 
 using HorizontalStereoPairRectifierEquidist32fC1 = HorizontalStereoPairRectifier<PinholeGeometry, EquidistantDistortion, Pixel32fC1>;

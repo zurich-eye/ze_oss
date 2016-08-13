@@ -142,6 +142,9 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   ze::Transformation T_C1_B = rig->T_C_B(1);
   ze::Transformation T_C0_C1 = T_C0_B * T_C1_B.inverse();
 
+  VLOG(2) << "Stereo extrinsics (T_C0_C1):\n" << T_C0_C1;
+  VLOG(2) << "Stereo extrinsics (T_C1_C0):\n" << T_C0_C1.inverse();
+
   // Allocate rectifier
   Vector4 transformed_left_cam_params;
   Vector4 transformed_right_cam_params;
