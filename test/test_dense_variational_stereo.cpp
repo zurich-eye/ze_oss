@@ -27,6 +27,51 @@
 DEFINE_bool(visualize, false, "Show input images and results");
 
 //-----------------------------------------------------------------------------
+// check whether machine is little endian
+int littleendian()
+{
+    int intval = 1;
+    uchar *uval = (uchar *)&intval;
+    return uval[0] == 1;
+}
+
+//-----------------------------------------------------------------------------
+// write pfm image
+// 1-band PFM image, see http://netpbm.sourceforge.net/doc/pfm.html
+void writePFM(const ze::ImageRaw32fC1& disp, const std::string& filename,
+              float scalefactor=1.f/255.f)
+{
+  // Open the file
+  FILE *stream = fopen(filename.c_str(), "wb");
+  CHECK(stream != 0) << "writePFM could not open File " << filename;
+
+  // sign of scalefact indicates endianness, see pfms specs
+  if (littleendian())
+  {
+    scalefactor = -scalefactor;
+  }
+
+  // write the header: 3 lines: Pf, dimensions, scale factor (negative val == little endian)
+  fprintf(stream, "Pf\n%d %d\n%f\n", disp.width(), disp.height(), scalefactor);
+
+
+  for (uint32_t y = disp.height(); y-- > 0;)
+  {
+    for (uint32_t x = 0; x < disp.width(); ++x)
+    {
+      float disp_value = -static_cast<float>(disp(x,y));
+      if (disp_value < 0.f)
+      {
+        disp_value = INFINITY;
+      }
+      CHECK(1 == static_cast<uint32_t>(
+              fwrite(&disp_value, sizeof(float), 1, stream)));
+    }
+  }
+  fclose(stream);
+}
+
+//-----------------------------------------------------------------------------
 // parameters: solver, scale_factor, expected error
 class DenseStereoTests
     : public ::testing::TestWithParam<std::tuple<ze::cu::StereoPDSolver, double, double>>
@@ -42,22 +87,16 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   // Load two images:
   std::string data_path = ze::getTestDataDir("computer_vision_images");
   ImageGpu32fC1::Ptr cuimg_ref, cuimg_cur;
-  cvBridgeLoad(cuimg_ref, data_path + "/cones/im2.png", ze::PixelOrder::gray);
-  cvBridgeLoad(cuimg_cur, data_path + "/cones/im6.png", ze::PixelOrder::gray);
-
-  {
-    ze::Pixel32fC1 min_val,max_val;
-    minMax(*cuimg_ref, min_val, max_val);
-    VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
-  }
+  cvBridgeLoad(cuimg_ref, data_path + "/middlebury/trainingQ/Teddy/im0.png", ze::PixelOrder::gray);
+  cvBridgeLoad(cuimg_cur, data_path + "/middlebury/trainingQ/Teddy/im1.png", ze::PixelOrder::gray);
 
   // compute dense stereo
   StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
   stereo_params->solver = std::get<0>(GetParam());
   stereo_params->ctf.scale_factor = std::get<1>(GetParam());;
-  stereo_params->ctf.iters = 100;
-  stereo_params->ctf.warps  = 10;
-  stereo_params->ctf.apply_median_filter = true;
+  //  stereo_params->ctf.iters = 100;
+  //  stereo_params->ctf.warps  = 10;
+  //  stereo_params->ctf.apply_median_filter = true;
 
   std::unique_ptr<Stereo> stereo(new Stereo(stereo_params));
 
@@ -76,6 +115,13 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
     VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
   }
 
+  { /// @todo MWE make function
+    ze::ImageRaw32fC1::Ptr disp = std::make_shared<ze::ImageRaw32fC1>(*cudisp);
+    std::string outfile(data_path + "/middlebury/trainingQ/Teddy/disp0VariationalStereo.pfm");
+//    writeFilePFM(reinterpret_cast<float*>(disp->data()), disp->width(), disp->height(),
+//                 outfile.c_str(), 1./55);
+    writePFM(*disp, outfile, 1.f/55.f);
+  }
 
   if (FLAGS_visualize)
   {
@@ -116,22 +162,22 @@ std::tuple<ze::cu::StereoPDSolver, double, double> const
 StereoTestsParametrizationTable[] =
 {
   //              solver                           scale_factor  error
-  std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
-  std::make_tuple(Solver::PrecondHuberL1,          0.5,          0.0),
-  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.5,          0.0),
+  //  std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
+  //  std::make_tuple(Solver::PrecondHuberL1,          0.5,          0.0),
+  //  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.5,          0.0),
   //              solver                           scale_factor  error
   std::make_tuple(Solver::HuberL1,                 0.8,          0.0),
   std::make_tuple(Solver::PrecondHuberL1,          0.8,          0.0),
   std::make_tuple(Solver::PrecondHuberL1Weighted,  0.8,          0.0),
   //              solver                           scale_factor  error
-  std::make_tuple(Solver::HuberL1,                 0.95,         0.0),
-  std::make_tuple(Solver::PrecondHuberL1,          0.95,         0.0),
-  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.95,         0.0),
+  //  std::make_tuple(Solver::HuberL1,                 0.95,         0.0),
+  //  std::make_tuple(Solver::PrecondHuberL1,          0.95,         0.0),
+  //  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.95,         0.0),
 };
 
 //-----------------------------------------------------------------------------
 INSTANTIATE_TEST_CASE_P(
-  DenseStereoSolverTests, DenseStereoTests,
+    DenseStereoSolverTests, DenseStereoTests,
     ::testing::ValuesIn(StereoTestsParametrizationTable));
 
 
