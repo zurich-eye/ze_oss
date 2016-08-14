@@ -22,6 +22,7 @@ set(HEADERS
   include/ze/geometry/align_points.h
   include/ze/geometry/align_poses.h
   include/ze/geometry/clam.h
+  include/ze/geometry/epipolar_geometry.hpp
   include/ze/geometry/line.hpp
   include/ze/geometry/lsq_solver.h
   include/ze/geometry/lsq_solver-inl.h
