@@ -24,7 +24,8 @@
 
 #include <imp/cu_correspondence/variational_stereo.hpp>
 
-DEFINE_bool(visualize, false, "Show input images and results");
+DEFINE_bool(visualize, false, "Show input images and results.");
+DEFINE_bool(writePFM, true, "Write disparity output as PFM file.");
 
 //-----------------------------------------------------------------------------
 // check whether machine is little endian
@@ -115,12 +116,35 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
     VLOG(2) << "disp: min: " << min_val.x << " max: " << max_val.x;
   }
 
-  { /// @todo MWE make function
+
+  if (FLAGS_writePFM)
+  {
+    std::stringstream ss_pfm_filename;
+    ss_pfm_filename << data_path << "/middlebury/trainingQ/Teddy/disp0";
+    std::string algorithm_short_string="?";
+    switch (stereo_params->solver)
+    {
+    case StereoPDSolver::HuberL1:
+      ss_pfm_filename << "HL1";
+      break;
+    case StereoPDSolver::PrecondHuberL1:
+      ss_pfm_filename << "HL1p";
+      break;
+    case StereoPDSolver::PrecondHuberL1Weighted:
+      ss_pfm_filename << "HL1p-w";
+      break;
+    default:
+      ss_pfm_filename << "unknown";
+      break;
+    }
+    ss_pfm_filename << "_sf";
+    ss_pfm_filename << stereo_params->ctf.scale_factor;
+    ss_pfm_filename << ".pfm";
+    std::string pfm_filename = ss_pfm_filename.str();
+
     ze::ImageRaw32fC1::Ptr disp = std::make_shared<ze::ImageRaw32fC1>(*cudisp);
-    std::string outfile(data_path + "/middlebury/trainingQ/Teddy/disp0VariationalStereo.pfm");
-//    writeFilePFM(reinterpret_cast<float*>(disp->data()), disp->width(), disp->height(),
-//                 outfile.c_str(), 1./55);
-    writePFM(*disp, outfile, 1.f/55.f);
+    VLOG(1) << "Writing disparities to '" << pfm_filename << "'.";
+    writePFM(*disp, pfm_filename, 1.f/55.f);
   }
 
   if (FLAGS_visualize)
@@ -162,17 +186,17 @@ std::tuple<ze::cu::StereoPDSolver, double, double> const
 StereoTestsParametrizationTable[] =
 {
   //              solver                           scale_factor  error
-  //  std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
-  //  std::make_tuple(Solver::PrecondHuberL1,          0.5,          0.0),
-  //  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.5,          0.0),
+  std::make_tuple(Solver::HuberL1,                 0.5,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1,          0.5,          0.0),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.5,          0.0),
   //              solver                           scale_factor  error
-  std::make_tuple(Solver::HuberL1,                 0.8,          0.0),
-  std::make_tuple(Solver::PrecondHuberL1,          0.8,          0.0),
-  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.8,          0.0),
+  std::make_tuple(Solver::HuberL1,                 0.8,          1.23),
+  std::make_tuple(Solver::PrecondHuberL1,          0.8,          1.23),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.8,          1.33),
   //              solver                           scale_factor  error
-  //  std::make_tuple(Solver::HuberL1,                 0.95,         0.0),
-  //  std::make_tuple(Solver::PrecondHuberL1,          0.95,         0.0),
-  //  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.95,         0.0),
+  std::make_tuple(Solver::HuberL1,                 0.95,         0.0),
+  std::make_tuple(Solver::PrecondHuberL1,          0.95,         0.0),
+  std::make_tuple(Solver::PrecondHuberL1Weighted,  0.95,         0.0),
 };
 
 //-----------------------------------------------------------------------------
