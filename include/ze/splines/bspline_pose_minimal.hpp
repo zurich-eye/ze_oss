@@ -130,6 +130,7 @@ class BSplinePoseMinimal : public BSpline
                             FloatType lambda);
 
     void addPoseSegment(FloatType tk, const Matrix4& T_n_tk);
+
     void addPoseSegment2(FloatType tk,
                          const Matrix4& T_n_tk,
                          FloatType lambda);
