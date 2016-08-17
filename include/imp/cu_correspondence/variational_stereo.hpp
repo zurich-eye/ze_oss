@@ -24,6 +24,7 @@ public:
 
 public:
   VariationalStereo(Parameters::Ptr params=nullptr);
+  VariationalStereo(ze::Size2u image_size, uint8_t num_images, Parameters::Ptr params=nullptr);
   virtual ~VariationalStereo(); //= default;
 
   virtual void addImage(const ImageGpu32fC1::Ptr& image);

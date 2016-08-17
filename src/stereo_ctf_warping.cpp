@@ -45,13 +45,13 @@ void StereoCtFWarping::init()
     {
     case StereoPDSolver::HuberL1:
       levels_.emplace_back(new SolverStereoHuberL1(params_, sz, i));
-    break;
+      break;
     case StereoPDSolver::PrecondHuberL1:
       levels_.emplace_back(new SolverStereoPrecondHuberL1(params_, sz, i));
-    break;
+      break;
     case StereoPDSolver::PrecondHuberL1Weighted:
       levels_.emplace_back(new SolverStereoPrecondHuberL1Weighted(params_, sz, i));
-    break;
+      break;
     case StereoPDSolver::EpipolarPrecondHuberL1:
     {
       if (!depth_proposal_)
@@ -69,7 +69,7 @@ void StereoCtFWarping::init()
                              params_, sz, i, cams_, F_, T_mov_fix_,
                              *depth_proposal_, *depth_proposal_sigma2_));
     }
-    break;
+      break;
     }
   }
 }
@@ -114,9 +114,9 @@ void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 
   VLOG(1) << "we have now " << images_.size() << " images and "
           <<  image_pyramids_.size() << " pyramids in the CTF instance. "
-          << "params_->ctf.levels: " << params_->ctf.levels
-          << " (" << params_->ctf.coarsest_level
-          << " -> " << params_->ctf.finest_level << ")";
+           << "params_->ctf.levels: " << params_->ctf.levels
+           << " (" << params_->ctf.coarsest_level
+           << " -> " << params_->ctf.finest_level << ")";
 }
 
 //------------------------------------------------------------------------------

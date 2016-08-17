@@ -60,8 +60,8 @@ void writePFM(const ze::ImageRaw32fC1& disp, const std::string& filename,
   {
     for (uint32_t x = 0; x < disp.width(); ++x)
     {
-      float disp_value = -static_cast<float>(disp(x,y));
-      if (disp_value < 0.f)
+      float disp_value = static_cast<float>(disp(x,y));
+      if (disp_value > 0.f)
       {
         disp_value = INFINITY;
       }
@@ -120,7 +120,7 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   if (FLAGS_writePFM)
   {
     std::stringstream ss_pfm_filename;
-    ss_pfm_filename << data_path << "/middlebury/trainingQ/Teddy/disp0";
+    ss_pfm_filename << data_path << "/middlebury/trainingQ/Teddy/disp1";
     std::string algorithm_short_string="?";
     switch (stereo_params->solver)
     {

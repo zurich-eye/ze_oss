@@ -101,7 +101,7 @@ void SolverStereoHuberL1::solve(std::vector<ImageGpu32fC1::Ptr> images)
   // warping
   for (uint32_t warp = 0; warp < params_->ctf.warps; ++warp)
   {
-      VLOG(101) << "SOLVING warp iteration of Huber-L1 stereo model. warp: " << warp;
+    VLOG(101) << "SOLVING warp iteration of Huber-L1 stereo model. warp: " << warp;
 
     u_->copyTo(*u0_);
 

@@ -37,11 +37,11 @@ public:
 
 public:
   StereoCtFWarping() = delete;
-  virtual ~StereoCtFWarping();// = default;
-//  StereoCtFWarping(const StereoCtFWarping&);
-//  StereoCtFWarping(StereoCtFWarping&&);
+  virtual ~StereoCtFWarping();
 
   StereoCtFWarping(Parameters::Ptr params);
+  StereoCtFWarping(ze::Size2u image_size, uint8_t num_images,
+                   Parameters::Ptr params);
 
   void addImage(const ImageGpu32fC1::Ptr& image);
   void reset();
