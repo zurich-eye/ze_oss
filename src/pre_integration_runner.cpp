@@ -3,7 +3,7 @@
 namespace ze {
 
 //------------------------------------------------------------------------------
-PreIntegrationRunner::PreIntegrationRunner(ScenarioRunner::Ptr scenario_runner,
+PreIntegrationRunner::PreIntegrationRunner(ImuSimulator::Ptr scenario_runner,
                                            FloatType imu_sampling_time,
                                            FloatType camera_sampling_time)
   : scenario_runner_(scenario_runner)
@@ -62,13 +62,13 @@ void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
     Vector6 measurement;
     if (corrupted)
     {
-      measurement.head<3>() = scenario_runner_->specific_force_corrupted(t);
-      measurement.tail<3>() = scenario_runner_->angular_velocity_corrupted(t);
+      measurement.head<3>() = scenario_runner_->specificForceCorrupted(t);
+      measurement.tail<3>() = scenario_runner_->angularVelocityCorrupted(t);
     }
     else
     {
-      measurement.head<3>() = scenario_runner_->specific_force_actual(t);
-      measurement.tail<3>() = scenario_runner_->angular_velocity_actual(t);
+      measurement.head<3>() = scenario_runner_->specificForceActual(t);
+      measurement.tail<3>() = scenario_runner_->angularVelocityActual(t);
     }
     imu_measurements.col(i) = measurement;
 

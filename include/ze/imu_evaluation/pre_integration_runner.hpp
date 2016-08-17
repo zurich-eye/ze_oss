@@ -16,7 +16,7 @@ public:
 
   //! Negative sampling values for camera sampling implies a single run where
   //! all imu samples are processed in a single step.
-  PreIntegrationRunner(ScenarioRunner::Ptr scenario_runner,
+  PreIntegrationRunner(ImuSimulator::Ptr scenario_runner,
                        FloatType imu_sampling_time,
                        FloatType camera_sampling_time = -1);
 
@@ -30,7 +30,7 @@ public:
                FloatType end);
 
 private:
-  ScenarioRunner::Ptr scenario_runner_;
+  ImuSimulator::Ptr scenario_runner_;
 
   //! The sampling time of the imu and camera. The camera's sampling interval
   //! should be larger than the imu's.

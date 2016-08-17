@@ -19,7 +19,7 @@
 #include <ze/imu_simulation/scenario.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/csv_trajectory.h>
-#include <ze/imu_simulation/imu_bias.hpp>
+#include <ze/imu_simulation/imu_bias_simulator.hpp>
 #include <ze/splines/viz_splines.hpp>
 #include <ze/visualization/viz_ros.h>
 #include <ze/matplotlib/matplotlibcpp.hpp>
@@ -660,11 +660,11 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
   FloatType end = trajectory_->t_max();
 
   VLOG(1) << "Initialize scenario";
-  Scenario::Ptr scenario = std::make_shared<SplineScenario>(trajectory_);
+  TrajectorySimulator::Ptr scenario = std::make_shared<SplineTrajectorySimulator>(trajectory_);
 
   VLOG(1) << "Initialize scenario runner";
 
-  ImuBias::Ptr bias;
+  ImuBiasSimulator::Ptr bias;
   if (parameters_.imu_bias_type == "continuous")
   {
     bias = generateImuBias(start, end, parameters_.imu_bias_type,
@@ -677,8 +677,8 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
                            Vector3::Ones() * parameters_.imu_acc_bias_const,
                            Vector3::Ones() * parameters_.imu_gyr_bias_const);
   }
-  ScenarioRunner::Ptr scenario_runner =
-      std::make_shared<ScenarioRunner>(scenario,
+  ImuSimulator::Ptr scenario_runner =
+      std::make_shared<ImuSimulator>(scenario,
                                        bias,
                                        accel_noise,
                                        gyro_noise,
