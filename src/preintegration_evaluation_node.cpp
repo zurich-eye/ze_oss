@@ -14,12 +14,12 @@
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
 #include <ze/imu_evaluation/pre_integration_mc_runner.hpp>
-#include <ze/imu_simulation/imu_simulator.hpp>
-#include <ze/imu_simulation/evaluation_tools.hpp>
-#include <ze/imu_simulation/trajectory_simulator.hpp>
+#include <ze/vi_simulation/evaluation_tools.hpp>
+#include <ze/vi_simulation/imu_bias_simulator.hpp>
+#include <ze/vi_simulation/imu_simulator.hpp>
+#include <ze/vi_simulation/trajectory_simulator.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
 #include <ze/common/csv_trajectory.h>
-#include <ze/imu_simulation/imu_bias_simulator.hpp>
 #include <ze/splines/viz_splines.hpp>
 #include <ze/visualization/viz_ros.h>
 #include <ze/matplotlib/matplotlibcpp.hpp>
