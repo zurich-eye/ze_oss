@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_vi_simulation</name>
+  <version>0.0.1</version>
+  <description>
+    Tools to simulate IMUs
+  </description>
+
+  <maintainer email="luc.oth@WyssZurich.ch">Luc Oth</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+  <depend>ze_cmake</depend>
+  <depend>ze_common</depend>
+  <depend>ze_splines</depend>
+  <depend>ze_data_provider</depend>
+  <depend>minkindr</depend>
+
+  <export></export>
+</package>
