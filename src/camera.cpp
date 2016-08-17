@@ -16,7 +16,7 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
   switch (type_)
   {
     case CameraType::Pinhole:
-      CHECK_EQ(distortion_params_.size(), 1);
+      CHECK_EQ(distortion_params_.size(), 0);
       break;
     case CameraType::PinholeRadialTangential:
       CHECK_EQ(distortion_params_.size(), 4);
