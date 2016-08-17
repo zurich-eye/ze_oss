@@ -3,7 +3,7 @@
 #include <ze/common/types.h>
 #include <ze/data_provider/data_provider_base.hpp>
 #include <ze/imu_evaluation/pre_integrator_base.hpp>
-#include <ze/imu_simulation/scenario_runner.hpp>
+#include <ze/imu_simulation/imu_simulator.hpp>
 
 namespace ze {
 
