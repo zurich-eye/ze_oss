@@ -136,7 +136,8 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
     {
       LOG(FATAL) << "Invalid bag end time: "
                  << absolute_end_time
-                 << ". Check that the bag file is properly indexed.";
+                 << ". Check that the bag file is properly indexed"
+                 << " by running 'rosbag reindex file.bag'.";
     }
 
     // Compute start and stop time.
@@ -157,13 +158,15 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
     {
       LOG(ERROR) << "Provided stop time is less than bag begin time. "
                  << "Please make sure to provide a valid stop time and "
-                 << "check that the bag file is properly indexed.";
+                 << "check that the bag file is properly indexed "
+                 << "by running 'rosbag reindex file.bag'.";
     }
     else if (absolute_stop_time > absolute_end_time)
     {
       LOG(ERROR) << "Provided stop time is greater than bag end time. "
                  << "Please make sure to provide a valid stop time and "
-                 << "check that the bag file is properly indexed.";
+                 << "check that the bag file is properly indexed "
+                 << "by running 'rosbag reindex file.bag'.";
     }
     else
     {
