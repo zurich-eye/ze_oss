@@ -77,21 +77,22 @@ TEST(TrajectorySimulator, testConsistency)
   ImuSimulator imu_simulator(
         scenario, bias, acc_noise, gyr_noise, 100, 100, gravity_magnitude);
 
-  VLOG(1) << imu_simulator.specificForceActual(11).normalized();
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+                imu_simulator.specificForceActual(11),
+                Vector3(9.38534, -1.7953, 2.219960), 1e-4));
 
   Matrix3 R_B_I;
   R_B_I.col(2) = imu_simulator.specificForceActual(11).normalized();
   R_B_I.col(0) = - (R_B_I.col(2).cross(Vector3::UnitY())).normalized();
-  //R_B_I.col(0) = (Vector3(R_B_I(2, 2), 0, -R_B_I(0, 2))).normalized(); // - R(2) x [0, 1, 0]^T
   R_B_I.col(1) = R_B_I.col(2).cross(R_B_I.col(0));
-
   R_B_I = R_B_I.transpose().eval();
 
-  VLOG(1) << R_B_I << "\n";
-  VLOG(1) << bs->orientation(11) << "\n";
-  VLOG(1) << R_B_I.eulerAngles(2, 1, 0) << "\n";
-  VLOG(1) << bs->orientation(15).eulerAngles(2, 1, 0) << "\n";
-
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+                R_B_I.eulerAngles(2, 1, 0),
+                Vector3(0.6585, -1.27549, -0.68003), 1e-4));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+                bs->orientation(15).eulerAngles(2, 1, 0),
+                Vector3(2.46156, -1.86611, 2.46156), 1e-4));
 
 }
 

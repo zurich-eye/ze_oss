@@ -6,10 +6,6 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 
-# The matplotlib-cpp headers are linked against
-find_package(PythonLibs)
-include_directories(${PYTHON_INCLUDE_DIRS})
-
 #############
 # LIBRARIES #
 #############

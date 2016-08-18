@@ -26,11 +26,7 @@ public:
 class ConstantBiasSimulator : public ImuBiasSimulator
 {
 public:
-  ConstantBiasSimulator()
-    : bias_acc_(0.0, 0.0, 0.0)
-    , bias_gyro_(0.0, 0.0, 0.0)
-  {
-  }
+  ConstantBiasSimulator() = default;
 
   ConstantBiasSimulator(const Vector3& bias_acc, const Vector3& bias_gyro) :
       bias_acc_(bias_acc), bias_gyro_(bias_gyro) {
@@ -52,8 +48,8 @@ public:
   {}
 
 private:
-  Vector3 bias_acc_;
-  Vector3 bias_gyro_;
+  Vector3 bias_acc_ = Vector3::Zero();
+  Vector3 bias_gyro_ = Vector3::Zero();
 };
 
 //! A continous-time bias curve seeded from a discrete random walk.
@@ -62,14 +58,15 @@ class ContinuousBiasSimulator : public ImuBiasSimulator
 public:
   //! Given the process noise, start/end times and number of samples to take
   //! initializes a spline from a discrete random walk.
-  ContinuousBiasSimulator(const Vector3& gyr_bias_noise_density,
-                 const Vector3& acc_bias_noise_density,
-                 FloatType start_time,
-                 FloatType end_time,
-                 size_t samples,
-                 size_t spline_order = 3,
-                 size_t spline_segments = 0,
-                 size_t spline_smoothing_lambda = 1e-5);
+  ContinuousBiasSimulator(
+      const Vector3& gyr_bias_noise_density,
+      const Vector3& acc_bias_noise_density,
+      FloatType start_time,
+      FloatType end_time,
+      size_t samples,
+      size_t spline_order = 3,
+      size_t spline_segments = 0,
+      size_t spline_smoothing_lambda = 1e-5);
 
   //! Get accelerometer bias at time t.
   const Vector3 accelerometer(FloatType t) const
