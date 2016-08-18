@@ -108,32 +108,45 @@ class BSplinePoseMinimal : public BSpline
 
     //! takes the two transformation matrices at two points in time
     //! to construct a pose spline
-    void initPoseSpline(FloatType t0,
-                        FloatType t1,
-                        const Matrix4& T_n_t0,
-                        const Matrix4& T_n_t);
+    void initPoseSpline(
+        FloatType t0,
+        FloatType t1,
+        const Matrix4& T_n_t0,
+        const Matrix4& T_n_t);
 
     //! take the pose in the minimal parametrization to initializ the spline
-    void initPoseSpline2(const VectorX& times,
-                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
-                         int num_segments,
-                         FloatType lambda);
-    void initPoseSpline3(const VectorX& times,
-                         const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
-                         int num_segments,
-                         FloatType lambda);
+    void initPoseSpline2(
+        const VectorX& times,
+        const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+        int num_segments,
+        FloatType lambda);
+
+    void initPoseSpline3(
+        const VectorX& times,
+        const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+        int num_segments,
+        FloatType lambda);
 
     //! initialize a bspline given a vector of poses
-    void initPoseSplinePoses(const VectorX& times,
-                            const std::vector<Matrix4>& poses,
-                            int num_segments,
-                            FloatType lambda);
+    void initPoseSplinePoses(
+        const VectorX& times,
+        const std::vector<Matrix4>& poses,
+        int num_segments,
+        FloatType lambda);
 
-    void addPoseSegment(FloatType tk, const Matrix4& T_n_tk);
+    void initPoseSplinePoses(
+        const StampedTransformationVector& poses,
+        int num_segments,
+        FloatType lambda);
 
-    void addPoseSegment2(FloatType tk,
-                         const Matrix4& T_n_tk,
-                         FloatType lambda);
+    void addPoseSegment(
+        FloatType tk,
+        const Matrix4& T_n_tk);
+
+    void addPoseSegment2(
+        FloatType tk,
+        const Matrix4& T_n_tk,
+        FloatType lambda);
 
     Matrix4 curveValueToTransformation(const VectorX& c) const;
     VectorX transformationToCurveValue(const Matrix4& T) const;

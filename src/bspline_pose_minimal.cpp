@@ -1,5 +1,7 @@
 #include <ze/splines/bspline_pose_minimal.hpp>
 
+#include <ze/common/time_conversions.h>
+
 namespace ze {
 
 template<class RP>
@@ -434,16 +436,37 @@ void BSplinePoseMinimal<RP>::initPoseSpline3(
 }
 
 template<class RP>
-void BSplinePoseMinimal<RP>::initPoseSplinePoses(const VectorX& times,
-                         const std::vector<Matrix4>& poses,
-                         int num_segments,
-                         FloatType lambda)
+void BSplinePoseMinimal<RP>::initPoseSplinePoses(
+    const VectorX& times,
+    const std::vector<Matrix4>& poses,
+    int num_segments,
+    FloatType lambda)
 {
   Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
   parameters.resize(6, poses.size());
   for (size_t i = 0; i < poses.size(); ++i)
   {
     parameters.col(i) = transformationToCurveValue(poses[i]);
+  }
+
+  initPoseSpline3(times, parameters, num_segments, lambda);
+}
+
+template<class RP>
+void BSplinePoseMinimal<RP>::initPoseSplinePoses(
+    const StampedTransformationVector& poses,
+    int num_segments,
+    FloatType lambda)
+{
+  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
+  parameters.resize(6, poses.size());
+  VectorX times(poses.size());
+  for (size_t i = 0; i < poses.size(); ++i)
+  {
+    const StampedTransformation& pose = poses[i];
+    parameters.col(i) =
+        transformationToCurveValue(pose.second.getTransformationMatrix());
+    times(i) = nanosecToSecTrunc(pose.first);
   }
 
   initPoseSpline3(times, parameters, num_segments, lambda);
