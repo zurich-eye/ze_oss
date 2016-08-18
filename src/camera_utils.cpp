@@ -1,7 +1,9 @@
 #include <ze/cameras/camera_utils.h>
 
 #include <random>
+#include <ze/common/config.hpp>
 #include <ze/common/logging.hpp>
+#include <ze/common/random_matrix.hpp>
 
 #include <ze/cameras/camera_rig.h>
 
@@ -16,15 +18,11 @@ Keypoints generateRandomKeypoints(
   DEBUG_CHECK_GT(size.width(), margin + 1u);
   DEBUG_CHECK_GT(size.height(), margin + 1u);
 
-  std::ranlux24 gen;
-  std::uniform_real_distribution<FloatType> dist_x(margin, size.width() - 1 - margin);
-  std::uniform_real_distribution<FloatType> dist_y(margin, size.height() - 1 - margin);
-
   Keypoints kp(2, num_keypoints);
   for(uint32_t i = 0u; i < num_keypoints; ++i)
   {
-    kp(0,i) = dist_x(gen);
-    kp(1,i) = dist_y(gen);
+    kp(0,i) = sampleUniformRealDistribution<FloatType>(false, margin, size.width() - 1 - margin);
+    kp(1,i) = sampleUniformRealDistribution<FloatType>(false, margin, size.height() - 1 - margin);
   }
   return kp;
 }
@@ -68,11 +66,9 @@ std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(
   Keypoints px = generateRandomKeypoints(cam.size(), margin, num_points);
   Bearings f = cam.backProjectVectorized(px);
   Positions pos = f;
-  std::ranlux24 gen;
-  std::uniform_real_distribution<FloatType> scale(min_depth, max_depth);
   for(uint32_t i = 0u; i < num_points; ++i)
   {
-    pos.col(i) *= scale(gen);
+    pos.col(i) *= sampleUniformRealDistribution<FloatType>(false, min_depth, max_depth);
   }
   return std::make_tuple(px, f, pos);
 }
