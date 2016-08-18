@@ -18,6 +18,7 @@ DECLARE_bool(calib_use_single_camera);
 
 namespace ze {
 
+// convenience typedefs.
 using CameraVector     = std::vector<Camera::Ptr>;
 using StereoIndexPair  = std::pair<uint8_t, uint8_t>;
 using StereoIndexPairs = std::vector<StereoIndexPair>;
@@ -37,12 +38,18 @@ public:
       const FloatType stereo_min_fov_overlap = 0.7,
       const FloatType stereo_min_baseline = 0.04);
 
-  //! @name Camera poses with respect to body frame.
+  //! @name Camera extrinsic calibration.
   //! @{
   inline const Transformation& T_C_B(size_t camera_index) const
   {
     DEBUG_CHECK_LT(camera_index, T_C_B_.size());
     return T_C_B_[camera_index];
+  }
+
+  inline Transformation T_B_C(size_t camera_index) const
+  {
+    DEBUG_CHECK_LT(camera_index, T_C_B_.size());
+    return T_C_B_[camera_index].inverse();
   }
 
   inline const TransformationVector& T_C_B_vec() const

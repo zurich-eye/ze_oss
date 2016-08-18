@@ -170,15 +170,15 @@ StereoIndexPairs identifyStereoPairsInRig(
       if (overlap > min_fov_overlap && baseline > min_baseline)
       {
         VLOG(1) << "Camera " << cam_A << " and " << cam_B
-                 << ": Overlap = " << overlap << ", Baseline = " << baseline
-                 << " -> Stereo Rig.";
+                << ": Overlap = " << overlap << ", Baseline = " << baseline
+                << " -> Stereo Rig.";
         pairs.push_back(std::make_pair(cam_A, cam_B));
       }
       else
       {
         VLOG(1) << "Camera " << cam_A << " and " << cam_B
-                 << ": Overlap = " << overlap << ", Baseline = " << baseline
-                 << " -> No stereo rig (baseline or overlap too small)";
+                << ": Overlap = " << overlap << ", Baseline = " << baseline
+                << " -> No stereo rig (baseline or overlap too small)";
       }
     }
   }
