@@ -16,7 +16,7 @@ TEST(TrajectorySimulator, testSplineScenario)
 
   // Create trajectory:
   PoseSeries pose_series;
-  pose_series.load(joinPath(getTestDataDir("ze_applanix_gt_data"), "traj_gt.csv"));
+  pose_series.load(joinPath(getTestDataDir("ze_applanix_gt_data"), "traj_es.csv"));
   StampedTransformationVector poses = pose_series.getStampedTransformationVector();
 
   std::shared_ptr<BSplinePoseMinimalRotationVector> bs =
@@ -26,7 +26,7 @@ TEST(TrajectorySimulator, testSplineScenario)
 
   // Create camera:
   CameraRig::Ptr rig = cameraRigFromYaml(joinPath(getTestDataDir("camera_models"),
-                                                  "camera_rig_1.yaml"));
+                                                  "camera_rig_3.yaml"));
 
   // Create visualizer:
   Visualizer::Ptr visualizer = std::make_shared<VisualizerRos>();
