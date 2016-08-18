@@ -126,22 +126,56 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
   {
     CHECK_GE(FLAGS_data_source_start_time_s, 0);
     CHECK_GE(FLAGS_data_source_stop_time_s, 0);
+
+    // Retrieve begin and end times from the bag file (given the topic query).
     const ros::Time absolute_time_offset = bag_view_->getBeginTime();
+    VLOG(2) << "Bag begin time: " << absolute_time_offset;
+    const ros::Time absolute_end_time = bag_view_->getEndTime();
+    VLOG(2) << "Bag end time: " << absolute_end_time;
+    if (absolute_end_time < absolute_time_offset)
+    {
+      LOG(FATAL) << "Invalid bag end time: "
+                 << absolute_end_time
+                 << ". Check that the bag file is properly indexed.";
+    }
+
+    // Compute start and stop time.
     const ros::Duration data_source_start_time(FLAGS_data_source_start_time_s);
     const ros::Time absolute_start_time =
         data_source_start_time.isZero() ?
-          ros::TIME_MIN : absolute_time_offset + data_source_start_time;
-    const ros::Time absolute_end_time = bag_view_->getEndTime();
+          absolute_time_offset : absolute_time_offset + data_source_start_time;
     const ros::Duration data_source_stop_time(FLAGS_data_source_stop_time_s);
     const ros::Time absolute_stop_time =
         data_source_stop_time.isZero() ?
-          ros::TIME_MAX : absolute_time_offset + data_source_stop_time;
+          absolute_end_time : absolute_time_offset + data_source_stop_time;
+
+    // Ensure that the provided stop time is valid.
+    // When a bag file is corrupted / invalid the bag end time
+    // cannot be retrieved. Run rosbag info to check if the bag file
+    // is properly indexed.
+    if (absolute_stop_time < absolute_start_time)
+    {
+      LOG(ERROR) << "Provided stop time is less than bag begin time. "
+                 << "Please make sure to provide a valid stop time and "
+                 << "check that the bag file is properly indexed.";
+    }
+    else if (absolute_stop_time > absolute_end_time)
+    {
+      LOG(ERROR) << "Provided stop time is greater than bag end time. "
+                 << "Please make sure to provide a valid stop time and "
+                 << "check that the bag file is properly indexed.";
+    }
+    else
+    {
+      VLOG(1) << "Absolute start time set to " << absolute_start_time;
+      VLOG(1) << "Absolute stop time set to " << absolute_stop_time;
+    }
+
+    // Reset the bag View
     CHECK_GT(absolute_stop_time, absolute_start_time);
-    CHECK_LT(absolute_stop_time, absolute_end_time);
+    CHECK_LE(absolute_stop_time, absolute_end_time);
     bag_view_.reset(new rosbag::View(*bag_, rosbag::TopicQuery(topics),
                                      absolute_start_time, absolute_stop_time));
-    VLOG(1) << "Absolute start time set to " << absolute_start_time;
-    VLOG(1) << "Absolute stop time set to " << absolute_stop_time;
   }
   bag_view_it_ = bag_view_->begin();
 
@@ -152,19 +186,19 @@ void DataProviderRosbag::initBagView(const std::vector<std::string>& topics)
       bag_view_->getConnections();
   if (topics.size() != connection_infos.size())
   {
-     LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
-     for (const rosbag::ConnectionInfo* info : connection_infos)
-     {
-       LOG(ERROR) << "*) " << info->topic;
-     }
-     LOG(ERROR) << "Requested " << topics.size() << " topics:";
-     for (const std::string topic : topics)
-     {
-       LOG(ERROR) << "*) " << topic;
-     }
-     LOG(FATAL) << "Not all requested topics founds in bagfile. "
-                << "Is topic_cam0, topic_imu0, etc. set correctly? "
-                << "Maybe removing/adding a slash as prefix solves the problem.";
+    LOG(ERROR) << "Successfully connected to " << connection_infos.size() << " topics:";
+    for (const rosbag::ConnectionInfo* info : connection_infos)
+    {
+      LOG(ERROR) << "*) " << info->topic;
+    }
+    LOG(ERROR) << "Requested " << topics.size() << " topics:";
+    for (const std::string topic : topics)
+    {
+      LOG(ERROR) << "*) " << topic;
+    }
+    LOG(FATAL) << "Not all requested topics founds in bagfile. "
+               << "Is topic_cam0, topic_imu0, etc. set correctly? "
+               << "Maybe removing/adding a slash as prefix solves the problem.";
   }
 }
 
