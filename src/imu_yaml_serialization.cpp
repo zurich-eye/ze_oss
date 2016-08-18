@@ -139,7 +139,7 @@ std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
   if (noise_type == "white-brownian")
   {
     FloatType noise_density;
-    uint32_t bandwidth;
+    FloatType bandwidth;
     FloatType bias_noise_density;
     if (!YAML::safeGet(node, "noise_density", &noise_density)
         || !YAML::safeGet(node, "bandwidth", &bandwidth)
