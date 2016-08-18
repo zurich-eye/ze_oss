@@ -16,7 +16,6 @@ struct CameraSimulatorOptions
   uint32_t max_num_landmarks_ { 10000 };
   FloatType min_depth { 2.0 };
   FloatType max_depth { 7.0 };
-
 };
 
 class CameraSimulator
@@ -39,7 +38,14 @@ public:
 
   void initializeMap();
 
-  void visualize(FloatType dt = 0.2);
+  void visualize(FloatType dt = 0.2, FloatType marker_size_trajectory = 0.2,
+                 FloatType marker_size_landmarks = 0.2);
+
+  size_t visibleLandmarks(
+      const uint32_t cam_idx,
+      const Transformation& T_W_B,
+      const uint32_t lm_min_idx,
+      const uint32_t lm_max_idx);
 
 private:
   TrajectorySimulator::Ptr trajectory_;
