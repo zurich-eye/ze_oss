@@ -6,11 +6,14 @@
 
 namespace ze {
 
+// fwd.
+class Visualizer;
+
 struct CameraSimulatorOptions
 {
   uint32_t num_keypoints_per_frame { 50  };
   FloatType keypoint_noise_sigma { 1.0 };
-  uint32_t max_num_landmarks_ { 20000 };
+  uint32_t max_num_landmarks_ { 10000 };
   FloatType min_depth { 2.0 };
   FloatType max_depth { 7.0 };
 
@@ -32,12 +35,18 @@ public:
     , options_(options)
   {}
 
+  void setVisualizer(const std::shared_ptr<Visualizer>& visualizer);
+
   void initializeMap();
+
+  void visualize(FloatType dt = 0.2);
 
 private:
   TrajectorySimulator::Ptr trajectory_;
   CameraRig::Ptr rig_;
   CameraSimulatorOptions options_;
+
+  std::shared_ptr<Visualizer> viz_;
 
   Positions landmarks_W_;
   Bearings normals_W_;

@@ -28,6 +28,9 @@ cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # GTESTS #
 ##########
 
+catkin_add_gtest(test_camera_simulator test/test_camera_simulator.cpp)
+target_link_libraries(test_camera_simulator ${PROJECT_NAME})
+
 catkin_add_gtest(test_imu_bias_simulator test/test_imu_bias_simulator.cpp)
 target_link_libraries(test_imu_bias_simulator ${PROJECT_NAME})
 
