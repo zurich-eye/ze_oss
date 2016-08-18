@@ -18,14 +18,14 @@ public:
   ZE_POINTER_TYPEDEFS(ImuSimulator);
 
   ImuSimulator(
-      const TrajectorySimulator::Ptr& scenario,
+      const TrajectorySimulator::Ptr& trajectory,
       const ImuBiasSimulator::Ptr& bias,
       RandomVectorSampler<3>::Ptr& accelerometer_noise,
       RandomVectorSampler<3>::Ptr& gyro_noise,
       FloatType accelerometer_noise_bandwidth_hz,
       FloatType gyroscope_noise_bandwidth_hz,
       FloatType gravity_magnitude)
-    : scenario_(scenario)
+    : trajectory_(trajectory)
     , bias_(bias)
     , accelerometer_noise_(accelerometer_noise)
     , gyro_noise_(gyro_noise)
@@ -43,14 +43,14 @@ public:
   //! Get the angular velocity in the body frame.
   Vector3 angularVelocityActual(FloatType t) const
   {
-    return scenario_->angularVelocity_B(t);
+    return trajectory_->angularVelocity_B(t);
   }
 
   //! An accelerometer measures the specific force (incl. gravity).
   Vector3 specificForceActual(FloatType t) const
   {
-    Quaternion Rbw(scenario_->R_W_B(t).inverse());
-    return scenario_->acceleration_B(t) + Rbw.rotate(gravity());
+    Quaternion Rbw(trajectory_->R_W_B(t).inverse());
+    return trajectory_->acceleration_B(t) + Rbw.rotate(gravity());
   }
 
   //! The angular velocity corrupted by noise and bias.
@@ -69,7 +69,7 @@ public:
   }
 
 private:
-  const TrajectorySimulator::Ptr scenario_;
+  const TrajectorySimulator::Ptr trajectory_;
   const ImuBiasSimulator::Ptr bias_;
 
   mutable RandomVectorSampler<3>::Ptr accelerometer_noise_;
