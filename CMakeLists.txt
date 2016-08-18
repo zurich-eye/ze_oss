@@ -10,6 +10,7 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
+    include/ze/vi_simulation/camera_simulator.hpp
     include/ze/vi_simulation/imu_bias_simulator.hpp
     include/ze/vi_simulation/imu_simulator.hpp
     include/ze/vi_simulation/trajectory_simulator.hpp
@@ -17,6 +18,7 @@ set(HEADERS
     )
 
 set(SOURCES
+    src/camera_simulator.cpp
     src/imu_bias_simulator.cpp
     )
 

@@ -11,6 +11,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>catkin_simple</buildtool_depend>
+  <depend>ze_cameras</depend>
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
   <depend>ze_splines</depend>
