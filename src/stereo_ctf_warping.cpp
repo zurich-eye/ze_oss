@@ -114,9 +114,9 @@ void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 
   VLOG(1) << "we have now " << images_.size() << " images and "
           <<  image_pyramids_.size() << " pyramids in the CTF instance. "
-           << "params_->ctf.levels: " << params_->ctf.levels
-           << " (" << params_->ctf.coarsest_level
-           << " -> " << params_->ctf.finest_level << ")";
+          << "params_->ctf.levels: " << params_->ctf.levels
+          << " (" << params_->ctf.coarsest_level
+          << " -> " << params_->ctf.finest_level << ")";
 }
 
 //------------------------------------------------------------------------------
