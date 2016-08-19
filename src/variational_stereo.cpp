@@ -20,22 +20,6 @@ VariationalStereo::VariationalStereo(Parameters::Ptr params)
 }
 
 //------------------------------------------------------------------------------
-VariationalStereo::VariationalStereo(ze::Size2u image_size, uint8_t num_images,
-                                     Parameters::Ptr params)
-{
-  if (params)
-  {
-    params_ = params;
-  }
-  else
-  {
-    params_ = std::make_shared<Parameters>();
-  }
-
-  ctf_.reset(new StereoCtFWarping(params_));
-}
-
-//------------------------------------------------------------------------------
 VariationalStereo::~VariationalStereo()
 { ; }
 
