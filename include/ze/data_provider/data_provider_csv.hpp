@@ -29,13 +29,17 @@ struct MeasurementBase
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ZE_POINTER_TYPEDEFS(MeasurementBase);
 
+public:
   MeasurementBase() = delete;
+  virtual ~MeasurementBase() = default;
+
+protected:
   MeasurementBase(int64_t stamp_ns, MeasurementType type)
     : stamp_ns(stamp_ns)
     , type(type)
   {}
-  virtual ~MeasurementBase() = default;
 
+public:
   const int64_t stamp_ns;
   const MeasurementType type;
 };
