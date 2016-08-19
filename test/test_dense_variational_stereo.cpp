@@ -31,9 +31,9 @@ DEFINE_bool(writePFM, true, "Write disparity output as PFM file.");
 // check whether machine is little endian
 int littleendian()
 {
-    int intval = 1;
-    uchar *uval = (uchar *)&intval;
-    return uval[0] == 1;
+  int intval = 1;
+  uchar *uval = (uchar*)&intval;
+  return uval[0] == 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,8 +60,8 @@ void writePFM(const ze::ImageRaw32fC1& disp, const std::string& filename,
   {
     for (uint32_t x = 0; x < disp.width(); ++x)
     {
-      float disp_value = static_cast<float>(disp(x,y));
-      if (disp_value > 0.f)
+      float disp_value = -static_cast<float>(disp(x,y));
+      if (disp_value < 0.f)
       {
         disp_value = INFINITY;
       }
@@ -95,9 +95,6 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   StereoParameters::Ptr stereo_params = std::make_shared<StereoParameters>();
   stereo_params->solver = std::get<0>(GetParam());
   stereo_params->ctf.scale_factor = std::get<1>(GetParam());;
-  //  stereo_params->ctf.iters = 100;
-  //  stereo_params->ctf.warps  = 10;
-  //  stereo_params->ctf.apply_median_filter = true;
 
   std::unique_ptr<Stereo> stereo(new Stereo(stereo_params));
 
@@ -120,7 +117,7 @@ TEST_P(DenseStereoTests, StereoAlgorithms)
   if (FLAGS_writePFM)
   {
     std::stringstream ss_pfm_filename;
-    ss_pfm_filename << data_path << "/middlebury/trainingQ/Teddy/disp1";
+    ss_pfm_filename << data_path << "/middlebury/trainingQ/Teddy/disp0";
     std::string algorithm_short_string="?";
     switch (stereo_params->solver)
     {
