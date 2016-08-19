@@ -38,7 +38,7 @@ void CameraSimulator::initializeMap()
       std::tie(std::ignore, std::ignore, p_C) =
           generateRandomVisible3dPoints(
             rig_->at(cam_idx), num_new_landmarks,
-            10u, options_.min_depth, options_.max_depth);
+            10u, options_.min_depth_m, options_.max_depth_m);
 
       DEBUG_CHECK_LE(static_cast<int>(num_landmarks + num_new_landmarks),
                      landmarks_W_.cols());
@@ -62,6 +62,8 @@ CameraMeasurements CameraSimulator::visibleLandmarks(
     const uint32_t lm_min_idx,
     const uint32_t lm_max_idx)
 {
+  auto t = timer_[SimTimer::visible_landmarks].timeScope();
+
   const uint32_t num_landmarks = lm_max_idx - lm_min_idx;
   if (num_landmarks == 0)
   {
@@ -75,8 +77,8 @@ CameraMeasurements CameraSimulator::visibleLandmarks(
   std::vector<uint32_t> visible_indices;
   for (uint32_t i = 0u; i < num_landmarks; ++i)
   {
-    if (lm_C(2,i) < options_.min_depth ||
-        lm_C(2,i) > options_.max_depth)
+    if (lm_C(2,i) < options_.min_depth_m ||
+        lm_C(2,i) > options_.max_depth_m)
     {
       // Landmark is either behind or too far from the camera.
       continue;
@@ -106,6 +108,8 @@ CameraMeasurementsVector CameraSimulator::getMeasurements(FloatType time)
 {
   CHECK_GE(time, trajectory_->start());
   CHECK_LT(time, trajectory_->end());
+
+  auto t = timer_[SimTimer::get_measurements].timeScope();
 
   Transformation T_W_B = trajectory_->T_W_B(time);
   std::unordered_map<int32_t, int32_t> new_global_lm_id_to_track_id_map;

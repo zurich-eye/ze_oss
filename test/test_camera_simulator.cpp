@@ -13,7 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #endif
 
-TEST(TrajectorySimulator, testSplineScenario)
+TEST(CameraSimulator, testSplineScenario)
 {
   using namespace ze;
 
@@ -36,8 +36,8 @@ TEST(TrajectorySimulator, testSplineScenario)
 
   // Create camera simulator:
   CameraSimulatorOptions options;
-  options.min_depth = 4.0;
-  options.max_depth = 10.0;
+  options.min_depth_m = 4.0;
+  options.max_depth_m = 10.0;
   options.max_num_landmarks_ = 20000;
   CameraSimulator cam_sim(trajectory, rig, options);
   cam_sim.setVisualizer(visualizer);
@@ -52,9 +52,9 @@ TEST(TrajectorySimulator, testSplineScenario)
 #endif
 
   // Loop through trajectory and visualize feature tracks:
-  for (FloatType time = cam_sim.trajectory().start();
-       time < cam_sim.trajectory().end(); time += 1.0/20.0)
+  for (int j = 0; j < 1000; ++j)
   {
+    FloatType time = cam_sim.trajectory().start() + j * 1.0/20.0;
     const CameraMeasurementsVector& m_vec = cam_sim.getMeasurements(time);
 #ifdef ZE_USE_OPENCV
     if (false)
@@ -70,6 +70,8 @@ TEST(TrajectorySimulator, testSplineScenario)
     }
 #endif
   }
+
+  VLOG(1) << "Timing results: \n" << cam_sim.timer_;
 }
 
 ZE_UNITTEST_ENTRYPOINT

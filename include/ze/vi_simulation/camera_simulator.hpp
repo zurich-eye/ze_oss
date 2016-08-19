@@ -4,6 +4,7 @@
 #include <ze/cameras/camera_rig.h>
 #include <ze/common/macros.h>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
+#include <ze/common/timer_collection.h>
 
 namespace ze {
 
@@ -32,11 +33,15 @@ struct CameraSimulatorOptions
   uint32_t num_keypoints_per_frame { 50  };
   FloatType keypoint_noise_sigma { 1.0 };
   uint32_t max_num_landmarks_ { 10000 };
-  FloatType min_depth { 2.0 };
-  FloatType max_depth { 7.0 };
+  FloatType min_depth_m { 2.0 };
+  FloatType max_depth_m { 7.0 };
 };
 
 // -----------------------------------------------------------------------------
+//! Simulate feature observations while moving along a trajectory.
+//! @todo(cfo) Model extra nuisances:
+//!            - false associations / outliers
+//!            - variable number of features along trajectory
 class CameraSimulator
 {
 public:
@@ -71,6 +76,9 @@ public:
   void reset();
 
   inline const TrajectorySimulator& trajectory() const { return *trajectory_; }
+
+  DECLARE_TIMER(SimTimer, timer_,
+                visible_landmarks, get_measurements);
 
 private:
   CameraMeasurements visibleLandmarks(
