@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
-#include <ze/data_provider/data_provider_base.hpp>
 #include <imp/core/image_base.hpp>
+#include <ze/common/macros.h>
+#include <ze/common/types.h>
+#include <ze/data_provider/data_provider_base.hpp>
 
 // fwd
 namespace cv {

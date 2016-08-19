@@ -2,10 +2,10 @@
 
 #include <memory>
 #include <imp/core/image_base.hpp>
-#include <ze/imu/imu_buffer.h>
-#include <ze/common/types.h>
 #include <ze/common/time_conversions.h>
+#include <ze/common/types.h>
 #include <ze/data_provider/camera_imu_synchronizer_base.hpp>
+#include <ze/imu/imu_buffer.h>
 
 namespace ze {
 
@@ -15,7 +15,7 @@ class ImageBase;
 
 // -----------------------------------------------------------------------------
 //! Uses an IMU Buffer that can handle model-based measurement corrections and
-//! synchronization of gyroscope and accelerometer.it
+//! synchronization of gyroscope and accelerometer.
 class CameraImuSynchronizerUnsync: public CameraImuSynchronizerBase
 {
 public:

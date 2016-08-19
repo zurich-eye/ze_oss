@@ -3,8 +3,8 @@
 #include <memory>
 #include <imp/core/image_base.hpp>
 #include <ze/common/ringbuffer.h>
-#include <ze/common/types.h>
 #include <ze/common/time_conversions.h>
+#include <ze/common/types.h>
 #include <ze/data_provider/camera_imu_synchronizer_base.hpp>
 
 namespace ze {
