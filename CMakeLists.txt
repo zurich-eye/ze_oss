@@ -15,11 +15,13 @@ set(HEADERS
     include/ze/vi_simulation/imu_simulator.hpp
     include/ze/vi_simulation/trajectory_simulator.hpp
     include/ze/vi_simulation/evaluation_tools.hpp
+    include/ze/vi_simulation/vi_simulator.hpp
     )
 
 set(SOURCES
     src/camera_simulator.cpp
     src/imu_bias_simulator.cpp
+    src/vi_simulator.cpp
     )
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

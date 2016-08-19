@@ -20,8 +20,8 @@ public:
   ImuSimulator(
       const TrajectorySimulator::Ptr& trajectory,
       const ImuBiasSimulator::Ptr& bias,
-      RandomVectorSampler<3>::Ptr& accelerometer_noise,
-      RandomVectorSampler<3>::Ptr& gyro_noise,
+      RandomVectorSampler<3>::Ptr accelerometer_noise,
+      RandomVectorSampler<3>::Ptr gyro_noise,
       FloatType accelerometer_noise_bandwidth_hz,
       FloatType gyroscope_noise_bandwidth_hz,
       FloatType gravity_magnitude)
