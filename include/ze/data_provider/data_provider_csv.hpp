@@ -51,7 +51,6 @@ public:
   }
 
 private:
-
   void loadImuData(
       const std::string data_dir,
       const size_t imu_index,
