@@ -21,17 +21,15 @@ void CameraSimulator::initializeMap()
 
     for (uint32_t cam_idx = 0u; cam_idx < rig_->size(); ++cam_idx)
     {
-      // Check how many landmarks are visible:
-
-
-      int num_visible = visibleLandmarks(cam_idx, T_W_B, 0u, num_landmarks);
-      VLOG(1) << num_visible << " already visible.";
-
+      // Check how many landmarks are already visible:
+      CameraMeasurements measurements = visibleLandmarks(cam_idx, T_W_B, 0u, num_landmarks);
+      int num_visible = measurements.keypoints_.cols();
       if (num_visible >= num_landmarks_per_frame)
       {
         continue;
       }
 
+      // Initialize new random visible landmarks.
       int32_t num_new_landmarks = std::max(0, num_landmarks_per_frame - num_visible);
       CHECK_GE(num_new_landmarks, 0);
 
@@ -57,7 +55,7 @@ void CameraSimulator::initializeMap()
 }
 
 // -----------------------------------------------------------------------------
-size_t CameraSimulator::visibleLandmarks(
+CameraMeasurements CameraSimulator::visibleLandmarks(
     const uint32_t cam_idx,
     const Transformation& T_W_B,
     const uint32_t lm_min_idx,
@@ -66,7 +64,7 @@ size_t CameraSimulator::visibleLandmarks(
   const uint32_t num_landmarks = lm_max_idx - lm_min_idx;
   if (num_landmarks == 0)
   {
-    return 0;
+    return CameraMeasurements();
   }
 
   const Size2u image_size = rig_->at(cam_idx).size();
@@ -89,9 +87,68 @@ size_t CameraSimulator::visibleLandmarks(
     }
   }
 
-  return visible_indices.size();
+  // Copy visible indices into Camera Measurements struct:
+  CameraMeasurements m;
+  m.keypoints_.resize(Eigen::NoChange, visible_indices.size());
+  m.global_landmark_ids_.resize(visible_indices.size());
+  for (size_t i = 0; i < visible_indices.size(); ++i)
+  {
+    m.keypoints_.col(i) = px.col(visible_indices[i]);
+    m.global_landmark_ids_[i] = visible_indices[i];
+  }
+
+  return m;
 }
 
+// -----------------------------------------------------------------------------
+CameraMeasurementsVector CameraSimulator::getMeasurements(FloatType time)
+{
+  CHECK_GE(time, trajectory_->start());
+  CHECK_LT(time, trajectory_->end());
+
+  Transformation T_W_B = trajectory_->T_W_B(time);
+  std::unordered_map<int32_t, int32_t> new_global_lm_id_to_track_id_map;
+  CameraMeasurementsVector measurements;
+
+  for (uint32_t cam_idx = 0u; cam_idx < rig_->size(); ++cam_idx)
+  {
+    CameraMeasurements m = visibleLandmarks(cam_idx, T_W_B, 0u, landmarks_W_.cols());
+    m.local_track_ids_.resize(m.keypoints_.cols());
+    for (int32_t i = 0; i < m.keypoints_.cols(); ++i)
+    {
+      const int32_t lm_id = m.global_landmark_ids_[i];
+      int32_t track_id = -1;
+      auto res = global_lm_id_to_track_id_map_.find(lm_id);
+      if (res == global_lm_id_to_track_id_map_.end())
+      {
+        // This is a new track:
+        track_id = track_id_counter_;
+        ++track_id_counter_;
+      }
+      else
+      {
+        // This is an existing track:
+        track_id = res->second;
+      }
+      m.local_track_ids_[i] = track_id;
+
+      // Update our list of tracks:
+      new_global_lm_id_to_track_id_map[lm_id] = track_id;
+    }
+    measurements.push_back(m);
+  }
+
+  // Update our list of active tracks:
+  global_lm_id_to_track_id_map_ = new_global_lm_id_to_track_id_map;
+
+  return measurements;
+}
+
+// -----------------------------------------------------------------------------
+void CameraSimulator::reset()
+{
+  global_lm_id_to_track_id_map_.clear();
+}
 
 // -----------------------------------------------------------------------------
 void CameraSimulator::setVisualizer(const std::shared_ptr<Visualizer>& visualizer)

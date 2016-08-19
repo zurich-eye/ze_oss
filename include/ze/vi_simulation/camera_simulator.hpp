@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <ze/cameras/camera_rig.h>
 #include <ze/common/macros.h>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
@@ -9,6 +10,7 @@ namespace ze {
 // fwd.
 class Visualizer;
 
+// -----------------------------------------------------------------------------
 struct CameraSimulatorOptions
 {
   uint32_t num_keypoints_per_frame { 50  };
@@ -18,6 +20,25 @@ struct CameraSimulatorOptions
   FloatType max_depth { 7.0 };
 };
 
+
+// -----------------------------------------------------------------------------
+struct CameraMeasurements
+{
+  //! Each column is a keypoint observation.
+  Keypoints keypoints_;
+
+  //! This is the index of the landmark. The size of the vector is the same as
+  //! the number of columns in the keypoints block.
+  std::vector<int32_t> global_landmark_ids_;
+
+  //! This is a temporary index assigned to a landmark. If the landmark is
+  //! re-observed after a loop, it will be assigned a different id.
+  std::vector<int32_t> local_track_ids_;
+};
+using CameraMeasurementsVector = std::vector<CameraMeasurements>;
+
+
+// -----------------------------------------------------------------------------
 class CameraSimulator
 {
 public:
@@ -38,16 +59,25 @@ public:
 
   void initializeMap();
 
-  void visualize(FloatType dt = 0.2, FloatType marker_size_trajectory = 0.2,
-                 FloatType marker_size_landmarks = 0.2);
+  void visualize(
+      FloatType dt = 0.2,
+      FloatType marker_size_trajectory = 0.2,
+      FloatType marker_size_landmarks = 0.2);
 
-  size_t visibleLandmarks(
+  CameraMeasurementsVector getMeasurements(
+      FloatType time);
+
+  void reset();
+
+  inline const TrajectorySimulator& trajectory() const { return *trajectory_; }
+
+private:
+  CameraMeasurements visibleLandmarks(
       const uint32_t cam_idx,
       const Transformation& T_W_B,
       const uint32_t lm_min_idx,
       const uint32_t lm_max_idx);
 
-private:
   TrajectorySimulator::Ptr trajectory_;
   CameraRig::Ptr rig_;
   CameraSimulatorOptions options_;
@@ -56,6 +86,9 @@ private:
 
   Positions landmarks_W_;
   Bearings normals_W_;
+
+  int32_t track_id_counter_ = 0;
+  std::unordered_map<int32_t, int32_t> global_lm_id_to_track_id_map_;
 };
 
 
