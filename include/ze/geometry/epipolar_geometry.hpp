@@ -72,10 +72,10 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
           Vector3(
             static_cast<FloatType>(x) *
             static_cast<FloatType>(img_size[0]) /
-          static_cast<FloatType>(num_pts-1),
+          static_cast<FloatType>(num_pts -1),
           static_cast<FloatType>(y) *
           static_cast<FloatType>(img_size[1]) /
-          static_cast<FloatType>(num_pts-1),
+          static_cast<FloatType>(num_pts - 1),
           1);
     }
   }
@@ -199,7 +199,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   const Matrix3 cam0_H = rect_R * avg_rotation.getRotationMatrix().transpose();
   const Matrix3 cam1_H = rect_R * avg_rotation.getRotationMatrix();
 
-  //! The images rectified according to left_H and right_H will not be contained
+  //! The images rectified according to cam0_H and cam1_H will not be contained
   //! in the same region of the image plane as the original image.
   //! Here we alter the focal lengths and the principal points to keep
   //! all points within the original image size.
