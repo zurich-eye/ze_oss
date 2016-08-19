@@ -56,16 +56,16 @@ private:
 };
 
 //------------------------------------------------------------------------------
-template<int rows, int cols>
-Eigen::Matrix<FloatType, rows, cols>
-randomMatrixUniformDistributed(
+inline MatrixX randomMatrixUniformDistributed(
+    int rows,
+    int cols,
     bool deterministic = false,
-    FloatType from = 0.0,
-    FloatType to   = 1.0)
+    FloatType from  = 0.0,
+    FloatType to    = 1.0)
 {
   DEBUG_CHECK_GT(rows, 0);
   DEBUG_CHECK_GT(cols, 0);
-  Eigen::Matrix<FloatType, rows, cols> m;
+  MatrixX m(rows, cols);
   for (int x = 0; x < cols; ++x)
   {
     for (int y = 0; y < rows; ++y)
@@ -76,7 +76,16 @@ randomMatrixUniformDistributed(
   return m;
 }
 
-//------------------------------------------------------------------------------
+template<int rows, int cols>
+Eigen::Matrix<FloatType, rows, cols>
+randomMatrixUniformDistributed(
+    bool deterministic = false,
+    FloatType from = 0.0,
+    FloatType to   = 1.0)
+{
+  return randomMatrixUniformDistributed(rows, cols, deterministic, from, to);
+}
+
 template<int size>
 Eigen::Matrix<FloatType, size, 1>
 randomVectorUniformDistributed(
@@ -88,16 +97,16 @@ randomVectorUniformDistributed(
 }
 
 //------------------------------------------------------------------------------
-template<int rows, int cols>
-Eigen::Matrix<FloatType, rows, cols>
-randomMatrixNormalDistributed(
+inline MatrixX randomMatrixNormalDistributed(
+    int rows,
+    int cols,
     bool deterministic = false,
     FloatType mean  = 0.0,
     FloatType sigma = 1.0)
 {
   DEBUG_CHECK_GT(rows, 0);
   DEBUG_CHECK_GT(cols, 0);
-  Eigen::Matrix<FloatType, rows, cols> m;
+  MatrixX m(rows, cols);
   for (int x = 0; x < cols; ++x)
   {
     for (int y = 0; y < rows; ++y)
@@ -108,7 +117,16 @@ randomMatrixNormalDistributed(
   return m;
 }
 
-//------------------------------------------------------------------------------
+template<int rows, int cols>
+Eigen::Matrix<FloatType, rows, cols>
+randomMatrixNormalDistributed(
+    bool deterministic = false,
+    FloatType mean  = 0.0,
+    FloatType sigma = 1.0)
+{
+  return randomMatrixNormalDistributed(rows, cols, deterministic, mean, sigma);
+}
+
 template<int size>
 Eigen::Matrix<FloatType, size, 1>
 randomVectorNormalDistributed(

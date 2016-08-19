@@ -31,10 +31,12 @@ TEST(RandomMatrixTests, testRandomVector)
   VLOG(1) << "\n" << randomMatrixUniformDistributed<2,3>(true);
   VLOG(1) << "\n" << randomMatrixNormalDistributed<2,3>(true);
   VLOG(1) << "\n" << randomVectorNormalDistributed<4>(true).transpose();
+  VLOG(1) << "\n" << randomMatrixNormalDistributed(2, 3, true);
   VLOG(1) << "Nondeterministic:";
   VLOG(1) << "\n" << randomMatrixUniformDistributed<2,3>();
   VLOG(1) << "\n" << randomMatrixNormalDistributed<2,3>();
   VLOG(1) << "\n" << randomVectorNormalDistributed<4>().transpose();
+  VLOG(1) << "\n" << randomMatrixNormalDistributed(2, 3);
 }
 
 ZE_UNITTEST_ENTRYPOINT
