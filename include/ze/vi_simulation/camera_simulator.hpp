@@ -11,6 +11,22 @@ namespace ze {
 class Visualizer;
 
 // -----------------------------------------------------------------------------
+struct CameraMeasurements
+{
+  //! Each column is a keypoint observation.
+  Keypoints keypoints_;
+
+  //! Global landmark index of each observed feature. The size of the vector is
+  //! the same as the number of columns in the keypoints block.
+  std::vector<int32_t> global_landmark_ids_;
+
+  //! Temporary track index of a landmark. If the landmark is
+  //! re-observed after a loop, it will be assigned a different id.
+  std::vector<int32_t> local_track_ids_;
+};
+using CameraMeasurementsVector = std::vector<CameraMeasurements>;
+
+// -----------------------------------------------------------------------------
 struct CameraSimulatorOptions
 {
   uint32_t num_keypoints_per_frame { 50  };
@@ -19,24 +35,6 @@ struct CameraSimulatorOptions
   FloatType min_depth { 2.0 };
   FloatType max_depth { 7.0 };
 };
-
-
-// -----------------------------------------------------------------------------
-struct CameraMeasurements
-{
-  //! Each column is a keypoint observation.
-  Keypoints keypoints_;
-
-  //! This is the index of the landmark. The size of the vector is the same as
-  //! the number of columns in the keypoints block.
-  std::vector<int32_t> global_landmark_ids_;
-
-  //! This is a temporary index assigned to a landmark. If the landmark is
-  //! re-observed after a loop, it will be assigned a different id.
-  std::vector<int32_t> local_track_ids_;
-};
-using CameraMeasurementsVector = std::vector<CameraMeasurements>;
-
 
 // -----------------------------------------------------------------------------
 class CameraSimulator
@@ -65,6 +63,9 @@ public:
       FloatType marker_size_landmarks = 0.2);
 
   CameraMeasurementsVector getMeasurements(
+      FloatType time);
+
+  CameraMeasurementsVector getMeasurementsCorrupted(
       FloatType time);
 
   void reset();

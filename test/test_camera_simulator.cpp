@@ -47,22 +47,25 @@ TEST(TrajectorySimulator, testSplineScenario)
     cam_sim.visualize(1.0, 4.0, 0.3);
   }
 
+#ifdef ZE_USE_OPENCV
+  cv::Mat img_0(rig->at(0).height(), rig->at(0).width(), CV_8UC1, cv::Scalar(0));
+#endif
+
   // Loop through trajectory and visualize feature tracks:
   for (FloatType time = cam_sim.trajectory().start();
-       time < cam_sim.trajectory().end() / 10.0; time += 1.0/20.0)
+       time < cam_sim.trajectory().end(); time += 1.0/20.0)
   {
     const CameraMeasurementsVector& m_vec = cam_sim.getMeasurements(time);
-    const CameraMeasurements& m = m_vec[0];
 #ifdef ZE_USE_OPENCV
     if (false)
     {
-      cv::Mat img(rig->at(0).height(), rig->at(0).width(), CV_8UC1, cv::Scalar(0));
+      const CameraMeasurements& m = m_vec[0];
       for (int i = 0; i < m.keypoints_.cols(); ++i)
       {
-        cv::circle(img, cv::Point(m.keypoints_(0,i), m.keypoints_(1,i)), 3,
+        cv::circle(img_0, cv::Point(m.keypoints_(0,i), m.keypoints_(1,i)), 3,
                    cv::Scalar(m.local_track_ids_[i] % 255), 3);
       }
-      cv::imshow("img", img);
+      cv::imshow("img_0", img_0);
       cv::waitKey(1);
     }
 #endif

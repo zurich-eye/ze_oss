@@ -1,5 +1,6 @@
 #include <ze/vi_simulation/camera_simulator.hpp>
 #include <ze/cameras/camera_utils.h>
+#include <ze/common/random_matrix.hpp>
 #include <ze/visualization/viz_interface.h>
 
 namespace ze {
@@ -141,6 +142,18 @@ CameraMeasurementsVector CameraSimulator::getMeasurements(FloatType time)
   // Update our list of active tracks:
   global_lm_id_to_track_id_map_ = new_global_lm_id_to_track_id_map;
 
+  return measurements;
+}
+
+// -----------------------------------------------------------------------------
+CameraMeasurementsVector CameraSimulator::getMeasurementsCorrupted(FloatType time)
+{
+  CameraMeasurementsVector measurements = getMeasurements(time);
+  for (CameraMeasurements& m : measurements)
+  {
+    m.keypoints_ += randomMatrixNormalDistributed(2, m.keypoints_.cols(), false,
+                                                  0.0, options_.keypoint_noise_sigma);
+  }
   return measurements;
 }
 
