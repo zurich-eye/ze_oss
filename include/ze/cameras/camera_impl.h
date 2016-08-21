@@ -30,7 +30,7 @@ public:
 
   virtual std::pair<Keypoint, bool> projectWithCheck(
       const Eigen::Ref<const Position>& pos,
-      FloatType border_margin) const override
+      real_t border_margin) const override
   {
     if (pos[2] < 0.0)
     {
@@ -54,13 +54,13 @@ public:
       const Eigen::Ref<const Position>& pos) const override
   {
     Matrix22 J_dist;
-    FloatType z_inv = 1.0 / pos.z();
-    FloatType z_inv_sq = z_inv * z_inv;
+    real_t z_inv = 1.0 / pos.z();
+    real_t z_inv_sq = z_inv * z_inv;
     Keypoint px_unitplane = pos.head<2>() * z_inv;
     Distortion::distort(
           this->distortion_params_.data(), px_unitplane.data(), J_dist.data());
-    const FloatType fx = this->projection_params_[0];
-    const FloatType fy = this->projection_params_[1];
+    const real_t fx = this->projection_params_[0];
+    const real_t fy = this->projection_params_[1];
     Matrix23 J;
     J(0, 0) = fx * J_dist(0, 0) * z_inv;
     J(0, 1) = fx * J_dist(0, 1) * z_inv;
@@ -80,7 +80,7 @@ public:
     return std::make_pair(px, J);
   }
 
-  virtual FloatType getApproxAnglePerPixel() const override
+  virtual real_t getApproxAnglePerPixel() const override
   {
     //! @todo: Is this correct? And if yes, this is costlty to compute often!
     //!        replace with acos and a dot product between the bearing vectors.
@@ -89,7 +89,7 @@ public:
          + std::atan(1.0 / (2.0 * std::abs(this->projection_params_[1])));
   }
 
-  virtual FloatType getApproxBearingAngleFromPixelDifference(FloatType px_diff) const override
+  virtual real_t getApproxBearingAngleFromPixelDifference(FloatType px_diff) const override
   {
     //! @todo: Is this correct? And if yes, this is costlty to compute often!
     //!        acos and a dot product between the bearing vectors.
@@ -111,15 +111,15 @@ typedef PinholeProjection<EquidistantDistortion> EquidistantCamera;
 // Convenience factory functions.
 
 inline PinholeCamera createPinholeCamera(
-    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy)
+    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy)
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
                        (Vector4() << fx, fy, cx, cy).finished(), VectorX());
 }
 
 inline FovCamera createFovCamera(
-    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
-    FloatType s)
+    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
+    real_t s)
 {
   return FovCamera(width, height, CameraType::PinholeFov,
                    (Vector4() << fx, fy, cx, cy).finished(),
@@ -127,8 +127,8 @@ inline FovCamera createFovCamera(
 }
 
 inline RadTanCamera createRadTanCamera(
-    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
-    FloatType k1, FloatType k2, FloatType r1, FloatType r2)
+    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
+    real_t k1, FloatType k2, FloatType r1, FloatType r2)
 {
   return RadTanCamera(width, height, CameraType::PinholeRadialTangential,
                        (Vector4() << fx, fy, cx, cy).finished(),
@@ -136,8 +136,8 @@ inline RadTanCamera createRadTanCamera(
 }
 
 inline EquidistantCamera createEquidistantCamera(
-    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
-    FloatType k1, FloatType k2, FloatType k3, FloatType k4)
+    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
+    real_t k1, FloatType k2, FloatType k3, FloatType k4)
 {
   return EquidistantCamera(width, height, CameraType::PinholeEquidistant,
                            (Vector4() << fx, fy, cx, cy).finished(),
@@ -145,8 +145,8 @@ inline EquidistantCamera createEquidistantCamera(
 }
 
 inline Camera::Ptr createEquidistantCameraShared(
-    int width, int height, FloatType fx, FloatType fy, FloatType cx, FloatType cy,
-    FloatType k1, FloatType k2, FloatType k3, FloatType k4)
+    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
+    real_t k1, FloatType k2, FloatType k3, FloatType k4)
 {
   return std::make_shared<EquidistantCamera>(
         width, height, CameraType::PinholeEquidistant,

@@ -31,15 +31,15 @@ std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(
     const Camera& cam,
     const uint32_t num_points,
     const uint32_t margin = 10u,
-    const FloatType min_depth = 1.0,
-    const FloatType max_depth = 3.0);
+    const real_t min_depth = 1.0,
+    const real_t max_depth = 3.0);
 
 // -----------------------------------------------------------------------------
 // Check overlapping field of view.
 
 //! Check if two cameras in a rig have an overlapping field of view.
 //! @return Approximate percentage of overlapping field of view between cameras.
-FloatType overlappingFieldOfView(
+real_t overlappingFieldOfView(
     const CameraRig& rig,
     const uint32_t cam_a,
     const uint32_t cam_b);

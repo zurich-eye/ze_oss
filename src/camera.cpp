@@ -28,8 +28,8 @@ Camera::Camera(const uint32_t width, const uint32_t height, const CameraType typ
     {
       CHECK_EQ(distortion_params_.size(), 1);
       // Pre-computations for improved speed.
-      const FloatType s = distortion_params_(0);
-      const FloatType tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
+      const real_t s = distortion_params_(0);
+      const real_t tan_s_half_x2 = std::tan(s / 2.0) * 2.0;
       distortion_params_ = Vector2(s, tan_s_half_x2);
       break;
     }
@@ -54,7 +54,7 @@ Keypoint Camera::projectHomogeneous(
 
 std::pair<Keypoint, bool> Camera::projectHomogeneousWithCheck(
     const Eigen::Ref<const HomPosition>& pos_h,
-    FloatType border_margin) const
+    real_t border_margin) const
 {
   if (pos_h[3] < 0.0)
   {

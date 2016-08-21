@@ -21,8 +21,8 @@ Keypoints generateRandomKeypoints(
   Keypoints kp(2, num_keypoints);
   for(uint32_t i = 0u; i < num_keypoints; ++i)
   {
-    kp(0,i) = sampleUniformRealDistribution<FloatType>(false, margin, size.width() - 1 - margin);
-    kp(1,i) = sampleUniformRealDistribution<FloatType>(false, margin, size.height() - 1 - margin);
+    kp(0,i) = sampleUniformRealDistribution<real_t>(false, margin, size.width() - 1 - margin);
+    kp(1,i) = sampleUniformRealDistribution<real_t>(false, margin, size.height() - 1 - margin);
   }
   return kp;
 }
@@ -38,8 +38,8 @@ Keypoints generateUniformKeypoints(
   const uint32_t num_rows = num_cols * size.height() / size.width();
 
   // Compute width and height of a cell:
-  FloatType w = (static_cast<FloatType>(size.width() - 0.01)  - 2.0 * margin) / (num_cols - 1);
-  FloatType h = (static_cast<FloatType>(size.height() - 0.01) - 2.0 * margin) / (num_rows - 1);
+  real_t w = (static_cast<FloatType>(size.width() - 0.01)  - 2.0 * margin) / (num_cols - 1);
+  real_t h = (static_cast<FloatType>(size.height() - 0.01) - 2.0 * margin) / (num_rows - 1);
 
   // Sample keypoints:
   Keypoints kp(2, num_rows * num_cols);
@@ -60,21 +60,21 @@ std::tuple<Keypoints, Bearings, Positions> generateRandomVisible3dPoints(
     const Camera& cam,
     const uint32_t num_points,
     const uint32_t margin,
-    const FloatType min_depth,
-    const FloatType max_depth)
+    const real_t min_depth,
+    const real_t max_depth)
 {
   Keypoints px = generateRandomKeypoints(cam.size(), margin, num_points);
   Bearings f = cam.backProjectVectorized(px);
   Positions pos = f;
   for(uint32_t i = 0u; i < num_points; ++i)
   {
-    pos.col(i) *= sampleUniformRealDistribution<FloatType>(false, min_depth, max_depth);
+    pos.col(i) *= sampleUniformRealDistribution<real_t>(false, min_depth, max_depth);
   }
   return std::make_tuple(px, f, pos);
 }
 
 // -----------------------------------------------------------------------------
-FloatType overlappingFieldOfView(
+real_t overlappingFieldOfView(
     const CameraRig& rig,
     const uint32_t cam_A,
     const uint32_t cam_B)
@@ -100,7 +100,7 @@ FloatType overlappingFieldOfView(
     }
   }
 
-  return static_cast<FloatType>(num_visible) / px_B.cols();
+  return static_cast<real_t>(num_visible) / px_B.cols();
 }
 
 } // namespace ze

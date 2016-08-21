@@ -20,8 +20,8 @@ CameraRig::CameraRig(
     const TransformationVector& T_C_B,
     const CameraVector& cameras,
     const std::string& label,
-    const FloatType stereo_min_fov_overlap,
-    const FloatType stereo_min_baseline)
+    const real_t stereo_min_fov_overlap,
+    const real_t stereo_min_baseline)
   : T_C_B_(T_C_B)
   , cameras_(cameras)
   , label_(label)
@@ -155,16 +155,16 @@ std::ostream& operator<<(std::ostream& out, const StereoIndexPairs& stereo_pairs
 // -----------------------------------------------------------------------------
 StereoIndexPairs identifyStereoPairsInRig(
     const CameraRig& rig,
-    const FloatType& min_fov_overlap,
-    const FloatType& min_baseline)
+    const real_t& min_fov_overlap,
+    const real_t& min_baseline)
 {
   StereoIndexPairs pairs;
   for (uint32_t cam_A = 0u; cam_A < rig.size(); ++cam_A)
   {
     for (uint32_t cam_B = cam_A + 1u; cam_B < rig.size(); ++cam_B)
     {
-      FloatType overlap = overlappingFieldOfView(rig, cam_A, cam_B);
-      FloatType baseline = (rig.T_C_B(cam_B) * rig.T_C_B(cam_A).inverse()).getPosition().norm();
+      real_t overlap = overlappingFieldOfView(rig, cam_A, cam_B);
+      real_t baseline = (rig.T_C_B(cam_B) * rig.T_C_B(cam_A).inverse()).getPosition().norm();
 
 
       if (overlap > min_fov_overlap && baseline > min_baseline)

@@ -67,7 +67,7 @@ public:
   //! visible also returns pixel coordinates.
   virtual std::pair<Keypoint, bool> projectWithCheck(
       const Eigen::Ref<const Position>& pos,
-      FloatType border_margin = 0.0) const = 0;
+      real_t border_margin = 0.0) const = 0;
 
   //! Computes pixel coordinates from 3D-point in homogeneous coordinates.
   virtual Keypoint projectHomogeneous(const Eigen::Ref<const HomPosition>& pos_h) const;
@@ -76,7 +76,7 @@ public:
   //! and if visible also returns the pixel coordinates.
   virtual std::pair<Keypoint, bool> projectHomogeneousWithCheck(
       const Eigen::Ref<const HomPosition>& pos_h,
-      FloatType border_margin = 0.0) const;
+      real_t border_margin = 0.0) const;
 
   //! Computes Jacobian of projection w.r.t. bearing vector.
   virtual Matrix23 dProject_dLandmark(const Eigen::Ref<const Position>& pos) const = 0;
@@ -128,9 +128,9 @@ public:
 
   //! Get angle corresponding to one pixel in image plane.
   //! @todo: make static cache.
-  virtual FloatType getApproxAnglePerPixel() const = 0;
+  virtual real_t getApproxAnglePerPixel() const = 0;
 
-  virtual FloatType getApproxBearingAngleFromPixelDifference(FloatType px_diff) const = 0;
+  virtual real_t getApproxBearingAngleFromPixelDifference(FloatType px_diff) const = 0;
 
   //! Set mask: 0 = masked, >0 = unmasked.
   void setMask(const Image8uC1::Ptr& mask);

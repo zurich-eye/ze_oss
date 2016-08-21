@@ -35,8 +35,8 @@ public:
       const TransformationVector& T_C_B,
       const CameraVector& cameras,
       const std::string& label,
-      const FloatType stereo_min_fov_overlap = 0.7,
-      const FloatType stereo_min_baseline = 0.04);
+      const real_t stereo_min_fov_overlap = 0.7,
+      const real_t stereo_min_baseline = 0.04);
 
   //! @name Camera extrinsic calibration.
   //! @{
@@ -134,8 +134,8 @@ std::ostream& operator<<(std::ostream& out, const StereoIndexPairs& stereo_pairs
 //! Compute overlapping field of view and baseline for all stereo pairs
 StereoIndexPairs identifyStereoPairsInRig(
     const CameraRig& rig,
-    const FloatType& min_fov_overlap,
-    const FloatType& min_baseline);
+    const real_t& min_fov_overlap,
+    const real_t& min_baseline);
 
 } // namespace ze
 

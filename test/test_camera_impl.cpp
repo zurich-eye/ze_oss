@@ -37,15 +37,15 @@ public:
       return;
     }
 
-    FloatType p1 = project();
-    FloatType p = (p1 - projectVectorized()) / p1;
-    FloatType p2 = backProject();
-    FloatType bp = (p2 - backProjectVectorized()) / p2;
+    real_t p1 = project();
+    real_t p = (p1 - projectVectorized()) / p1;
+    real_t p2 = backProject();
+    real_t bp = (p2 - backProjectVectorized()) / p2;
     VLOG(1) << "[" << test_name_ << "]" << "Vectorized back projection " << bp * 100 << "% faster." << "\n"
             << "[" << test_name_ << "]" << "Vectorized projection " << p * 100 << "% faster.";
   }
 
-  FloatType backProjectVectorized()
+  real_t backProjectVectorized()
   {
     // Test back-project vectorized
     Bearings f(3, sample_size_);
@@ -57,7 +57,7 @@ public:
                        test_name_ + ": Back-project vectorized", true);
   }
 
-  FloatType backProject()
+  real_t backProject()
   {
     // Test not vectorized.
     Bearings f(3, sample_size_);
@@ -72,7 +72,7 @@ public:
                        test_name_ + ": Back-project N-times", true);
   }
 
-  FloatType projectVectorized()
+  real_t projectVectorized()
   {
     // Test back-project vectorized
     Keypoints px(2, sample_size_);
@@ -84,7 +84,7 @@ public:
                        test_name_ + ": Project vectorized", true);
   }
 
-  FloatType project()
+  real_t project()
   {
     // Test not vectorized.
     Keypoints px(2, sample_size_);
@@ -122,7 +122,7 @@ public:
     Bearings f1 = cam_.backProjectVectorized(px1);
     Keypoints px2 = cam_.projectVectorized(f1);
     Keypoints px_error = px1 - px2;
-    FloatType max_error = px_error.colwise().norm().array().maxCoeff();
+    real_t max_error = px_error.colwise().norm().array().maxCoeff();
     EXPECT_LT(max_error, 1.3e-4);
   }
 
