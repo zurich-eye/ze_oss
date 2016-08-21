@@ -33,7 +33,7 @@ bool RosbagImageQuery::loadRosbag(const std::string& bagfile_path)
 StampedImage RosbagImageQuery::getStampedImageAtTime(
     const std::string& img_topic,
     const int64_t stamp_ns,
-    const FloatType search_range_ms)
+    const real_t search_range_ms)
 {
   // Considering rounding errors.
   const int64_t search_range_ns = millisecToNanosec(search_range_ms);

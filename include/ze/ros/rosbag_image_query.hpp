@@ -26,7 +26,7 @@ public:
   StampedImage getStampedImageAtTime(
       const std::string& img_topic,
       const int64_t stamp_ns,
-      const FloatType search_range_ms = 10.0);
+      const real_t search_range_ms = 10.0);
 
 private:
   rosbag::Bag bag_;
