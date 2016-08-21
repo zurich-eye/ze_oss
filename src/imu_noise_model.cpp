@@ -29,9 +29,9 @@ ImuNoiseNone::ImuNoiseNone(): ImuNoiseModel(Type)
 
 //------------------------------------------------------------------------------
 // White brownian noise model
-ImuNoiseWhiteBrownian::ImuNoiseWhiteBrownian(FloatType noise_density,
-           FloatType bandwidth,
-           FloatType bias_noise_density)
+ImuNoiseWhiteBrownian::ImuNoiseWhiteBrownian(real_t noise_density,
+           real_t bandwidth,
+           real_t bias_noise_density)
   : ImuNoiseModel(Type)
   , noise_density_(noise_density)
   , bandwidth_(bandwidth)

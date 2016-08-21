@@ -35,9 +35,9 @@ public:
   typedef VectorX secondary_measurement_t;
 
   explicit ImuIntrinsicModel(ImuIntrinsicType type);
-  ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range);
+  ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, FloatType range);
 
-  static constexpr FloatType UndefinedRange = -1.;
+  static constexpr real_t UndefinedRange = -1.;
 
   inline ImuIntrinsicType type() const { return type_; }
   std::string typeAsString() const;
@@ -49,13 +49,13 @@ public:
                             const Eigen::Ref<const secondary_measurement_t>& secondary) const = 0;
 
   // getters
-  inline FloatType delay() const { return delay_; }
-  inline FloatType range() const { return range_; }
+  inline real_t delay() const { return delay_; }
+  inline real_t range() const { return range_; }
 
 private:
   ImuIntrinsicType type_;
-  FloatType delay_;
-  FloatType range_;
+  real_t delay_;
+  real_t range_;
 };
 
 //------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ public:
   using ImuIntrinsicModel::secondary_measurement_t;
 
   ImuIntrinsicModelCalibrated();
-  ImuIntrinsicModelCalibrated(FloatType delay, FloatType range);
+  ImuIntrinsicModelCalibrated(real_t delay, FloatType range);
 
   virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
 			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
@@ -91,7 +91,7 @@ public:
   using ImuIntrinsicModel::secondary_measurement_t;
 
   //! delay, range, bias, scale misalignment matrix
-  ImuIntrinsicModelScaleMisalignment(FloatType delay, FloatType range,
+  ImuIntrinsicModelScaleMisalignment(real_t delay, FloatType range,
                                      const Vector3& b, const Matrix3& M);
 
   virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
@@ -125,8 +125,8 @@ public:
 
   //! This model applies exclusively to gyroscopes.
   //! delay, range, bias, scale misalignment matrix, g-sensitivity matrix
-  ImuIntrinsicModelScaleMisalignmentGSensitivity(FloatType delay,
-                                                 FloatType range,
+  ImuIntrinsicModelScaleMisalignmentGSensitivity(real_t delay,
+                                                 real_t range,
                                                  const Vector3& b,
                                                  const Matrix3& M,
                                                  const Matrix3& Ma);
@@ -163,8 +163,8 @@ public:
 
   //! This model applies exclusively to accelerometers.
   //! delay, range, bias, scale misalignment matrix, accel. column position vectors
-  ImuIntrinsicModelScaleMisalignmentSizeEffect(FloatType delay,
-                                               FloatType range,
+  ImuIntrinsicModelScaleMisalignmentSizeEffect(real_t delay,
+                                               real_t range,
                                                const Vector3& b,
                                                const Matrix3& M,
                                                const Matrix3& R);

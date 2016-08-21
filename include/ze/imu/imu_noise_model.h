@@ -49,19 +49,19 @@ public:
   ZE_POINTER_TYPEDEFS(ImuNoiseWhiteBrownian);
   static constexpr ImuNoiseType Type = ImuNoiseType::WhiteBrownian;
 
-  ImuNoiseWhiteBrownian(FloatType noise_density,
-                        FloatType bandwidth,
-                        FloatType bias_noise_density);
+  ImuNoiseWhiteBrownian(real_t noise_density,
+                        real_t bandwidth,
+                        real_t bias_noise_density);
 
   // getters
-  inline FloatType noiseDensity() const { return noise_density_; }
-  inline FloatType bandwidth() const { return bandwidth_; }
-  inline FloatType biasNoiseDensity() const { return bias_noise_density_; }
+  inline real_t noiseDensity() const { return noise_density_; }
+  inline real_t bandwidth() const { return bandwidth_; }
+  inline real_t biasNoiseDensity() const { return bias_noise_density_; }
 
 private:
-  FloatType noise_density_;
-  FloatType bandwidth_;
-  FloatType bias_noise_density_;
+  real_t noise_density_;
+  real_t bandwidth_;
+  real_t bias_noise_density_;
 };
 
 } // namespace ze

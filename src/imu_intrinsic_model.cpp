@@ -3,7 +3,7 @@
 namespace ze {
 
 // The constexpr needs a definition to make it passable by reference.
-constexpr FloatType ImuIntrinsicModel::UndefinedRange;
+constexpr real_t ImuIntrinsicModel::UndefinedRange;
 
 //------------------------------------------------------------------------------
 // Intrinsics Base Class
@@ -12,7 +12,7 @@ ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
 {
 }
 
-ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type, FloatType delay, FloatType range)
+ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, FloatType range)
  : type_(type), delay_(delay), range_(range)
 {
   CHECK(range == UndefinedRange || range > 0) << "Range must either be of constant UndefinedRange or be > 0";
@@ -40,7 +40,7 @@ ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated()
 {
 }
 
-ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated(FloatType delay, FloatType range)
+ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated(real_t delay, FloatType range)
   : ImuIntrinsicModel(Type, delay, range)
 {
 }
@@ -68,8 +68,8 @@ Vector3 ImuIntrinsicModelCalibrated::distort(
 //------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment
 ImuIntrinsicModelScaleMisalignment::ImuIntrinsicModelScaleMisalignment(
-    FloatType delay,
-    FloatType range,
+    real_t delay,
+    real_t range,
     const Vector3& b,
     const Matrix3& M)
   : ImuIntrinsicModel(Type, delay, range)
@@ -100,8 +100,8 @@ Vector3 ImuIntrinsicModelScaleMisalignment::distort(
 //------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment g-Sensitivity
 ImuIntrinsicModelScaleMisalignmentGSensitivity::ImuIntrinsicModelScaleMisalignmentGSensitivity(
-    FloatType delay,
-    FloatType range,
+    real_t delay,
+    real_t range,
     const Vector3& b,
     const Matrix3& M,
     const Matrix3& Ma)
@@ -140,8 +140,8 @@ Vector3 ImuIntrinsicModelScaleMisalignmentGSensitivity::distort(
 //------------------------------------------------------------------------------
 // Intrinsic Model Scale Misalignment Size Effect
 ImuIntrinsicModelScaleMisalignmentSizeEffect::ImuIntrinsicModelScaleMisalignmentSizeEffect(
-    FloatType delay,
-    FloatType range,
+    real_t delay,
+    real_t range,
     const Vector3& b,
     const Matrix3& M,
     const Matrix3& R)

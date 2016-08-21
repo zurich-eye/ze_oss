@@ -119,7 +119,7 @@ TEST(ImuBufferTest, testDifferentiation)
 {
 
   using namespace ze;
-  typedef Ringbuffer<FloatType, 3, 100> RingBuffer_t;
+  typedef Ringbuffer<real_t, 3, 100> RingBuffer_t;
   VectorX m;
   Vector6 ref;
 

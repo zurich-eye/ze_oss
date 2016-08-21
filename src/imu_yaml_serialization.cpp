@@ -10,7 +10,7 @@
 
 using ze::Matrix3;
 using ze::Vector3;
-using ze::FloatType;
+using ze::real_t;
 
 namespace YAML {
 
@@ -138,9 +138,9 @@ std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
   }
   if (noise_type == "white-brownian")
   {
-    FloatType noise_density;
-    FloatType bandwidth;
-    FloatType bias_noise_density;
+    real_t noise_density;
+    real_t bandwidth;
+    real_t bias_noise_density;
     if (!YAML::safeGet(node, "noise_density", &noise_density)
         || !YAML::safeGet(node, "bandwidth", &bandwidth)
         || !YAML::safeGet(node, "bias_noise_density", &bias_noise_density))
@@ -182,8 +182,8 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
            type == "scale-misalignment-gsensitivity" ||
            type == "scale-misalignment-size-effect")
   {
-    FloatType delay;
-    FloatType range;
+    real_t delay;
+    real_t range;
     Vector3 b;
     Matrix3 M;
 
