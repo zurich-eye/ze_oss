@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   google::InstallFailureSignalHandler();
 
   // Load groundtruth.
-  ze::Buffer<ze::FloatType,1> gt_stamps;
+  ze::Buffer<ze::real_t,1> gt_stamps;
   {
     ze::Vector1 dummy; // We misuse the Buffer class to easily find the closest timestamp.
     std::ifstream fs;

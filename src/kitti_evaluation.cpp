@@ -7,7 +7,7 @@ namespace ze {
 
 RelativeError::RelativeError(
     size_t first_frame, Vector3 W_t_gt_es, Vector3 W_R_gt_es,
-    FloatType segment_length, FloatType scale_error, int num_frames_in_between)
+    real_t segment_length, FloatType scale_error, int num_frames_in_between)
   : first_frame(first_frame)
   , W_t_gt_es(W_t_gt_es)
   , W_R_gt_es(W_R_gt_es)
@@ -16,10 +16,10 @@ RelativeError::RelativeError(
   , num_frames(num_frames_in_between)
 {}
 
-std::vector<FloatType> trajectoryDistances(
+std::vector<real_t> trajectoryDistances(
     const TransformationVector& poses)
 {
-  std::vector<FloatType> dist;
+  std::vector<real_t> dist;
   dist.reserve(poses.size());
   dist.push_back(0);
   for (size_t i = 1; i < poses.size(); ++i)
@@ -30,9 +30,9 @@ std::vector<FloatType> trajectoryDistances(
 }
 
 int32_t lastFrameFromSegmentLength(
-    const std::vector<FloatType>& dist,
+    const std::vector<real_t>& dist,
     const size_t first_frame,
-    const FloatType segment_length)
+    const real_t segment_length)
 {
   for (size_t i = first_frame; i < dist.size(); i++)
   {
@@ -45,15 +45,15 @@ int32_t lastFrameFromSegmentLength(
 std::vector<RelativeError> calcSequenceErrors(
     const TransformationVector& T_W_A, // groundtruth
     const TransformationVector& T_W_B,
-    const FloatType& segment_length,
+    const real_t& segment_length,
     const size_t skip_num_frames_between_segment_evaluation,
     const bool use_least_squares_alignment,
     const double least_squares_align_range,
     const bool least_squares_align_translation_only)
 {
   // Pre-compute cumulative distances (from ground truth as reference).
-  std::vector<FloatType> dist_gt = trajectoryDistances(T_W_A);
-  std::vector<FloatType> dist_es = trajectoryDistances(T_W_B);
+  std::vector<real_t> dist_gt = trajectoryDistances(T_W_A);
+  std::vector<real_t> dist_es = trajectoryDistances(T_W_B);
 
   // Compute relative errors for all start positions.
   std::vector<RelativeError> errors;
@@ -98,8 +98,8 @@ std::vector<RelativeError> calcSequenceErrors(
               T_W_A.begin() + first_frame, T_W_A.begin() + first_frame + n_align_poses);
         VLOG(40) << "T_W_es_align size = " << T_W_es_align.size();
 
-        const FloatType sigma_pos = 0.05;
-        const FloatType sigma_rot = 5.0 / 180 * M_PI;
+        const real_t sigma_pos = 0.05;
+        const real_t sigma_rot = 5.0 / 180 * M_PI;
         PoseAligner problem(T_W_gt_align, T_W_es_align, sigma_pos, sigma_rot);
         problem.optimize(T_A0_B0);
       }
@@ -120,7 +120,7 @@ std::vector<RelativeError> calcSequenceErrors(
     Vector3 W_R_gtlast_eslast = T_W_Ai.getRotation().rotate(T_Ai_Bi.getRotation().log());
 
     // Scale error is the ratio of the respective segment length
-    FloatType scale_error =
+    real_t scale_error =
         (dist_es.at(last_frame) - dist_es.at(first_frame))
         / (dist_gt.at(last_frame) - dist_gt.at(first_frame));
 
