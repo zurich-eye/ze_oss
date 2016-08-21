@@ -105,13 +105,13 @@ TEST(BufferTest, testInterpolation)
 {
   using namespace ze;
 
-  Buffer<FloatType, 2> buffer;
+  Buffer<real_t, 2> buffer;
 
   for(int i = 0; i < 10; ++i)
     buffer.insert(secToNanosec(i), Vector2(i, i));
 
   Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
-  Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
+  Eigen::Matrix<real_t, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(1.2), secToNanosec(5.4));
 

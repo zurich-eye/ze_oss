@@ -20,7 +20,7 @@ namespace ze {
   ze::StatisticsCollection stats;
   stats[StatisticsName::foo].addSample(12);
   stats[StatisticsName::foo].addSample(10);
-  FloatType variance = stats[StatisticsName::foo].var();
+  real_t variance = stats[StatisticsName::foo].var();
 \endcode
 */
 template<typename StatisticsEnum>

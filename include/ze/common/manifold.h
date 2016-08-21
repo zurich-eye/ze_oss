@@ -73,20 +73,20 @@ template<> struct traits<float> : public internal::ScalarTraits<float> {};
 // -----------------------------------------------------------------------------
 // Manifold traits for fixed-size Eigen matrices and vectors with double precision.
 template<int M, int N, int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> >
+struct traits<Eigen::Matrix<real_t, M, N, Options, MaxRows, MaxCols> >
 {
   //static constexpr int dimension = M * N;
   enum { dimension = M * N };
-  typedef Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> Matrix;
-  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<real_t, M, N, Options, MaxRows, MaxCols> Matrix;
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
 
   static int getDimension(const Matrix& /*v*/)
   {
     return M * N;
   }
 
-  static bool equals(const Matrix& v1, const Matrix& v2, FloatType tol = 1e-8)
+  static bool equals(const Matrix& v1, const Matrix& v2, real_t tol = 1e-8)
   {
     if (v1.size() != v2.size())
     {
@@ -137,12 +137,12 @@ namespace internal {
 template<int M, int N, int Options, int MaxRows, int MaxCols>
 struct DynamicMatrixTraits {
 
-  typedef Eigen::Matrix<FloatType, M, N, Options, MaxRows, MaxCols> DynamicMatrix;
+  typedef Eigen::Matrix<real_t, M, N, Options, MaxRows, MaxCols> DynamicMatrix;
 
   enum Dimension : int { dimension = Eigen::Dynamic };
 
   typedef VectorX TangentVector;
-  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
   typedef DynamicMatrix ManifoldType;
 
   static int getDimension(const DynamicMatrix& m)
@@ -153,7 +153,7 @@ struct DynamicMatrixTraits {
   static Jacobian eye(const DynamicMatrix& m)
   {
     int dim = getDimension(m);
-    return Eigen::Matrix<FloatType, dimension, dimension>::Identity(dim, dim);
+    return Eigen::Matrix<real_t, dimension, dimension>::Identity(dim, dim);
   }
 
   static TangentVector local(
@@ -193,19 +193,19 @@ struct DynamicMatrixTraits {
 
 // traits for fully dynamic matrix
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
+struct traits<Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
     public internal::DynamicMatrixTraits<Eigen::Dynamic, Eigen::Dynamic, Options, MaxRows, MaxCols> {
 };
 
 // traits for dynamic column vector
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, Eigen::Dynamic, 1, Options, MaxRows, MaxCols> > :
+struct traits<Eigen::Matrix<real_t, Eigen::Dynamic, 1, Options, MaxRows, MaxCols> > :
     public internal::DynamicMatrixTraits<Eigen::Dynamic, 1, Options, MaxRows, MaxCols> {
 };
 
 // traits for dynamic row vector
 template<int Options, int MaxRows, int MaxCols>
-struct traits<Eigen::Matrix<FloatType, 1, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
+struct traits<Eigen::Matrix<real_t, 1, Eigen::Dynamic, Options, MaxRows, MaxCols> > :
     public internal::DynamicMatrixTraits<1, Eigen::Dynamic, Options, MaxRows, MaxCols> {
 };
 

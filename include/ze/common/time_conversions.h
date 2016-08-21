@@ -12,13 +12,13 @@ namespace ze {
 //!            dictionaries/maps.
 
 //! Seconds to nanoseconds.
-inline constexpr int64_t secToNanosec(FloatType seconds)
+inline constexpr int64_t secToNanosec(real_t seconds)
 {
   return static_cast<int64_t>(seconds * 1e9);
 }
 
 //! Milliseconds to nanoseconds.
-inline constexpr int64_t millisecToNanosec(FloatType milliseconds)
+inline constexpr int64_t millisecToNanosec(real_t milliseconds)
 {
   return static_cast<int64_t>(milliseconds * 1e6);
 }
@@ -28,18 +28,18 @@ inline constexpr int64_t millisecToNanosec(FloatType milliseconds)
 //!          representability of the float value does not capture nanoseconds
 //!          resolution. The resulting accuracy will be in the order of
 //!          hundreds of nanoseconds.
-inline constexpr FloatType nanosecToSecTrunc(int64_t nanoseconds)
+inline constexpr real_t nanosecToSecTrunc(int64_t nanoseconds)
 {
-  return static_cast<FloatType>(nanoseconds) / 1e9;
+  return static_cast<real_t>(nanoseconds) / 1e9;
 }
 
 //! Nanoseconds to milliseconds.
 //! WARNING: Don't pass very large or very small numbers to this function as the
 //!          representability of the float value does not capture nanoseconds
 //!          resolution.
-inline constexpr FloatType nanosecToMillisecTrunc(int64_t nanoseconds)
+inline constexpr real_t nanosecToMillisecTrunc(int64_t nanoseconds)
 {
-  return static_cast<FloatType>(nanoseconds) / 1e6;
+  return static_cast<real_t>(nanoseconds) / 1e6;
 }
 
 //! Return total nanoseconds from seconds and nanoseconds pair.

@@ -5,9 +5,9 @@
 #include <ze/common/transformation.h>
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
-constexpr ze::FloatType tol = 1e-9;
+constexpr ze::real_t tol = 1e-9;
 #else
-constexpr ze::FloatType tol = 1e-7;
+constexpr ze::real_t tol = 1e-7;
 #endif
 
 TEST(TransformationTests, testManifoldSO3)

@@ -12,9 +12,9 @@
 
 namespace ze {
 
-using Transformation = kindr::minimal::QuatTransformationTemplate<FloatType>;
-using Quaternion = kindr::minimal::RotationQuaternionTemplate<FloatType>;
-using AngleAxis = kindr::minimal::AngleAxisTemplate<FloatType>;
+using Transformation = kindr::minimal::QuatTransformationTemplate<real_t>;
+using Quaternion = kindr::minimal::RotationQuaternionTemplate<real_t>;
+using AngleAxis = kindr::minimal::AngleAxisTemplate<real_t>;
 
 using TransformationVector = std::vector<Transformation, Eigen::aligned_allocator<Transformation>>;
 using QuaternionVector = std::vector<Quaternion, Eigen::aligned_allocator<Quaternion>>;
@@ -29,12 +29,12 @@ using StampedTransformationVector = std::vector<StampedTransformation,
 // Right Jacobian for Exponential map in SO(3)
 inline Matrix3 expmapDerivativeSO3(const Vector3& omega)
 {
-  FloatType theta2 = omega.dot(omega);
-  if (theta2 <= std::numeric_limits<FloatType>::epsilon())
+  real_t theta2 = omega.dot(omega);
+  if (theta2 <= std::numeric_limits<real_t>::epsilon())
   {
     return I_3x3;
   }
-  FloatType theta = std::sqrt(theta2);  // rotation angle
+  real_t theta = std::sqrt(theta2);  // rotation angle
   // element of Lie algebra so(3): X = omega^, normalized by normx
   const Matrix3 Y = skewSymmetric(omega) / theta;
   return I_3x3 - ((1 - std::cos(theta)) / (theta)) * Y
@@ -44,12 +44,12 @@ inline Matrix3 expmapDerivativeSO3(const Vector3& omega)
 // Right Jacobian for Log map in SO(3)
 inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
 {
-  FloatType theta2 = omega.dot(omega);
-  if (theta2 <= std::numeric_limits<FloatType>::epsilon())
+  real_t theta2 = omega.dot(omega);
+  if (theta2 <= std::numeric_limits<real_t>::epsilon())
   {
     return I_3x3;
   }
-  FloatType theta = std::sqrt(theta2);  // rotation angle
+  real_t theta = std::sqrt(theta2);  // rotation angle
   const Matrix3 X = skewSymmetric(omega); // element of Lie algebra so(3): X = omega^
   return I_3x3 + 0.5 * X
       + (1 / (theta * theta) - (1 + std::cos(theta)) / (2 * theta * std::sin(theta))) * X * X;
@@ -59,7 +59,7 @@ inline Matrix3 logmapDerivativeSO3(const Vector3& omega)
 // Quaternion utils
 
 //! Plus matrix for a quaternion. q_AB x q_BC = plus(q_AB) * q_BC.coeffs().
-inline Matrix4 quaternionPlusMatrix(const Eigen::Quaternion<FloatType>& q_AB)
+inline Matrix4 quaternionPlusMatrix(const Eigen::Quaternion<real_t>& q_AB)
 {
   const Vector4& q = q_AB.coeffs();
   Matrix4 Q;
@@ -71,7 +71,7 @@ inline Matrix4 quaternionPlusMatrix(const Eigen::Quaternion<FloatType>& q_AB)
 }
 
 //! Opposite-Plus matrix for a quaternion q_AB x q_BC = oplus(q_BC) * q_AB.coeffs().
-inline Matrix4 quaternionOplusMatrix(const Eigen::Quaternion<FloatType>& q_BC)
+inline Matrix4 quaternionOplusMatrix(const Eigen::Quaternion<real_t>& q_BC)
 {
   const Vector4& q = q_BC.coeffs();
   Matrix4 Q;
@@ -92,8 +92,8 @@ template<> struct traits<Quaternion>
 {
   enum { dimension = 3 }; // The dimension of the manifold.
 
-  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
 
   static int getDimension(const Quaternion& /*v*/)
   {
@@ -101,7 +101,7 @@ template<> struct traits<Quaternion>
   }
 
   static bool equals(
-      const Quaternion& q1, const Quaternion& q2, FloatType tol = 1e-8)
+      const Quaternion& q1, const Quaternion& q2, real_t tol = 1e-8)
   {
     return (q1.getUnique().vector()
             - q2.getUnique().vector()).array().abs().maxCoeff() < tol;
@@ -156,8 +156,8 @@ template<> struct traits<Transformation>
 {
   enum { dimension = 6 }; // The dimension of the manifold.
 
-  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
 
   static int getDimension(const Transformation& /*v*/)
   {
@@ -165,7 +165,7 @@ template<> struct traits<Transformation>
   }
 
   static bool equals(
-      const Transformation& T1, const Transformation& T2, FloatType tol = 1e-8)
+      const Transformation& T1, const Transformation& T2, real_t tol = 1e-8)
   {
     return (T1.getRotation().getUnique().vector()
             - T2.getRotation().getUnique().vector()).array().abs().maxCoeff() < tol

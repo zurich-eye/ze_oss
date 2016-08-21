@@ -33,12 +33,12 @@ public:
     return duration.count();
   }
 
-  inline FloatType stopAndGetMilliseconds()
+  inline real_t stopAndGetMilliseconds()
   {
     return nanosecToMillisecTrunc(stopAndGetNanoseconds());
   }
 
-  inline FloatType stopAndGetSeconds()
+  inline real_t stopAndGetSeconds()
   {
     return nanosecToSecTrunc(stopAndGetNanoseconds());
   }

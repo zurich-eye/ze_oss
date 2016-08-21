@@ -17,9 +17,9 @@ inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
            w(2),  0.0f, -w(0),
           -w(1),  w(0),  0.0f).finished();
 }
-inline Matrix3 skewSymmetric(const FloatType w1,
-                             const FloatType w2,
-                             const FloatType w3)
+inline Matrix3 skewSymmetric(const real_t w1,
+                             const real_t w2,
+                             const real_t w3)
 {
   return (Matrix3() <<
            0.0f, -w3,  w2,
@@ -55,7 +55,7 @@ inline Matrix2X project2Vectorized(const Matrix3X& v)
 
 // ----------------------------------------------------------------------------
 //! Get element with max norm in a vector.
-inline FloatType normMax(const VectorX& v)
+inline real_t normMax(const VectorX& v)
 {
   return v.lpNorm<Eigen::Infinity>();
 }
@@ -63,9 +63,9 @@ inline FloatType normMax(const VectorX& v)
 // ----------------------------------------------------------------------------
 //! Get element with maximum norm on diagonal.
 template<typename Derived>
-FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
+real_t maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
 {
-  FloatType max_val = 0.0f;
+  real_t max_val = 0.0f;
   CHECK_EQ(M.cols(), M.rows());
   for (int i = 0; i < M.cols(); ++i)
   {
@@ -80,8 +80,8 @@ FloatType maxAbsDiagonalElement(const Eigen::MatrixBase<Derived>& M)
 //! @param A of size m*n, where m>=n (pad with zero rows if not!)
 //! @return Rank of A, minimum error (singular value), and corresponding
 //! eigenvector (column of V, with A=U*S*V')
-std::tuple<int, FloatType, VectorX> directLinearTransform(
-    const MatrixX& A, FloatType rank_tol = 1e-9);
+std::tuple<int, real_t, VectorX> directLinearTransform(
+    const MatrixX& A, real_t rank_tol = 1e-9);
 
 // ----------------------------------------------------------------------------
 //! Get a slice of vector X by the specified indices.

@@ -56,10 +56,10 @@ TEST(RingViewTest, testRingEigenVector)
 {
   using namespace ze;
 
-  Eigen::Matrix<FloatType, 1, 4> data;
+  Eigen::Matrix<real_t, 1, 4> data;
   data << 1, 2, 3, 4;
 
-  ring_view<FloatType> rv(data.data(), data.data()+4);
+  ring_view<real_t> rv(data.data(), data.data()+4);
   ASSERT_EQ(1, rv.at(0));
   ASSERT_EQ(2, rv.at(1));
   ASSERT_EQ(3, rv.at(2));
@@ -73,10 +73,10 @@ TEST(RingViewTest, testRingEigenVector)
 TEST(RingViewTest, testIteratorOperators)
 {
   using namespace ze;
-  Eigen::Matrix<FloatType, 1, 4> data;
+  Eigen::Matrix<real_t, 1, 4> data;
   data << 1, 2, 3, 4;
 
-  ring_view<FloatType> rv(data.data(), data.data()+4);
+  ring_view<real_t> rv(data.data(), data.data()+4);
 
   auto iter1 = rv.begin();
   auto iter2 = rv.end();
@@ -134,13 +134,13 @@ TEST(RingViewTest, benchmarkFixedVsDynamicSize)
   //////
   // access
   auto atFixed = [&]() { rv2.at(26); };
-  FloatType atFixed_r = runTimingBenchmark(atFixed, 1000, 20, "At Fixed", true);
+  real_t atFixed_r = runTimingBenchmark(atFixed, 1000, 20, "At Fixed", true);
   auto atDynamic = [&]() { rv1.at(26); };
-  FloatType atDynamic_r = runTimingBenchmark(atDynamic, 1000, 20, "At Fixed", true);
+  real_t atDynamic_r = runTimingBenchmark(atDynamic, 1000, 20, "At Fixed", true);
   auto atFixed_128 = [&]() { rv4.at(26); };
-  FloatType atFixed128_r = runTimingBenchmark(atFixed_128, 1000, 20, "At Fixed", true);
+  real_t atFixed128_r = runTimingBenchmark(atFixed_128, 1000, 20, "At Fixed", true);
   auto atDynamic_128 = [&]() { rv3.at(26); };
-  FloatType atDynamic128_r = runTimingBenchmark(atDynamic_128, 1000, 20, "At Fixed", true);
+  real_t atDynamic128_r = runTimingBenchmark(atDynamic_128, 1000, 20, "At Fixed", true);
 
   VLOG(1) << "Fixed: " << atFixed_r << ", Fixed128: " << atFixed128_r << "\n";
   VLOG(1) << "Dynamic: " << atDynamic_r << ", Dynamic128: " << atDynamic128_r << "\n";

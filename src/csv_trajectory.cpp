@@ -78,12 +78,12 @@ void PositionSeries::load(const std::string& in_file_path)
   }
 }
 
-const Buffer<FloatType, 3>& PositionSeries::getBuffer() const
+const Buffer<real_t, 3>& PositionSeries::getBuffer() const
 {
   return position_buf_;
 }
 
-Buffer<FloatType, 3>& PositionSeries::getBuffer()
+Buffer<real_t, 3>& PositionSeries::getBuffer()
 {
   return position_buf_;
 }
@@ -120,12 +120,12 @@ void PoseSeries::load(const std::string& in_file_path)
   }
 }
 
-const Buffer<FloatType, 7>& PoseSeries::getBuffer() const
+const Buffer<real_t, 7>& PoseSeries::getBuffer() const
 {
   return pose_buf_;
 }
 
-Buffer<FloatType, 7>& PoseSeries::getBuffer()
+Buffer<real_t, 7>& PoseSeries::getBuffer()
 {
   return pose_buf_;
 }
@@ -147,7 +147,7 @@ StampedTransformationVector PoseSeries::getStampedTransformationVector()
 Transformation PoseSeries::getTransformationFromVec7(const Vector7& data)
 {
   Vector3 p = data.head<3>();
-  Eigen::Quaternion<FloatType> q(data(6), data(3), data(4), data(5));
+  Eigen::Quaternion<real_t> q(data(6), data(3), data(4), data(5));
   CHECK_NEAR(q.squaredNorm(), 1.0, 1e-4);
   q.normalize();
   return Transformation(q, p);
