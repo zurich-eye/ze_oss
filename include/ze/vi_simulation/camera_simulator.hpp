@@ -31,10 +31,10 @@ using CameraMeasurementsVector = std::vector<CameraMeasurements>;
 struct CameraSimulatorOptions
 {
   uint32_t num_keypoints_per_frame { 50  };
-  FloatType keypoint_noise_sigma { 1.0 };
+  real_t keypoint_noise_sigma { 1.0 };
   uint32_t max_num_landmarks_ { 10000 };
-  FloatType min_depth_m { 2.0 };
-  FloatType max_depth_m { 7.0 };
+  real_t min_depth_m { 2.0 };
+  real_t max_depth_m { 7.0 };
 };
 
 // -----------------------------------------------------------------------------
@@ -63,15 +63,15 @@ public:
   void initializeMap();
 
   void visualize(
-      FloatType dt = 0.2,
-      FloatType marker_size_trajectory = 0.2,
-      FloatType marker_size_landmarks = 0.2);
+      real_t dt = 0.2,
+      real_t marker_size_trajectory = 0.2,
+      real_t marker_size_landmarks = 0.2);
 
   CameraMeasurementsVector getMeasurements(
-      FloatType time);
+      real_t time);
 
   CameraMeasurementsVector getMeasurementsCorrupted(
-      FloatType time);
+      real_t time);
 
   void reset();
 

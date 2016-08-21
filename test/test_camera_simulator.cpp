@@ -54,7 +54,7 @@ TEST(CameraSimulator, testSplineScenario)
   // Loop through trajectory and visualize feature tracks:
   for (int j = 0; j < 1000; ++j)
   {
-    FloatType time = cam_sim.trajectory().start() + j * 1.0/20.0;
+    real_t time = cam_sim.trajectory().start() + j * 1.0/20.0;
     const CameraMeasurementsVector& m_vec = cam_sim.getMeasurements(time);
 #ifdef ZE_USE_OPENCV
     if (false)

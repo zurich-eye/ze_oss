@@ -22,9 +22,9 @@ public:
       const ImuBiasSimulator::Ptr& bias,
       RandomVectorSampler<3>::Ptr& accelerometer_noise,
       RandomVectorSampler<3>::Ptr& gyro_noise,
-      FloatType accelerometer_noise_bandwidth_hz,
-      FloatType gyroscope_noise_bandwidth_hz,
-      FloatType gravity_magnitude)
+      real_t accelerometer_noise_bandwidth_hz,
+      real_t gyroscope_noise_bandwidth_hz,
+      real_t gravity_magnitude)
     : trajectory_(trajectory)
     , bias_(bias)
     , accelerometer_noise_(accelerometer_noise)
@@ -41,27 +41,27 @@ public:
   }
 
   //! Get the angular velocity in the body frame.
-  Vector3 angularVelocityActual(FloatType t) const
+  Vector3 angularVelocityActual(real_t t) const
   {
     return trajectory_->angularVelocity_B(t);
   }
 
   //! An accelerometer measures the specific force (incl. gravity).
-  Vector3 specificForceActual(FloatType t) const
+  Vector3 specificForceActual(real_t t) const
   {
     Quaternion Rbw(trajectory_->R_W_B(t).inverse());
     return trajectory_->acceleration_B(t) + Rbw.rotate(gravity());
   }
 
   //! The angular velocity corrupted by noise and bias.
-  Vector3 angularVelocityCorrupted(FloatType t) const
+  Vector3 angularVelocityCorrupted(real_t t) const
   {
     return angularVelocityActual(t) + bias_->gyroscope(t) +
         gyro_noise_->sample() * gyro_noise_bandwidth_hz_sqrt_;
   }
 
   //! The specific force corrupted by noise and bias.
-  Vector3 specificForceCorrupted(FloatType t) const
+  Vector3 specificForceCorrupted(real_t t) const
   {
     return specificForceActual(t) + bias_->accelerometer(t) +
         accelerometer_noise_->sample() *
@@ -76,8 +76,8 @@ private:
   mutable RandomVectorSampler<3>::Ptr gyro_noise_;
 
   //! The noise bandwidth of accelerometer and gyroscope (sqrt(hz))
-  const FloatType accelerometer_noise_bandwidth_hz_sqrt_;
-  const FloatType gyro_noise_bandwidth_hz_sqrt_;
+  const real_t accelerometer_noise_bandwidth_hz_sqrt_;
+  const real_t gyro_noise_bandwidth_hz_sqrt_;
 
   //! The gravity vector in the world frame (negative Z-axis).
   const Vector3 gravity_;

@@ -16,38 +16,38 @@ public:
   ZE_POINTER_TYPEDEFS(TrajectorySimulator);
 
   //! Get the pose at a given time.
-  virtual Transformation T_W_B(FloatType t) const = 0;
+  virtual Transformation T_W_B(real_t t) const = 0;
 
   //! Get the rotational velocity in the body frame.
-  virtual Vector3 angularVelocity_B(FloatType t) const = 0;
+  virtual Vector3 angularVelocity_B(real_t t) const = 0;
 
   //! Get the velocity in the world frame.
-  virtual Vector3 velocity_W(FloatType t) const = 0;
+  virtual Vector3 velocity_W(real_t t) const = 0;
 
   //! Get the acceleration in the world frame (without gravity).
-  virtual Vector3 acceleration_W(FloatType t) const = 0;
+  virtual Vector3 acceleration_W(real_t t) const = 0;
 
   //! Start time of the scenario
-  virtual FloatType start() const = 0;
+  virtual real_t start() const = 0;
 
   //! End time of the scenario
-  virtual FloatType end() const = 0;
+  virtual real_t end() const = 0;
 
   //! Get the orientation in the world frame.
-  Quaternion R_W_B(FloatType t) const
+  Quaternion R_W_B(real_t t) const
   {
     return T_W_B(t).getRotation();
   }
 
   //! The linear velocity in the body frame.
-  Vector3 velocity_B(FloatType t) const
+  Vector3 velocity_B(real_t t) const
   {
     const Quaternion Rwb = R_W_B(t);
     return Rwb.inverse().rotate(velocity_W(t));
   }
 
   //! The linear acceleration in the body frame (without gravity).
-  Vector3 acceleration_B(FloatType t) const
+  Vector3 acceleration_B(real_t t) const
   {
     const Quaternion Rwb = R_W_B(t);
     return Rwb.inverse().rotate(acceleration_W(t));
@@ -63,37 +63,37 @@ public:
   {}
 
   //! Get pose at time t.
-  virtual Transformation T_W_B(FloatType t) const override
+  virtual Transformation T_W_B(real_t t) const override
   {
     return Transformation(bs_->transformation(t));
   }
 
   //! Get gyro measurement at time t (B_w_WB).
-  virtual Vector3 angularVelocity_B(FloatType t) const override
+  virtual Vector3 angularVelocity_B(real_t t) const override
   {
     return bs_->angularVelocityBodyFrame(t);
   }
 
   //! Get velocity in world coorinates at time t.
-  virtual  Vector3 velocity_W(FloatType t) const override
+  virtual  Vector3 velocity_W(real_t t) const override
   {
     return bs_->linearVelocity(t);
   }
 
   //! Get acceleration in world coordinates at time t (without gravity).
-  virtual Vector3 acceleration_W(FloatType t) const override
+  virtual Vector3 acceleration_W(real_t t) const override
   {
     return bs_->linearAcceleration(t);
   }
 
   //! Get start-time of trajectory.
-  virtual FloatType start() const override
+  virtual real_t start() const override
   {
     return bs_->t_min();
   }
 
   //! Get end time of trajectory.
-  virtual FloatType end() const override
+  virtual real_t end() const override
   {
     return bs_->t_max();
   }

@@ -27,14 +27,14 @@ TEST(TrajectorySimulator, testSplineScenario)
       RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
   RandomVectorSampler<3>::Ptr gyr_noise =
       RandomVectorSampler<3>::sigmas(Vector3(1e-5, 1e-5, 1e-5));
-  FloatType gravity_magnitude = 9.81;
+  real_t gravity_magnitude = 9.81;
 
   // test runner
   ImuSimulator imu_simulator(
         scenario, bias, acc_noise, gyr_noise,
         100, 100, gravity_magnitude);
 
-  for (FloatType t = 10.0; t < 20.0; t += 0.1)
+  for (real_t t = 10.0; t < 20.0; t += 0.1)
   {
     // the probability is really high that this test passes... but not guaranteed
     EXPECT_TRUE(EIGEN_MATRIX_NEAR(
@@ -71,7 +71,7 @@ TEST(TrajectorySimulator, testConsistency)
       RandomVectorSampler<3>::sigmas(Vector3(0, 0, 0));
   RandomVectorSampler<3>::Ptr gyr_noise =
       RandomVectorSampler<3>::sigmas(Vector3(0, 0, 0));
-  FloatType gravity_magnitude = 9.81;
+  real_t gravity_magnitude = 9.81;
 
   // test runner
   ImuSimulator imu_simulator(

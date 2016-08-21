@@ -6,8 +6,8 @@ namespace ze {
 ContinuousBiasSimulator::ContinuousBiasSimulator(
     const Vector3& gyr_bias_noise_density,
     const Vector3& acc_bias_noise_density,
-    FloatType start_time,
-    FloatType end_time,
+    real_t start_time,
+    real_t end_time,
     size_t samples,
     size_t spline_order,
     size_t spline_segments,
@@ -40,8 +40,8 @@ void ContinuousBiasSimulator::initialize()
   RandomVectorSampler<6>::Ptr sampler = RandomVectorSampler<6>::sigmas(noise);
 
   // sampling interval
-  FloatType dt = (end_ - start_) / samples_;
-  FloatType dt_sqrt = sqrt(dt);
+  real_t dt = (end_ - start_) / samples_;
+  real_t dt_sqrt = sqrt(dt);
   CHECK_LE(0, dt);
 
   // simulate the white noise process

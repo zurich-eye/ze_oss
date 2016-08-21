@@ -10,8 +10,8 @@ void CameraSimulator::initializeMap()
 {
   uint32_t num_frames = options_.max_num_landmarks_
                          / options_.num_keypoints_per_frame;
-  FloatType time = trajectory_->start();
-  FloatType dt = (trajectory_->end() - time) / num_frames;
+  real_t time = trajectory_->start();
+  real_t dt = (trajectory_->end() - time) / num_frames;
   int num_landmarks_per_frame = options_.num_keypoints_per_frame / rig_->size();
   uint32_t num_landmarks = 0u;
   landmarks_W_.resize(Eigen::NoChange, options_.max_num_landmarks_);
@@ -104,7 +104,7 @@ CameraMeasurements CameraSimulator::visibleLandmarks(
 }
 
 // -----------------------------------------------------------------------------
-CameraMeasurementsVector CameraSimulator::getMeasurements(FloatType time)
+CameraMeasurementsVector CameraSimulator::getMeasurements(real_t time)
 {
   CHECK_GE(time, trajectory_->start());
   CHECK_LT(time, trajectory_->end());
@@ -150,7 +150,7 @@ CameraMeasurementsVector CameraSimulator::getMeasurements(FloatType time)
 }
 
 // -----------------------------------------------------------------------------
-CameraMeasurementsVector CameraSimulator::getMeasurementsCorrupted(FloatType time)
+CameraMeasurementsVector CameraSimulator::getMeasurementsCorrupted(real_t time)
 {
   CameraMeasurementsVector measurements = getMeasurements(time);
   for (CameraMeasurements& m : measurements)
@@ -175,13 +175,13 @@ void CameraSimulator::setVisualizer(const std::shared_ptr<Visualizer>& visualize
 
 // -----------------------------------------------------------------------------
 void CameraSimulator::visualize(
-    FloatType dt,
-    FloatType marker_size_trajectory,
-    FloatType marker_size_landmarks)
+    real_t dt,
+    real_t marker_size_trajectory,
+    real_t marker_size_landmarks)
 {
   DEBUG_CHECK(viz_);
   std::vector<Position> trajectory;
-  for (FloatType time = trajectory_->start(), time_end = trajectory_->end();
+  for (real_t time = trajectory_->start(), time_end = trajectory_->end();
        time < time_end; time += dt)
   {
     trajectory.push_back(trajectory_->T_W_B(time).getPosition());

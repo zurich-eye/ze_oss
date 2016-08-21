@@ -10,8 +10,8 @@ namespace ze {
 // -----------------------------------------------------------------------------
 //! Takes the accel / gyro bias noise density in the continuous-case and
 //! a constant vector valued bias otherwise.
-ImuBiasSimulator::Ptr generateImuBias(FloatType start,
-                             FloatType end,
+ImuBiasSimulator::Ptr generateImuBias(real_t start,
+                             real_t end,
                              const std::string& type,
                              Vector3 imu_acc_bias,
                              Vector3 imu_gyr_bias)
@@ -36,10 +36,10 @@ ImuBiasSimulator::Ptr generateImuBias(FloatType start,
 
 //-----------------------------------------------------------------------------
 void plotOrientation(
-    const std::vector<FloatType>& times,
-    const Eigen::Matrix<FloatType, 3, Eigen::Dynamic>& points,
+    const std::vector<real_t>& times,
+    const Eigen::Matrix<real_t, 3, Eigen::Dynamic>& points,
     const std::string& label,
-    const Eigen::Matrix<FloatType, 3, Eigen::Dynamic>* ref_points = nullptr)
+    const Eigen::Matrix<real_t, 3, Eigen::Dynamic>* ref_points = nullptr)
 {
   plt::figure("orientation");
   plt::subplot(3, 1, 1);
@@ -68,15 +68,15 @@ void plotOrientation(
 
 //-----------------------------------------------------------------------------
 void plotOrientation(
-    const std::vector<FloatType>& times,
+    const std::vector<real_t>& times,
     const QuaternionVector& orientation,
     const std::string& label,
     const BSplinePoseMinimalRotationVector::Ptr reference = nullptr)
 {
   CHECK_EQ(times.size(), orientation.size());
 
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
+  Eigen::Matrix<real_t, 3, Eigen::Dynamic> points(3, orientation.size());
+  Eigen::Matrix<real_t, 3, Eigen::Dynamic> ref_points(3, orientation.size());
 
   for (size_t i = 0; i < orientation.size(); ++i)
   {
@@ -106,15 +106,15 @@ void plotOrientation(
 
 //-----------------------------------------------------------------------------
 void plotOrientation(
-    const std::vector<FloatType>& times,
+    const std::vector<real_t>& times,
     const std::vector<Matrix3>& orientation,
     const std::string& label,
     const BSplinePoseMinimalRotationVector::Ptr& trajectory = nullptr)
 {
   CHECK_EQ(times.size(), orientation.size());
 
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> points(3, orientation.size());
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> ref_points(3, orientation.size());
+  Eigen::Matrix<real_t, 3, Eigen::Dynamic> points(3, orientation.size());
+  Eigen::Matrix<real_t, 3, Eigen::Dynamic> ref_points(3, orientation.size());
 
   for (size_t i = 0; i < orientation.size(); ++i)
   {
@@ -138,14 +138,14 @@ void plotOrientation(
 
 //-----------------------------------------------------------------------------
 void plotOrientationError(
-    const std::vector<FloatType>& times,
+    const std::vector<real_t>& times,
     const std::vector<Matrix3>& est,
     const std::string& label,
     const BSplinePoseMinimalRotationVector::Ptr trajectory)
 {
   CHECK_EQ(times.size(), est.size());
 
-  Eigen::Matrix<FloatType, 1, Eigen::Dynamic> err(1, est.size());
+  Eigen::Matrix<real_t, 1, Eigen::Dynamic> err(1, est.size());
 
   for (size_t i = 0; i < est.size(); ++i)
   {
@@ -163,7 +163,7 @@ void plotOrientationError(
 
 //-----------------------------------------------------------------------------
 void plotImuMeasurements(
-    const std::vector<FloatType>& times,
+    const std::vector<real_t>& times,
     const ImuAccGyrContainer& measurements)
 {
   CHECK_EQ(static_cast<int>(times.size()), measurements.cols());
