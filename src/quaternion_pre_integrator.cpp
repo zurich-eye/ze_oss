@@ -95,7 +95,7 @@ void QuaternionPreIntegrationState::integrate(
 Quaternion QuaternionPreIntegrationState::integrateFirstOrderFwdStep(
     Quaternion q,
     Vector3 w_i,
-    FloatType dt)
+    real_t dt)
 {
   return q * Quaternion(Vector3(w_i * dt));
 }
@@ -105,7 +105,7 @@ Quaternion QuaternionPreIntegrationState::integrateFirstOrderMidStep(
     Quaternion q,
     Vector3 w_i,
     Vector3 w_i_1,
-    FloatType dt)
+    real_t dt)
 {
   return q * Quaternion(Vector3((w_i + w_i_1) * 0.5 * dt));
 }
@@ -115,7 +115,7 @@ std::pair<Quaternion, Matrix3> QuaternionPreIntegrationState::integrateRK(
     Quaternion q,
     Vector3 w_i,
     Vector3 w_i_1,
-    FloatType dt,
+    real_t dt,
     uint32_t order)
 {
 
@@ -237,10 +237,10 @@ Quaternion QuaternionPreIntegrationState::integrateCrouchGrossman(
     Quaternion q,
     Vector3 w_i,
     Vector3 w_i_1,
-    FloatType dt,
+    real_t dt,
     uint32_t order)
 {
-  auto exp = [](FloatType coeff, FloatType dt, Vector3 w) -> Quaternion {
+  auto exp = [](real_t coeff, FloatType dt, Vector3 w) -> Quaternion {
     return Quaternion::exp(dt * coeff * w);
   };
 
@@ -286,7 +286,7 @@ void QuaternionPreIntegrationState::integrateFirstOrderFwd(
   {
     timers_[IntegrationTimer::integrate].start();
 
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
     if (i == 0)
@@ -347,7 +347,7 @@ void QuaternionPreIntegrationState::integrateFirstOrderMid(
   {
     timers_[IntegrationTimer::integrate].start();
 
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
     if (i == 0)
@@ -411,7 +411,7 @@ void QuaternionPreIntegrationState::integrateRK(
   {
     timers_[IntegrationTimer::integrate].start();
 
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
     if (i == 0)
@@ -485,7 +485,7 @@ void QuaternionPreIntegrationState::integrateCrouchGrossman(
   {
     timers_[IntegrationTimer::integrate].start();
 
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     // Reset to 0 at every step:
     if (i == 0)

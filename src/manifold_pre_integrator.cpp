@@ -61,7 +61,7 @@ void ManifoldPreIntegrationState::integrateFirstOrderFwd(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     Vector6 measurement = measurements.col(i);
     Vector3 gyro_measurement = measurement.tail<3>(3);
@@ -89,7 +89,7 @@ void ManifoldPreIntegrationState::integrateFirstOrderMid(
   // Integrate measurements between frames.
   for (int i = 0; i < measurements.cols() - 1; ++i)
   {
-    FloatType dt = stamps[i+1] - stamps[i];
+    real_t dt = stamps[i+1] - stamps[i];
 
     Vector6 measurement = measurements.col(i);
     Vector3 gyro_measurement = measurement.tail<3>(3);
@@ -111,7 +111,7 @@ void ManifoldPreIntegrationState::integrateFirstOrderMid(
 
 //------------------------------------------------------------------------------
 void ManifoldPreIntegrationState::setInitialValuesFwd(
-    const FloatType dt,
+    const real_t dt,
     const Eigen::Ref<Vector3>& gyro_measurement)
 {
   Matrix3 increment = Quaternion::exp(gyro_measurement * dt).getRotationMatrix();
@@ -127,7 +127,7 @@ void ManifoldPreIntegrationState::setInitialValuesFwd(
 
 //------------------------------------------------------------------------------
 void ManifoldPreIntegrationState::integrateStepFwd(
-    const FloatType dt,
+    const real_t dt,
     const Eigen::Ref<Vector3>& gyro_measurement)
 {
   timers_[IntegrationTimer::integrate].start();
@@ -173,7 +173,7 @@ void ManifoldPreIntegrationState::integrateStepFwd(
 
 //------------------------------------------------------------------------------
 void ManifoldPreIntegrationState::setInitialValuesMid(
-    const FloatType dt,
+    const real_t dt,
     const Eigen::Ref<Vector3>& gyro_measurement,
     const Eigen::Ref<Vector3>& gyro_measurement2)
 {
@@ -190,7 +190,7 @@ void ManifoldPreIntegrationState::setInitialValuesMid(
 
 //------------------------------------------------------------------------------
 void ManifoldPreIntegrationState::integrateStepMid(
-    const FloatType dt,
+    const real_t dt,
     const Eigen::Ref<Vector3>& gyro_measurement,
     const Eigen::Ref<Vector3>& gyro_measurement2)
 {

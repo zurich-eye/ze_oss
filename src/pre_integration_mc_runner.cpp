@@ -15,8 +15,8 @@ PreIntegratorMonteCarlo::PreIntegratorMonteCarlo(
 
 //------------------------------------------------------------------------------
 void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
-                                       FloatType start,
-                                       FloatType end)
+                                       real_t start,
+                                       real_t end)
 {
   PreIntegrator::Ptr pre_int_actual = preintegrateActual(start, end);
   D_R_ref_ = pre_int_actual->D_R_i_k();
@@ -50,7 +50,7 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
 
 //------------------------------------------------------------------------------
 PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateActual(
-    FloatType start, FloatType end)
+    real_t start, FloatType end)
 {
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
@@ -65,7 +65,7 @@ PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateActual(
 
 //------------------------------------------------------------------------------
 PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateCorrupted(
-    FloatType start, FloatType end)
+    real_t start, FloatType end)
 {
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
@@ -91,7 +91,7 @@ std::vector<Matrix3> PreIntegratorMonteCarlo::covarianceEstimates(
   //! Estimate the covariance matrix for every integration step.
   for (size_t step = 0; step < D_R_actual.size(); ++step)
   {
-    Eigen::Matrix<FloatType, 3, Eigen::Dynamic> errors;
+    Eigen::Matrix<real_t, 3, Eigen::Dynamic> errors;
     errors.resize(3, D_R_mc.size());
 
     for (size_t run = 0; run < D_R_mc.size(); ++run)

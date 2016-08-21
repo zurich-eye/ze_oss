@@ -39,33 +39,33 @@ namespace ze {
 struct ImuPreIntegrationParameters
 {
   // The Imu Model and Noise Parameters:
-  FloatType imu_sampling_time;
-  FloatType camera_sampling_time;
-  FloatType accel_noise_density;
-  FloatType gyro_noise_density;
-  FloatType gravity_magnitude;
+  real_t imu_sampling_time;
+  real_t camera_sampling_time;
+  real_t accel_noise_density;
+  real_t gyro_noise_density;
+  real_t gravity_magnitude;
 
   // Imu Bias Model
   std::string imu_bias_type;
 
   // Parameters of continous-time bias model:
-  FloatType imu_acc_bias_noise_density;
-  FloatType imu_gyr_bias_noise_density;
+  real_t imu_acc_bias_noise_density;
+  real_t imu_gyr_bias_noise_density;
 
   // Parameters of constant bias model:
-  FloatType imu_acc_bias_const;
-  FloatType imu_gyr_bias_const;
+  real_t imu_acc_bias_const;
+  real_t imu_gyr_bias_const;
 
   // Trajectory Generation Parameters:
   std::string trajectory_source;
-  FloatType trajectory_start_time;
-  FloatType trajectory_end_time;
+  real_t trajectory_start_time;
+  real_t trajectory_end_time;
   int trajectory_num_interpolation_points;
   int trajectory_num_segments;
-  FloatType trajectory_lambda;
+  real_t trajectory_lambda;
   int trajectory_spline_order = 10;
-  FloatType trajectory_rotation_factor;
-  FloatType trajectory_translation_factor;
+  real_t trajectory_rotation_factor;
+  real_t trajectory_translation_factor;
 
   //! Initialize a parameter structure from gflags
   static ImuPreIntegrationParameters fromGFlags()

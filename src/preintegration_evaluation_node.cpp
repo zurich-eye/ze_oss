@@ -69,8 +69,8 @@ void PreIntegrationEvaluationNode::runCovarianceMonteCarloMain()
                                                       accel_noise,
                                                       gyro_noise);
 
-  FloatType start = trajectory_->t_min();
-  FloatType end = trajectory_->t_max() - 5;
+  real_t start = trajectory_->t_min();
+  real_t end = trajectory_->t_max() - 5;
 
   //! A single monte carlo run
   PreIntegratorMonteCarlo::Ptr mc = runManifoldCorruptedMc(
@@ -187,8 +187,8 @@ void PreIntegrationEvaluationNode::runDriftEvaluationMain()
                                                       accel_noise,
                                                       gyro_noise);
 
-  FloatType start = trajectory_->t_min();
-  FloatType end = trajectory_->t_max() - 5;
+  real_t start = trajectory_->t_min();
+  real_t end = trajectory_->t_max() - 5;
 
   /////// Evaluate drifts:
  runDriftEvaluationRuns(
@@ -284,11 +284,11 @@ void PreIntegrationEvaluationNode::runRealDatasetMain()
 
 
   // Map the stamped transformation vector to time and Rotation matrix vectors.
-  std::vector<FloatType> times_ref;
+  std::vector<real_t> times_ref;
   std::vector<Matrix3> R_ref_list;
   for (auto entry: T_ref_list)
   {
-    times_ref.push_back(static_cast<FloatType>(entry.first) * 1e-9);
+    times_ref.push_back(static_cast<real_t>(entry.first) * 1e-9);
     R_ref_list.push_back(entry.second.getRotationMatrix());
   }
 
@@ -314,10 +314,10 @@ void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
                                                         accel_noise,
                                                         gyro_noise);
 
-    FloatType start = trajectory_->t_min();
-    FloatType end = trajectory_->t_max() - 5;
+    real_t start = trajectory_->t_min();
+    real_t end = trajectory_->t_max() - 5;
 
-    std::vector<FloatType> errors = runDriftEvaluation(preintegration_runner,
+    std::vector<real_t> errors = runDriftEvaluation(preintegration_runner,
                                                        gyroscope_noise_covariance,
                                                        start,
                                                        end);
@@ -353,25 +353,25 @@ void PreIntegrationEvaluationNode::runDriftEvaluationRuns(
 }
 
 // -----------------------------------------------------------------------------
-std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
+std::vector<real_t> PreIntegrationEvaluationNode::runDriftEvaluation(
     const PreIntegrationRunner::Ptr& preintegration_runner,
     const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end,
+    real_t start,
+    real_t end,
     bool plot)
 {
-  std::vector<FloatType> errors;
+  std::vector<real_t> errors;
 
   //! Evalutes an orientation error wrt. the reference trajectory.
-  auto evaluateOrientationError = [this](const std::vector<FloatType> times,
-                                  const std::vector<Matrix3> est) -> FloatType
+  auto evaluateOrientationError = [this](const std::vector<real_t> times,
+                                  const std::vector<Matrix3> est) -> real_t
   {
-    FloatType error = 0;
+    real_t error = 0;
     for (size_t i = 0; i < est.size(); ++i)
     {
       Quaternion q1 = Quaternion::fromApproximateRotationMatrix(est[i]);
       Quaternion q2(trajectory_->orientation(times[i]));
-      error += q1.getDisparityAngle(q2) / static_cast<FloatType>(est.size());
+      error += q1.getDisparityAngle(q2) / static_cast<real_t>(est.size());
     }
 
     return error;
@@ -390,7 +390,7 @@ std::vector<FloatType> PreIntegrationEvaluationNode::runDriftEvaluation(
 
   VLOG(1) << "Simulate single run for integration drift.";
   ThreadPool pool(FLAGS_num_threads);
-  std::vector<std::future<std::pair<PreIntegrator::Ptr, FloatType>>> results_future;
+  std::vector<std::future<std::pair<PreIntegrator::Ptr, real_t>>> results_future;
 
   // 1) Manifold Fwd
   results_future.emplace_back(
@@ -522,8 +522,8 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runManifoldCorruptedM
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end)
+    real_t start,
+    real_t end)
 {
   VLOG(1) << "Monte Carlo Simulation [Manifoold: " + name + "]";
   PreIntegratorFactory::Ptr preintegrator_factory(
@@ -547,8 +547,8 @@ PreIntegratorMonteCarlo::Ptr PreIntegrationEvaluationNode::runQuaternionMc(
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end)
+    real_t start,
+    real_t end)
 {
   VLOG(1) << "Monte Carlo Simulation [Quaternion: " + name + "]";
   PreIntegratorFactory::Ptr preintegrator_factory(
@@ -572,8 +572,8 @@ ManifoldPreIntegrationState::Ptr PreIntegrationEvaluationNode::runManifoldCorrup
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end,
+    real_t start,
+    real_t end,
     const PreIntegratorMonteCarlo::Ptr& mc,
     bool simplified_covariance)
 {
@@ -615,8 +615,8 @@ QuaternionPreIntegrationState::Ptr PreIntegrationEvaluationNode::runQuaternion(
     PreIntegrator::IntegratorType integrator_type,
     const std::string& name,
     const Matrix3& gyroscope_noise_covariance,
-    FloatType start,
-    FloatType end,
+    real_t start,
+    real_t end,
     const PreIntegratorMonteCarlo::Ptr& mc)
 {
   VLOG(1) << "Reference Estimates [Quaternion]";
@@ -656,8 +656,8 @@ PreIntegrationRunner::Ptr PreIntegrationEvaluationNode::getPreIntegrationRunner(
     RandomVectorSampler<3>::Ptr gyro_noise)
 {
   loadTrajectory();
-  FloatType start = trajectory_->t_min();
-  FloatType end = trajectory_->t_max();
+  real_t start = trajectory_->t_min();
+  real_t end = trajectory_->t_max();
 
   VLOG(1) << "Initialize scenario";
   TrajectorySimulator::Ptr scenario = std::make_shared<SplineTrajectorySimulator>(trajectory_);
@@ -706,8 +706,8 @@ void PreIntegrationEvaluationNode::loadTrajectory()
   // generate random
   if (parameters_.trajectory_source == "")
   {
-    FloatType start = parameters_.trajectory_start_time;
-    FloatType end = parameters_.trajectory_end_time;
+    real_t start = parameters_.trajectory_start_time;
+    real_t end = parameters_.trajectory_end_time;
 
     VLOG(1) << "Generating random trajectory of " << (end - start) << "seconds";
 
@@ -758,7 +758,7 @@ void PreIntegrationEvaluationNode::plotCovarianceResults(
   auto label = labels.begin();
   for(auto elem: covariances_vectors)
   {
-    Eigen::Matrix<FloatType, 3, Eigen::Dynamic> v(3, elem.size());
+    Eigen::Matrix<real_t, 3, Eigen::Dynamic> v(3, elem.size());
     for (size_t i = 0; i < elem.size(); ++i)
     {
       v.col(i) = elem[i].diagonal();
@@ -785,7 +785,7 @@ void PreIntegrationEvaluationNode::plotCovarianceError(
   CHECK_EQ(ref.size(), est.size());
 
   plt::figure("covariance_offsets");
-  Eigen::Matrix<FloatType, 3, Eigen::Dynamic> v(3, ref.size());
+  Eigen::Matrix<real_t, 3, Eigen::Dynamic> v(3, ref.size());
   for (size_t i = 0; i < ref.size(); ++i)
   {
     v.col(i) = (ref[i].diagonal() - est[i].diagonal()).cwiseAbs();
@@ -801,7 +801,7 @@ void PreIntegrationEvaluationNode::plotCovarianceError(
   plt::show(false);
 
   plt::figure("covariance_distance");
-  Eigen::Matrix<FloatType, 1, Eigen::Dynamic> dist(1, ref.size());
+  Eigen::Matrix<real_t, 1, Eigen::Dynamic> dist(1, ref.size());
   for (size_t i = 0; i < ref.size(); ++i)
   {
     dist(i) = (ref[i] - est[i]).norm();

@@ -45,21 +45,21 @@ private:
                            measurements_container_t measurements);
 
   //! Set the values used for a new pre-integration batch.
-  void setInitialValuesFwd(const FloatType dt,
+  void setInitialValuesFwd(const real_t dt,
                             const Eigen::Ref<Vector3>& gyro_measurement);
 
   //! Set the values used for a new pre-integration batch.
-  inline void setInitialValuesMid(const FloatType dt,
+  inline void setInitialValuesMid(const real_t dt,
                             const Eigen::Ref<Vector3>& gyro_measurement,
                             const Eigen::Ref<Vector3>& gyro_measurement2);
 
   //! Push a new integration step to the containers.
-  inline void integrateStepFwd(const FloatType dt,
+  inline void integrateStepFwd(const real_t dt,
                                  const Eigen::Ref<Vector3>& gyro_measurement);
 
   //! Push a new integration step to the containers.
   void integrateStepMid(
-      const FloatType dt,
+      const real_t dt,
       const Eigen::Ref<Vector3>& gyro_measurement,
       const Eigen::Ref<Vector3>& gyro_measurement2);
 

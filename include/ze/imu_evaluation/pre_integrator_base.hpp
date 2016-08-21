@@ -27,7 +27,7 @@ public:
      CrouchGrossman4
    };
 
-  typedef std::vector<FloatType> times_container_t;
+  typedef std::vector<real_t> times_container_t;
   typedef ImuAccGyrContainer measurements_container_t;
   typedef std::vector<Matrix3> preintegrated_orientation_container_t;
   typedef std::vector<Matrix3> covariance_container_t;

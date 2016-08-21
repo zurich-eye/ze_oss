@@ -27,24 +27,24 @@ public:
 //      const std::string& name,
 //      const Matrix3& gyroscope_noise_covariance,
 //      const std::vector<Matrix3>* D_R_i_k_reference,
-//      FloatType start,
-//      FloatType end);
+//      real_t start,
+//      real_t end);
 
   PreIntegratorMonteCarlo::Ptr runManifoldCorruptedMc(
       const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end);
+      real_t start,
+      real_t end);
 
   PreIntegratorMonteCarlo::Ptr runQuaternionMc(
       const PreIntegrationRunner::Ptr& preintegration_runner,
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end);
+      real_t start,
+      real_t end);
 
   //! Pre-Integration Simulation Runners:
   ManifoldPreIntegrationState::Ptr runManifoldCorrupted(
@@ -52,8 +52,8 @@ public:
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end,
+      real_t start,
+      real_t end,
       const PreIntegratorMonteCarlo::Ptr& mc_ref,
       bool simplified_covariance = false);
 
@@ -62,18 +62,18 @@ public:
       PreIntegrator::IntegratorType integrator_type,
       const std::string& name,
       const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end,
+      real_t start,
+      real_t end,
       const PreIntegratorMonteCarlo::Ptr& mc_ref);
 
   //! Runs a single noisy integration on all channels and shows plots of the
   //! estimates.
   //! Returns the error offset (rotation only) for the different methods
-  std::vector<FloatType> runDriftEvaluation(
+  std::vector<real_t> runDriftEvaluation(
       const PreIntegrationRunner::Ptr& preintegration_runner,
       const Matrix3& gyroscope_noise_covariance,
-      FloatType start,
-      FloatType end,
+      real_t start,
+      real_t end,
       bool plot = false);
 
   void runDriftEvaluationRuns(size_t runs,

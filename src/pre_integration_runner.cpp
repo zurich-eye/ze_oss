@@ -4,8 +4,8 @@ namespace ze {
 
 //------------------------------------------------------------------------------
 PreIntegrationRunner::PreIntegrationRunner(ImuSimulator::Ptr scenario_runner,
-                                           FloatType imu_sampling_time,
-                                           FloatType camera_sampling_time)
+                                           real_t imu_sampling_time,
+                                           real_t camera_sampling_time)
   : scenario_runner_(scenario_runner)
   , imu_sampling_time_(imu_sampling_time)
   , camera_sampling_time_(camera_sampling_time)
@@ -27,18 +27,18 @@ void PreIntegrationRunner::setInitialOrientation(Matrix3 initial_orientation)
 //------------------------------------------------------------------------------
 void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
                                    bool corrupted,
-                                   FloatType start,
-                                   FloatType end)
+                                   real_t start,
+                                   real_t end)
 {
-  FloatType t = start;
+  real_t t = start;
   pre_integrator->setInitialOrientation(initial_orientation_);
 
   // For negative camera sampling rates, a single batch of imu samples between
   // start and end is taken.
-  FloatType next_camera_sample;
+  real_t next_camera_sample;
   int samples_per_batch;
 
-  std::vector<FloatType> times;
+  std::vector<real_t> times;
   // Worst case container size allocation.
   if (camera_sampling_time_ < 0)
   {
@@ -56,7 +56,7 @@ void PreIntegrationRunner::process(PreIntegrator::Ptr pre_integrator,
   ImuAccGyrContainer imu_measurements(6, samples_per_batch);
 
   int i = 0;
-  for (FloatType t = start; t <= end; t += imu_sampling_time_)
+  for (real_t t = start; t <= end; t += imu_sampling_time_)
   {
     times.push_back(t);
     Vector6 measurement;
@@ -127,7 +127,7 @@ void PreIntegrationRunnerDataProvider::loadData()
 {
   if (times_.size() == 0)
   {
-    std::vector<FloatType> times;
+    std::vector<real_t> times;
     std::vector<Vector6> measurement_vector;
 
     // subscribe to the dataprovider callback to get all measurements between
@@ -136,7 +136,7 @@ void PreIntegrationRunnerDataProvider::loadData()
                             int64_t stamp, const Vector3& acc,
                             const Vector3 gyr, uint32_t imu_idx)
     {
-      FloatType stamp_float = static_cast<FloatType>(stamp) * 1e-9;
+      real_t stamp_float = static_cast<FloatType>(stamp) * 1e-9;
 
       Vector6 measurement;
       // @todo: actually inject into integrators

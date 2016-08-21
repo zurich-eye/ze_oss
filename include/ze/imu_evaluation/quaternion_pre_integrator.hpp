@@ -34,13 +34,13 @@ private:
   //! Forward integration.
   inline Quaternion integrateFirstOrderFwdStep(Quaternion q,
                                     Vector3 w_i,
-                                    FloatType dt);
+                                    real_t dt);
 
   //! Midpoint integration.
   inline Quaternion integrateFirstOrderMidStep(Quaternion q,
                                     Vector3 w_i,
                                     Vector3 w_i_1,
-                                    FloatType dt);
+                                    real_t dt);
 
   //! Runge-Kutta Integration
   //! Returns the quaternion after preintegration and
@@ -49,14 +49,14 @@ private:
   inline std::pair<Quaternion, Matrix3> integrateRK(Quaternion q,
                                              Vector3 w_i,
                                              Vector3 w_i_1,
-                                             FloatType dt,
+                                             real_t dt,
                                              uint32_t order);
 
   //! Runge-Kutta Integration
   inline Quaternion integrateCrouchGrossman(Quaternion q,
                          Vector3 w_i,
                          Vector3 w_i_1,
-                         FloatType dt,
+                         real_t dt,
                          uint32_t order);
 
   void integrateFirstOrderFwd(times_container_t stamps,

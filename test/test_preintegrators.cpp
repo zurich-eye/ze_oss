@@ -17,7 +17,7 @@ TEST(PreIntegratorTest, testManifold)
 
   int runs = 1000;
 
-  std::vector<FloatType> times(runs);
+  std::vector<real_t> times(runs);
   std::iota(times.begin(), times.end(), 0);
 
   MatrixX values(6, runs);
