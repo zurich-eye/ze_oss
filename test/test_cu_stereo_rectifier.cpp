@@ -148,7 +148,7 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
   // Allocate rectifier
   Vector4 transformed_left_cam_params;
   Vector4 transformed_right_cam_params;
-  FloatType horizontal_offset;
+  real_t horizontal_offset;
   cu::HorizontalStereoPairRectifierRadTan32fC1 rectifier(
         transformed_left_cam_params,
         transformed_right_cam_params,

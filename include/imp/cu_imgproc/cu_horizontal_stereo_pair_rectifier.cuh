@@ -28,7 +28,7 @@ public:
   //! \param T_cam1_cam0 transformation from cam0 to cam1 reference system.
   HorizontalStereoPairRectifier(Vector4& transformed_cam0_params,
                                 Vector4& transformed_cam1_params,
-                                FloatType& horizontal_offset,
+                                real_t& horizontal_offset,
                                 const Size2u& img_size,
                                 const Vector4& cam0_params,
                                 const Vector4& cam0_dist_coeffs,
