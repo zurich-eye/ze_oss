@@ -37,7 +37,7 @@ inline Matrix3 fundamentalMatrix(const Transformation& T_cam0_cam1,
 // ----------------------------------------------------------------------------
 //! Stereo Rectification
 
-using Rect = Roi<FloatType, 2>;
+using Rect = Roi<real_t, 2>;
 
 //! \brief Compute inner and outer rectangles.
 //!
@@ -70,12 +70,12 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
     {
       pts.col(k++) =
           Vector3(
-            static_cast<FloatType>(x) *
-            static_cast<FloatType>(img_size[0]) /
-          static_cast<FloatType>(num_pts -1),
-          static_cast<FloatType>(y) *
-          static_cast<FloatType>(img_size[1]) /
-          static_cast<FloatType>(num_pts - 1),
+            static_cast<real_t>(x) *
+            static_cast<real_t>(img_size[0]) /
+          static_cast<real_t>(num_pts -1),
+          static_cast<real_t>(y) *
+          static_cast<real_t>(img_size[1]) /
+          static_cast<real_t>(num_pts - 1),
           1);
     }
   }
@@ -102,14 +102,14 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   }
 
   //! Rectangles are specified by two points.
-  FloatType inner_x_left{-std::numeric_limits<FloatType>::max()};
-  FloatType inner_x_right{std::numeric_limits<FloatType>::max()};
-  FloatType inner_y_top{-std::numeric_limits<FloatType>::max()};
-  FloatType inner_y_bottom{std::numeric_limits<FloatType>::max()};
-  FloatType outer_x_left{std::numeric_limits<FloatType>::max()};
-  FloatType outer_x_right{-std::numeric_limits<FloatType>::max()};
-  FloatType outer_y_top{std::numeric_limits<FloatType>::max()};
-  FloatType outer_y_bottom{-std::numeric_limits<FloatType>::max()};
+  real_t inner_x_left{-std::numeric_limits<FloatType>::max()};
+  real_t inner_x_right{std::numeric_limits<FloatType>::max()};
+  real_t inner_y_top{-std::numeric_limits<FloatType>::max()};
+  real_t inner_y_bottom{std::numeric_limits<FloatType>::max()};
+  real_t outer_x_left{std::numeric_limits<FloatType>::max()};
+  real_t outer_x_right{-std::numeric_limits<FloatType>::max()};
+  real_t outer_y_top{std::numeric_limits<FloatType>::max()};
+  real_t outer_y_bottom{-std::numeric_limits<FloatType>::max()};
 
   //! Iterate over the sampling points and adjust the rectangle bounds.
   for (int y = 0, k = 0; y < num_pts; y++)
@@ -172,7 +172,7 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
 //! \return horizontal_offset Output displacement for the rectified stereo pair.
 template<typename CameraModel,
          typename DistortionModel>
-inline std::tuple<Matrix3, Matrix3, Vector4, Vector4, FloatType>
+inline std::tuple<Matrix3, Matrix3, Vector4, Vector4, real_t>
 computeHorizontalStereoParameters(const Size2u& img_size,
                                   const Vector4& cam0_parameters,
                                   const Vector4& cam0_distortion_coefficients,
@@ -210,15 +210,15 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   const Matrix3* const homography_ptrs[2] = {&cam0_H,
                                              &cam1_H};
 
-  const FloatType nx = img_size[0];
-  const FloatType ny = img_size[1];
+  const real_t nx = img_size[0];
+  const real_t ny = img_size[1];
 
-  FloatType transformed_focal_length = std::numeric_limits<FloatType>::max();
+  real_t transformed_focal_length = std::numeric_limits<FloatType>::max();
   for (int8_t i = 0; i < 2; ++i)
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];
     const Vector4& distortion_coefficients = *distortion_coefficient_ptrs[i];
-    FloatType focal_length = camera_parameters(1);
+    real_t focal_length = camera_parameters(1);
     if (distortion_coefficients(0) < 0)
     {
       focal_length *= 1 + distortion_coefficients(0)*
@@ -286,7 +286,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   //! @todo (MPI) support different scales in [0, 1].
   //! Currently only scale = 0 is supported (s0).
   //! Camera 0 image
-  FloatType s0 = std::max(
+  real_t s0 = std::max(
         transformed_principal_point(0, 0) / (transformed_principal_point(0, 0) - cam0_rects.first.x()),
         transformed_principal_point(1, 0) / (transformed_principal_point(1, 0) - cam0_rects.first.y()));
 
@@ -316,7 +316,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
       transformed_cam1_parameters(0) =
       transformed_cam1_parameters(1) = transformed_focal_length * s0;
 
-  const FloatType horizontal_offset = transformed_t(0) * s0;
+  const real_t horizontal_offset = transformed_t(0) * s0;
 
   return std::make_tuple(cam0_H,
                          cam1_H,

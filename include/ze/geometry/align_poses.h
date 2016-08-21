@@ -14,14 +14,14 @@ class PoseAligner :
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = UnitScaleEstimator<FloatType>;
-  using WeightFunction = UnitWeightFunction<FloatType>;
+  using ScaleEstimator = UnitScaleEstimator<real_t>;
+  using WeightFunction = UnitWeightFunction<real_t>;
 
   PoseAligner(
       const TransformationVector& T_W_A,
       const TransformationVector& T_W_B,
-      const FloatType measurement_sigma_pos,
-      const FloatType measurement_sigma_rot);
+      const real_t measurement_sigma_pos,
+      const real_t measurement_sigma_rot);
 
   double evaluateError(
       const Transformation& T_A_B,
@@ -31,8 +31,8 @@ public:
 private:
   const TransformationVector& T_W_A_;
   const TransformationVector& T_W_B_;
-  FloatType measurement_sigma_pos_;
-  FloatType measurement_sigma_rot_;
+  real_t measurement_sigma_pos_;
+  real_t measurement_sigma_rot_;
 };
 
 inline Matrix6 dRelpose_dTransformation(

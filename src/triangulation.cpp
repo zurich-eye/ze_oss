@@ -49,8 +49,8 @@ void triangulateManyAndComputeAngularErrors(
 
     // Bearing-vector based outlier criterium (select threshold accordingly):
     // 1 - (f1' * f2) = 1 - cos(alpha) as used in OpenGV.
-    FloatType reproj_error_1 = 1.0 - (f_A_vec.col(i).dot(f_A_predicted));
-    FloatType reproj_error_2 = 1.0 - (f_B_vec.col(i).dot(f_B_predicted));
+    real_t reproj_error_1 = 1.0 - (f_A_vec.col(i).dot(f_A_predicted));
+    real_t reproj_error_2 = 1.0 - (f_B_vec.col(i).dot(f_B_predicted));
     reprojection_erors(i) = reproj_error_1 + reproj_error_2;
   }
 }
@@ -59,7 +59,7 @@ void triangulateManyAndComputeAngularErrors(
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
     const Bearings& p_C,
-    const FloatType rank_tol)
+    const real_t rank_tol)
 {
   // Number of observations.
   size_t m = T_C_W.size();
@@ -82,7 +82,7 @@ std::pair<Vector4, bool> triangulateHomogeneousDLT(
     A.row(row + 1) = uv(1, i) * projection.row(2) - projection.row(1);
   }
   int rank;
-  FloatType error;
+  real_t error;
   VectorX v;
   std::tie(rank, error, v) = directLinearTransform(A, rank_tol);
 
@@ -99,7 +99,7 @@ void triangulateGaussNewton(
     Eigen::Ref<Position> p_W)
 {
   Position p_W_old = p_W;
-  FloatType chi2{0.0};
+  real_t chi2{0.0};
   Matrix3 A;
   Vector3 b;
 
@@ -109,12 +109,12 @@ void triangulateGaussNewton(
     return;
   }
 
-  constexpr FloatType eps{1e-7};
+  constexpr real_t eps{1e-7};
   for (uint32_t iter = 0; iter < 5u; ++iter)
   {
     A.setZero();
     b.setZero();
-    FloatType new_chi2{0.0};
+    real_t new_chi2{0.0};
 
     // compute residuals
     for(size_t i = 0; i < T_C_W.size(); ++i)

@@ -17,7 +17,7 @@ namespace ze {
 
 RansacRelativePose::RansacRelativePose(
     const Camera& cam,
-    const FloatType& reprojection_threshold_px)
+    const real_t& reprojection_threshold_px)
   : ogv_threshold_(
       1.0 - std::cos(cam.getApproxAnglePerPixel() * reprojection_threshold_px))
 {
@@ -89,9 +89,9 @@ bool RansacRelativePose::solveRelativePose(
            << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
-  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
-  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
+  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<real_t>();
+  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<real_t>();
+  T_cur_ref = Transformation(Eigen::Quaternion<real_t>(R).normalized(), t);
 
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
@@ -129,9 +129,9 @@ bool RansacRelativePose::solveTranslationOnly(
            << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
-  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
-  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
+  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<real_t>();
+  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<real_t>();
+  T_cur_ref = Transformation(Eigen::Quaternion<real_t>(R).normalized(), t);
 
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;
@@ -168,9 +168,9 @@ bool RansacRelativePose::solveRotationOnly(
            << ", #inliers = " << ransac.inliers_.size();
 
   // Process results.
-  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<FloatType>();
-  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<FloatType>();
-  T_cur_ref = Transformation(Eigen::Quaternion<FloatType>(R).normalized(), t);
+  Matrix3 R = ransac.model_coefficients_.leftCols<3>().cast<real_t>();
+  Vector3 t = ransac.model_coefficients_.rightCols<1>().cast<real_t>();
+  T_cur_ref = Transformation(Eigen::Quaternion<real_t>(R).normalized(), t);
 
   result_probability_ = ransac.probability_;
   num_iterations_ = ransac.iterations_;

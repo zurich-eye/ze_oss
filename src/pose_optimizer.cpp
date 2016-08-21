@@ -27,8 +27,8 @@ PoseOptimizer::PoseOptimizer(
     const LeastSquaresSolverOptions& options,
     std::vector<PoseOptimizerFrameData>& data,
     const Transformation& T_B_W_prior,
-    const FloatType prior_weight_pos,
-    const FloatType prior_weight_rot)
+    const real_t prior_weight_pos,
+    const real_t prior_weight_rot)
   : LeastSquaresSolver<Transformation, PoseOptimizer>(options)
   , data_(data)
   , T_B_W_prior_(T_B_W_prior)
@@ -60,8 +60,8 @@ void PoseOptimizer::checkData() const
 //------------------------------------------------------------------------------
 void PoseOptimizer::setPrior(
     const Transformation& T_B_W_prior,
-    const FloatType prior_weight_pos,
-    const FloatType prior_weight_rot)
+    const real_t prior_weight_pos,
+    const real_t prior_weight_rot)
 {
   T_B_W_prior_ = T_B_W_prior;
   prior_weight_pos_ = prior_weight_pos;
@@ -69,10 +69,10 @@ void PoseOptimizer::setPrior(
 }
 
 //------------------------------------------------------------------------------
-FloatType PoseOptimizer::evaluateError(
+real_t PoseOptimizer::evaluateError(
     const Transformation& T_B_W, HessianMatrix* H, GradientVector* g)
 {
-  FloatType chi2 = FloatType{0.0};
+  real_t chi2 = FloatType{0.0};
 
   // Loop over all cameras in rig.
   VLOG(400) << "Num residual blocks = " << data_.size();
@@ -103,7 +103,7 @@ FloatType PoseOptimizer::evaluateError(
   }
 
   // Apply prior.
-  if (prior_weight_rot_ > FloatType{0.0} || prior_weight_pos_ > FloatType{0.0})
+  if (prior_weight_rot_ > real_t{0.0} || prior_weight_pos_ > FloatType{0.0})
   {
     applyPosePrior(T_B_W, T_B_W_prior_, prior_weight_rot_, prior_weight_pos_, *H, *g);
   }
@@ -112,7 +112,7 @@ FloatType PoseOptimizer::evaluateError(
 }
 
 //------------------------------------------------------------------------------
-std::pair<FloatType, VectorX> evaluateBearingErrors(
+std::pair<real_t, VectorX> evaluateBearingErrors(
     const Transformation& T_B_W,
     const bool first_iteration,
     PoseOptimizerFrameData& data,
@@ -167,12 +167,12 @@ std::pair<FloatType, VectorX> evaluateBearingErrors(
   }
 
   // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
-  return std::make_pair(FloatType{0.5} * weights.dot(f_err.colwise().squaredNorm()),
+  return std::make_pair(real_t{0.5} * weights.dot(f_err.colwise().squaredNorm()),
                         f_err_norm);
 }
 
 //------------------------------------------------------------------------------
-std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
+std::pair<real_t, VectorX> evaluateUnitPlaneErrors(
     const Transformation& T_B_W,
     const bool first_iteration,
     PoseOptimizerFrameData& data,
@@ -229,12 +229,12 @@ std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
   }
 
   // Compute log-likelihood : 1/(2*sigma^2)*(z-h(x))^2 = 1/2*e'R'*R*e
-  return std::make_pair(FloatType{0.5} * weights.dot(uv_err.colwise().squaredNorm()),
+  return std::make_pair(real_t{0.5} * weights.dot(uv_err.colwise().squaredNorm()),
                         uv_err_norm);
 }
 
 //------------------------------------------------------------------------------
-std::pair<FloatType, VectorX> evaluateLineErrors(
+std::pair<real_t, VectorX> evaluateLineErrors(
     const Transformation& T_B_W,
     const bool first_iteration,
     PoseOptimizerFrameData& data,
@@ -284,7 +284,7 @@ std::pair<FloatType, VectorX> evaluateLineErrors(
     }
   }
 
-  return std::make_pair(FloatType{0.5} * weights.dot(error.colwise().squaredNorm()),
+  return std::make_pair(real_t{0.5} * weights.dot(error.colwise().squaredNorm()),
                         error_norm);
 }
 
@@ -293,7 +293,7 @@ std::vector<KeypointIndex> getOutlierIndices(
     PoseOptimizerFrameData& data,
     const Camera& cam,
     const Transformation& T_B_W,
-    const FloatType pixel_threshold)
+    const real_t pixel_threshold)
 {
   if (data.kp_idx.size() == 0)
   {
@@ -301,10 +301,10 @@ std::vector<KeypointIndex> getOutlierIndices(
     return {};
   }
 
-  FloatType chi2;
+  real_t chi2;
   VectorX err_norm_vec;
-  FloatType error_multiplier = 1.0;
-  FloatType threshold = pixel_threshold; //! @todo: multiple thresholds for multiple residual blocks!
+  real_t error_multiplier = 1.0;
+  real_t threshold = pixel_threshold; //! @todo: multiple thresholds for multiple residual blocks!
   switch (data.type)
   {
     case PoseOptimizerResidualType::Bearing:

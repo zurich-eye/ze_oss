@@ -11,9 +11,9 @@
 namespace ze {
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
-  FloatType tol = 1e-10;
+  real_t tol = 1e-10;
 #else
-  FloatType tol = 3e-6;
+  real_t tol = 3e-6;
 #endif
 
 std::tuple<Position, TransformationVector, Bearings>
@@ -30,8 +30,8 @@ generateObservingCameras()
   Bearings f_C(3, 10);
   int n = 0;
   std::ranlux24 gen;
-  std::normal_distribution<FloatType> noise_rot(0, 0.1);
-  std::normal_distribution<FloatType> noise_pos(0, 0.5);
+  std::normal_distribution<real_t> noise_rot(0, 0.1);
+  std::normal_distribution<real_t> noise_pos(0, 0.5);
   for(int i = 0; i < 10; ++i)
   {
     // Perturb pose:

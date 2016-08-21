@@ -10,9 +10,9 @@
 #include <ze/geometry/align_points.h>
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
-ze::FloatType tol = 1e-10;
+ze::real_t tol = 1e-10;
 #else
-ze::FloatType tol = 1e-6;
+ze::real_t tol = 1e-6;
 #endif
 
 TEST(AlignPointsTest, testJacobian)
@@ -111,8 +111,8 @@ TEST(AlignPosesTest, testAlignSim3)
   {
     p_B.col(i) = Vector3::Random();
   }
-  FloatType scale =
-      sampleUniformRealDistribution<FloatType>(false, 0.1, 10.0);
+  real_t scale =
+      sampleUniformRealDistribution<real_t>(false, 0.1, 10.0);
 
   // Random transformation between trajectories.
   Transformation T_A_B;
@@ -124,10 +124,10 @@ TEST(AlignPosesTest, testAlignSim3)
       + T_A_B.getPosition();
 
   // Align trajectories
-  std::pair<FloatType, Transformation> sim3_estimate =
+  std::pair<real_t, Transformation> sim3_estimate =
       PointAligner::alignSim3(p_B, p_A);
   Transformation T_A_B_estimate = sim3_estimate.second;
-  FloatType scale_estimate = sim3_estimate.first;
+  real_t scale_estimate = sim3_estimate.first;
 
   // Compute error.
   Transformation T_err = T_A_B.inverse() * T_A_B_estimate;

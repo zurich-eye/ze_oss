@@ -8,7 +8,7 @@
 namespace ze {
 
 //! Return depth in reference frame.
-inline std::pair<FloatType, bool> depthFromTriangulation(
+inline std::pair<real_t, bool> depthFromTriangulation(
     const Transformation& T_cur_ref,
     const Eigen::Ref<const Bearing>& f_ref,
     const Eigen::Ref<const Bearing>& f_cur)
@@ -50,7 +50,7 @@ void triangulateManyAndComputeAngularErrors(
 std::pair<Vector4, bool> triangulateHomogeneousDLT(
     const TransformationVector& T_C_W,
     const Bearings& p_C,
-    const FloatType rank_tol = 1e-9);
+    const real_t rank_tol = 1e-9);
 
 //! Non-linear least squares refinement of the triangulation using Gauss-Newton.
 void triangulateGaussNewton(

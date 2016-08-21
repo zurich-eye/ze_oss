@@ -69,8 +69,8 @@ public:
       ? internal::TupleGetDimension<StateTuple>::dimension : Eigen::Dynamic
   };
 
-  using TangentVector = Eigen::Matrix<FloatType, dimension, 1> ;
-  using Jacobian = Eigen::Matrix<FloatType, dimension, dimension>;
+  using TangentVector = Eigen::Matrix<real_t, dimension, 1> ;
+  using Jacobian = Eigen::Matrix<real_t, dimension, dimension>;
 
   // utility
   template <size_t i>
@@ -226,8 +226,8 @@ struct traits<State<Elements...>>
   typedef State<Elements...> StateT;
   enum { dimension = StateT::dimension };
 
-  typedef Eigen::Matrix<FloatType, dimension, 1> TangentVector;
-  typedef Eigen::Matrix<FloatType, dimension, dimension> Jacobian;
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
 
   static StateT retract(
            const StateT& origin, const TangentVector& v,
