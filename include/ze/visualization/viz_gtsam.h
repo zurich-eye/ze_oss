@@ -20,7 +20,7 @@ void drawGtsamPoint3(
     const std::string& ns,
     const size_t id,
     const Color& color,
-    const FloatType size = 0.02);
+    const real_t size = 0.02);
 
 void drawGtsamPose3(
     Visualizer& visualizer,
@@ -28,6 +28,6 @@ void drawGtsamPose3(
     const char key_prefix,
     const std::string& ns,
     const size_t id,
-    const FloatType size = 0.02);
+    const real_t size = 0.02);
 
 } // namespace ze

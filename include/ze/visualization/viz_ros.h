@@ -33,7 +33,7 @@ public:
       const size_t id,
       const Position& point,
       const Color& color,
-      const FloatType size = 0.02) override;
+      const real_t size = 0.02) override;
 
   virtual void drawLine(
       const std::string& ns,
@@ -41,13 +41,13 @@ public:
       const Position& line_from,
       const Position& line_to,
       const Color& color,
-      const FloatType size = 0.02) override;
+      const real_t size = 0.02) override;
 
   virtual void drawCoordinateFrame(
       const std::string& ns,
       const size_t id,
       const Transformation& pose, // T_W_B
-      const FloatType size = 0.2) override;
+      const real_t size = 0.2) override;
 
   virtual void drawRobot(
       const std::string& name,
@@ -61,27 +61,27 @@ public:
       const size_t id,
       const Positions& points,
       const Color& color,
-      const FloatType size = 0.02) override;
+      const real_t size = 0.02) override;
 
   virtual void drawLines(
       const std::string& ns,
       const size_t id,
       const LineMarkers& lines,
       const Color& color,
-      const FloatType size = 0.02) override;
+      const real_t size = 0.02) override;
 
   virtual void drawCoordinateFrames(
       const std::string& ns,
       const size_t id,
       const TransformationVector& poses,
-      const FloatType size = 0.2) override;
+      const real_t size = 0.2) override;
 
   virtual void drawTrajectory(
       const std::string& topic,
       const size_t id,
       const std::vector<Position>& points,
       const Color& color,
-      const FloatType size = 0.02) override;
+      const real_t size = 0.02) override;
 
 private:
   std::shared_ptr<ros::NodeHandle> nh_;

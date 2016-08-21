@@ -37,7 +37,7 @@ void VisualizerRos::drawPoint(
     const size_t id,
     const Position& point,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -49,7 +49,7 @@ void VisualizerRos::drawPoint(
   m.id = id;
   m.type = visualization_msgs::Marker::CUBE;
   m.action = 0; // add/modify
-  FloatType marker_scale = size * viz_scale_;
+  real_t marker_scale = size * viz_scale_;
   m.scale.x = marker_scale;
   m.scale.y = marker_scale;
   m.scale.z = marker_scale;
@@ -64,7 +64,7 @@ void VisualizerRos::drawLine(
     const Position& line_from,
     const Position& line_to,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -90,7 +90,7 @@ void VisualizerRos::drawCoordinateFrame(
     const std::string& ns,
     const size_t id,
     const Transformation& pose, // T_W_B
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -107,7 +107,7 @@ void VisualizerRos::drawCoordinateFrame(
   m.scale.x = size * viz_scale_ * 0.05;
   m.colors.reserve(6);
   m.points.reserve(6);
-  FloatType length = size * viz_scale_;
+  real_t length = size * viz_scale_;
   m.points.push_back(getRosPoint(Vector3::Zero()));
   m.colors.push_back(getRosColor(Colors::Red));
   m.points.push_back(getRosPoint(Vector3::UnitX() * length));
@@ -141,7 +141,7 @@ void VisualizerRos::drawPoints(
     const size_t id,
     const Positions& points,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -153,7 +153,7 @@ void VisualizerRos::drawPoints(
   m.id = id;
   m.type = visualization_msgs::Marker::POINTS;
   m.action = 0; // add/modify
-  FloatType marker_scale = size * viz_scale_;
+  real_t marker_scale = size * viz_scale_;
   m.scale.x = marker_scale;
   m.scale.y = marker_scale;
   m.scale.z = marker_scale;
@@ -175,7 +175,7 @@ void VisualizerRos::drawLines(
     const size_t id,
     const LineMarkers& lines,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -202,7 +202,7 @@ void VisualizerRos::drawCoordinateFrames(
     const std::string& ns,
     const size_t id,
     const TransformationVector& poses,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;
@@ -217,7 +217,7 @@ void VisualizerRos::drawCoordinateFrames(
   m.scale.x = size * viz_scale_ * 0.05;
   m.colors.reserve(poses.size() * 3);
   m.points.reserve(poses.size() * 3);
-  FloatType length = size * viz_scale_;
+  real_t length = size * viz_scale_;
   for(const Transformation& T : poses)
   {
     const Vector3& p = T.getPosition();
@@ -243,7 +243,7 @@ void VisualizerRos::drawTrajectory(
     const size_t id,
     const std::vector<Position>& points,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   if(pub_marker_->getNumSubscribers() == 0)
     return;

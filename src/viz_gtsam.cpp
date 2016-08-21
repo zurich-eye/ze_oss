@@ -16,7 +16,7 @@ void drawGtsamPoint3(
     const std::string& ns,
     const size_t id,
     const Color& color,
-    const FloatType size)
+    const real_t size)
 {
   auto gtsam_points = values.filter<gtsam::Point3>(gtsam::Symbol::ChrTest(key_prefix));
   const size_t num_points = gtsam_points.size();
@@ -24,7 +24,7 @@ void drawGtsamPoint3(
   size_t i = 0;
   for(const auto& it : gtsam_points)
   {
-    points.col(i++) = it.value.vector().cast<FloatType>();
+    points.col(i++) = it.value.vector().cast<real_t>();
   }
   visualizer.drawPoints(ns, id, points, color, size);
 }
@@ -35,7 +35,7 @@ void drawGtsamPose3(
     const char key_prefix,
     const std::string& ns,
     const size_t id,
-    const FloatType size)
+    const real_t size)
 {
   auto gtsam_poses = values.filter<gtsam::Pose3>(gtsam::Symbol::ChrTest(key_prefix));
   const size_t num_poses = gtsam_poses.size();
@@ -43,8 +43,8 @@ void drawGtsamPose3(
   poses.reserve(num_poses);
   for(const auto& it : gtsam_poses)
   {
-    poses.push_back(Transformation(Eigen::Quaterniond(it.value.rotation().matrix()).cast<FloatType>(),
-                                   it.value.translation().vector().cast<FloatType>()));
+    poses.push_back(Transformation(Eigen::Quaterniond(it.value.rotation().matrix()).cast<real_t>(),
+                                   it.value.translation().vector().cast<real_t>()));
   }
   visualizer.drawCoordinateFrames(ns, id, poses, size);
 }

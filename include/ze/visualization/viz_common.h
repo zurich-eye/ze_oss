@@ -6,16 +6,16 @@ namespace ze {
 
 struct Color
 {
-  FloatType r = 0.0f;
-  FloatType g = 0.0f;
-  FloatType b = 0.0f;
-  FloatType a = 1.0f;
+  real_t r = 0.0f;
+  real_t g = 0.0f;
+  real_t b = 0.0f;
+  real_t a = 1.0f;
 
-  constexpr Color(FloatType r, FloatType g, FloatType b)
+  constexpr Color(real_t r, FloatType g, FloatType b)
     : r(r), g(g), b(b)
   {}
 
-  constexpr Color(FloatType r, FloatType g, FloatType b, FloatType a)
+  constexpr Color(real_t r, FloatType g, FloatType b, FloatType a)
     : r(r), g(g), b(b), a(a)
   {}
 };
