@@ -57,7 +57,7 @@ public:
 
 protected:
   //! Allowed time differences of images in bundle.
-  static constexpr FloatType c_camera_bundle_time_accuracy_ns = millisecToNanosec(2.0);
+  static constexpr real_t c_camera_bundle_time_accuracy_ns = millisecToNanosec(2.0);
 
   //! Stamp of previous synchronized image bundle.
   int64_t last_img_bundle_min_stamp_ { -1 };

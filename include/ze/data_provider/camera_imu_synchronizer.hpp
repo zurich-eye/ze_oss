@@ -18,7 +18,7 @@ class CameraImuSynchronizer: public CameraImuSynchronizerBase
 {
 public:
   // convenience typedefs
-  using ImuSyncBuffer = Ringbuffer<FloatType, 6, 1000>;
+  using ImuSyncBuffer = Ringbuffer<real_t, 6, 1000>;
   using ImuBufferVector = std::vector<ImuSyncBuffer>;
 
   //! Default constructor.
