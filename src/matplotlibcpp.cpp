@@ -497,7 +497,7 @@ bool labelPlot(
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format)
 {
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> x(y.size());
+  Eigen::Matrix<real_t, Eigen::Dynamic, 1> x(y.size());
   for (int i=0; i < x.size(); ++i)
   {
     x(i) = i;
@@ -511,7 +511,7 @@ bool plot(
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format)
 {
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> x(y.size());
+  Eigen::Matrix<real_t, Eigen::Dynamic, 1> x(y.size());
   for (int i=0; i < x.size(); ++i)
   {
     x(i) = i;
@@ -521,58 +521,58 @@ bool plot(
 
 // -----------------------------------------------------------------------------
 bool plot(
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& y,
     const std::string& format)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return plot(y_e, format);
 }
 
 // -----------------------------------------------------------------------------
 bool plot(
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::map<std::string, std::string>& keywords)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return plot(x_e, y_e, keywords);
 }
 
 // -----------------------------------------------------------------------------
 bool plot(
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::map<std::string, std::string>& keywords)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
   return plot(x_e, y, keywords);
 }
 
 // -----------------------------------------------------------------------------
 bool plot(
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::string& s)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return plot(x_e, y_e, s);
 }
 
 // -----------------------------------------------------------------------------
 bool plot(
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::string& s)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
   return plot(x_e, y, s);
 }
@@ -580,13 +580,13 @@ bool plot(
 // -----------------------------------------------------------------------------
 bool labelPlot(
     const std::string& name,
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::string& format)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> y_e(y.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> y_e(y.data(),
                                                                     y.size());
   return labelPlot(name, x_e, y_e, format);
 }
@@ -594,11 +594,11 @@ bool labelPlot(
 // -----------------------------------------------------------------------------
 bool labelPlot(
     const std::string& name,
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format)
 {
-  Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> x_e(x.data(),
+  Eigen::Map<const Eigen::Matrix<real_t, Eigen::Dynamic, 1>> x_e(x.data(),
                                                                     x.size());
   return labelPlot(name, x_e, y, format);
 }
@@ -619,7 +619,7 @@ void legend()
 }
 
 // -----------------------------------------------------------------------------
-void ylim(FloatType ymin, FloatType ymax)
+void ylim(real_t ymin, FloatType ymax)
 {
   PyObject* list = PyList_New(2);
   PyList_SetItem(list, 0, PyFloat_FromDouble(ymin));
@@ -642,7 +642,7 @@ void ylim(FloatType ymin, FloatType ymax)
 }
 
 // -----------------------------------------------------------------------------
-void xlim(FloatType xmin, FloatType xmax)
+void xlim(real_t xmin, FloatType xmax)
 {
   PyObject* list = PyList_New(2);
   PyList_SetItem(list, 0, PyFloat_FromDouble(xmin));

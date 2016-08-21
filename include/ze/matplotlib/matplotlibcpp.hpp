@@ -93,37 +93,37 @@ bool plot(
 //! @name std::vector wrappers.
 //! @{
 bool plot(
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& y,
     const std::string& format = "");
 
 bool plot(
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::map<std::string, std::string>& keywords);
 
 bool plot(
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::map<std::string, std::string>& keywords);
 
 bool plot(
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::string& s = "");
 bool plot(
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::string& s = "");
 
 bool labelPlot(
     const std::string& name,
-    const std::vector<FloatType>& x,
-    const std::vector<FloatType>& y,
+    const std::vector<real_t>& x,
+    const std::vector<real_t>& y,
     const std::string& format = "");
 
 bool labelPlot(
     const std::string& name,
-    const std::vector<FloatType>& x,
+    const std::vector<real_t>& x,
     const Eigen::Ref<const MatrixX>& y,
     const std::string& format = "");
 //! @}
@@ -133,9 +133,9 @@ bool labelPlot(
 //! @{
 void legend();
 
-void ylim(FloatType min, FloatType max);
+void ylim(real_t min, FloatType max);
 
-void xlim(FloatType xmin, FloatType xmax);
+void xlim(real_t xmin, FloatType xmax);
 
 void title(const std::string &titlestr);
 
