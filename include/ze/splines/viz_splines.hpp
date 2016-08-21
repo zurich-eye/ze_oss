@@ -21,7 +21,7 @@ public:
   void plotSpline(
       const BSpline& bs,
       const size_t dimension,
-      FloatType step_size = 0.05);
+      real_t step_size = 0.05);
 
   //! Display a spline (max 3 dimensions) as point curve in space.
   void displaySplineTrajectory(
@@ -29,7 +29,7 @@ public:
       const std::string& topic,
       const size_t id,
       const Color& color,
-      FloatType step_size = 0.05);
+      real_t step_size = 0.05);
 
   //! Display a spline (max 3 dimensions) as point curve specifying the dimensions
   //! of the spline to plot.
@@ -39,20 +39,20 @@ public:
       const size_t id,
       const Color& color,
       const std::vector<size_t>& draw_dimensions,
-      FloatType step_size = 0.05);
+      real_t step_size = 0.05);
 
   //! Display a pose spline as pose-curve.
   void displaySplineTrajectory(
       const BSplinePoseMinimalRotationVector& bs,
       const std::string& topic,
       const size_t id,
-      FloatType step_size = 0.05);
+      real_t step_size = 0.05);
 
   //! Plot a pose spline as one graph for rotational and one graph
   //! for translational components.
   void plotSpline(
       const BSplinePoseMinimalRotationVector& bs,
-      FloatType step_size = 0.05);
+      real_t step_size = 0.05);
 
 private:
   std::shared_ptr<Visualizer> viz_;

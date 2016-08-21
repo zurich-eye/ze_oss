@@ -14,7 +14,7 @@ class FixedTimeBSpline
 public:
   //! t: time of evaluation
   //! d: derivative order (0..splineOrder -1)
-  FixedTimeBSpline(BSpline* bs, FloatType t, int d)
+  FixedTimeBSpline(BSpline* bs, real_t t, int d)
     : bs_(bs), t_(t), d_(d)
   {
   }
@@ -44,7 +44,7 @@ public:
 
 private:
   BSpline* bs_;
-  FloatType t_;
+  real_t t_;
   int d_;
 };
 } // namespace ze
@@ -59,7 +59,7 @@ TEST(SplineTestSuite, testBSplineJacobian)
   {
     BSpline bs(order);
     int nk = bs.numKnotsRequired(segments);
-    std::vector<FloatType> knots;
+    std::vector<real_t> knots;
     for (int i = 0; i < nk; ++i)
     {
       knots.push_back(i);
@@ -72,12 +72,12 @@ TEST(SplineTestSuite, testBSplineJacobian)
       bs.setKnotsAndCoefficients(knots, C);
       for (int derivative = 0; derivative < order; ++derivative)
       {
-        for (FloatType t = bs.t_min(); t < bs.t_max(); t += 0.1)
+        for (real_t t = bs.t_min(); t < bs.t_max(); t += 0.1)
         {
 
           FixedTimeBSpline fixed_bs(&bs, t, derivative);
 
-          Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+          Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
               fixed_bs.coefficientVector();
           MatrixX estJ =
               numericalDerivative<MatrixX, VectorX>(
@@ -106,7 +106,7 @@ TEST(SplineTestSuite, testCoefficientMap)
   int nk = bs.numKnotsRequired(segments);
   int nc = bs.numCoefficientsRequired(segments);
 
-  std::vector<FloatType> knots;
+  std::vector<real_t> knots;
   for (int i = 0; i < nk; ++i)
   {
     knots.push_back(i);
@@ -120,7 +120,7 @@ TEST(SplineTestSuite, testCoefficientMap)
   {
     Eigen::Map<VectorX> m = bs.vvCoefficientVector(i);
     // Test pass by value...
-    Eigen::Map<Eigen::Matrix<FloatType, 5, 1> > m2=
+    Eigen::Map<Eigen::Matrix<real_t, 5, 1> > m2=
         bs.fixedSizeVvCoefficientVector<dim>(i);
     for (int r = 0; r < m.size(); ++r)
     {
@@ -139,15 +139,15 @@ TEST(SplineTestSuite, testGetBi)
 
   const int order = 4;
   const int segments = 10;
-  const FloatType startTime = 0;
-  const FloatType endTime = 5;
+  const real_t startTime = 0;
+  const real_t endTime = 5;
   const int numTimeSteps = 43;
   BSpline bs(order);
   bs.initConstantSpline(startTime, endTime, segments, VectorX::Zero(1));
 
   for (int i = 0; i <= numTimeSteps; ++i)
   {
-    FloatType t = startTime + (endTime - startTime) * ((FloatType) i / numTimeSteps);
+    real_t t = startTime + (endTime - startTime) * ((FloatType) i / numTimeSteps);
     VectorX localBiVector = bs.getLocalBiVector(t);
 
     EXPECT_NEAR(localBiVector.sum(), 1.0, 1e-10)

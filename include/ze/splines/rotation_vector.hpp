@@ -30,7 +30,7 @@ public:
   {
     Matrix3 C;
 
-    FloatType angle = v_.norm();
+    real_t angle = v_.norm();
 
     if(angle < 1e-14)
     {
@@ -40,17 +40,17 @@ public:
     else
     {
       Vector3 axis;
-      FloatType recip_angle = 1.0/angle;
+      real_t recip_angle = 1.0/angle;
       axis = v_ * recip_angle;
 
-      FloatType ax = axis[0];
-      FloatType ay = axis[1];
-      FloatType az = axis[2];
-      FloatType sa = sin(angle);
-      FloatType ca = cos(angle);
-      FloatType ax2 = ax*ax;
-      FloatType ay2 = ay*ay;
-      FloatType az2 = az*az;
+      real_t ax = axis[0];
+      real_t ay = axis[1];
+      real_t az = axis[2];
+      real_t sa = sin(angle);
+      real_t ca = cos(angle);
+      real_t ax2 = ax*ax;
+      real_t ay2 = ay*ay;
+      real_t az2 = az*az;
 
       C << ax2+ca*(1.0-ax2),     ax*ay-ca*ax*ay+sa*az, ax*az-ca*ax*az-sa*ay,
            ax*ay-ca*ax*ay-sa*az, ay2+ca*(1.0-ay2),     ay*az-ca*ay*az+sa*ax,
@@ -63,7 +63,7 @@ public:
   Matrix3 toSMatrix() const
   {
     Matrix3 S;
-    FloatType angle = v_.norm();
+    real_t angle = v_.norm();
 
     if(angle < 1e-14)
     {
@@ -71,13 +71,13 @@ public:
     }
     else
     {
-      FloatType recip_angle = 1.0/angle;
+      real_t recip_angle = 1.0/angle;
       Vector3 axis = v_ * recip_angle;
-      FloatType st2 = sin(angle * 0.5);
-      FloatType st  = sin(angle);
+      real_t st2 = sin(angle * 0.5);
+      real_t st  = sin(angle);
 
-      FloatType c1 = -2.0 * st2 * st2 * recip_angle;
-      FloatType c2 = (angle - st) * recip_angle;
+      real_t c1 = -2.0 * st2 * st2 * recip_angle;
+      real_t c2 = (angle - st) * recip_angle;
       Matrix3 crossA = skewSymmetric(axis);
 
       S = Matrix3::Identity() + (c1 * crossA) + (c2 * crossA * crossA);
@@ -104,45 +104,45 @@ public:
       // LAZY
       // \todo...redo when there is time and not so lazy.
       Matrix36 & J = *Jacobian;
-      FloatType t1 = v_[0];
-      FloatType t2 = v_[1];
-      FloatType t3 = v_[2];
-      FloatType dt1 = pdot[0];
-      FloatType dt2 = pdot[1];
-      FloatType dt3 = pdot[2];
-      FloatType t5 = t1*t1;
-      FloatType t6 = t2*t2;
-      FloatType t7 = t3*t3;
-      FloatType t8 = t5+t6+t7;
-      FloatType t9 = pow(t8,3.0/2.0);
-      FloatType t10 = sqrt(t8);
-      FloatType t11 = sin(t10);
-      FloatType t12 = cos(t10);
-      FloatType t13 = t12*(1.0/2.0);
-      FloatType t14 = t13-1.0/2.0;
-      FloatType t15 = 1.0/pow(t8,5.0/2.0);
-      FloatType t16 = dt3*t14*t9*2.0;
-      FloatType t17 = dt3*t1*t11*t2*t3*3.0;
-      FloatType t18 = dt3*t3*t9;
-      FloatType t19 = dt1*t1*t10*t6*2.0;
-      FloatType t20 = dt2*t11*t2*t5*3.0;
-      FloatType t21 = dt1*t1*t10*t12*t6;
-      FloatType t22 = dt2*t14*t9*2.0;
-      FloatType t23 = dt2*t1*t10*t2*t3*2.0;
-      FloatType t24 = dt2*t1*t10*t12*t2*t3;
-      FloatType t25 = dt1*t14*t9*2.0;
-      FloatType t26 = dt1*t1*t11*t2*t3*3.0;
-      FloatType t27 = dt1*t1*t9;
-      FloatType t28 = dt2*t2*t9;
-      FloatType t29 = dt1*t1*t10*t7*2.0;
-      FloatType t30 = dt2*t10*t2*t7*2.0;
-      FloatType t31 = dt3*t11*t3*t5*3.0;
-      FloatType t32 = dt3*t11*t3*t6*3.0;
-      FloatType t33 = dt2*t1*t11*t3*t8;
-      FloatType t34 = dt2*t1*t10*t14*t3*4.0;
-      FloatType t35 = dt1*t1*t10*t12*t7;
-      FloatType t36 = dt2*t10*t12*t2*t7;
-      FloatType t0  = t15*(t18+t19+t20+t21+t28+t29+t31+t33+t34+t35-dt1*t1*t11*t6*3.0-dt2*t10*t2*t5*2.0-dt1*t1*t11*t7*3.0-dt3*t10*t3*t5*2.0-dt2*t11*t2*t8-dt3*t11*t3*t8-dt3*t1*t10*t14*t2*4.0-dt2*t10*t12*t2*t5-dt3*t10*t12*t3*t5-dt3*t1*t11*t2*t8);
+      real_t t1 = v_[0];
+      real_t t2 = v_[1];
+      real_t t3 = v_[2];
+      real_t dt1 = pdot[0];
+      real_t dt2 = pdot[1];
+      real_t dt3 = pdot[2];
+      real_t t5 = t1*t1;
+      real_t t6 = t2*t2;
+      real_t t7 = t3*t3;
+      real_t t8 = t5+t6+t7;
+      real_t t9 = pow(t8,3.0/2.0);
+      real_t t10 = sqrt(t8);
+      real_t t11 = sin(t10);
+      real_t t12 = cos(t10);
+      real_t t13 = t12*(1.0/2.0);
+      real_t t14 = t13-1.0/2.0;
+      real_t t15 = 1.0/pow(t8,5.0/2.0);
+      real_t t16 = dt3*t14*t9*2.0;
+      real_t t17 = dt3*t1*t11*t2*t3*3.0;
+      real_t t18 = dt3*t3*t9;
+      real_t t19 = dt1*t1*t10*t6*2.0;
+      real_t t20 = dt2*t11*t2*t5*3.0;
+      real_t t21 = dt1*t1*t10*t12*t6;
+      real_t t22 = dt2*t14*t9*2.0;
+      real_t t23 = dt2*t1*t10*t2*t3*2.0;
+      real_t t24 = dt2*t1*t10*t12*t2*t3;
+      real_t t25 = dt1*t14*t9*2.0;
+      real_t t26 = dt1*t1*t11*t2*t3*3.0;
+      real_t t27 = dt1*t1*t9;
+      real_t t28 = dt2*t2*t9;
+      real_t t29 = dt1*t1*t10*t7*2.0;
+      real_t t30 = dt2*t10*t2*t7*2.0;
+      real_t t31 = dt3*t11*t3*t5*3.0;
+      real_t t32 = dt3*t11*t3*t6*3.0;
+      real_t t33 = dt2*t1*t11*t3*t8;
+      real_t t34 = dt2*t1*t10*t14*t3*4.0;
+      real_t t35 = dt1*t1*t10*t12*t7;
+      real_t t36 = dt2*t10*t12*t2*t7;
+      real_t t0  = t15*(t18+t19+t20+t21+t28+t29+t31+t33+t34+t35-dt1*t1*t11*t6*3.0-dt2*t10*t2*t5*2.0-dt1*t1*t11*t7*3.0-dt3*t10*t3*t5*2.0-dt2*t11*t2*t8-dt3*t11*t3*t8-dt3*t1*t10*t14*t2*4.0-dt2*t10*t12*t2*t5-dt3*t10*t12*t3*t5-dt3*t1*t11*t2*t8);
 
       J(0,0) = t0;
       J(0,1) = t15*(t16+t17+dt2*t1*t9-dt1*t2*t9*2.0-dt2*t1*t10*t6*2.0+dt2*t1*t11*t6*3.0-dt3*t10*t14*t6*4.0+dt1*t10*t2*t6*2.0-dt1*t11*t2*t6*3.0+dt1*t10*t2*t7*2.0-dt1*t11*t2*t7*3.0-dt2*t1*t11*t8+dt1*t11*t2*t8*2.0-dt3*t11*t6*t8-dt3*t1*t10*t2*t3*2.0+dt2*t10*t14*t2*t3*4.0-dt2*t1*t10*t12*t6+dt1*t10*t12*t2*t6+dt1*t10*t12*t2*t7+dt2*t11*t2*t3*t8-dt3*t1*t10*t12*t2*t3);
@@ -160,7 +160,7 @@ public:
 
   Matrix3 parametersToInverseSMatrix(const Vector3 & parameters) const
   {
-    FloatType phi = std::sqrt(parameters.transpose()*parameters);
+    real_t phi = std::sqrt(parameters.transpose()*parameters);
     Matrix3 invS;
     if(phi == 0)
     {
@@ -168,8 +168,8 @@ public:
     }
     else
     {
-      FloatType cot = - std::sin(phi)/(std::cos(phi)-1);
-      FloatType a1 = 1/(phi*phi) * (1- 0.5*phi*cot);
+      real_t cot = - std::sin(phi)/(std::cos(phi)-1);
+      real_t a1 = 1/(phi*phi) * (1- 0.5*phi*cot);
       invS = Matrix3::Identity()
              + 0.5 * skewSymmetric(parameters)
              + a1 * skewSymmetric(parameters) * skewSymmetric(parameters);
@@ -185,9 +185,9 @@ private:
     Vector3 p;
     // Sometimes, because of roundoff error, the value of tr ends up outside
     // the valid range of arccos. Truncate to the valid range.
-    FloatType tr = std::max(-1.0, std::min(
+    real_t tr = std::max(-1.0, std::min(
                            (C(0,0) + C(1,1) + C(2,2) - 1.0) * 0.5, 1.0));
-    FloatType a = acos( tr ) ;
+    real_t a = acos( tr ) ;
 
     if(fabs(a) < 1e-14)
     {
@@ -197,13 +197,13 @@ private:
     p[0] = (C(2,1) - C(1,2));
     p[1] = (C(0,2) - C(2,0));
     p[2] = (C(1,0) - C(0,1));
-    FloatType n2 = p.norm();
+    real_t n2 = p.norm();
     if(fabs(n2) < 1e-14)
     {
       return Vector3::Zero();
     }
 
-    FloatType scale = -a/n2;
+    real_t scale = -a/n2;
     p = scale * p;
 
     return p;

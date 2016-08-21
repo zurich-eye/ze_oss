@@ -11,10 +11,10 @@ SplinesVisualizer::SplinesVisualizer(const std::shared_ptr<Visualizer>& viz)
 
 void SplinesVisualizer::plotSpline(const BSpline& bs,
                                    const size_t dimension,
-                                   FloatType step_size)
+                                   real_t step_size)
 {
-  FloatType start = bs.t_min();
-  FloatType end = bs.t_max();
+  real_t start = bs.t_min();
+  real_t end = bs.t_max();
   size_t samples = (end - start) / step_size - 1;
   size_t spline_dimension = bs.dimension();
   CHECK_LE(dimension, spline_dimension);
@@ -36,7 +36,7 @@ void SplinesVisualizer::displaySplineTrajectory(const BSpline& bs,
                                                 const std::string& topic,
                                                 const size_t id,
                                                 const Color& color,
-                                                FloatType step_size)
+                                                real_t step_size)
 {
   CHECK_LE(bs.dimension(), 3) << "For splines with more than 3 dimensions specify"
                               << "which dimenions to draw.";
@@ -58,10 +58,10 @@ void SplinesVisualizer::displaySplineTrajectory(
     const size_t id,
     const Color& color,
     const std::vector<size_t>& draw_dimensions,
-    FloatType step_size)
+    real_t step_size)
 {
-  FloatType start = bs.t_min();
-  FloatType end = bs.t_max();
+  real_t start = bs.t_min();
+  real_t end = bs.t_max();
   size_t samples = (end - start) / step_size - 1;
   size_t dimension = bs.dimension();
 
@@ -85,12 +85,12 @@ void SplinesVisualizer::displaySplineTrajectory(
     const BSplinePoseMinimalRotationVector& bs,
     const std::string& topic,
     const size_t id,
-    FloatType step_size)
+    real_t step_size)
 {
   ze::TransformationVector poses;
 
-  FloatType start = bs.t_min();
-  FloatType end = bs.t_max();
+  real_t start = bs.t_min();
+  real_t end = bs.t_max();
   size_t samples = (end - start) / step_size - 1;
 
   for (size_t i = 0; i <= samples; ++i)
@@ -104,10 +104,10 @@ void SplinesVisualizer::displaySplineTrajectory(
 
 void SplinesVisualizer::plotSpline(
     const BSplinePoseMinimalRotationVector& bs,
-    FloatType step_size)
+    real_t step_size)
 {
-  FloatType start = bs.t_min();
-  FloatType end = bs.t_max();
+  real_t start = bs.t_min();
+  real_t end = bs.t_max();
   size_t samples = (end - start) / step_size - 1;
 
   ze::MatrixX points(6, samples);

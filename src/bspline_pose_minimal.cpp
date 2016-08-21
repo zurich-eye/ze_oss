@@ -16,14 +16,14 @@ BSplinePoseMinimal<RP>::~BSplinePoseMinimal()
 }
 
 template<class RP>
-Matrix4 BSplinePoseMinimal<RP>::transformation(FloatType tk) const
+Matrix4 BSplinePoseMinimal<RP>::transformation(real_t tk) const
 {
   return curveValueToTransformation(eval(tk));
 }
 
 template<class RP>
 Matrix4 BSplinePoseMinimal<RP>::transformationAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -44,7 +44,7 @@ Matrix4 BSplinePoseMinimal<RP>::transformationAndJacobian(
 
 template<class RP>
 Matrix3 BSplinePoseMinimal<RP>::orientationAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -71,7 +71,7 @@ Matrix3 BSplinePoseMinimal<RP>::orientationAndJacobian(
 
 template<class RP>
 Matrix3 BSplinePoseMinimal<RP>::inverseOrientationAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -97,7 +97,7 @@ Matrix3 BSplinePoseMinimal<RP>::inverseOrientationAndJacobian(
 
 template<class RP>
 Matrix4 BSplinePoseMinimal<RP>::inverseTransformationAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -128,7 +128,7 @@ Matrix4 BSplinePoseMinimal<RP>::inverseTransformationAndJacobian(
 }
 
 template<class RP>
-Matrix4 BSplinePoseMinimal<RP>::inverseTransformation(FloatType tk) const
+Matrix4 BSplinePoseMinimal<RP>::inverseTransformation(real_t tk) const
 {
   Matrix4 T = curveValueToTransformation(eval(tk));
   T.topLeftCorner<3,3>().transposeInPlace();
@@ -138,7 +138,7 @@ Matrix4 BSplinePoseMinimal<RP>::inverseTransformation(FloatType tk) const
 
 template<class RP>
 Vector4 BSplinePoseMinimal<RP>::transformVectorAndJacobian(
-    FloatType tk,
+    real_t tk,
     const Vector4& v_tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
@@ -156,35 +156,35 @@ Vector4 BSplinePoseMinimal<RP>::transformVectorAndJacobian(
 }
 
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::position(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::position(real_t tk) const
 {
   Matrix61 v = eval(tk);
   return v.head<3>();
 }
 
 template<class RP>
-Matrix3 BSplinePoseMinimal<RP>::orientation(FloatType tk) const
+Matrix3 BSplinePoseMinimal<RP>::orientation(real_t tk) const
 {
   Matrix61 v = eval(tk);
   return RP(Vector3(v.tail<3>())).getRotationMatrix();
 }
 
 template<class RP>
-Matrix3 BSplinePoseMinimal<RP>::inverseOrientation(FloatType tk) const
+Matrix3 BSplinePoseMinimal<RP>::inverseOrientation(real_t tk) const
 {
   Matrix61 v = eval(tk);
   return RP(Vector3(v.tail<3>())).getRotationMatrix().transpose();
 }
 
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::linearVelocity(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::linearVelocity(real_t tk) const
 {
   Matrix61 v = evalD(tk, 1);
   return v.head<3>();
 }
 
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::linearVelocityBodyFrame(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::linearVelocityBodyFrame(real_t tk) const
 {
   Matrix61 r = evalD(tk, 0);
   Matrix61 v = evalD(tk, 1);
@@ -193,14 +193,14 @@ Vector3 BSplinePoseMinimal<RP>::linearVelocityBodyFrame(FloatType tk) const
 }
 
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::linearAcceleration(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::linearAcceleration(real_t tk) const
 {
   Matrix61 v = evalD(tk, 2);
   return v.head<3>();
 }
 
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::linearAccelerationBodyFrame(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::linearAccelerationBodyFrame(real_t tk) const
 {
   VectorX r = evalD(tk, 0);
   Matrix61 v = evalD(tk, 2);
@@ -210,7 +210,7 @@ Vector3 BSplinePoseMinimal<RP>::linearAccelerationBodyFrame(FloatType tk) const
 
 template<class RP>
 Vector3 BSplinePoseMinimal<RP>::linearAccelerationAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -227,7 +227,7 @@ Vector3 BSplinePoseMinimal<RP>::linearAccelerationAndJacobian(
 // \omega_w_{b,w} (angular velocity of the body frame as seen from the world
 // frame, expressed in the world frame)
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::angularVelocity(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::angularVelocity(real_t tk) const
 {
   Vector3 omega;
   VectorX r = evalD(tk,0);
@@ -244,7 +244,7 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocity(FloatType tk) const
 // \omega_b_{w,b} (angular velocity of the world frame as seen from the body
 // frame, expressed in the body frame)
 template<class RP>
-Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrame(FloatType tk) const
+Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrame(real_t tk) const
 {
   Vector3 omega;
   VectorX r = evalD(tk,0);
@@ -264,7 +264,7 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrame(FloatType tk) const
 // frame, expressed in the body frame)
 template<class RP>
 Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrameAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -303,7 +303,7 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocityBodyFrameAndJacobian(
 // frame, expressed in the world frame)
 template<class RP>
 Vector3 BSplinePoseMinimal<RP>::angularVelocityAndJacobian(
-    FloatType tk,
+    real_t tk,
     MatrixX* J,
     VectorXi* coefficient_indices) const
 {
@@ -339,8 +339,8 @@ Vector3 BSplinePoseMinimal<RP>::angularVelocityAndJacobian(
 
 template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSpline(
-    FloatType t0,
-    FloatType t1,
+    real_t t0,
+    real_t t1,
     const Matrix4& T_n_t0,
     const Matrix4& T_n_t1)
 {
@@ -351,7 +351,7 @@ void BSplinePoseMinimal<RP>::initPoseSpline(
 }
 
 template<class RP>
-void BSplinePoseMinimal<RP>::addPoseSegment(FloatType tk, const Matrix4& T_n_tk)
+void BSplinePoseMinimal<RP>::addPoseSegment(real_t tk, const Matrix4& T_n_tk)
 {
   VectorX vk = transformationToCurveValue(T_n_tk);
 
@@ -360,9 +360,9 @@ void BSplinePoseMinimal<RP>::addPoseSegment(FloatType tk, const Matrix4& T_n_tk)
 
 template<class RP>
 void BSplinePoseMinimal<RP>::addPoseSegment2(
-    FloatType tk,
+    real_t tk,
     const Matrix4& T_n_tk,
-    FloatType lambda)
+    real_t lambda)
 {
   VectorX vk = transformationToCurveValue(T_n_tk);
 
@@ -418,9 +418,9 @@ VectorX BSplinePoseMinimal<RP>::transformationToCurveValue(
 template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSpline2(
     const VectorX& times,
-    const Eigen::Matrix<FloatType,6,Eigen::Dynamic>& poses,
+    const Eigen::Matrix<real_t,6,Eigen::Dynamic>& poses,
     int num_segments,
-    FloatType lambda)
+    real_t lambda)
 {
   initSpline2(times, poses, num_segments, lambda);
 }
@@ -428,9 +428,9 @@ void BSplinePoseMinimal<RP>::initPoseSpline2(
 template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSpline3(
     const VectorX& times,
-    const Eigen::Matrix<FloatType,6,Eigen::Dynamic>& poses,
+    const Eigen::Matrix<real_t,6,Eigen::Dynamic>& poses,
     int num_segments,
-    FloatType lambda)
+    real_t lambda)
 {
   initSpline3(times, poses, num_segments, lambda);
 }
@@ -440,9 +440,9 @@ void BSplinePoseMinimal<RP>::initPoseSplinePoses(
     const VectorX& times,
     const std::vector<Matrix4>& poses,
     int num_segments,
-    FloatType lambda)
+    real_t lambda)
 {
-  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
+  Eigen::Matrix<real_t, 6, Eigen::Dynamic> parameters;
   parameters.resize(6, poses.size());
   for (size_t i = 0; i < poses.size(); ++i)
   {
@@ -456,9 +456,9 @@ template<class RP>
 void BSplinePoseMinimal<RP>::initPoseSplinePoses(
     const StampedTransformationVector& poses,
     int num_segments,
-    FloatType lambda)
+    real_t lambda)
 {
-  Eigen::Matrix<FloatType, 6, Eigen::Dynamic> parameters;
+  Eigen::Matrix<real_t, 6, Eigen::Dynamic> parameters;
   parameters.resize(6, poses.size());
   VectorX times(poses.size());
   for (size_t i = 0; i < poses.size(); ++i)

@@ -32,7 +32,7 @@ int BSpline::polynomialDegree() const
   return spline_order_ - 1;
 }
 
-void BSpline::setKnotsAndCoefficients(const std::vector<FloatType>& knots,
+void BSpline::setKnotsAndCoefficients(const std::vector<real_t>& knots,
                                       const MatrixX& coefficients)
 {
   //std::cout << "setting " << knots.size() << " knots\n";
@@ -96,7 +96,7 @@ MatrixX BSpline::M(int k, int i)
     for(int idx = 0; idx < A.rows(); idx++)
     {
       int j = i - k + 2 + idx;
-      FloatType d0 = d_0(k, i, j);
+      real_t d0 = d_0(k, i, j);
       A(idx, idx  ) = 1.0 - d0;
       A(idx, idx+1) = d0;
     }
@@ -105,7 +105,7 @@ MatrixX BSpline::M(int k, int i)
     for(int idx = 0; idx < B.rows(); idx++)
     {
       int j = i - k + 2 + idx;
-      FloatType d1 = d_1(k, i, j);
+      real_t d1 = d_1(k, i, j);
       B(idx, idx  ) = -d1;
       B(idx, idx+1) = d1;
     }
@@ -116,7 +116,7 @@ MatrixX BSpline::M(int k, int i)
   }
 }
 
-FloatType BSpline::d_0(int k, int i, int j)
+real_t BSpline::d_0(int k, int i, int j)
 {
   CHECK_LE(j+k-1.0, (int)knots_.size()) <<  "Index out of range with k=" << k
                                         << ", i=" << i << ", and j=" << j;
@@ -127,18 +127,18 @@ FloatType BSpline::d_0(int k, int i, int j)
   CHECK_LE(i, (int)knots_.size()) <<  "Index out of range with k=" << k
                                   << ", i=" << i << ", and j=" << j;
 
-  FloatType denom = knots_[j+k-1] - knots_[j];
+  real_t denom = knots_[j+k-1] - knots_[j];
   if(denom <= 0.0)
   {
     return 0.0;
   }
 
-  FloatType numerator = knots_[i] - knots_[j];
+  real_t numerator = knots_[i] - knots_[j];
 
   return numerator/denom;
 }
 
-FloatType BSpline::d_1(int k, int i, int j)
+real_t BSpline::d_1(int k, int i, int j)
 {
   CHECK_LE(j+k-1.0, (int)knots_.size()) <<  "Index out of range with k="
                                         << k << ", i=" << i << ", and j=" << j;
@@ -148,13 +148,13 @@ FloatType BSpline::d_1(int k, int i, int j)
                                   << k << ", i=" << i << ", and j=" << j;
   CHECK_LE(i, (int)knots_.size()) <<  "Index out of range with k="
                                   << k << ", i=" << i << ", and j=" << j;
-  FloatType denom = knots_[j+k-1] - knots_[j];
+  real_t denom = knots_[j+k-1] - knots_[j];
   if(denom <= 0.0)
   {
     return 0.0;
   }
 
-  FloatType numerator = knots_[i+1] - knots_[i];
+  real_t numerator = knots_[i+1] - knots_[i];
 
   return numerator/denom;
 }
@@ -162,7 +162,7 @@ FloatType BSpline::d_1(int k, int i, int j)
 void BSpline::setKnotVectorAndCoefficients(const VectorX& knots,
                                            const MatrixX& coefficients)
 {
-  std::vector<FloatType> k(knots.size());
+  std::vector<real_t> k(knots.size());
   for(unsigned i = 0; i < k.size(); i++)
   {
     k[i] = knots(i);
@@ -171,7 +171,7 @@ void BSpline::setKnotVectorAndCoefficients(const VectorX& knots,
   setKnotsAndCoefficients(k, coefficients);
 }
 
-const std::vector<FloatType> BSpline::knots() const
+const std::vector<real_t> BSpline::knots() const
 {
   return knots_;
 }
@@ -192,7 +192,7 @@ const MatrixX& BSpline::coefficients() const
   return coefficients_;
 }
 
-void BSpline::verifyKnotSequence(const std::vector<FloatType>& knots)
+void BSpline::verifyKnotSequence(const std::vector<real_t>& knots)
 {
   CHECK_GE((int)knots.size(), minimumKnotsRequired())
       << "The sequence does not contain enough knots to define an active time sequence "
@@ -234,21 +234,21 @@ int BSpline::numKnotsRequired(int num_time_segments) const
   return numCoefficientsRequired(num_time_segments) + spline_order_;
 }
 
-FloatType BSpline::t_min() const
+real_t BSpline::t_min() const
 {
   CHECK_GE((int)knots_.size(), minimumKnotsRequired())
       << "The B-spline is not well initialized";
   return knots_[spline_order_ - 1];
 }
 
-FloatType BSpline::t_max() const
+real_t BSpline::t_max() const
 {
   CHECK_GE((int)knots_.size(), minimumKnotsRequired())
       << "The B-spline is not well initialized";
   return knots_[knots_.size() - spline_order_];
 }
 
-std::pair<FloatType,int> BSpline::computeTIndex(FloatType t) const
+std::pair<real_t,int> BSpline::computeTIndex(FloatType t) const
 {
   CHECK_GE(t, t_min()) << "The time is out of range by " << (t - t_min());
 
@@ -261,7 +261,7 @@ std::pair<FloatType,int> BSpline::computeTIndex(FloatType t) const
 
   CHECK_LE(t, t_max())
       << "The time is out of range by " << (t_max() - t);
-  std::vector<FloatType>::const_iterator i;
+  std::vector<real_t>::const_iterator i;
   if(t == t_max())
   {
     // This is a special case to allow us to evaluate the spline at the boundary of the
@@ -280,12 +280,12 @@ std::pair<FloatType,int> BSpline::computeTIndex(FloatType t) const
 
 }
 
-std::pair<FloatType,int> BSpline::computeUAndTIndex(FloatType t) const
+std::pair<real_t,int> BSpline::computeUAndTIndex(FloatType t) const
 {
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
 
   int index = ui.second;
-  FloatType denom = ui.first;
+  real_t denom = ui.first;
 
   if(denom <= 0.0)
   {
@@ -295,7 +295,7 @@ std::pair<FloatType,int> BSpline::computeUAndTIndex(FloatType t) const
   }
   else
   {
-    FloatType u = (t - knots_[index])/denom;
+    real_t u = (t - knots_[index])/denom;
 
     return std::make_pair(u, index);
   }
@@ -317,19 +317,19 @@ int dmul(int i, int derivative_order)
   }
 }
 
-VectorX BSpline::computeU(FloatType uval,
+VectorX BSpline::computeU(real_t uval,
                           int segmentIndex,
                           int derivativeOrder) const
 {
   VectorX u = VectorX::Zero(spline_order_);
-  FloatType delta_t = knots_[segmentIndex+1] - knots_[segmentIndex];
-  FloatType multiplier = 0.0;
+  real_t delta_t = knots_[segmentIndex+1] - knots_[segmentIndex];
+  real_t multiplier = 0.0;
   if(delta_t > 0.0)
   {
     multiplier = 1.0/pow(delta_t, derivativeOrder);
   }
 
-  FloatType uu = 1.0;
+  real_t uu = 1.0;
   for(int i = derivativeOrder; i < spline_order_; i++)
   {
     u(i) = multiplier * uu * dmul(i,derivativeOrder) ;
@@ -339,7 +339,7 @@ VectorX BSpline::computeU(FloatType uval,
   return u;
 }
 
-VectorX BSpline::eval(FloatType t) const
+VectorX BSpline::eval(real_t t) const
 {
   return evalD(t,0);
 }
@@ -349,11 +349,11 @@ const MatrixX& BSpline::basisMatrixFromKnotIndex(int knot_index) const
   return basis_matrices_[basisMatrixIndexFromStartingKnotIndex(knot_index)];
 }
 
-VectorX BSpline::evalD(FloatType t, int derivative_order) const
+VectorX BSpline::evalD(real_t t, int derivative_order) const
 {
   CHECK_GE(derivative_order, 0) << "To integrate, use the integral function";
   // Returns the normalized u value and the lower-bound time index.
-  std::pair<FloatType,int> ui = computeUAndTIndex(t);
+  std::pair<real_t,int> ui = computeUAndTIndex(t);
   VectorX u = computeU(ui.first, ui.second, derivative_order);
 
   int bidx = ui.second - spline_order_ + 1;
@@ -369,14 +369,14 @@ VectorX BSpline::evalD(FloatType t, int derivative_order) const
   return rv;
 }
 
-VectorX BSpline::evalDAndJacobian(FloatType t,
+VectorX BSpline::evalDAndJacobian(real_t t,
                                   int derivative_order,
                                   MatrixX* Jacobian,
                                   VectorXi* coefficient_indices) const
 {
   CHECK_GE(derivative_order, 0) << "To integrate, use the integral function";
   // Returns the normalized u value and the lower-bound time index.
-  std::pair<FloatType,int> ui = computeUAndTIndex(t);
+  std::pair<real_t,int> ui = computeUAndTIndex(t);
   VectorX u = computeU(ui.first, ui.second, derivative_order);
 
   int bidx = ui.second - spline_order_ + 1;
@@ -414,7 +414,7 @@ VectorX BSpline::evalDAndJacobian(FloatType t,
   return v;
 }
 
-std::pair<VectorX, MatrixX> BSpline::evalDAndJacobian(FloatType t,
+std::pair<VectorX, MatrixX> BSpline::evalDAndJacobian(real_t t,
                                                       int derivative_order) const
 {
   std::pair<VectorX, MatrixX> rv;
@@ -424,23 +424,23 @@ std::pair<VectorX, MatrixX> BSpline::evalDAndJacobian(FloatType t,
   return rv;
 }
 
-MatrixX BSpline::localBasisMatrix(FloatType t, int derivative_order) const
+MatrixX BSpline::localBasisMatrix(real_t t, int derivative_order) const
 {
   return Phi(t,derivative_order);
 }
 
-MatrixX BSpline::localCoefficientMatrix(FloatType t) const
+MatrixX BSpline::localCoefficientMatrix(real_t t) const
 {
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
   int bidx = ui.second - spline_order_ + 1;
 
   return coefficients_.block(0,bidx,coefficients_.rows(),spline_order_);
 }
 
-VectorX BSpline::localCoefficientVector(FloatType t) const
+VectorX BSpline::localCoefficientVector(real_t t) const
 {
 
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
   int bidx = ui.second - spline_order_ + 1;
   VectorX c(spline_order_ * coefficients_.rows());
   for(int i = 0; i < spline_order_; i++)
@@ -451,27 +451,27 @@ VectorX BSpline::localCoefficientVector(FloatType t) const
   return c;
 }
 
-VectorXi BSpline::localCoefficientVectorIndices(FloatType t) const
+VectorXi BSpline::localCoefficientVectorIndices(real_t t) const
 {
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
   int bidx = ui.second - spline_order_ + 1;
   int D = coefficients_.rows();
 
   return VectorXi::LinSpaced(spline_order_*D,bidx*D,(bidx + spline_order_)*D - 1);
 }
 
-VectorXi BSpline::localVvCoefficientVectorIndices(FloatType t) const
+VectorXi BSpline::localVvCoefficientVectorIndices(real_t t) const
 {
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
   int bidx = ui.second - spline_order_ + 1;
 
   return VectorXi::LinSpaced(spline_order_,bidx,(bidx + spline_order_) - 1);
 }
 
-MatrixX BSpline::Phi(FloatType t, int derivative_order) const
+MatrixX BSpline::Phi(real_t t, int derivative_order) const
 {
   CHECK_GE(derivative_order, 0) << "To integrate, use the integral function";
-  std::pair<FloatType,int> ui = computeUAndTIndex(t);
+  std::pair<real_t,int> ui = computeUAndTIndex(t);
 
   VectorX u = computeU(ui.first, ui.second, derivative_order);
 
@@ -527,12 +527,12 @@ const MatrixX& BSpline::basisMatrix(int i) const
 }
 
 
-std::pair<FloatType,FloatType> BSpline::timeInterval() const
+std::pair<real_t,FloatType> BSpline::timeInterval() const
 {
   return std::make_pair(t_min(), t_max());
 }
 
-std::pair<FloatType,FloatType> BSpline::timeInterval(int i) const
+std::pair<real_t,FloatType> BSpline::timeInterval(int i) const
 {
   CHECK_GE((int)knots_.size(), minimumKnotsRequired()) << "The B-spline is not well initialized";
   CHECK_LE(i, numValidTimeSegments()) << "index out of range";
@@ -540,7 +540,7 @@ std::pair<FloatType,FloatType> BSpline::timeInterval(int i) const
   return std::make_pair(knots_[spline_order_ + i - 1],knots_[spline_order_ + i]);
 }
 
-void BSpline::initSpline(FloatType t_0, FloatType t_1,
+void BSpline::initSpline(real_t t_0, FloatType t_1,
                          const VectorX& p_0,
                          const VectorX& p_1)
 {
@@ -559,8 +559,8 @@ void BSpline::initSpline(FloatType t_0, FloatType t_1,
   int D = p_0.size();
 
   // Initialize a uniform knot sequence
-  FloatType dt = t_1 - t_0;
-  std::vector<FloatType> knots(K);
+  real_t dt = t_1 - t_0;
+  std::vector<real_t> knots(K);
   for(int i = 0; i < K; i++)
   {
     knots[i] = t_0 + (i - spline_order_ + 1) * dt;
@@ -634,7 +634,7 @@ void BSpline::initSpline(FloatType t_0, FloatType t_1,
   setCoefficientVector(c);
 }
 
-void BSpline::addCurveSegment(FloatType t, const VectorX& p_1)
+void BSpline::addCurveSegment(real_t t, const VectorX& p_1)
 {
   CHECK_GT(t, t_max())
       << "The new time must be past the end of the last valid segment";
@@ -642,7 +642,7 @@ void BSpline::addCurveSegment(FloatType t, const VectorX& p_1)
 
   // Get the final valid time interval.
   int NT = numValidTimeSegments();
-  std::pair<FloatType, FloatType> interval_km1 = timeInterval(NT-1);
+  std::pair<real_t, FloatType> interval_km1 = timeInterval(NT-1);
 
   VectorX p_0;
 
@@ -651,16 +651,16 @@ void BSpline::addCurveSegment(FloatType t, const VectorX& p_1)
   p_0 = eval(interval_km1.second);
 
   // Retool the knot vector.
-  FloatType du;
+  real_t du;
   int km1;
   std::tie(du,km1) = computeTIndex(interval_km1.first);
 
   // leave knots km1 and k alone but retool the other knots.
-  FloatType dt = t - knots_[km1 + 1];
-  FloatType kt = t;
+  real_t dt = t - knots_[km1 + 1];
+  real_t kt = t;
 
   // add another knot.
-  std::vector<FloatType> knots(knots_);
+  std::vector<real_t> knots(knots_);
   knots.push_back(0.0);
   // space the further knots uniformly.
   for(unsigned k = km1 + 2; k < knots.size(); k++)
@@ -679,7 +679,7 @@ void BSpline::addCurveSegment(FloatType t, const VectorX& p_1)
   // (i.e., the new one and the one before the new one).
 
   // Get the time interval of the new time segment.
-  FloatType t_0, t_1;
+  real_t t_0, t_1;
   std::tie(t_0,t_1) = timeInterval(NT);
 
   // what is the coefficient dimension?
@@ -748,11 +748,11 @@ void BSpline::removeCurveSegment()
   }
 }
 
-void BSpline::setLocalCoefficientVector(FloatType t, const VectorX& c)
+void BSpline::setLocalCoefficientVector(real_t t, const VectorX& c)
 {
   CHECK_EQ(c.size(), spline_order_ * coefficients_.rows())
       << "The local coefficient vector is the wrong size";
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
   int bidx = ui.second - spline_order_ + 1;
   for(int i = 0; i < spline_order_; i++)
   {
@@ -765,7 +765,7 @@ void BSpline::setLocalCoefficientVector(FloatType t, const VectorX& c)
 void BSpline::initSpline2(const VectorX& times,
                           const MatrixX& interpolation_points,
                           int num_segments,
-                          FloatType lambda)
+                          real_t lambda)
 {
   CHECK_EQ(times.size(), interpolation_points.cols())
       << "The number of times and the number of interpolation points must be equal";
@@ -788,8 +788,8 @@ void BSpline::initSpline2(const VectorX& times,
   int D = interpolation_points.rows();
 
   // Initialize a uniform knot sequence
-  FloatType dt = (times[times.size() - 1] - times[0]) / num_segments;
-  std::vector<FloatType> knots(K);
+  real_t dt = (times[times.size() - 1] - times[0]) / num_segments;
+  std::vector<real_t> knots(K);
   for(int i = 0; i < K; i++)
   {
     knots[i] = times[0] + (i - spline_order_ + 1) * dt;
@@ -852,7 +852,7 @@ void BSpline::initSpline2(const VectorX& times,
 void BSpline::initSpline3(const VectorX& times,
                           const MatrixX& interpolation_points,
                           int num_segments,
-                          FloatType lambda)
+                          real_t lambda)
 {
   CHECK_EQ(times.size(), interpolation_points.cols())
       << "The number of times and the number of interpolation points must be equal";
@@ -873,8 +873,8 @@ void BSpline::initSpline3(const VectorX& times,
   int D = interpolation_points.rows();
 
   // Initialize a uniform knot sequence
-  FloatType dt = (times[times.size() - 1] - times[0]) / num_segments;
-  std::vector<FloatType> knots(K);
+  real_t dt = (times[times.size() - 1] - times[0]) / num_segments;
+  std::vector<real_t> knots(K);
   for(int i = 0; i < K; i++)
   {
     knots[i] = times[0] + (i - spline_order_ + 1) * dt;
@@ -916,9 +916,9 @@ void BSpline::initSpline3(const VectorX& times,
 
 }
 
-void BSpline::addCurveSegment2(FloatType t,
+void BSpline::addCurveSegment2(real_t t,
                                const VectorX& p_1,
-                               FloatType lambda)
+                               real_t lambda)
 {
   CHECK_GT(t, t_max())
       << "The new time must be past the end of the last valid segment";
@@ -927,7 +927,7 @@ void BSpline::addCurveSegment2(FloatType t,
 
   // Get the final valid time interval.
   int NT = numValidTimeSegments();
-  std::pair<FloatType, FloatType> interval_km1 = timeInterval(NT-1);
+  std::pair<real_t, FloatType> interval_km1 = timeInterval(NT-1);
 
   VectorX p_0;
 
@@ -936,16 +936,16 @@ void BSpline::addCurveSegment2(FloatType t,
   p_0 = eval(interval_km1.second);
 
   // Retool the knot vector.
-  FloatType du;
+  real_t du;
   int km1;
   std::tie(du,km1) = computeTIndex(interval_km1.first);
 
   // leave knots km1 and k alone but retool the other knots.
-  FloatType dt = t - knots_[km1 + 1];
-  FloatType kt = t;
+  real_t dt = t - knots_[km1 + 1];
+  real_t kt = t;
 
   // add another knot.
-  std::vector<FloatType> knots(knots_);
+  std::vector<real_t> knots(knots_);
   knots.push_back(0.0);
   // space the further knots uniformly.
   for(unsigned k = km1 + 2; k < knots.size(); k++)
@@ -965,7 +965,7 @@ void BSpline::addCurveSegment2(FloatType t,
   // new one).
 
   // Get the time interval of the new time segment.
-  FloatType t_0, t_1;
+  real_t t_0, t_1;
   std::tie(t_0,t_1) = timeInterval(NT);
 
   // what is the coefficient dimension?
@@ -1056,7 +1056,7 @@ MatrixX BSpline::Vi(int segment_index) const
     }
   }
 
-  FloatType t_0,t_1;
+  real_t t_0,t_1;
   std::tie(t_0,t_1) = timeInterval(segment_index);
 
   V *= t_1 - t_0;
@@ -1064,25 +1064,25 @@ MatrixX BSpline::Vi(int segment_index) const
   return V;
 }
 
-VectorX BSpline::evalIntegral(FloatType t1, FloatType t2) const
+VectorX BSpline::evalIntegral(real_t t1, FloatType t2) const
 {
   if(t1 > t2)
   {
     return -evalIntegral(t2,t1);
   }
 
-  std::pair<FloatType,int> u1 = computeTIndex(t1);
-  std::pair<FloatType,int> u2 = computeTIndex(t2);
+  std::pair<real_t,int> u1 = computeTIndex(t1);
+  std::pair<real_t,int> u2 = computeTIndex(t2);
 
   VectorX integral = VectorX::Zero(coefficients_.rows());
 
   // LHS remainder.
-  FloatType lhs_remainder = t1 - knots_[u1.second];
+  real_t lhs_remainder = t1 - knots_[u1.second];
   if(lhs_remainder > 1e-16 && u1.first > 1e-16)
   {
     lhs_remainder /= u1.first;
     VectorX v(spline_order_);
-    FloatType du = lhs_remainder;
+    real_t du = lhs_remainder;
     for(int i = 0; i < spline_order_; i++)
     {
       v(i) = du/(i + 1.0);
@@ -1111,13 +1111,13 @@ VectorX BSpline::evalIntegral(FloatType t1, FloatType t2) const
   }
 
   // RHS remainder.
-  FloatType rhs_remainder = t2 - knots_[u2.second];
+  real_t rhs_remainder = t2 - knots_[u2.second];
   if(rhs_remainder > 1e-16 && u2.first > 1e-16)
   {
     rhs_remainder /= u2.first;
 
     VectorX v(spline_order_);
-    FloatType du = rhs_remainder;
+    real_t du = rhs_remainder;
     for(int i = 0; i < spline_order_; i++)
     {
       v(i) = du / (i + 1.0);
@@ -1176,7 +1176,7 @@ MatrixX BSpline::Mi(int segment_index) const
   return M;
 }
 
-VectorX BSpline::getLocalBiVector(FloatType t, int derivative_order) const
+VectorX BSpline::getLocalBiVector(real_t t, int derivative_order) const
 {
   VectorX ret = VectorX::Zero(spline_order_);
   getLocalBiInto(t, ret, derivative_order);
@@ -1184,7 +1184,7 @@ VectorX BSpline::getLocalBiVector(FloatType t, int derivative_order) const
   return ret;
 }
 
-void BSpline::getLocalBiInto(FloatType t, VectorX& ret, int derivative_order) const
+void BSpline::getLocalBiInto(real_t t, VectorX& ret, int derivative_order) const
 {
   int si = segmentIndex(t);
   VectorX lu = u(t, derivative_order);
@@ -1193,14 +1193,14 @@ void BSpline::getLocalBiInto(FloatType t, VectorX& ret, int derivative_order) co
   }
 }
 
-VectorX BSpline::getLocalCumulativeBiVector(FloatType t, int derivative_order) const
+VectorX BSpline::getLocalCumulativeBiVector(real_t t, int derivative_order) const
 {
   VectorX bi = getLocalBiVector(t, derivative_order);
   int maxIndex = bi.rows() - 1;
   // tildeB(i) = np.sum(bi[i+1:]) :
   for(int i = 1; i <= maxIndex; i ++)
   {
-    FloatType sum = 0;
+    real_t sum = 0;
     for(int j = maxIndex; j > i; j--)
     {
       sum += bi[j];
@@ -1218,14 +1218,14 @@ VectorX BSpline::getLocalCumulativeBiVector(FloatType t, int derivative_order) c
   return bi;
 }
 
-int BSpline::segmentIndex(FloatType t) const
+int BSpline::segmentIndex(real_t t) const
 {
-  std::pair<FloatType,int> ui = computeTIndex(t);
+  std::pair<real_t,int> ui = computeTIndex(t);
 
   return basisMatrixIndexFromStartingKnotIndex(ui.second);
 }
 
-MatrixX BSpline::U(FloatType t, int derivative_order) const
+MatrixX BSpline::U(real_t t, int derivative_order) const
 {
   VectorX uvec = u(t,derivative_order);
   int D = coefficients_.rows();
@@ -1239,9 +1239,9 @@ MatrixX BSpline::U(FloatType t, int derivative_order) const
   return Umat;
 }
 
-VectorX BSpline::u(FloatType t, int derivative_order) const
+VectorX BSpline::u(real_t t, int derivative_order) const
 {
-  std::pair<FloatType,int> ui = computeUAndTIndex(t);
+  std::pair<real_t,int> ui = computeUAndTIndex(t);
 
   return computeU(ui.first, ui.second, derivative_order);
 }
@@ -1265,11 +1265,11 @@ MatrixX BSpline::Dii(int segment_index) const
 {
   CHECK_LE(segment_index, (int)basis_matrices_.size()) << "Out of range";
   CHECK_LT(0, (int)basis_matrices_.size()) << "Out of range";
-  FloatType t_0,t_1;
+  real_t t_0,t_1;
   std::tie(t_0,t_1) = timeInterval(segment_index);
-  FloatType dt = t_1 - t_0;
+  real_t dt = t_1 - t_0;
 
-  FloatType recip_dt = 0.0;
+  real_t recip_dt = 0.0;
   if(dt > 0)
   {
     recip_dt = 1.0/dt;
@@ -1412,8 +1412,8 @@ int BSpline::coefficientVectorLength() const
   return coefficients_.rows() * coefficients_.cols();
 }
 
-void BSpline::initConstantSpline(FloatType t_min,
-                                 FloatType t_max,
+void BSpline::initConstantSpline(real_t t_min,
+                                 real_t t_max,
                                  int num_segments,
                                  const VectorX& constant)
 {
@@ -1424,10 +1424,10 @@ void BSpline::initConstantSpline(FloatType t_min,
 
   int K = numKnotsRequired(num_segments);
   int C = numCoefficientsRequired(num_segments);
-  FloatType dt = (t_max - t_min) / (FloatType)num_segments;
+  real_t dt = (t_max - t_min) / (FloatType)num_segments;
 
-  FloatType minTime = t_min - (spline_order_ - 1)*dt;
-  FloatType maxTime = t_max + (spline_order_ - 1)*dt;
+  real_t minTime = t_min - (spline_order_ - 1)*dt;
+  real_t maxTime = t_max + (spline_order_ - 1)*dt;
   VectorX knotVector = VectorX::LinSpaced(K,minTime,maxTime);
   // std::cout << "K: " << K << std::endl;
   // std::cout << "S: " << numSegments << std::endl;

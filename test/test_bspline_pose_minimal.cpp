@@ -19,7 +19,7 @@ public:
   //! v: homogeneous coordinates vector to transform (transformation Jacobians)
   FixedTimeBSplinePoseMinimal(
       BSplinePoseMinimal<ROTATION>* bs,
-      FloatType t, int d, Vector4 v = Vector4::Zero())
+      real_t t, int d, Vector4 v = Vector4::Zero())
     : bs_(bs)
     , t_(t)
     , d_(d)
@@ -106,7 +106,7 @@ public:
 
 private:
   BSplinePoseMinimal<ROTATION>* bs_;
-  FloatType t_;
+  real_t t_;
   int d_;
   Vector4 v_;
 };
@@ -143,12 +143,12 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineTransformationJacobian)
     // Create a random homogeneous vector.
     Vector4 v = Vector4::Random() * 10.0;
 
-    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413)
+    for (real_t t = bs.t_min(); t <= bs.t_max(); t+= 0.413)
     {
       FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0, v);
 
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+      Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
           fixed_bs.coefficientVector();
       MatrixX estJ =
           numericalDerivative<MatrixX, VectorX>(
@@ -188,11 +188,11 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineInverseTransformationJacobian)
     // Create a random homogeneous vector.
     Vector4 v = Vector4::Random() * 10.0;
 
-    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.413) {
+    for (real_t t = bs.t_min(); t <= bs.t_max(); t+= 0.413) {
       FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0, v);
 
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+      Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
           fixed_bs.coefficientVector();
       MatrixX estJ =
           numericalDerivative<MatrixX, VectorX>(
@@ -222,14 +222,14 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAccelerationJacobian)
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
+    for (real_t t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
       MatrixX J;
       bs.linearAccelerationAndJacobian(t, &J, NULL);
 
       FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+      Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
           fixed_bs.coefficientVector();
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
@@ -255,14 +255,14 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityJacobian)
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
+    for (real_t t = bs.t_min(); t <= bs.t_max(); t+= 0.1) {
       MatrixX J;
       bs.angularVelocityAndJacobian(t, &J, NULL);
 
       FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+      Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
           fixed_bs.coefficientVector();
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
@@ -288,7 +288,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
                       bs.curveValueToTransformation(VectorX::Random(6)));
     bs.addPoseSegment(2.0,bs.curveValueToTransformation(VectorX::Random(6)));
 
-    for (FloatType t = bs.t_min(); t <= bs.t_max(); t+= 0.1)
+    for (real_t t = bs.t_min(); t <= bs.t_max(); t+= 0.1)
     {
       MatrixX J;
       bs.angularVelocityBodyFrameAndJacobian(t, &J, NULL);
@@ -296,7 +296,7 @@ TEST(BSplinePoseMinimalTestSuite, testBSplineAngularVelocityBodyFrameJacobian)
       FixedTimeBSplinePoseMinimal<ze::sm::RotationVector> fixed_bs(
             &bs, t, 0);
 
-      Eigen::Matrix<FloatType, Eigen::Dynamic, 1> point =
+      Eigen::Matrix<real_t, Eigen::Dynamic, 1> point =
           fixed_bs.coefficientVector();
       MatrixX estJ =
           numericalDerivative<VectorX, VectorX>(
@@ -321,9 +321,9 @@ TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
 
   // get a vector matrice
   std::vector<Matrix4> poses;
-  Eigen::Matrix<FloatType, 1, 20> times;
+  Eigen::Matrix<real_t, 1, 20> times;
   size_t i = 0;
-  for (FloatType t = bs.t_min(); t <= bs.t_max(); t += 0.1)
+  for (real_t t = bs.t_min(); t <= bs.t_max(); t += 0.1)
   {
     times(i) = t;
     poses.push_back(bs.transformation(t));
@@ -335,7 +335,7 @@ TEST(BSplinePoseMinimalTestSuite, testInitializePoses)
   bs2.initPoseSplinePoses(times, poses, 8, 1e-6);
 
   // compare
-  for (FloatType t = bs.t_min(); t <= bs.t_max(); t += 0.1)
+  for (real_t t = bs.t_min(); t <= bs.t_max(); t += 0.1)
   {
     EXPECT_TRUE(EIGEN_MATRIX_NEAR(
                   bs.transformation(t),

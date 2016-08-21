@@ -50,103 +50,103 @@ class BSplinePoseMinimal : public BSpline
 
     ~BSplinePoseMinimal();
 
-    Matrix4 transformation(FloatType tk) const;
+    Matrix4 transformation(real_t tk) const;
     Matrix4 transformationAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J = NULL,
         VectorXi* coefficient_indices = NULL) const;
 
     Matrix4 inverseTransformationAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J = NULL,
         VectorXi* coefficient_indices = NULL) const;
 
-    Matrix4 inverseTransformation(FloatType tk) const;
+    Matrix4 inverseTransformation(real_t tk) const;
 
 
     Vector4 transformVectorAndJacobian(
-        FloatType tk,
+        real_t tk,
         const Vector4& v,
         MatrixX* J = NULL,
         VectorXi* coefficient_indices = NULL) const;
 
-    Vector3 position(FloatType tk) const;
+    Vector3 position(real_t tk) const;
 
-    Matrix3 orientation(FloatType tk) const;
+    Matrix3 orientation(real_t tk) const;
     Matrix3 orientationAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J,
         VectorXi* coefficient_indices) const;
 
-    Matrix3 inverseOrientation(FloatType tk) const;
+    Matrix3 inverseOrientation(real_t tk) const;
     Matrix3 inverseOrientationAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J,
         VectorXi* coefficient_indices) const;
 
-    Vector3 linearVelocity(FloatType tk) const;
-    Vector3 linearVelocityBodyFrame(FloatType tk) const;
+    Vector3 linearVelocity(real_t tk) const;
+    Vector3 linearVelocityBodyFrame(real_t tk) const;
 
-    Vector3 linearAcceleration(FloatType tk) const;
-    Vector3 linearAccelerationBodyFrame(FloatType tk) const;
+    Vector3 linearAcceleration(real_t tk) const;
+    Vector3 linearAccelerationBodyFrame(real_t tk) const;
     Vector3 linearAccelerationAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J,
         VectorXi* coefficient_indices) const;
 
-    Vector3 angularVelocity(FloatType tk) const;
-    Vector3 angularVelocityBodyFrame(FloatType tk) const;
+    Vector3 angularVelocity(real_t tk) const;
+    Vector3 angularVelocityBodyFrame(real_t tk) const;
     Vector3 angularVelocityBodyFrameAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J,
         VectorXi* coefficient_indices) const;
 
     Vector3 angularVelocityAndJacobian(
-        FloatType tk,
+        real_t tk,
         MatrixX* J,
         VectorXi* coefficient_indices) const;
 
     //! takes the two transformation matrices at two points in time
     //! to construct a pose spline
     void initPoseSpline(
-        FloatType t0,
-        FloatType t1,
+        real_t t0,
+        real_t t1,
         const Matrix4& T_n_t0,
         const Matrix4& T_n_t);
 
     //! take the pose in the minimal parametrization to initializ the spline
     void initPoseSpline2(
         const VectorX& times,
-        const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+        const Eigen::Matrix<real_t, 6, Eigen::Dynamic>& poses,
         int num_segments,
-        FloatType lambda);
+        real_t lambda);
 
     void initPoseSpline3(
         const VectorX& times,
-        const Eigen::Matrix<FloatType, 6, Eigen::Dynamic>& poses,
+        const Eigen::Matrix<real_t, 6, Eigen::Dynamic>& poses,
         int num_segments,
-        FloatType lambda);
+        real_t lambda);
 
     //! initialize a bspline given a vector of poses
     void initPoseSplinePoses(
         const VectorX& times,
         const std::vector<Matrix4>& poses,
         int num_segments,
-        FloatType lambda);
+        real_t lambda);
 
     void initPoseSplinePoses(
         const StampedTransformationVector& poses,
         int num_segments,
-        FloatType lambda);
+        real_t lambda);
 
     void addPoseSegment(
-        FloatType tk,
+        real_t tk,
         const Matrix4& T_n_tk);
 
     void addPoseSegment2(
-        FloatType tk,
+        real_t tk,
         const Matrix4& T_n_tk,
-        FloatType lambda);
+        real_t lambda);
 
     Matrix4 curveValueToTransformation(const VectorX& c) const;
     VectorX transformationToCurveValue(const Matrix4& T) const;
