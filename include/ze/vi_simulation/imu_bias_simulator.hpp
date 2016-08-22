@@ -73,7 +73,7 @@ public:
   const Vector3 accelerometer(real_t t) const
   {
     CHECK_GE(t, start_);
-    CHECK_LE(secToNanosec(t), secToNanosec(end_));
+    CHECK_LE(t, end_);
     return bs_.eval(t).head<3>();
   }
 

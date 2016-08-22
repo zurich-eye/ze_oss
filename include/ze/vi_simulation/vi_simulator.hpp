@@ -42,7 +42,6 @@ struct ViSensorData
     Vector3 gyr_bias;
     Vector3 linear_velocity_W;
     Vector3 angular_velocity_B;
-
   };
   Groundtruth groundtruth;
 };
