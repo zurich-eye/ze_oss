@@ -240,7 +240,7 @@ Quaternion QuaternionPreIntegrationState::integrateCrouchGrossman(
     real_t dt,
     uint32_t order)
 {
-  auto exp = [](real_t coeff, FloatType dt, Vector3 w) -> Quaternion {
+  auto exp = [](real_t coeff, real_t dt, Vector3 w) -> Quaternion {
     return Quaternion::exp(dt * coeff * w);
   };
 

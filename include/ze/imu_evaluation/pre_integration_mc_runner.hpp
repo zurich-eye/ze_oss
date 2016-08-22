@@ -19,16 +19,16 @@ public:
   //! Run a simulation with a given number of monte carlo runs.
   //! Specify the start and end-times of the trajectory to simulate. These
   //! must be compatible with the underlying scenario.
-  void simulate(size_t num_rounds, real_t start, FloatType end);
+  void simulate(size_t num_rounds, real_t start, real_t end);
 
   //! Perform a pre-integration of the actual (exact, noise-free) trajectory.
-  PreIntegrator::Ptr preintegrateActual(real_t start, FloatType end);
+  PreIntegrator::Ptr preintegrateActual(real_t start, real_t end);
 
   //! Perform a pre-integration of the corrupted (bias, noisy) trajectory.
   //! Every call to this function will generate different results due to
   //! the repeated noise generation in the scenarios. The bias will not change
   //! between calls.
-  PreIntegrator::Ptr preintegrateCorrupted(real_t start, FloatType end);
+  PreIntegrator::Ptr preintegrateCorrupted(real_t start, real_t end);
 
   const std::vector<Matrix3>& covariances()
   {

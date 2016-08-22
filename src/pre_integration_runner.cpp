@@ -136,7 +136,7 @@ void PreIntegrationRunnerDataProvider::loadData()
                             int64_t stamp, const Vector3& acc,
                             const Vector3 gyr, uint32_t imu_idx)
     {
-      real_t stamp_float = static_cast<FloatType>(stamp) * 1e-9;
+      real_t stamp_float = static_cast<real_t>(stamp) * 1e-9;
 
       Vector6 measurement;
       // @todo: actually inject into integrators

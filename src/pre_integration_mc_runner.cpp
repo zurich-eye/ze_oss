@@ -50,7 +50,7 @@ void PreIntegratorMonteCarlo::simulate(size_t num_rounds,
 
 //------------------------------------------------------------------------------
 PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateActual(
-    real_t start, FloatType end)
+    real_t start, real_t end)
 {
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
@@ -65,7 +65,7 @@ PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateActual(
 
 //------------------------------------------------------------------------------
 PreIntegrator::Ptr PreIntegratorMonteCarlo::preintegrateCorrupted(
-    real_t start, FloatType end)
+    real_t start, real_t end)
 {
   // Create a new container to integrate and store the results.
   PreIntegrator::Ptr pre_integrator = pre_integrator_factory_->get();
