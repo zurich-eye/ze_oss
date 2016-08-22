@@ -11,6 +11,7 @@ include(ze_setup)
 #############
 set(HEADERS
     include/ze/vi_simulation/camera_simulator.hpp
+    include/ze/vi_simulation/camera_simulator_types.hpp
     include/ze/vi_simulation/imu_bias_simulator.hpp
     include/ze/vi_simulation/imu_simulator.hpp
     include/ze/vi_simulation/trajectory_simulator.hpp
@@ -41,6 +42,9 @@ target_link_libraries(test_imu_simulator ${PROJECT_NAME})
 
 catkin_add_gtest(test_trajectory_simulator test/test_trajectory_simulator.cpp)
 target_link_libraries(test_trajectory_simulator ${PROJECT_NAME})
+
+catkin_add_gtest(test_vi_simulator test/test_vi_simulator.cpp)
+target_link_libraries(test_vi_simulator ${PROJECT_NAME})
 
 ##########
 # EXPORT #

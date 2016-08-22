@@ -1,40 +1,28 @@
 #pragma once
 
+#include <memory>
 #include <unordered_map>
-#include <ze/cameras/camera_rig.h>
 #include <ze/common/macros.h>
-#include <ze/vi_simulation/trajectory_simulator.hpp>
 #include <ze/common/timer_collection.h>
+#include <ze/common/transformation.h>
+#include <ze/common/types.h>
+#include <ze/vi_simulation/camera_simulator_types.hpp>
 
 namespace ze {
 
 // fwd.
+class CameraRig;
+class TrajectorySimulator;
 class Visualizer;
-
-// -----------------------------------------------------------------------------
-struct CameraMeasurements
-{
-  //! Each column is a keypoint observation.
-  Keypoints keypoints_;
-
-  //! Global landmark index of each observed feature. The size of the vector is
-  //! the same as the number of columns in the keypoints block.
-  std::vector<int32_t> global_landmark_ids_;
-
-  //! Temporary track index of a landmark. If the landmark is
-  //! re-observed after a loop, it will be assigned a different id.
-  std::vector<int32_t> local_track_ids_;
-};
-using CameraMeasurementsVector = std::vector<CameraMeasurements>;
 
 // -----------------------------------------------------------------------------
 struct CameraSimulatorOptions
 {
   uint32_t num_keypoints_per_frame { 50  };
-  FloatType keypoint_noise_sigma { 1.0 };
+  real_t keypoint_noise_sigma { 1.0 };
   uint32_t max_num_landmarks_ { 10000 };
-  FloatType min_depth_m { 2.0 };
-  FloatType max_depth_m { 7.0 };
+  real_t min_depth_m { 2.0 };
+  real_t max_depth_m { 7.0 };
 };
 
 // -----------------------------------------------------------------------------
@@ -50,8 +38,8 @@ public:
   CameraSimulator() = delete;
 
   CameraSimulator(
-      const TrajectorySimulator::Ptr& trajectory,
-      const CameraRig::Ptr& camera_rig,
+      const std::shared_ptr<TrajectorySimulator>& trajectory,
+      const std::shared_ptr<CameraRig>& camera_rig,
       const CameraSimulatorOptions& options)
     : trajectory_(trajectory)
     , rig_(camera_rig)
@@ -63,15 +51,15 @@ public:
   void initializeMap();
 
   void visualize(
-      FloatType dt = 0.2,
-      FloatType marker_size_trajectory = 0.2,
-      FloatType marker_size_landmarks = 0.2);
+      real_t dt = 0.2,
+      real_t marker_size_trajectory = 0.2,
+      real_t marker_size_landmarks = 0.2);
 
   CameraMeasurementsVector getMeasurements(
-      FloatType time);
+      real_t time);
 
   CameraMeasurementsVector getMeasurementsCorrupted(
-      FloatType time);
+      real_t time);
 
   void reset();
 
@@ -87,8 +75,8 @@ private:
       const uint32_t lm_min_idx,
       const uint32_t lm_max_idx);
 
-  TrajectorySimulator::Ptr trajectory_;
-  CameraRig::Ptr rig_;
+  std::shared_ptr<TrajectorySimulator> trajectory_;
+  std::shared_ptr<CameraRig> rig_;
   CameraSimulatorOptions options_;
 
   std::shared_ptr<Visualizer> viz_;

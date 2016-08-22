@@ -68,6 +68,12 @@ public:
         accelerometer_noise_bandwidth_hz_sqrt_;
   }
 
+  //! Gyro and accel bias.
+  ImuBiasSimulator::Ptr bias()
+  {
+    return bias_;
+  }
+
 private:
   const TrajectorySimulator::Ptr trajectory_;
   const ImuBiasSimulator::Ptr bias_;
