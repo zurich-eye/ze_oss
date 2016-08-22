@@ -1,8 +1,9 @@
-#include <stdlib.h>
-#include <iostream>
 #include <cstdint>
-#include <glog/logging.h>
-#include <imp/core/timer.hpp>
+#include <iostream>
+#include <stdlib.h>
+#include <ze/common/logging.hpp>
+#include <ze/common/timer.h>
+#include <ze/common/timer_statistics.h>
 #include <imp/core/image_raw.hpp>
 
 int main(int argc, char* argv[])
@@ -16,29 +17,27 @@ int main(int argc, char* argv[])
   std::uint64_t num_rounds = 1e8;
 
   {
-    ze::SingleShotTimer timer("posix_memalign");
-
+    ze::TimerStatistics timer;
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
+      timer.timeScope();
       std::uint8_t* p_data_aligned;
       int ret = posix_memalign((void**)&p_data_aligned, memaddr_align, memory_size);
       free(p_data_aligned);
       (void)ret;
     }
-
-    LOG(INFO) << "posix_memalign: " << std::fixed << (double)timer.elapsedMs().count()/num_rounds << " ms / alloc+free";
+    LOG(INFO) << "posix_memalign: " << timer.mean() << "ms";
   }
 
   {
-    ze::SingleShotTimer timer("aligned_alloc");
-
+    ze::TimerStatistics timer;
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
+      timer.timeScope();
       std::uint8_t* p_data_aligned = (std::uint8_t*)aligned_alloc(memaddr_align, memory_size);
       free(p_data_aligned);
     }
-
-    LOG(INFO) << "aligned_alloc: " << std::fixed << (double)timer.elapsedMs().count()/num_rounds << " ms / alloc+free";
+    LOG(INFO) << "posix_memalign: " << timer.mean() << "ms";
   }
 
 }
