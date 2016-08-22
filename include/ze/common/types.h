@@ -26,6 +26,7 @@ using uint64_t  = std::uint64_t;
 using FloatType = float;
 #else
 using FloatType = double;
+using real_t = double;
 #endif
 
 //------------------------------------------------------------------------------
