@@ -12,7 +12,7 @@ namespace cu {
 template<typename Pixel>
 std::shared_ptr<ImagePyramid<Pixel>>
 createImagePyramidGpu(
-    typename Image<Pixel>::Ptr img_level0, FloatType scale_factor=0.5,
+    typename Image<Pixel>::Ptr img_level0, real_t scale_factor=0.5,
     uint32_t max_num_levels=UINT32_MAX, uint32_t size_bound=8u)
 {
   // Sanity checks.
