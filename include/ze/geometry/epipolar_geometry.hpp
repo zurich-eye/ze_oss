@@ -185,7 +185,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   //! Prentice Hall 1998, page 160.
   const Quaternion avg_rotation =
       Quaternion::exp(-0.5*Quaternion::log(T_cam0_cam1.getRotation()));
-  const Vector3 transformed_t = avg_rotation.rotate(T_cam0_cam1.getPosition());
+  const Vector3 transformed_t = avg_rotation.rotate(-T_cam0_cam1.getPosition());
   const Vector3 e1 = transformed_t / transformed_t.norm();
   Vector3 e2(-transformed_t(1), transformed_t(0), 0);
   e2 = e2 / e2.norm();
