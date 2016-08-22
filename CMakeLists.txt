@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ze_visualization)
 
 find_package(catkin_simple REQUIRED)
-catkin_simple()
+catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
 include(ze_gtsam)
@@ -26,6 +26,8 @@ if(ZE_USE_GTSAM)
   list(APPEND HEADERS include/ze/visualization/viz_gtsam.h)
   list(APPEND SOURCES src/viz_gtsam.cpp)
 endif()
+
+message(STATUS "catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
