@@ -17,7 +17,7 @@ TEST(CameraSimulator, testSplineScenario)
   std::tie(data, success) = sim->getMeasurement();
   int64_t last_cam_stamp = data.timestamp;
   TimerStatistics timer;
-  for (int i = 0; i < 1000; ++i)
+  for (int i = 0; i < 2000; ++i)
   {
     auto t = timer.timeScope();
     std::tie(data, success) = sim->getMeasurement();
@@ -25,7 +25,7 @@ TEST(CameraSimulator, testSplineScenario)
     EXPECT_EQ(data.imu_stamps(0), last_cam_stamp);
     EXPECT_EQ(data.imu_stamps(data.imu_stamps.size()-1), data.timestamp);
     last_cam_stamp = data.timestamp;
-    sim->visualize();
+    sim->visualize(1.0, 4.0, 0.3);
   }
   VLOG(1) << "Average time per frame = " << timer.mean() << " milliseconds.";
 }

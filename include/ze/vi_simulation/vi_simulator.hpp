@@ -60,7 +60,7 @@ public:
       const real_t acc_bias_noise_sigma = 0.000433,
       const real_t gyr_noise_sigma = 0.000186,
       const real_t acc_noise_sigma = 0.00186,
-      const uint32_t cam_bandwidth_hz = 20,
+      const uint32_t cam_framerate_hz = 20,
       const uint32_t imu_bandwidth_hz = 200,
       const real_t gravity_magnitude = 9.81);
 

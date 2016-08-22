@@ -20,15 +20,15 @@ ViSimulator::ViSimulator(
     const real_t acc_bias_noise_sigma,
     const real_t gyr_noise_sigma,
     const real_t acc_noise_sigma,
-    const uint32_t cam_bandwidth_hz,
+    const uint32_t cam_framerate_hz,
     const uint32_t imu_bandwidth_hz,
     const real_t gravity_magnitude)
   : trajectory_(trajectory)
-  , cam_dt_ns_(secToNanosec(1.0 / cam_bandwidth_hz))
+  , cam_dt_ns_(secToNanosec(1.0 / cam_framerate_hz))
   , imu_dt_ns_(secToNanosec(1.0 / imu_bandwidth_hz))
   , last_sample_stamp_ns_(secToNanosec(trajectory->start()))
 {
-  CHECK(imu_bandwidth_hz % cam_bandwidth_hz == 0);
+  CHECK(imu_bandwidth_hz % cam_framerate_hz == 0);
 
   ImuBiasSimulator::Ptr bias;
   try
@@ -44,7 +44,8 @@ ViSimulator::ViSimulator(
   }
   catch (const std::bad_alloc& e)
   {
-    LOG(FATAL) << "Could not create bias: Allocation failed: " << e.what();
+    LOG(FATAL) << "Could not create bias because number of samples is too high."
+               << " Allocation failed: " << e.what();
   }
 
   VLOG(1) << "Initialize IMU ...";
@@ -57,7 +58,6 @@ ViSimulator::ViSimulator(
            imu_bandwidth_hz,
            gravity_magnitude);
   VLOG(1) << "done.";
-
 
   camera_ = std::make_shared<CameraSimulator>(
               trajectory,
@@ -78,14 +78,15 @@ std::pair<ViSensorData, bool> ViSimulator::getMeasurement()
 {
   int64_t new_img_stamp_ns = last_sample_stamp_ns_ + cam_dt_ns_;
 
+  real_t time_s = nanosecToSecTrunc(new_img_stamp_ns);
   ViSensorData data;
-  if (nanosecToSecTrunc(new_img_stamp_ns) > trajectory_->end())
+
+  if (time_s > trajectory_->end())
   {
     LOG(WARNING) << "Reached end of trajectory!";
     return std::make_pair(data, false);
   }
 
-  real_t time_s = nanosecToSecTrunc(new_img_stamp_ns);
   data.timestamp = new_img_stamp_ns;
 
   // Get camera measurements:
