@@ -28,8 +28,8 @@ struct InterpolatorDifferentiatorLinear
           Vector3::Zero()).finished();
     }
 
-    const real_t offset = static_cast<FloatType>(time - *it_before);
-    const real_t duration = static_cast<FloatType>(*it_after - *it_before);
+    const real_t offset = static_cast<real_t>(time - *it_before);
+    const real_t duration = static_cast<real_t>(*it_after - *it_before);
     const Vector3 before = buffer->data().col(it_before.container_index());
     const Vector3 after = buffer->data().col(it_after.container_index());
 

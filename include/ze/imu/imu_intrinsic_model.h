@@ -35,7 +35,7 @@ public:
   typedef VectorX secondary_measurement_t;
 
   explicit ImuIntrinsicModel(ImuIntrinsicType type);
-  ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, FloatType range);
+  ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, real_t range);
 
   static constexpr real_t UndefinedRange = -1.;
 
@@ -70,7 +70,7 @@ public:
   using ImuIntrinsicModel::secondary_measurement_t;
 
   ImuIntrinsicModelCalibrated();
-  ImuIntrinsicModelCalibrated(real_t delay, FloatType range);
+  ImuIntrinsicModelCalibrated(real_t delay, real_t range);
 
   virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,
 			  const Eigen::Ref<const secondary_measurement_t>& secondary) const;
@@ -91,7 +91,7 @@ public:
   using ImuIntrinsicModel::secondary_measurement_t;
 
   //! delay, range, bias, scale misalignment matrix
-  ImuIntrinsicModelScaleMisalignment(real_t delay, FloatType range,
+  ImuIntrinsicModelScaleMisalignment(real_t delay, real_t range,
                                      const Vector3& b, const Matrix3& M);
 
   virtual Vector3 distort(const Eigen::Ref<const primary_measurement_t>& primary,

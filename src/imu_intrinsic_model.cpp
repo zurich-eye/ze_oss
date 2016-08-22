@@ -12,7 +12,7 @@ ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type)
 {
 }
 
-ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, FloatType range)
+ImuIntrinsicModel::ImuIntrinsicModel(ImuIntrinsicType type, real_t delay, real_t range)
  : type_(type), delay_(delay), range_(range)
 {
   CHECK(range == UndefinedRange || range > 0) << "Range must either be of constant UndefinedRange or be > 0";
@@ -40,7 +40,7 @@ ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated()
 {
 }
 
-ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated(real_t delay, FloatType range)
+ImuIntrinsicModelCalibrated::ImuIntrinsicModelCalibrated(real_t delay, real_t range)
   : ImuIntrinsicModel(Type, delay, range)
 {
 }
