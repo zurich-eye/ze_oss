@@ -147,7 +147,7 @@ TEST(SplineTestSuite, testGetBi)
 
   for (int i = 0; i <= numTimeSteps; ++i)
   {
-    real_t t = startTime + (endTime - startTime) * ((FloatType) i / numTimeSteps);
+    real_t t = startTime + (endTime - startTime) * ((real_t) i / numTimeSteps);
     VectorX localBiVector = bs.getLocalBiVector(t);
 
     EXPECT_NEAR(localBiVector.sum(), 1.0, 1e-10)

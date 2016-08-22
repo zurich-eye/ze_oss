@@ -172,7 +172,7 @@ public:
    * @return the time interval that the spline is well-defined on
    * [t_min(), t_max()]
    */
-  std::pair<real_t, FloatType> timeInterval() const;
+  std::pair<real_t, real_t> timeInterval() const;
 
   /**
    * Return the time interval of a single spline segment.
@@ -181,7 +181,7 @@ public:
    *
    * @return the time interval of the ith spline segment.
    */
-  std::pair<real_t, FloatType> timeInterval(int i) const;
+  std::pair<real_t, real_t> timeInterval(int i) const;
 
   /**
    * Set the knots and coefficients of the spline. Each column of the
@@ -517,7 +517,7 @@ public:
    * @param p The point to interpolate at time t.
    * @param lambda a smoothness parameter. Higher for more smooth.
    */
-  void addCurveSegment2(real_t t, const VectorX& p, FloatType lambda);
+  void addCurveSegment2(real_t t, const VectorX& p, real_t lambda);
 
   /**
    * Removes a curve segment from the left by removing one knot and one coefficient vector.
@@ -536,8 +536,8 @@ public:
    */
   MatrixX Vi(int segmentIndex) const;
 
-  VectorX evalIntegral(real_t t1, FloatType t2) const;
-  inline VectorX evalI(real_t t1, FloatType t2) const
+  VectorX evalIntegral(real_t t1, real_t t2) const;
+  inline VectorX evalI(real_t t1, real_t t2) const
   {
     return evalIntegral(t1, t2);
   }
@@ -597,7 +597,7 @@ public:
   MatrixX curveQuadraticIntegral(const MatrixX& W,int derivative_order) const;
   MatrixX curveQuadraticIntegralDiag(const VectorX& Wdiag, int derivative_order) const;
 
-  void initConstantSpline(real_t t_min, FloatType t_max,
+  void initConstantSpline(real_t t_min, real_t t_max,
                           int num_segments, const VectorX& constant);
 
 protected:
@@ -611,7 +611,7 @@ protected:
    * @return A pair with the first value \f$ u = \frac{t - t_i}{t_{i+1} - t_i} \f$
    * and the second value the index \f$i\f$
    */
-  std::pair<real_t,int> computeUAndTIndex(FloatType t) const;
+  std::pair<real_t,int> computeUAndTIndex(real_t t) const;
 
   /**
    * An internal function to find the segment of the knot sequence
@@ -623,7 +623,7 @@ protected:
    * @return A pair with the first value \f$ \Delta t_i = t_{i+1} - t_i \f$
    * and the second value the index \f$i\f$
    */
-  std::pair<real_t,int> computeTIndex(FloatType t) const;
+  std::pair<real_t,int> computeTIndex(real_t t) const;
 
   /**
    * Compute the vector \f$ \mathbf u(t) \f$ for a spline of

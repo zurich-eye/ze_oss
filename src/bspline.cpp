@@ -248,7 +248,7 @@ real_t BSpline::t_max() const
   return knots_[knots_.size() - spline_order_];
 }
 
-std::pair<real_t,int> BSpline::computeTIndex(FloatType t) const
+std::pair<real_t,int> BSpline::computeTIndex(real_t t) const
 {
   CHECK_GE(t, t_min()) << "The time is out of range by " << (t - t_min());
 
@@ -280,7 +280,7 @@ std::pair<real_t,int> BSpline::computeTIndex(FloatType t) const
 
 }
 
-std::pair<real_t,int> BSpline::computeUAndTIndex(FloatType t) const
+std::pair<real_t,int> BSpline::computeUAndTIndex(real_t t) const
 {
   std::pair<real_t,int> ui = computeTIndex(t);
 
@@ -527,12 +527,12 @@ const MatrixX& BSpline::basisMatrix(int i) const
 }
 
 
-std::pair<real_t,FloatType> BSpline::timeInterval() const
+std::pair<real_t,real_t> BSpline::timeInterval() const
 {
   return std::make_pair(t_min(), t_max());
 }
 
-std::pair<real_t,FloatType> BSpline::timeInterval(int i) const
+std::pair<real_t,real_t> BSpline::timeInterval(int i) const
 {
   CHECK_GE((int)knots_.size(), minimumKnotsRequired()) << "The B-spline is not well initialized";
   CHECK_LE(i, numValidTimeSegments()) << "index out of range";
@@ -540,7 +540,7 @@ std::pair<real_t,FloatType> BSpline::timeInterval(int i) const
   return std::make_pair(knots_[spline_order_ + i - 1],knots_[spline_order_ + i]);
 }
 
-void BSpline::initSpline(real_t t_0, FloatType t_1,
+void BSpline::initSpline(real_t t_0, real_t t_1,
                          const VectorX& p_0,
                          const VectorX& p_1)
 {
@@ -642,7 +642,7 @@ void BSpline::addCurveSegment(real_t t, const VectorX& p_1)
 
   // Get the final valid time interval.
   int NT = numValidTimeSegments();
-  std::pair<real_t, FloatType> interval_km1 = timeInterval(NT-1);
+  std::pair<real_t, real_t> interval_km1 = timeInterval(NT-1);
 
   VectorX p_0;
 
@@ -927,7 +927,7 @@ void BSpline::addCurveSegment2(real_t t,
 
   // Get the final valid time interval.
   int NT = numValidTimeSegments();
-  std::pair<real_t, FloatType> interval_km1 = timeInterval(NT-1);
+  std::pair<real_t, real_t> interval_km1 = timeInterval(NT-1);
 
   VectorX p_0;
 
@@ -1064,7 +1064,7 @@ MatrixX BSpline::Vi(int segment_index) const
   return V;
 }
 
-VectorX BSpline::evalIntegral(real_t t1, FloatType t2) const
+VectorX BSpline::evalIntegral(real_t t1, real_t t2) const
 {
   if(t1 > t2)
   {
@@ -1424,7 +1424,7 @@ void BSpline::initConstantSpline(real_t t_min,
 
   int K = numKnotsRequired(num_segments);
   int C = numCoefficientsRequired(num_segments);
-  real_t dt = (t_max - t_min) / (FloatType)num_segments;
+  real_t dt = (t_max - t_min) / (real_t)num_segments;
 
   real_t minTime = t_min - (spline_order_ - 1)*dt;
   real_t maxTime = t_max + (spline_order_ - 1)*dt;
