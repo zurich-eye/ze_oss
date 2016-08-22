@@ -104,7 +104,6 @@ TEST(impCuStereoRectifierTexture, radTan32fC1)
                                   c_map_tolearance);
 }
 
-
 TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
 {
   constexpr float c_map_tolearance{1.0f};
@@ -161,9 +160,9 @@ TEST(impCuStereoRectifierTexture, horizontalStereoPairRadTan32fC1)
         T_C0_C1);
 
   // Download maps from GPU
-  ImageCv32fC2 left_map(rectifier.getLeftCameraUndistortRectifyMap());
+  ImageCv32fC2 left_map(rectifier.getUndistortRectifyMap(0));
   CHECK_EQ(cv_left_img->size(), left_map.size());
-  ImageCv32fC2 right_map(rectifier.getRightCameraUndistortRectifyMap());
+  ImageCv32fC2 right_map(rectifier.getUndistortRectifyMap(1));
   CHECK_EQ(cv_right_img->size(), right_map.size());
 
   // Test against ground-truth maps
