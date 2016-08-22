@@ -4,10 +4,11 @@
 #include <iostream>
 #include <ze/common/logging.hpp>
 
+#include <imp/bridge/opencv/cv_bridge.hpp>
+#include <imp/core/image_base.hpp>
 #include <ze/common/time_conversions.h>
 #include <ze/common/string_utils.h>
 #include <ze/common/file_utils.h>
-#include <imp/bridge/opencv/cv_bridge.hpp>
 
 namespace ze {
 namespace internal {
