@@ -9,10 +9,10 @@ namespace ze {
 
 // The traits used for this functions are defined in common/manifold.h
 template<class Y, class X>
-typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension>
-numericalDerivative(std::function<Y(const X&)> h, const X& x, FloatType delta = 1e-5)
+typename Eigen::Matrix<real_t, traits<Y>::dimension, traits<X>::dimension>
+numericalDerivative(std::function<Y(const X&)> h, const X& x, real_t delta = 1e-5)
 {
-  typedef typename Eigen::Matrix<FloatType, traits<Y>::dimension, traits<X>::dimension> Jacobian;
+  typedef typename Eigen::Matrix<real_t, traits<Y>::dimension, traits<X>::dimension> Jacobian;
   typedef typename traits<Y>::TangentVector TangentY;
   typedef typename traits<X>::TangentVector TangentX;
 
@@ -33,7 +33,7 @@ numericalDerivative(std::function<Y(const X&)> h, const X& x, FloatType delta = 
   H.resize(N_Y, N_X);
   H.setZero();
 
-  FloatType factor = 1.0 / (2.0 * delta);
+  real_t factor = 1.0 / (2.0 * delta);
 
   for(int i = 0; i < N_X; ++i)
   {

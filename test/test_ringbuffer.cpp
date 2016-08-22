@@ -10,11 +10,11 @@
 
 DEFINE_bool(run_benchmark, false, "Benchmark the buffer vs. ringbuffer");
 
-using ze::FloatType;
+using ze::real_t;
 
 TEST(RingBufferTest, testTimeAndDataSync)
 {
-  ze::Ringbuffer<FloatType, 3, 10> buffer;
+  ze::Ringbuffer<real_t, 3, 10> buffer;
   for(int i = 1; i < 8; ++i)
   {
     buffer.insert(i, Eigen::Vector3d(i, i, i));
@@ -55,7 +55,7 @@ TEST(RingBufferTest, testTimeAndDataSync)
 
 TEST(RingBufferTest, testLowerBound)
 {
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(i, Eigen::Vector2d(i, i));
@@ -71,7 +71,7 @@ TEST(RingBufferTest, testLowerBound)
 
 TEST(RingBufferTest, testRemoveOlderThanTimestamp)
 {
-  ze::Ringbuffer<FloatType, 3, 10> buffer;
+  ze::Ringbuffer<real_t, 3, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(i, Eigen::Vector3d(i, i, i));
@@ -90,7 +90,7 @@ TEST(RingBufferTest, testRemoveOlderThanTimestamp)
 
 TEST(RingBufferTest, testRemoveOlderThan)
 {
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
@@ -105,7 +105,7 @@ TEST(RingBufferTest, testRemoveOlderThan)
 
 TEST(RingBufferTest, testIterator)
 {
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(ze::secToNanosec(i), Eigen::Vector2d(i, i));
@@ -140,7 +140,7 @@ TEST(RingBufferTest, testIterator)
 
 TEST(RingBufferTest, testNearestValue)
 {
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   EXPECT_FALSE(std::get<2>(buffer.getNearestValue(ze::secToNanosec(1))));
 
   for(int i = 1; i < 10; ++i)
@@ -156,7 +156,7 @@ TEST(RingBufferTest, testNearestValue)
 
 TEST(RingBufferTest, testOldestNewestValue)
 {
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   EXPECT_FALSE(buffer.getOldestValue().second);
   EXPECT_FALSE(buffer.getNewestValue().second);
 
@@ -173,7 +173,7 @@ TEST(RingBufferTest, testInterpolation)
 {
   using namespace ze;
 
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
 
   for(int i = 0; i < 10; ++i)
   {
@@ -181,7 +181,7 @@ TEST(RingBufferTest, testInterpolation)
   }
 
   Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
-  Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
+  Eigen::Matrix<real_t, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(1.2), secToNanosec(5.4));
 
@@ -234,7 +234,7 @@ TEST(RingBufferTest, testInterpolation)
 TEST(RingBufferTest, testInterpolationTimestamps)
 {
   using namespace ze;
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(secToNanosec(i), Vector2(i, i));
@@ -256,7 +256,7 @@ TEST(RingBufferTest, testInterpolationTimestamps)
 TEST(RingBufferTest, testGetValueInterpolated)
 {
   using namespace ze;
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
   for(int i = 1; i < 10; ++i)
   {
     buffer.insert(secToNanosec(i), Vector2(i, i));
@@ -283,7 +283,7 @@ TEST(RingBufferTest, testInterpolationBounds)
 {
   using namespace ze;
 
-  ze::Ringbuffer<FloatType, 2, 10> buffer;
+  ze::Ringbuffer<real_t, 2, 10> buffer;
 
   for(int i = 1; i < 10; ++i)
   {
@@ -291,7 +291,7 @@ TEST(RingBufferTest, testInterpolationBounds)
   }
 
   Eigen::Matrix<int64_t, Eigen::Dynamic, 1> stamps;
-  Eigen::Matrix<FloatType, 2, Eigen::Dynamic> values;
+  Eigen::Matrix<real_t, 2, Eigen::Dynamic> values;
   std::tie(stamps, values) = buffer.getBetweenValuesInterpolated(
         secToNanosec(0), secToNanosec(2));
   EXPECT_EQ(stamps.size(), values.cols());
@@ -321,8 +321,8 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
   Eigen::MatrixXd data(3, 10000);
   data.setRandom();
 
-  Buffer<FloatType, 3> buffer(nanosecToSecTrunc(1024));
-  Ringbuffer<FloatType, 3, 1024> ringbuffer;
+  Buffer<real_t, 3> buffer(nanosecToSecTrunc(1024));
+  Ringbuffer<real_t, 3, 1024> ringbuffer;
 
   //////
   // Insert
@@ -341,14 +341,14 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     }
   };
 
-  FloatType ringbuffer_insert = runTimingBenchmark(insertRingbuffer, 10, 20,
+  real_t ringbuffer_insert = runTimingBenchmark(insertRingbuffer, 10, 20,
                      "Ringbuffer: Insert", true);
-  FloatType buffer_insert = runTimingBenchmark(insertBuffer, 10, 20,
+  real_t buffer_insert = runTimingBenchmark(insertBuffer, 10, 20,
                      "Buffer: Insert", true);
 
   VLOG(1) << "[Insert]" << "Buffer/Ringbuffer: " <<  buffer_insert / ringbuffer_insert << "\n";
 
-  FloatType oldest, newest;
+  real_t oldest, newest;
   std::tie(newest, oldest, std::ignore) = ringbuffer.getOldestAndNewestStamp();
 
   VLOG(1) << "BufferSize: " << buffer.size() << "\n";
@@ -367,9 +367,9 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     buffer.getNearestValue(stamp);
   };
 
-  FloatType ringbuffer_nearest = runTimingBenchmark(getNearestValueRingbuffer, 10, 20,
+  real_t ringbuffer_nearest = runTimingBenchmark(getNearestValueRingbuffer, 10, 20,
                      "Ringbuffer: Nearest Value", true);
-  FloatType buffer_nearest = runTimingBenchmark(getNearestValueBuffer, 10, 20,
+  real_t buffer_nearest = runTimingBenchmark(getNearestValueBuffer, 10, 20,
                      "Buffer: Nearest Value", true);
 
   VLOG(1) << "[NearestValue]" << "Buffer/Ringbuffer: " <<  buffer_nearest / ringbuffer_nearest << "\n";
@@ -389,9 +389,9 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     buffer.getBetweenValuesInterpolated(stamp1, stamp2);
   };
 
-  FloatType ringbuffer_interpolate = runTimingBenchmark(getBetweenValuesInterpolatedRingbuffer, 10, 20,
+  real_t ringbuffer_interpolate = runTimingBenchmark(getBetweenValuesInterpolatedRingbuffer, 10, 20,
                      "Ringbuffer: Interpolate", true);
-  FloatType buffer_interpolate = runTimingBenchmark(getBetweenValuesInterpolatedBuffer, 10, 20,
+  real_t buffer_interpolate = runTimingBenchmark(getBetweenValuesInterpolatedBuffer, 10, 20,
                      "Buffer: Interpolate", true);
 
   VLOG(1) << "[Interpolate]" << "Buffer/Ringbuffer: " <<  buffer_interpolate / ringbuffer_interpolate << "\n";
@@ -411,9 +411,9 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     buffer.iterator_equal_or_before(stamp);
   };
 
-  FloatType ringbuffer_iterator = runTimingBenchmark(iteratorEqRingbuffer, 10, 20,
+  real_t ringbuffer_iterator = runTimingBenchmark(iteratorEqRingbuffer, 10, 20,
                      "Ringbuffer: Interpolate", true);
-  FloatType buffer_iterator = runTimingBenchmark(iteratorEqBuffer, 10, 20,
+  real_t buffer_iterator = runTimingBenchmark(iteratorEqBuffer, 10, 20,
                      "Buffer: Interpolate", true);
   buffer.unlock();
   ringbuffer.unlock();
@@ -435,9 +435,9 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     buffer.iterator_equal_or_after(stamp);
   };
 
-  FloatType ringbuffer_iterator_af = runTimingBenchmark(iteratorEqAfRingbuffer, 10, 20,
+  real_t ringbuffer_iterator_af = runTimingBenchmark(iteratorEqAfRingbuffer, 10, 20,
                      "Ringbuffer: Interpolate", true);
-  FloatType buffer_iterator_af = runTimingBenchmark(iteratorEqAfBuffer, 10, 20,
+  real_t buffer_iterator_af = runTimingBenchmark(iteratorEqAfBuffer, 10, 20,
                      "Buffer: Interpolate", true);
   buffer.unlock();
   ringbuffer.unlock();
@@ -457,9 +457,9 @@ TEST(RingBufferTest, benchmarkBufferVsRingBuffer)
     buffer.removeDataBeforeTimestamp(stamp);
   };
 
-  FloatType ringbuffer_remove = runTimingBenchmark(removeDataBeforeTimestampRingbuffer, 10, 20,
+  real_t ringbuffer_remove = runTimingBenchmark(removeDataBeforeTimestampRingbuffer, 10, 20,
                      "Ringbuffer: Interpolate", true);
-  FloatType buffer_remove = runTimingBenchmark(removeDataBeforeTimestampBuffer, 10, 20,
+  real_t buffer_remove = runTimingBenchmark(removeDataBeforeTimestampBuffer, 10, 20,
                      "Buffer: Interpolate", true);
 
   VLOG(1) << "[Remove]" << "Buffer/Ringbuffer: " <<  buffer_remove / ringbuffer_remove << "\n";

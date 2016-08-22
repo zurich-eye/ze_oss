@@ -14,10 +14,10 @@ class RandomVectorSampler
 public:
   ZE_POINTER_TYPEDEFS(RandomVectorSampler);
 
-  typedef Eigen::Matrix<FloatType, DIM, DIM> covariance_matrix_t;
-  typedef Eigen::Matrix<FloatType, DIM, 1> covariance_vector_t;
-  typedef Eigen::Matrix<FloatType, DIM, 1> sigma_vector_t;
-  typedef Eigen::Matrix<FloatType, DIM, 1> noise_vector_t;
+  typedef Eigen::Matrix<real_t, DIM, DIM> covariance_matrix_t;
+  typedef Eigen::Matrix<real_t, DIM, 1> covariance_vector_t;
+  typedef Eigen::Matrix<real_t, DIM, 1> sigma_vector_t;
+  typedef Eigen::Matrix<real_t, DIM, 1> noise_vector_t;
 
   //! Get a noise sample.
   noise_vector_t sample()
@@ -26,7 +26,7 @@ public:
     for (size_t i = 0; i < DIM; ++i)
     {
       // The gaussian takes a standard deviation as input.
-      noise(i) = sampleNormalDistribution<FloatType>(deterministic_, 0.0, sigma_(i));
+      noise(i) = sampleNormalDistribution<real_t>(deterministic_, 0.0, sigma_(i));
     }
     return noise;
   }
@@ -60,8 +60,8 @@ inline MatrixX randomMatrixUniformDistributed(
     int rows,
     int cols,
     bool deterministic = false,
-    FloatType from  = 0.0,
-    FloatType to    = 1.0)
+    real_t from  = 0.0,
+    real_t to    = 1.0)
 {
   DEBUG_CHECK_GT(rows, 0);
   DEBUG_CHECK_GT(cols, 0);
@@ -77,21 +77,21 @@ inline MatrixX randomMatrixUniformDistributed(
 }
 
 template<int rows, int cols>
-Eigen::Matrix<FloatType, rows, cols>
+Eigen::Matrix<real_t, rows, cols>
 randomMatrixUniformDistributed(
     bool deterministic = false,
-    FloatType from = 0.0,
-    FloatType to   = 1.0)
+    real_t from = 0.0,
+    real_t to   = 1.0)
 {
   return randomMatrixUniformDistributed(rows, cols, deterministic, from, to);
 }
 
 template<int size>
-Eigen::Matrix<FloatType, size, 1>
+Eigen::Matrix<real_t, size, 1>
 randomVectorUniformDistributed(
     bool deterministic = false,
-    FloatType from = 0.0,
-    FloatType to   = 1.0)
+    real_t from = 0.0,
+    real_t to   = 1.0)
 {
   return randomMatrixUniformDistributed<size, 1>(deterministic, from, to);
 }
@@ -101,8 +101,8 @@ inline MatrixX randomMatrixNormalDistributed(
     int rows,
     int cols,
     bool deterministic = false,
-    FloatType mean  = 0.0,
-    FloatType sigma = 1.0)
+    real_t mean  = 0.0,
+    real_t sigma = 1.0)
 {
   DEBUG_CHECK_GT(rows, 0);
   DEBUG_CHECK_GT(cols, 0);
@@ -118,21 +118,21 @@ inline MatrixX randomMatrixNormalDistributed(
 }
 
 template<int rows, int cols>
-Eigen::Matrix<FloatType, rows, cols>
+Eigen::Matrix<real_t, rows, cols>
 randomMatrixNormalDistributed(
     bool deterministic = false,
-    FloatType mean  = 0.0,
-    FloatType sigma = 1.0)
+    real_t mean  = 0.0,
+    real_t sigma = 1.0)
 {
   return randomMatrixNormalDistributed(rows, cols, deterministic, mean, sigma);
 }
 
 template<int size>
-Eigen::Matrix<FloatType, size, 1>
+Eigen::Matrix<real_t, size, 1>
 randomVectorNormalDistributed(
     bool deterministic = false,
-    FloatType mean  = 0.0,
-    FloatType sigma = 1.0)
+    real_t mean  = 0.0,
+    real_t sigma = 1.0)
 {
   return randomMatrixNormalDistributed<size, 1>(deterministic, mean, sigma);
 }

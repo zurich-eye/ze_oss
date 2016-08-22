@@ -5,11 +5,11 @@
 
 TEST(ManifoldTests, testScalarTraits)
 {
-  EXPECT_EQ(ze::traits<ze::FloatType>::dimension, 1);
-  ze::testManifoldInvariants<ze::FloatType>(1.0, 1.5);
+  EXPECT_EQ(ze::traits<ze::real_t>::dimension, 1);
+  ze::testManifoldInvariants<ze::real_t>(1.0, 1.5);
 #ifndef ZE_SINGLE_PRECISION_FLOAT
-  ze::testRetractJacobians<ze::FloatType>(1.0, 1.5);
-  ze::testLocalJacobians<ze::FloatType>(1.0, 1.5);
+  ze::testRetractJacobians<ze::real_t>(1.0, 1.5);
+  ze::testLocalJacobians<ze::real_t>(1.0, 1.5);
 #else
   LOG(WARNING) << "Numerical derivative test ignored for single precision float.";
 #endif

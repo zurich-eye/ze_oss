@@ -23,20 +23,20 @@ public:
   //! the timer is stopped.
   inline TimedScope timeScope();
 
-  inline FloatType stop()
+  inline real_t stop()
   {
-    FloatType t = t_.stopAndGetMilliseconds();
+    real_t t = t_.stopAndGetMilliseconds();
     stat_.addSample(t);
     return t;
   }
 
-  inline FloatType numTimings() const { return stat_.numSamples(); }
-  inline FloatType accumulated() const { return stat_.sum(); }
-  inline FloatType min() const { return stat_.min(); }
-  inline FloatType max() const { return stat_.max(); }
-  inline FloatType mean() const { return stat_.mean(); }
-  inline FloatType variance() const { return stat_.var(); }
-  inline FloatType standarDeviation() const { return stat_.std(); }
+  inline real_t numTimings() const { return stat_.numSamples(); }
+  inline real_t accumulated() const { return stat_.sum(); }
+  inline real_t min() const { return stat_.min(); }
+  inline real_t max() const { return stat_.max(); }
+  inline real_t mean() const { return stat_.mean(); }
+  inline real_t variance() const { return stat_.var(); }
+  inline real_t standarDeviation() const { return stat_.std(); }
   inline void reset() { stat_.reset(); }
   inline const RunningStatistics& statistics() const { return stat_; }
 

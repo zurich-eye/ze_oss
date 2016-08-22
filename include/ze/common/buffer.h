@@ -23,7 +23,7 @@ public:
   static constexpr int kDim = Dim;
 
   Buffer() = default;
-  Buffer(FloatType buffer_size_seconds)
+  Buffer(real_t buffer_size_seconds)
     : buffer_size_nanosec_(secToNanosec(buffer_size_seconds))
   {}
 

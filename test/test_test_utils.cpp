@@ -16,7 +16,7 @@ TEST(TestUtilsTest, testLoadCsvPoses)
   std::string filename = data_path + "/traj_gt.csv";
   std::map<int64_t, Transformation> poses = loadIndexedPosesFromCsv(filename);
   EXPECT_EQ(poses.size(), 50u);
-  EXPECT_FLOATTYPE_EQ(poses[1].getPosition().x(), FloatType{1.499260});
+  EXPECT_FLOATTYPE_EQ(poses[1].getPosition().x(), real_t{1.499260});
 }
 
 ZE_UNITTEST_ENTRYPOINT

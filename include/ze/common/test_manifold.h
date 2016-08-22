@@ -8,7 +8,7 @@
 namespace ze {
 
 template<typename T>
-void testManifoldInvariants(const T& a, const T& b, FloatType tol = 1e-9)
+void testManifoldInvariants(const T& a, const T& b, real_t tol = 1e-9)
 {
   CHECK(traits<T>::equals(a, a));
   typename traits<T>::TangentVector v = traits<T>::local(a, b);
@@ -17,7 +17,7 @@ void testManifoldInvariants(const T& a, const T& b, FloatType tol = 1e-9)
 }
 
 template<typename T>
-void testRetractJacobians(const T& a, const T& b, FloatType tol = 1e-9)
+void testRetractJacobians(const T& a, const T& b, real_t tol = 1e-9)
 {
   using namespace std::placeholders; // for _1
   typename traits<T>::Jacobian H1, H2;
@@ -35,7 +35,7 @@ void testRetractJacobians(const T& a, const T& b, FloatType tol = 1e-9)
 }
 
 template<typename T>
-void testLocalJacobians(const T& a, const T& b, FloatType tol = 1e-9)
+void testLocalJacobians(const T& a, const T& b, real_t tol = 1e-9)
 {
   using namespace std::placeholders; // for _1
   typename traits<T>::Jacobian H1, H2;

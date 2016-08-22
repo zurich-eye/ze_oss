@@ -52,7 +52,7 @@ T sampleNormalDistribution(
 //! @return Return true with given probability. Samples the Bernoulli distribution.
 inline bool flipCoin(
     bool deterministic = false,
-    FloatType true_probability = FloatType{0.5})
+    real_t true_probability = real_t{0.5})
 {
   DEBUG_CHECK_GE(true_probability, 0.0);
   DEBUG_CHECK_LT(true_probability, 1.0);

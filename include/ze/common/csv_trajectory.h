@@ -38,11 +38,11 @@ public:
 
   PositionSeries();
   virtual void load(const std::string& in_file_path) override;
-  const Buffer<FloatType, 3>& getBuffer() const;
-  Buffer<FloatType, 3>& getBuffer();
+  const Buffer<real_t, 3>& getBuffer() const;
+  Buffer<real_t, 3>& getBuffer();
 
 protected:
-  Buffer<FloatType, 3> position_buf_;
+  Buffer<real_t, 3> position_buf_;
 };
 
 class PoseSeries : public CSVTrajectory
@@ -53,14 +53,14 @@ public:
   PoseSeries();
 
   virtual void load(const std::string& in_file_path) override;
-  virtual const Buffer<FloatType, 7>& getBuffer() const;
-  virtual Buffer<FloatType, 7>& getBuffer();
+  virtual const Buffer<real_t, 7>& getBuffer() const;
+  virtual Buffer<real_t, 7>& getBuffer();
   virtual StampedTransformationVector getStampedTransformationVector();
 
   static Transformation getTransformationFromVec7(const Vector7& data);
 
 protected:
-  Buffer<FloatType, 7> pose_buf_;
+  Buffer<real_t, 7> pose_buf_;
 };
 
 class SWEResultSeries : public PoseSeries

@@ -77,11 +77,11 @@ struct InterpolatorLinear
       return buffer->dataAtTimeIterator(it_before);
     }
 
-    const FloatType w1 =
-        static_cast<FloatType>(time - *it_before) /
-        static_cast<FloatType>(*it_after - *it_before);
+    const real_t w1 =
+        static_cast<real_t>(time - *it_before) /
+        static_cast<real_t>(*it_after - *it_before);
 
-    return (FloatType{1.0} - w1) * buffer->dataAtTimeIterator(it_before)
+    return (real_t{1.0} - w1) * buffer->dataAtTimeIterator(it_before)
         + w1 * buffer->dataAtTimeIterator(it_after);
   }
 
@@ -208,7 +208,7 @@ public:
     removeDataBeforeTimestamp_impl(stamp);
   }
 
-  inline void removeDataOlderThan(FloatType seconds)
+  inline void removeDataOlderThan(real_t seconds)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if(times_.empty())
