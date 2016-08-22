@@ -6,11 +6,10 @@
 #include <cmath>
 #endif
 #include <type_traits>
-
-#include <imp/core/size.hpp>
-#include <imp/core/roi.hpp>
+#include <ze/common/logging.hpp>
 #include <imp/core/pixel.hpp>
-#include <imp/cu_core/cu_exception.hpp>
+#include <imp/core/roi.hpp>
+#include <imp/core/size.hpp>
 
 namespace ze {
 namespace cu {
@@ -257,15 +256,14 @@ static inline void checkCudaErrorState(const char* file, const char* function,
 {
   cudaDeviceSynchronize();
   cudaError_t err = cudaGetLastError();
-  if( err != ::cudaSuccess )
-    throw ze::cu::Exception("error state check", err, file, function, line);
+  CHECK_EQ(err, ::cudaSuccess);
 }
 
 /** Macro for checking on cuda errors
  * @note This check is only enabled when the compile time flag is set
  * @todo (MWE) we should enable this whenever we compile in debug mode
  */
-#ifdef THROW_ON_CUDA_ERROR
+#ifdef FATAL_CUDA_ERROR
 #  define IMP_CUDA_CHECK() ze::cu::checkCudaErrorState(__FILE__, __FUNCTION__, __LINE__)
 #else
 #  define IMP_CUDA_CHECK() cudaDeviceSynchronize()
@@ -298,10 +296,6 @@ static inline void printGPUMemoryUsage()
   printf("   Used memory:  %.2f MiB\n", total-free);
   printf("   Free memory:  %.2f MiB\n", free);
 }
-
-/** @} */ // end of Error Handling
-/** @} */ // end of Cuda Utilities
-
 
 } // namespace cu
 } // namespace ze

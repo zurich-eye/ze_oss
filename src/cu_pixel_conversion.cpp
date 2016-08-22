@@ -1,9 +1,8 @@
 #include <imp/cu_core/cu_pixel_conversion.hpp>
-
 #include <cuda_runtime.h>
+#include <ze/common/logging.hpp>
 #include <imp/core/pixel.hpp>
 #include <imp/core/pixel_enums.hpp>
-#include <imp/cu_core/cu_exception.hpp>
 
 namespace ze {
 namespace cu {
@@ -223,44 +222,41 @@ cudaChannelFormatDesc toCudaChannelFormatDesc(ze::PixelType pixel_type)
   switch (pixel_type)
   {
   case ze::PixelType::i8uC1:
-  return cudaCreateChannelDesc<unsigned char>();
+    return cudaCreateChannelDesc<unsigned char>();
   case ze::PixelType::i8uC2:
-  return cudaCreateChannelDesc<uchar2>();
+    return cudaCreateChannelDesc<uchar2>();
   case ze::PixelType::i8uC3:
-  return cudaCreateChannelDesc<uchar3>();
+    return cudaCreateChannelDesc<uchar3>();
   case ze::PixelType::i8uC4:
-  return cudaCreateChannelDesc<uchar4>();
+    return cudaCreateChannelDesc<uchar4>();
   case ze::PixelType::i16uC1:
-  return cudaCreateChannelDesc<unsigned short>();
+    return cudaCreateChannelDesc<unsigned short>();
   case ze::PixelType::i16uC2:
-  return cudaCreateChannelDesc<ushort2>();
+    return cudaCreateChannelDesc<ushort2>();
   case ze::PixelType::i16uC3:
-  return cudaCreateChannelDesc<ushort3>();
+    return cudaCreateChannelDesc<ushort3>();
   case ze::PixelType::i16uC4:
-  return cudaCreateChannelDesc<ushort4>();
+    return cudaCreateChannelDesc<ushort4>();
   case ze::PixelType::i32sC1:
-  return cudaCreateChannelDesc<int>();
+    return cudaCreateChannelDesc<int>();
   case ze::PixelType::i32sC2:
-  return cudaCreateChannelDesc<int2>();
+    return cudaCreateChannelDesc<int2>();
   case ze::PixelType::i32sC3:
-  return cudaCreateChannelDesc<int3>();
+    return cudaCreateChannelDesc<int3>();
   case ze::PixelType::i32sC4:
-  return cudaCreateChannelDesc<int4>();
+    return cudaCreateChannelDesc<int4>();
   case ze::PixelType::i32fC1:
-  return cudaCreateChannelDesc<float>();
+    return cudaCreateChannelDesc<float>();
   case ze::PixelType::i32fC2:
-  return cudaCreateChannelDesc<float2>();
+    return cudaCreateChannelDesc<float2>();
   case ze::PixelType::i32fC3:
-  return cudaCreateChannelDesc<float3>();
+    return cudaCreateChannelDesc<float3>();
   case ze::PixelType::i32fC4:
-  return cudaCreateChannelDesc<float4>();
+    return cudaCreateChannelDesc<float4>();
   default:
-    throw ze::cu::Exception("Pixel type not supported to generate a CUDA texture.",
-                             __FILE__, __FUNCTION__, __LINE__);
+    CHECK(false) << "Pixel type not supported to generate a CUDA texture.";
   }
 }
-
-
 
 } // namespace cu
 } // namespace ze

@@ -1,16 +1,12 @@
 #include <imp/cu_core/cu_image_gpu.cuh>
-
 #include <iostream>
 #include <memory>
-
-#include <imp/cu_core/cu_exception.hpp>
-#include <imp/cu_core/cu_utils.hpp>
+#include <ze/common/logging.hpp>
 #include <imp/cu_core/cu_linearmemory.cuh>
 #include <imp/cu_core/cu_texture.cuh>
-
+#include <imp/cu_core/cu_utils.hpp>
 // kernel includes
 #include <imp/cu_core/cu_k_setvalue.cuh>
-
 
 namespace ze {
 namespace cu {
@@ -48,11 +44,8 @@ ImageGpu<Pixel>::ImageGpu(const Image<Pixel>& from)
 //           uint32_t pitch, bool use_ext_data_pointer)
 //  : Base(width, height)
 //{
-//  if (data == nullptr)
-//  {
-//    throw ze::cu::Exception("input data not valid", __FILE__, __FUNCTION__, __LINE__);
-//  }
-
+//  CHECK_NOT_NULL(data);
+//
 //  if(use_ext_data_pointer)
 //  {
 //    // This uses the external data pointer as internal data pointer.
@@ -100,11 +93,7 @@ void ImageGpu<Pixel>::copyTo(ze::Image<Pixel>& dst) const
                                         this->data(), this->pitch(),
                                         this->rowBytes(),
                                         this->height(), memcpy_kind);
-  if (cu_err != cudaSuccess)
-  {
-    throw ze::cu::Exception("copyTo failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
-  }
-
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 //-----------------------------------------------------------------------------
@@ -118,16 +107,12 @@ void ImageGpu<Pixel>::copyFrom(const Image<Pixel>& from)
                                         from.data(), from.pitch(),
                                         this->rowBytes(),
                                         this->height(), memcpy_kind);
-  if (cu_err != cudaSuccess)
-  {
-    throw ze::cu::Exception("copyFrom failed", cu_err, __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-Pixel* ImageGpu<Pixel>::data(
-    uint32_t ox, uint32_t oy)
+Pixel* ImageGpu<Pixel>::data(uint32_t ox, uint32_t oy)
 {
   CHECK_EQ(0u, ox) << "getting datapointer with offset not allowed for GPU memory";
   CHECK_EQ(0u, oy) << "getting datapointer with offset not allowed for GPU memory";
@@ -136,13 +121,10 @@ Pixel* ImageGpu<Pixel>::data(
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
-const Pixel* ImageGpu<Pixel>::data(
-    uint32_t ox, uint32_t oy) const
+const Pixel* ImageGpu<Pixel>::data(uint32_t ox, uint32_t oy) const
 {
-  if (ox != 0u || oy != 0u)
-  {
-    throw ze::cu::Exception("Device memory pointer offset is not possible from host function");
-  }
+  CHECK_EQ(ox, 0u) << "Device memory offset access not possible.";
+  CHECK_EQ(oy, 0u) << "Device memory offset access not possible.";
   return data_.get();
 }
 

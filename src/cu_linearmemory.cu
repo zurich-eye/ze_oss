@@ -1,6 +1,5 @@
 #include <imp/cu_core/cu_linearmemory.cuh>
-
-#include <imp/cu_core/cu_exception.hpp>
+#include <ze/common/logging.hpp>
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_k_setvalue.cuh>
 
@@ -21,10 +20,7 @@ template<typename Pixel>
 LinearMemory<Pixel>::LinearMemory(const ze::cu::LinearMemory<Pixel>& from)
   : ze::cu::LinearMemory<Pixel>(from.length())
 {
-  if (from.data() == 0)
-  {
-    throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_NOTNULL(from.data());
   this->copyFrom(from);
 }
 
@@ -33,10 +29,7 @@ template<typename Pixel>
 LinearMemory<Pixel>::LinearMemory(const ze::LinearMemory<Pixel>& from)
   : ze::cu::LinearMemory<Pixel>(from.length())
 {
-  if (from.data() == 0)
-  {
-    throw ze::cu::Exception("'from' data not valid", __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_NOTNULL(from.data());
   this->copyFrom(from);
 }
 
@@ -93,68 +86,52 @@ void LinearMemory<Pixel>::setValue(const Pixel& value)
 template<typename Pixel>
 void LinearMemory<Pixel>::copyTo(ze::cu::LinearMemory<Pixel>& dst)
 {
-  if (dst.data() == 0 || !data_)
-    IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
-  if (this->roiBytes() != dst.roiBytes())
-    IMP_THROW_EXCEPTION("source and destination array region of interests are of different length (byte length checked)");
-
+  CHECK_NOTNULL(dst.data());
+  CHECK(data_);
+  CHECK_EQ(this->roiBytes(), dst.roiBytes());
   const cudaError cu_err =
       cudaMemcpy(dst.data()+dst.roi().x(), this->data()+this->roi().x(),
                  this->roiBytes(), cudaMemcpyDeviceToDevice);
-
-  if (cu_err != cudaSuccess)
-    IMP_CU_THROW_EXCEPTION("cudaMemcpy returned error code", cu_err);
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void LinearMemory<Pixel>::copyFrom(const ze::cu::LinearMemory<Pixel>& from)
 {
-  if (from.data() == 0 || !data_)
-    IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
-  if (this->roiBytes() != from.roiBytes())
-    IMP_THROW_EXCEPTION("source and destination array region of interests are of different length (byte length checked)");
-
+  CHECK_NOTNULL(from.data());
+  CHECK(data_);
+  CHECK_EQ(this->roiBytes(), from.roiBytes());
   const cudaError cu_err =
       cudaMemcpy(this->data()+this->roi().x(), from.data()+from.roi().x(),
                  from.roiBytes(), cudaMemcpyDeviceToDevice);
-
-  if (cu_err != cudaSuccess)
-    IMP_CU_THROW_EXCEPTION("cudaMemcpy returned error code", cu_err);
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void LinearMemory<Pixel>::copyTo(ze::LinearMemory<Pixel>& dst)
 {
-  if (dst.data() == 0 || !data_)
-    IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
-  if (this->roiBytes() != dst.roiBytes())
-    IMP_THROW_EXCEPTION("source and destination array region of interests are of different length (byte length checked)");
-
+  CHECK_NOTNULL(dst.data());
+  CHECK(data_);
+  CHECK_EQ(this->roiBytes(), dst.roiBytes());
   const cudaError cu_err =
       cudaMemcpy(dst.data()+dst.roi().x(), this->data()+this->roi().x(),
                  this->roiBytes(), cudaMemcpyDeviceToHost);
-
-  if (cu_err != cudaSuccess)
-    IMP_CU_THROW_EXCEPTION("cudaMemcpy returned error code", cu_err);
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void LinearMemory<Pixel>::copyFrom(const ze::LinearMemory<Pixel>& from)
 {
-  if (from.data() == 0 || !data_)
-    IMP_THROW_EXCEPTION("'from' or 'to' data is not valid");
-  if (this->roiBytes() != from.roiBytes())
-    IMP_THROW_EXCEPTION("source and destination array region of interests are of different length (byte length checked)");
-
+  CHECK_NOTNULL(from.data());
+  CHECK(data_);
+  CHECK_EQ(this->roiBytes(), from.roiBytes());
   const cudaError cu_err =
       cudaMemcpy(this->data()+this->roi().x(), from.data()+from.roi().x(),
                  from.roiBytes(), cudaMemcpyHostToDevice);
-
-  if (cu_err != cudaSuccess)
-    IMP_CU_THROW_EXCEPTION("cudaMemcpy returned error code", cu_err);
+  CHECK_EQ(cu_err, ::cudaSuccess);
 }
 
 

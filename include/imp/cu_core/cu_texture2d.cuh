@@ -4,11 +4,11 @@
 #include <memory>
 #include <cstring>
 #include <cuda_runtime_api.h>
-#include <imp/core/types.hpp>
-#include <imp/core/size.hpp>
+#include <ze/common/logging.hpp>
 #include <imp/core/pixel.hpp>
 #include <imp/core/pixel_enums.hpp>
-#include <imp/cu_core/cu_exception.hpp>
+#include <imp/core/size.hpp>
+#include <imp/core/types.hpp>
 
 namespace ze {
 namespace cu {
@@ -60,21 +60,13 @@ struct Texture2D
     tex_desc.readMode = read_mode;
 
     cudaError_t err = cudaCreateTextureObject(&tex_object, &tex_res, &tex_desc, 0);
-    if  (err != ::cudaSuccess)
-    {
-      throw ze::cu::Exception("Failed to create texture object", err,
-                               __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(err, ::cudaSuccess);
   }
 
   __host__ virtual ~Texture2D()
   {
     cudaError_t err = cudaDestroyTextureObject(tex_object);
-    if  (err != ::cudaSuccess)
-    {
-      throw ze::cu::Exception("Failed to destroy texture object", err,
-                               __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_EQ(err, ::cudaSuccess);
   }
 
   // copy and asignment operator enforcing deep copy

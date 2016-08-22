@@ -14,7 +14,6 @@ find_cuda()
 
 set(HEADERS
   include/imp/cu_core/cu_utils.hpp
-  include/imp/cu_core/cu_exception.hpp
   include/imp/cu_core/cu_pixel_conversion.hpp
   )
 
