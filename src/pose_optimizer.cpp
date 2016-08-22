@@ -72,7 +72,7 @@ void PoseOptimizer::setPrior(
 real_t PoseOptimizer::evaluateError(
     const Transformation& T_B_W, HessianMatrix* H, GradientVector* g)
 {
-  real_t chi2 = FloatType{0.0};
+  real_t chi2 = real_t{0.0};
 
   // Loop over all cameras in rig.
   VLOG(400) << "Num residual blocks = " << data_.size();
@@ -103,7 +103,7 @@ real_t PoseOptimizer::evaluateError(
   }
 
   // Apply prior.
-  if (prior_weight_rot_ > real_t{0.0} || prior_weight_pos_ > FloatType{0.0})
+  if (prior_weight_rot_ > real_t{0.0} || prior_weight_pos_ > real_t{0.0})
   {
     applyPosePrior(T_B_W, T_B_W_prior_, prior_weight_rot_, prior_weight_pos_, *H, *g);
   }

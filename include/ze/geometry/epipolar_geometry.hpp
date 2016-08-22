@@ -102,14 +102,14 @@ inline std::pair<Rect, Rect> innerAndOuterRectangles(
   }
 
   //! Rectangles are specified by two points.
-  real_t inner_x_left{-std::numeric_limits<FloatType>::max()};
-  real_t inner_x_right{std::numeric_limits<FloatType>::max()};
-  real_t inner_y_top{-std::numeric_limits<FloatType>::max()};
-  real_t inner_y_bottom{std::numeric_limits<FloatType>::max()};
-  real_t outer_x_left{std::numeric_limits<FloatType>::max()};
-  real_t outer_x_right{-std::numeric_limits<FloatType>::max()};
-  real_t outer_y_top{std::numeric_limits<FloatType>::max()};
-  real_t outer_y_bottom{-std::numeric_limits<FloatType>::max()};
+  real_t inner_x_left{-std::numeric_limits<real_t>::max()};
+  real_t inner_x_right{std::numeric_limits<real_t>::max()};
+  real_t inner_y_top{-std::numeric_limits<real_t>::max()};
+  real_t inner_y_bottom{std::numeric_limits<real_t>::max()};
+  real_t outer_x_left{std::numeric_limits<real_t>::max()};
+  real_t outer_x_right{-std::numeric_limits<real_t>::max()};
+  real_t outer_y_top{std::numeric_limits<real_t>::max()};
+  real_t outer_y_bottom{-std::numeric_limits<real_t>::max()};
 
   //! Iterate over the sampling points and adjust the rectangle bounds.
   for (int y = 0, k = 0; y < num_pts; y++)
@@ -213,7 +213,7 @@ computeHorizontalStereoParameters(const Size2u& img_size,
   const real_t nx = img_size[0];
   const real_t ny = img_size[1];
 
-  real_t transformed_focal_length = std::numeric_limits<FloatType>::max();
+  real_t transformed_focal_length = std::numeric_limits<real_t>::max();
   for (int8_t i = 0; i < 2; ++i)
   {
     const Vector4& camera_parameters = *camera_parameter_ptrs[i];

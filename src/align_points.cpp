@@ -112,7 +112,7 @@ std::pair<real_t, Transformation> PointAligner::alignSim3(
   // S. Umeyama: Least-Squares Estimation
   // of Transformation Parameters Between Two Point Patterns,
   // IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.
-  const real_t n = static_cast<FloatType>(pts_A.cols());
+  const real_t n = static_cast<real_t>(pts_A.cols());
   const Position mean_pts_A = pts_A.rowwise().mean();
   const Position mean_pts_B = pts_B.rowwise().mean();
   const Positions zero_mean_pts_A = pts_A.colwise() - mean_pts_A;

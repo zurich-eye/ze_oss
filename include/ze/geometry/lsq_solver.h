@@ -203,7 +203,7 @@ protected:
   UpdateVector dx_;
 
   //! Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  real_t chi2_{std::numeric_limits<FloatType>::max()};
+  real_t chi2_{std::numeric_limits<real_t>::max()};
 
   //! Error reduction: chi2 - new_chi2.
   real_t rho_{0.0};

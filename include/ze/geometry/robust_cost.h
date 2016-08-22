@@ -78,7 +78,7 @@ struct WeightFunction
     return weights;
   }
 
-  static real_t weight(const FloatType error)
+  static real_t weight(const real_t error)
   {
     return Implementation::weight(error);
   }

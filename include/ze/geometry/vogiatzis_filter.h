@@ -35,17 +35,17 @@ inline real_t getInvMaxDepth(const Eigen::Ref<const Seed>& mu_sigma2_a_b)
   return std::max(mu_sigma2_a_b(0) - std::sqrt(mu_sigma2_a_b(1)), real_t{0.00000001});
 }
 
-inline real_t getMeanFromDepth(FloatType depth)
+inline real_t getMeanFromDepth(real_t depth)
 {
   return real_t{1.0} / depth;
 }
 
-inline real_t getMeanRangeFromDepthMinMax(FloatType depth_min, FloatType /*depth_max*/)
+inline real_t getMeanRangeFromDepthMinMax(real_t depth_min, real_t /*depth_max*/)
 {
   return real_t{1.0} / depth_min;
 }
 
-inline real_t getInitSigma2FromMuRange(FloatType mu_range)
+inline real_t getInitSigma2FromMuRange(real_t mu_range)
 {
   return mu_range * mu_range / real_t{36.0};
 }
@@ -57,7 +57,7 @@ inline void increaseOutlierProbability(Eigen::Ref<Seed> mu_sigma2_a_b)
 
 inline bool isConverged(
     const Eigen::Ref<const Seed>& mu_sigma2_a_b,
-    real_t mu_range, FloatType sigma2_convergence_threshold)
+    real_t mu_range, real_t sigma2_convergence_threshold)
 {
   // If initial uncertainty was reduced by factor sigma2_convergence_threshold
   // we accept the seed as converged.
@@ -65,10 +65,10 @@ inline bool isConverged(
   return (mu_sigma2_a_b(1) < thresh * thresh);
 }
 
-inline real_t getSigma2FromDepthSigma(FloatType depth, FloatType depth_sigma)
+inline real_t getSigma2FromDepthSigma(real_t depth, real_t depth_sigma)
 {
   const real_t sigma =
-      real_t{0.5} * (FloatType{1.0} / std::max(FloatType{1.0e-8}, depth - depth_sigma)
+      real_t{0.5} * (real_t{1.0} / std::max(real_t{1.0e-8}, depth - depth_sigma)
                       - real_t{1.0} / (depth + depth_sigma));
   return sigma * sigma;
 }
@@ -92,19 +92,19 @@ inline bool updateFilterVogiatzis(
   }
 
   const real_t oldsigma2 = sigma2;
-  const real_t s2 = FloatType{1.0} / (FloatType{1.0} / sigma2 + FloatType{1.0} / tau2);
+  const real_t s2 = real_t{1.0} / (real_t{1.0} / sigma2 + real_t{1.0} / tau2);
   const real_t m = s2 * (mu / sigma2 + z / tau2);
-  const real_t uniform_x = FloatType{1.0} / mu_range;
-  real_t C1 = a / (a + b) * normPdf<FloatType>(z, mu, norm_scale);
+  const real_t uniform_x = real_t{1.0} / mu_range;
+  real_t C1 = a / (a + b) * normPdf<real_t>(z, mu, norm_scale);
   real_t C2 = b / (a + b) * uniform_x;
   const real_t normalization_constant = C1 + C2;
   C1 /= normalization_constant;
   C2 /= normalization_constant;
   const real_t f =
-      C1 * (a+real_t{1.0}) / (a+b+FloatType{1.0}) + C2 * a/(a+b+FloatType{1.0});
+      C1 * (a+real_t{1.0}) / (a+b+real_t{1.0}) + C2 * a/(a+b+real_t{1.0});
   const real_t e =
-      C1 * (a+real_t{1.0}) * (a+FloatType{2.0}) / ((a+b+FloatType{1.0}) * (a+b+FloatType{2.0}))
-    + C2 * a * (a+real_t{1.0}) / ((a+b+FloatType{1.0})*(a+b+FloatType{2.0}));
+      C1 * (a+real_t{1.0}) * (a+real_t{2.0}) / ((a+b+real_t{1.0}) * (a+b+real_t{2.0}))
+    + C2 * a * (a+real_t{1.0}) / ((a+b+real_t{1.0})*(a+b+real_t{2.0}));
 
   // update parameters
   const real_t mu_new = C1 * m + C2 * mu;
