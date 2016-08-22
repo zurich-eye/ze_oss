@@ -89,7 +89,7 @@ public:
          + std::atan(1.0 / (2.0 * std::abs(this->projection_params_[1])));
   }
 
-  virtual real_t getApproxBearingAngleFromPixelDifference(FloatType px_diff) const override
+  virtual real_t getApproxBearingAngleFromPixelDifference(real_t px_diff) const override
   {
     //! @todo: Is this correct? And if yes, this is costlty to compute often!
     //!        acos and a dot product between the bearing vectors.
@@ -111,14 +111,14 @@ typedef PinholeProjection<EquidistantDistortion> EquidistantCamera;
 // Convenience factory functions.
 
 inline PinholeCamera createPinholeCamera(
-    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy)
+    int width, int height, real_t fx, real_t fy, real_t cx, real_t cy)
 {
   return PinholeCamera(width, height, CameraType::Pinhole,
                        (Vector4() << fx, fy, cx, cy).finished(), VectorX());
 }
 
 inline FovCamera createFovCamera(
-    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
+    int width, int height, real_t fx, real_t fy, real_t cx, real_t cy,
     real_t s)
 {
   return FovCamera(width, height, CameraType::PinholeFov,
@@ -127,8 +127,8 @@ inline FovCamera createFovCamera(
 }
 
 inline RadTanCamera createRadTanCamera(
-    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
-    real_t k1, FloatType k2, FloatType r1, FloatType r2)
+    int width, int height, real_t fx, real_t fy, real_t cx, real_t cy,
+    real_t k1, real_t k2, real_t r1, real_t r2)
 {
   return RadTanCamera(width, height, CameraType::PinholeRadialTangential,
                        (Vector4() << fx, fy, cx, cy).finished(),
@@ -136,8 +136,8 @@ inline RadTanCamera createRadTanCamera(
 }
 
 inline EquidistantCamera createEquidistantCamera(
-    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
-    real_t k1, FloatType k2, FloatType k3, FloatType k4)
+    int width, int height, real_t fx, real_t fy, real_t cx, real_t cy,
+    real_t k1, real_t k2, real_t k3, real_t k4)
 {
   return EquidistantCamera(width, height, CameraType::PinholeEquidistant,
                            (Vector4() << fx, fy, cx, cy).finished(),
@@ -145,8 +145,8 @@ inline EquidistantCamera createEquidistantCamera(
 }
 
 inline Camera::Ptr createEquidistantCameraShared(
-    int width, int height, real_t fx, FloatType fy, FloatType cx, FloatType cy,
-    real_t k1, FloatType k2, FloatType k3, FloatType k4)
+    int width, int height, real_t fx, real_t fy, real_t cx, real_t cy,
+    real_t k1, real_t k2, real_t k3, real_t k4)
 {
   return std::make_shared<EquidistantCamera>(
         width, height, CameraType::PinholeEquidistant,

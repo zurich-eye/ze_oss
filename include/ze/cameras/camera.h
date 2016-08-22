@@ -130,7 +130,7 @@ public:
   //! @todo: make static cache.
   virtual real_t getApproxAnglePerPixel() const = 0;
 
-  virtual real_t getApproxBearingAngleFromPixelDifference(FloatType px_diff) const = 0;
+  virtual real_t getApproxBearingAngleFromPixelDifference(real_t px_diff) const = 0;
 
   //! Set mask: 0 = masked, >0 = unmasked.
   void setMask(const Image8uC1::Ptr& mask);

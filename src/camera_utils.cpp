@@ -38,8 +38,8 @@ Keypoints generateUniformKeypoints(
   const uint32_t num_rows = num_cols * size.height() / size.width();
 
   // Compute width and height of a cell:
-  real_t w = (static_cast<FloatType>(size.width() - 0.01)  - 2.0 * margin) / (num_cols - 1);
-  real_t h = (static_cast<FloatType>(size.height() - 0.01) - 2.0 * margin) / (num_rows - 1);
+  real_t w = (static_cast<real_t>(size.width() - 0.01)  - 2.0 * margin) / (num_cols - 1);
+  real_t h = (static_cast<real_t>(size.height() - 0.01) - 2.0 * margin) / (num_rows - 1);
 
   // Sample keypoints:
   Keypoints kp(2, num_rows * num_cols);
