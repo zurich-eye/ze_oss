@@ -619,7 +619,7 @@ void legend()
 }
 
 // -----------------------------------------------------------------------------
-void ylim(real_t ymin, FloatType ymax)
+void ylim(real_t ymin, real_t ymax)
 {
   PyObject* list = PyList_New(2);
   PyList_SetItem(list, 0, PyFloat_FromDouble(ymin));
@@ -642,7 +642,7 @@ void ylim(real_t ymin, FloatType ymax)
 }
 
 // -----------------------------------------------------------------------------
-void xlim(real_t xmin, FloatType xmax)
+void xlim(real_t xmin, real_t xmax)
 {
   PyObject* list = PyList_New(2);
   PyList_SetItem(list, 0, PyFloat_FromDouble(xmin));

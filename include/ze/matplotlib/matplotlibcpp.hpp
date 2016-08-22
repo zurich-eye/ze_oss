@@ -133,9 +133,9 @@ bool labelPlot(
 //! @{
 void legend();
 
-void ylim(real_t min, FloatType max);
+void ylim(real_t min, real_t max);
 
-void xlim(real_t xmin, FloatType xmax);
+void xlim(real_t xmin, real_t xmax);
 
 void title(const std::string &titlestr);
 
