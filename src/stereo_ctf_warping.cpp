@@ -29,15 +29,7 @@ StereoCtFWarping::~StereoCtFWarping()
 //------------------------------------------------------------------------------
 void StereoCtFWarping::init()
 {
-  if (image_pyramids_.empty())
-  {
-    throw Exception("No Image set, can't initialize when number of levels is unknown.",
-                    __FILE__, __FUNCTION__, __LINE__);
-  }
-
-  //  // just in case
-  //  levels_.clear();
-
+  CHECK(!image_pyramids_.empty());
   for (size_t i=params_->ctf.finest_level; i<=params_->ctf.coarsest_level; ++i)
   {
     Size2u sz = image_pyramids_.front()->size(i);
@@ -114,9 +106,9 @@ void StereoCtFWarping::addImage(const ImageGpu32fC1::Ptr& image)
 
   VLOG(1) << "we have now " << images_.size() << " images and "
           <<  image_pyramids_.size() << " pyramids in the CTF instance. "
-          << "params_->ctf.levels: " << params_->ctf.levels
-          << " (" << params_->ctf.coarsest_level
-          << " -> " << params_->ctf.finest_level << ")";
+           << "params_->ctf.levels: " << params_->ctf.levels
+           << " (" << params_->ctf.coarsest_level
+           << " -> " << params_->ctf.finest_level << ")";
 }
 
 //------------------------------------------------------------------------------
