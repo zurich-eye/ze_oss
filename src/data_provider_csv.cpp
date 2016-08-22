@@ -234,7 +234,7 @@ void DataProviderCsv::loadImuData(
     auto imu_measurement =
         std::make_shared<internal::ImuMeasurement>(
           std::stoll(items[0]), imu_index,
-        acc.cast<FloatType>(), gyr.cast<FloatType>());
+          acc.cast<real_t>(), gyr.cast<real_t>());
 
     buffer_.insert(std::make_pair(
                      imu_measurement->stamp_ns + playback_delay,
