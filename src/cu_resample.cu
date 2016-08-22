@@ -84,7 +84,7 @@ void resample(ImageGpu<Pixel>& dst,
           dst_frag.dimGrid, dst_frag.dimBlock/*, 0, stream*/
         >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
              dst_roi.x(), dst_roi.y(), sf_x , sf_y, *src_tex);
-  break;
+    break;
     //  case InterpolationMode::Cubic:
     //    cuTransformCubicKernel_32f_C1
     //        <<< dimGridOut, dimBlock, 0, stream >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
@@ -96,7 +96,7 @@ void resample(ImageGpu<Pixel>& dst,
     //                                      sf_x , sf_y);
     //    break;
   default:
-    IMP_THROW_EXCEPTION("unsupported interpolation type");
+    CHECK(false) << "unsupported interpolation type";
   }
 
   IMP_CUDA_CHECK();

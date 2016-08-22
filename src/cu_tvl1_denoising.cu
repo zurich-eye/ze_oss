@@ -1,15 +1,14 @@
 #include <imp/cu_imgproc/cu_tvl1_denoising.cuh>
 
 #include <iostream>
-
 #include <cuda_runtime.h>
-#include <glog/logging.h>
-
-#include <imp/cuda_toolkit/helper_math.h>
+#include <ze/common/logging.hpp>
 #include <imp/core/pixel.hpp>
-#include <imp/cu_core/cu_texture.cuh>
-#include <imp/cu_core/cu_k_derivative.cuh>
 #include <imp/cu_core/cu_math.cuh>
+#include <imp/cu_core/cu_texture.cuh>
+#include <imp/cuda_toolkit/helper_math.h>
+// kernels
+#include <imp/cu_core/cu_k_derivative.cuh>
 
 
 namespace ze {
@@ -92,8 +91,8 @@ __global__ void k_tvL1DualUpdate(
 //-----------------------------------------------------------------------------
 //! @todo (MWE) move to a common place (also needed for other algorithms!)
 __global__ void k_tvL1convertResult8uC1(Pixel8uC1* d_u, size_t stride_u,
-                                    ze::cu::Texture2D u_tex,
-                                    size_t width, size_t height)
+                                        ze::cu::Texture2D u_tex,
+                                        size_t width, size_t height)
 {
   int x = blockIdx.x*blockDim.x + threadIdx.x;
   int y = blockIdx.y*blockDim.y + threadIdx.y;
@@ -137,15 +136,10 @@ void TvL1Denoising<Pixel>::init(const Size2u& size)
 //-----------------------------------------------------------------------------
 template<typename Pixel>
 void TvL1Denoising<Pixel>::denoise(const ImageBase::Ptr& dst,
-                                               const ImageBase::Ptr& src)
+                                   const ImageBase::Ptr& src)
 {
   VLOG(100) << "[Solver @gpu] TvL1Denoising::denoise:";
-
-  if (src->size() != dst->size())
-  {
-    throw ze::cu::Exception("Input and output image are not of the same size.",
-                             __FILE__, __FUNCTION__, __LINE__);
-  }
+  CHECK_EQ(src->size(), dst->size());
 
   f_ = std::dynamic_pointer_cast<ImageGpu>(src);
   //! @todo (MWE) we could use dst for u_ if pixel_type is consistent
@@ -196,16 +190,15 @@ void TvL1Denoising<Pixel>::denoise(const ImageBase::Ptr& dst,
         <<< dimGrid(), dimBlock() >>> (u->data(), u->stride(),
                                        *u_tex_, size_.width(), size_.height());
   }
-  break;
+    break;
   case PixelType::i32fC1:
   {
     std::shared_ptr<ImageGpu32fC1> u(std::dynamic_pointer_cast<ImageGpu32fC1>(dst));
     u_->copyTo(*u);
   }
-  break;
+    break;
   default:
-    throw ze::cu::Exception("Unsupported PixelType.",
-                             __FILE__, __FUNCTION__, __LINE__);
+    CHECK(false) << "Unsupported PixelType";
   }
   IMP_CUDA_CHECK();
 }

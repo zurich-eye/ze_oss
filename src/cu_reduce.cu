@@ -84,7 +84,7 @@ void reduce(ImageGpu<Pixel>& dst,
           dst_frag.dimGrid, dst_frag.dimBlock/*, 0, stream*/
         >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
              dst_roi.x(), dst_roi.y(), sf_x , sf_y, *src_tex);
-  break;
+    break;
     //  case InterpolationMode::Cubic:
     //    cuTransformCubicKernel_32f_C1
     //        <<< dimGridOut, dimBlock, 0, stream >>> (dst.data(), dst.stride(), dst.width(), dst.height(),
@@ -96,7 +96,7 @@ void reduce(ImageGpu<Pixel>& dst,
     //                                      sf_x , sf_y);
     //    break;
   default:
-    IMP_THROW_EXCEPTION("unsupported interpolation type");
+    CHECK(false) << "unsupported interpolation type";
   }
 
   IMP_CUDA_CHECK();
@@ -106,7 +106,6 @@ void reduce(ImageGpu<Pixel>& dst,
 //
 // template instantiations for all our image types
 //
-
 template void reduce(ImageGpu8uC1& dst, const ImageGpu8uC1& src, InterpolationMode interp, bool gauss_prefilter);
 template void reduce(ImageGpu8uC2& dst, const ImageGpu8uC2& src, InterpolationMode interp, bool gauss_prefilter);
 template void reduce(ImageGpu8uC4& dst, const ImageGpu8uC4& src, InterpolationMode interp, bool gauss_prefilter);
@@ -122,7 +121,6 @@ template void reduce(ImageGpu32sC4& dst, const ImageGpu32sC4& src, Interpolation
 template void reduce(ImageGpu32fC1& dst, const ImageGpu32fC1& src, InterpolationMode interp, bool gauss_prefilter);
 template void reduce(ImageGpu32fC2& dst, const ImageGpu32fC2& src, InterpolationMode interp, bool gauss_prefilter);
 template void reduce(ImageGpu32fC4& dst, const ImageGpu32fC4& src, InterpolationMode interp, bool gauss_prefilter);
-
 
 } // namespace cu
 } // namespace ze
