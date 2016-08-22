@@ -7,7 +7,7 @@ namespace ze {
 
 RelativeError::RelativeError(
     size_t first_frame, Vector3 W_t_gt_es, Vector3 W_R_gt_es,
-    real_t segment_length, FloatType scale_error, int num_frames_in_between)
+    real_t segment_length, real_t scale_error, int num_frames_in_between)
   : first_frame(first_frame)
   , W_t_gt_es(W_t_gt_es)
   , W_R_gt_es(W_R_gt_es)
