@@ -102,7 +102,7 @@ Transformation PointAligner::alignSE3(
   return Transformation(t_B_A, Quaternion(R_B_A));
 }
 
-std::pair<FloatType, Transformation> PointAligner::alignSim3(
+std::pair<real_t, Transformation> PointAligner::alignSim3(
     const Positions& pts_A, const Positions& pts_B)
 {
   CHECK_NE(pts_A.cols(), 0u);
@@ -112,14 +112,14 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
   // S. Umeyama: Least-Squares Estimation
   // of Transformation Parameters Between Two Point Patterns,
   // IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.
-  const FloatType n = static_cast<FloatType>(pts_A.cols());
+  const real_t n = static_cast<real_t>(pts_A.cols());
   const Position mean_pts_A = pts_A.rowwise().mean();
   const Position mean_pts_B = pts_B.rowwise().mean();
   const Positions zero_mean_pts_A = pts_A.colwise() - mean_pts_A;
   const Positions zero_mean_pts_B = pts_B.colwise() - mean_pts_B;
   const Matrix3 Sigma_AB =
       zero_mean_pts_B * zero_mean_pts_A.transpose() / n;
-  const FloatType sigma_sq_A
+  const real_t sigma_sq_A
       = zero_mean_pts_A.rowwise().squaredNorm().sum() / n;
 
   Eigen::JacobiSVD<Matrix3> svd(
@@ -139,9 +139,9 @@ std::pair<FloatType, Transformation> PointAligner::alignSim3(
   }
 
   const Matrix3 R_B_A = svd_U * S * svd_V.transpose();
-  const FloatType c = (svd_D * S).trace() / sigma_sq_A;
+  const real_t c = (svd_D * S).trace() / sigma_sq_A;
   const Vector3 t_B_A = mean_pts_B - c * R_B_A * mean_pts_A;
-  return std::pair<FloatType, Transformation>(
+  return std::pair<real_t, Transformation>(
         c, Transformation(t_B_A, Quaternion(R_B_A)));
 }
 

@@ -11,20 +11,20 @@ TEST(RobustCostTest, testScaleEstimators)
 
   // Generate normally distributed errors with standard deviation 3.0
   std::ranlux24 gen;
-  std::normal_distribution<FloatType> noise(0.0, 3.0);
+  std::normal_distribution<real_t> noise(0.0, 3.0);
   constexpr int n = 1000;
   VectorX errors(n);
   errors.setZero();
   for(int i = 0; i < n; ++i)
     errors(i) = noise(gen);
 
-  double s1 = UnitScaleEstimator<FloatType>::compute(errors);
+  double s1 = UnitScaleEstimator<real_t>::compute(errors);
   EXPECT_FLOATTYPE_EQ(s1, 1.0);
 
-  double s2 = NormalDistributionScaleEstimator<FloatType>::compute(errors);
+  double s2 = NormalDistributionScaleEstimator<real_t>::compute(errors);
   EXPECT_TRUE(std::abs(s2 - 3.0) < 0.2);
 
-  double s3 = MADScaleEstimator<FloatType>::compute(errors);
+  double s3 = MADScaleEstimator<real_t>::compute(errors);
   EXPECT_TRUE(std::abs(s3 - 3.0) < 0.2);
 }
 
@@ -34,7 +34,7 @@ TEST(RobustCostTest, testWeightFunctions)
 
   // Generate normally distributed errors with standard deviation 3.0
   std::ranlux24 gen;
-  std::normal_distribution<FloatType> noise(0.0, 3.0);
+  std::normal_distribution<real_t> noise(0.0, 3.0);
   constexpr int n = 10;
   VectorX errors(n);
   errors.setZero();
@@ -43,7 +43,7 @@ TEST(RobustCostTest, testWeightFunctions)
     errors(i) = noise(gen);
   }
 
-  VectorX errors_scaled = HuberWeightFunction<FloatType>::weightVectorized(errors);
+  VectorX errors_scaled = HuberWeightFunction<real_t>::weightVectorized(errors);
 
   //! @todo: add checks.
   VLOG(1) << errors.transpose();

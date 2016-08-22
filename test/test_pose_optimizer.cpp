@@ -14,8 +14,8 @@
 namespace ze {
 
 void testPoseOptimizer(
-    const FloatType pos_prior_weight,
-    const FloatType rot_prior_weight,
+    const real_t pos_prior_weight,
+    const real_t rot_prior_weight,
     const Transformation& T_B_W,
     const Transformation& T_B_W_perturbed,
     const PoseOptimizerFrameData& data,
@@ -35,8 +35,8 @@ void testPoseOptimizer(
 
   // Compute error:
   Transformation T_err = T_B_W * T_B_W_estimate.inverse();
-  FloatType pos_error = T_err.getPosition().norm();
-  FloatType ang_error = T_err.getRotation().log().norm();
+  real_t pos_error = T_err.getPosition().norm();
+  real_t ang_error = T_err.getRotation().log().norm();
   EXPECT_LT(pos_error, 0.005);
   EXPECT_LT(ang_error, 0.005);
   VLOG(1) << "ang error = " << ang_error;
@@ -169,7 +169,7 @@ TEST(PoseOptimizerTests, testSolver_withLines)
   PoseOptimizer optimizer(
         PoseOptimizer::getDefaultSolverOptions(),
         data_vec, T_B_W, 0.0, 0.0);
-  FloatType error = optimizer.evaluateError(T_B_W, nullptr, nullptr);
+  real_t error = optimizer.evaluateError(T_B_W, nullptr, nullptr);
   EXPECT_NEAR(error, 0.0, 1e-5);
 
   // Perturb pose:

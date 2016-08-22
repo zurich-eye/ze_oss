@@ -9,8 +9,8 @@ Clam::Clam(
     const std::vector<ClamFrameData>& data,
     const CameraRig& rig,
     const Transformation& T_Bc_Br_prior,
-    const FloatType prior_weight_pos,
-    const FloatType prior_weight_rot)
+    const real_t prior_weight_pos,
+    const real_t prior_weight_rot)
   : landmarks_(landmarks)
   , data_(data)
   , rig_(rig)
@@ -22,11 +22,11 @@ Clam::Clam(
   CHECK_EQ(landmarks_.f_Br.cols(), landmarks_.origin_Br.cols());
 }
 
-FloatType Clam::evaluateError(
+real_t Clam::evaluateError(
     const ClamState& state, HessianMatrix* H, GradientVector* g)
 {
   CHECK_EQ(data_.size(), measurement_sigma_localization_.size());
-  FloatType chi2 = 0.0;
+  real_t chi2 = 0.0;
 
   const Transformation& T_Bc_Br = state.at<0>();
   const VectorX& inv_depth = state.at<1>();
@@ -38,7 +38,7 @@ FloatType Clam::evaluateError(
   for (size_t i = 0; i < data_.size(); ++i)
   {
     const ClamFrameData& data = data_[i];
-    FloatType& measurement_sigma = measurement_sigma_localization_[i];
+    real_t& measurement_sigma = measurement_sigma_localization_[i];
 
     // Continue if we have no landmarks to localize with.
     if(data.p_Br.cols() == 0)
@@ -117,7 +117,7 @@ FloatType Clam::evaluateError(
             cam, data.T_C_B, T_Bc_Br, inv_depth(m.first), m.second, &H1, &H2);
 
       // Robust cost function.
-      const FloatType weight = 1.0; //!< @todo(cfo)
+      const real_t weight = 1.0; //!< @todo(cfo)
 
       // Whiten error
       err /= measurement_sigma_mapping_;

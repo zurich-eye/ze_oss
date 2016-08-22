@@ -46,7 +46,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     g_.setZero();
 
     // compute initial error
-    FloatType new_chi2 = evaluateError(state, &H_, &g_);
+    real_t new_chi2 = evaluateError(state, &H_, &g_);
 
     // solve the linear system
     if (!solve(state, H_, g_, dx_))
@@ -74,7 +74,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeGaussNewton(State& state)
     state = new_state;
     chi2_ = new_chi2;
     chi2_per_iter_.push_back(chi2_);
-    FloatType x_norm = normMax(dx_);
+    real_t x_norm = normMax(dx_);
     VLOG(400) << "It. " << iter_
               << "\t Success"
               << "\t new_chi2 = " << new_chi2
@@ -107,8 +107,8 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
   // Compute Initial Lambda
   if (mu_ < 0)
   {
-    FloatType H_max_diag = maxAbsDiagonalElement(H_);
-    FloatType tau = 1e-4;
+    real_t H_max_diag = maxAbsDiagonalElement(H_);
+    real_t tau = 1e-4;
     mu_ = tau*H_max_diag;
   }
 
@@ -124,7 +124,7 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
     {
       // init variables
       State new_model;
-      FloatType new_chi2 = -1;
+      real_t new_chi2 = -1;
       H_.setZero();
       g_.setZero();
 
@@ -158,9 +158,9 @@ void LeastSquaresSolver<T, Implementation>::optimizeLevenbergMarquardt(State& st
         chi2_ = new_chi2;
         chi2_per_iter_.push_back(chi2_);
         stop_ = normMax(dx_) < solver_options_.eps;
-        mu_ *= std::max(FloatType{0.333f},
-                        std::min(FloatType{1.0f - 8.0f * rho_ * rho_ * rho_},
-                                 FloatType{0.666f}));
+        mu_ *= std::max(real_t{0.333f},
+                        std::min(real_t{1.0f - 8.0f * rho_ * rho_ * rho_},
+                                 real_t{0.666f}));
         nu_ = 2.;
         VLOG(400) << "It. " << iter_
                   << "\t Trial " << trials_
@@ -204,7 +204,7 @@ template <typename T, typename Implementation>
 void LeastSquaresSolver<T, Implementation>::reset()
 {
   VLOG(400) << "Reset";
-  chi2_ = std::numeric_limits<FloatType>::max();
+  chi2_ = std::numeric_limits<real_t>::max();
   mu_ = solver_options_.mu_init;
   nu_ = solver_options_.nu_init;
   iter_ = 0;

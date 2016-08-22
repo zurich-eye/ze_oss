@@ -12,7 +12,7 @@ class Line;
 // Convenience typedefs:
 using Lines = std::vector<Line>;
 
-inline FloatType distanceToLine(const Position& pos,
+inline real_t distanceToLine(const Position& pos,
                                 const Position& line_anchor,
                                 const Vector3& line_direction)
 {
@@ -44,7 +44,7 @@ class Line
 public:
   Line() = default;
 
-  Line(Quaternion orientation, FloatType distance)
+  Line(Quaternion orientation, real_t distance)
   : orientation_(orientation)
   , distance_(distance) {}
 
@@ -59,7 +59,7 @@ public:
     return distance_ * orientation_.rotate(Vector3::UnitZ());
   }
 
-  inline FloatType distanceToLine(const Position& pos) const
+  inline real_t distanceToLine(const Position& pos) const
   {
     return ze::distanceToLine(pos, anchorPoint(), direction());
   }
@@ -69,7 +69,7 @@ public:
 
 private:
   Quaternion orientation_;
-  FloatType distance_ = 0.0;
+  real_t distance_ = 0.0;
 };
 
 } // namespace ze

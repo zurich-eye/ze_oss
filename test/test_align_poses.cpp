@@ -57,8 +57,8 @@ TEST(AlignPosesTest, testOptimization)
   }
 
   // Perturb estimated pose.
-  FloatType sigma_pos = 0.05;
-  FloatType sigma_rot = 5.0 / 180 * M_PI;
+  real_t sigma_pos = 0.05;
+  real_t sigma_rot = 5.0 / 180 * M_PI;
   Vector3 pos_pert = Vector3::Random();
   pos_pert = pos_pert.normalized() * sigma_pos;
   Vector3 rot_pert = Vector3::Random();

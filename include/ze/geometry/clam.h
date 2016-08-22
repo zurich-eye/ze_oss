@@ -51,18 +51,18 @@ class Clam : public LeastSquaresSolver<ClamState, Clam>
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = MADScaleEstimator<FloatType>;
-  using WeightFunction = TukeyWeightFunction<FloatType>;
+  using ScaleEstimator = MADScaleEstimator<real_t>;
+  using WeightFunction = TukeyWeightFunction<real_t>;
 
   Clam(
       const ClamLandmarks& landmarks,
       const std::vector<ClamFrameData>& data,
       const CameraRig& rig,
       const Transformation& T_Bc_Br_prior,
-      const FloatType prior_weight_pos,
-      const FloatType prior_weight_rot);
+      const real_t prior_weight_pos,
+      const real_t prior_weight_rot);
 
-  FloatType evaluateError(
+  real_t evaluateError(
       const ClamState& state,
       HessianMatrix* H,
       GradientVector* g);
@@ -71,13 +71,13 @@ private:
   const ClamLandmarks& landmarks_;
   const std::vector<ClamFrameData>& data_;
   const CameraRig& rig_;
-  std::vector<FloatType> measurement_sigma_localization_;
-  FloatType measurement_sigma_mapping_ = 2.0;
+  std::vector<real_t> measurement_sigma_localization_;
+  real_t measurement_sigma_mapping_ = 2.0;
 
   // Prior:
   const Transformation& T_Bc_Br_prior_; //!< Body-frame of (c)urrent and (r)eference view.
-  FloatType prior_weight_pos_;
-  FloatType prior_weight_rot_;
+  real_t prior_weight_pos_;
+  real_t prior_weight_rot_;
 };
 
 inline Vector2 reprojectionResidual(
@@ -86,7 +86,7 @@ inline Vector2 reprojectionResidual(
     const Camera& cam,
     const Transformation& T_C_B,
     const Transformation& T_Bc_Br,
-    const FloatType inv_depth,
+    const real_t inv_depth,
     const Eigen::Ref<const Keypoint>& px_measured,
     Matrix26* H1 = nullptr, //!< Jacobian dreprojectionResidual() / dT_Bc_Br
     Matrix21* H2 = nullptr  //!< Jacobian dreprojectionResidual() / dinv_depth

@@ -26,7 +26,7 @@ Matrix26 dLineMeasurement_dPose(const Transformation& T_B_W,
   const Matrix13 measurement_W_transpose = measurement_W.transpose();
   const Vector3 anchor_to_cam = T_C_W.inverse().getPosition() - line_anchor;
   DEBUG_CHECK_NE(anchor_to_cam.norm(), 0.0);
-  const FloatType inverse_distance = 1.0 / anchor_to_cam.norm();
+  const real_t inverse_distance = 1.0 / anchor_to_cam.norm();
   const Vector3 anchor_to_cam_normalized = anchor_to_cam * inverse_distance;
   const Matrix3 d_anchor_to_cam_normalized_d_campos =
       inverse_distance * (Matrix3::Identity() -

@@ -13,8 +13,8 @@ class PointAligner : public LeastSquaresSolver<Transformation, PointAligner>
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = UnitScaleEstimator<FloatType>;
-  using WeightFunction = UnitWeightFunction<FloatType>;
+  using ScaleEstimator = UnitScaleEstimator<real_t>;
+  using WeightFunction = UnitWeightFunction<real_t>;
 
   PointAligner(
       const Positions& p_A,
@@ -40,11 +40,11 @@ public:
   //! @param pts_A A vector of N points in the 'A' reference system (3xN)
   //! @param pts_B A vector of N points in the 'B' reference system (3xN)
   //! @return <s, T_B_A> such that ||s*T_B_A * pts_A - pts_B|| is minimized
-  static std::pair<FloatType, Transformation> alignSim3(
+  static std::pair<real_t, Transformation> alignSim3(
       const Positions& pts_A, const Positions& pts_B);
 
 private:
-  FloatType measurement_sigma_;
+  real_t measurement_sigma_;
   const Positions& p_A_;
   const Positions& p_B_;
 };

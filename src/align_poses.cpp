@@ -13,8 +13,8 @@ namespace ze {
 PoseAligner::PoseAligner(
     const TransformationVector& T_W_A,
     const TransformationVector& T_W_B,
-    const FloatType measurement_sigma_pos,
-    const FloatType measurement_sigma_rot)
+    const real_t measurement_sigma_pos,
+    const real_t measurement_sigma_rot)
   : T_W_A_(T_W_A)
   , T_W_B_(T_W_B)
   , measurement_sigma_pos_(measurement_sigma_pos)

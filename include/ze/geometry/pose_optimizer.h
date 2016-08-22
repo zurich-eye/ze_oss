@@ -57,7 +57,7 @@ struct PoseOptimizerFrameData
   //! Measurements: Projected on unit-plane. (computed internally).
   Keypoints uv;
 
-  FloatType measurement_sigma;
+  real_t measurement_sigma;
   //! @}
 };
 using PoseOptimizerFrameDataVec = std::vector<PoseOptimizerFrameData>;
@@ -69,8 +69,8 @@ class PoseOptimizer :
 public:
   using LeastSquaresSolver::HessianMatrix;
   using LeastSquaresSolver::GradientVector;
-  using ScaleEstimator = MADScaleEstimator<FloatType>;
-  using WeightFunction = TukeyWeightFunction<FloatType>;
+  using ScaleEstimator = MADScaleEstimator<real_t>;
+  using WeightFunction = TukeyWeightFunction<real_t>;
 
   PoseOptimizer(
       const LeastSquaresSolverOptions& options,
@@ -80,17 +80,17 @@ public:
       const LeastSquaresSolverOptions& options,
       std::vector<PoseOptimizerFrameData>& data,
       const Transformation& T_B_W_prior,
-      const FloatType prior_weight_pos,
-      const FloatType prior_weight_rot);
+      const real_t prior_weight_pos,
+      const real_t prior_weight_rot);
 
   static LeastSquaresSolverOptions getDefaultSolverOptions();
 
   void setPrior(
       const Transformation& T_B_W_prior,
-      const FloatType prior_weight_pos,
-      const FloatType prior_weight_rot);
+      const real_t prior_weight_pos,
+      const real_t prior_weight_rot);
 
-  FloatType evaluateError(
+  real_t evaluateError(
       const Transformation& T_B_W,
       HessianMatrix* H,
       GradientVector* g);
@@ -113,14 +113,14 @@ private:
   //! @name Prior
   //! @{
   Transformation T_B_W_prior_;
-  FloatType prior_weight_pos_ {0.0};
-  FloatType prior_weight_rot_ {0.0};
+  real_t prior_weight_pos_ {0.0};
+  real_t prior_weight_rot_ {0.0};
   //! @}
 };
 
 //! Returns sum of chi2 errors (weighted and whitened errors) and
 //! a vector of withened errors for each error term (used for outlier removal).
-std::pair<FloatType, VectorX> evaluateBearingErrors(
+std::pair<real_t, VectorX> evaluateBearingErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
@@ -129,14 +129,14 @@ std::pair<FloatType, VectorX> evaluateBearingErrors(
 
 //! Returns sum of chi2 errors (weighted and whitened errors) and
 //! a vector of withened errors for each error term (used for outlier removal).
-std::pair<FloatType, VectorX> evaluateUnitPlaneErrors(
+std::pair<real_t, VectorX> evaluateUnitPlaneErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
     PoseOptimizer::HessianMatrix* H,
     PoseOptimizer::GradientVector* g);
 
-std::pair<FloatType, VectorX> evaluateLineErrors(
+std::pair<real_t, VectorX> evaluateLineErrors(
     const Transformation& T_B_W,
     const bool compute_measurement_sigma,
     PoseOptimizerFrameData& data,
@@ -147,7 +147,7 @@ std::vector<KeypointIndex> getOutlierIndices(
     PoseOptimizerFrameData& data,
     const Camera& cam,
     const Transformation& T_B_W,
-    const FloatType pixel_threshold);
+    const real_t pixel_threshold);
 
 /*!
  * @brief Jacobian of bearing vector w.r.t. landmark in camera coordinates.
@@ -160,13 +160,13 @@ std::vector<KeypointIndex> getOutlierIndices(
  */
 inline Matrix3 dBearing_dLandmark(const Eigen::Ref<const Position>& p_C)
 {
-  const FloatType x2 = p_C(0) * p_C(0);
-  const FloatType y2 = p_C(1) * p_C(1);
-  const FloatType z2 = p_C(2) * p_C(2);
-  const FloatType xy = p_C(0) * p_C(1);
-  const FloatType xz = p_C(0) * p_C(2);
-  const FloatType yz = p_C(1) * p_C(2);
-  const FloatType x2_y2_z2 = x2 + y2 + z2;
+  const real_t x2 = p_C(0) * p_C(0);
+  const real_t y2 = p_C(1) * p_C(1);
+  const real_t z2 = p_C(2) * p_C(2);
+  const real_t xy = p_C(0) * p_C(1);
+  const real_t xz = p_C(0) * p_C(2);
+  const real_t yz = p_C(1) * p_C(2);
+  const real_t x2_y2_z2 = x2 + y2 + z2;
   Matrix3 J;
   J << y2 + z2, -xy, -xz,
        -xy, x2 + z2, -yz,
@@ -180,8 +180,8 @@ inline Matrix3 dBearing_dLandmark(const Eigen::Ref<const Position>& p_C)
  */
 inline Matrix23 dUv_dLandmark(const Eigen::Ref<const Position>& p_C)
 {
-  const FloatType z_sq = p_C(2) * p_C(2);
-  const FloatType z_inv = FloatType{1.0} / p_C(2);
+  const real_t z_sq = p_C(2) * p_C(2);
+  const real_t z_inv = real_t{1.0} / p_C(2);
   Matrix23 J;
   J << z_inv, 0.0, -p_C(0) / z_sq,
        0.0, z_inv, -p_C(1) / z_sq;

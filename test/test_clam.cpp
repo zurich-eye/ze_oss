@@ -26,7 +26,7 @@ TEST(ClamTests, testJacobians)
   Bearing f_Br = T_C_B.getRotation().inverse().rotate(f_Cr);
   Bearing p_Br = T_C_B.inverse().getPosition();
 
-  FloatType inv_depth = 0.455;
+  real_t inv_depth = 0.455;
 
   Keypoint px_Cc = cam.project(T_C_B * T_Bc_Br * T_C_B.inverse() * (f_Cr * (1.0 / inv_depth)));
 
@@ -41,7 +41,7 @@ TEST(ClamTests, testJacobians)
                   std::placeholders::_1, inv_depth, px_Cc, nullptr, nullptr), T_Bc_Br);
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H1, H1_numeric, 1e-6));
 
-  Matrix21 H2_numeric = numericalDerivative<Vector2, FloatType>(
+  Matrix21 H2_numeric = numericalDerivative<Vector2, real_t>(
         std::bind(&reprojectionResidual, f_Br, p_Br, cam, T_C_B,
                   T_Bc_Br, std::placeholders::_1, px_Cc, nullptr, nullptr), inv_depth);
   EXPECT_TRUE(EIGEN_MATRIX_NEAR(H2, H2_numeric, 1e-6));
@@ -68,7 +68,7 @@ TEST(ClamTests, testExperiment)
 
   // Obtain the 3D points by applying a random scaling between 1 and 3 meters.
   std::ranlux24 gen;
-  std::uniform_real_distribution<FloatType> scale(1.0, 3.0);
+  std::uniform_real_distribution<real_t> scale(1.0, 3.0);
   VectorX depth_true(n);
   for(size_t i = 0; i < n; ++i)
   {
@@ -82,8 +82,8 @@ TEST(ClamTests, testExperiment)
 
   // Apply some noise to the keypoints to simulate measurements.
   Keypoints px_Cc_noisy = px_Cc_true;
-  const FloatType stddev = 1.0;
-  std::normal_distribution<FloatType> px_noise(0.0, stddev);
+  const real_t stddev = 1.0;
+  std::normal_distribution<real_t> px_noise(0.0, stddev);
   for(size_t i = 0; i < n; ++i)
   {
     px_Cc_noisy(0,i) += px_noise(gen);
@@ -105,8 +105,8 @@ TEST(ClamTests, testExperiment)
 
     ClamLandmarks landmarks;
 
-    FloatType pos_prior_weight = 0.0;
-    FloatType rot_prior_weight = 0.0;
+    real_t pos_prior_weight = 0.0;
+    real_t rot_prior_weight = 0.0;
     ze::Timer t;
     Clam optimizer(
           landmarks, data_vec, *rig, T_Bc_Br, pos_prior_weight, rot_prior_weight);
@@ -120,8 +120,8 @@ TEST(ClamTests, testExperiment)
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
     Transformation T_err = T_Bc_Br * T_Bc_Br_estimate.inverse();
-    FloatType pos_error = T_err.getPosition().norm();
-    FloatType ang_error = T_err.getRotation().log().norm();
+    real_t pos_error = T_err.getPosition().norm();
+    real_t ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
     VLOG(1) << "ang error = " << ang_error;
@@ -148,8 +148,8 @@ TEST(ClamTests, testExperiment)
     Vector3 t_Br_Cr = T_C_B.inverse().getPosition();
     landmarks.origin_Br = t_Br_Cr.replicate(1, landmarks.f_Br.cols());
 
-    FloatType pos_prior_weight = 0.2;
-    FloatType rot_prior_weight = 10.0;
+    real_t pos_prior_weight = 0.2;
+    real_t rot_prior_weight = 10.0;
     ze::Timer t;
     Clam optimizer(
           landmarks, data_vec, *rig, T_Bc_Br, pos_prior_weight, rot_prior_weight);
@@ -166,8 +166,8 @@ TEST(ClamTests, testExperiment)
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
     Transformation T_err = T_Bc_Br * T_Bc_Br_estimate.inverse();
-    FloatType pos_error = T_err.getPosition().norm();
-    FloatType ang_error = T_err.getRotation().log().norm();
+    real_t pos_error = T_err.getPosition().norm();
+    real_t ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
     VLOG(1) << "ang error = " << ang_error;
@@ -196,8 +196,8 @@ TEST(ClamTests, testExperiment)
     Vector3 t_Br_Cr = T_C_B.inverse().getPosition();
     landmarks.origin_Br = t_Br_Cr.replicate(1, landmarks.f_Br.cols());
 
-    FloatType pos_prior_weight = 0.0;
-    FloatType rot_prior_weight = 0.0;
+    real_t pos_prior_weight = 0.0;
+    real_t rot_prior_weight = 0.0;
     ze::Timer t;
     Clam optimizer(
           landmarks, data_vec, *rig, T_Bc_Br, pos_prior_weight, rot_prior_weight);
@@ -214,8 +214,8 @@ TEST(ClamTests, testExperiment)
     // Compute error:
     T_Bc_Br_estimate = state.at<0>();
     Transformation T_err = T_Bc_Br * T_Bc_Br_estimate.inverse();
-    FloatType pos_error = T_err.getPosition().norm();
-    FloatType ang_error = T_err.getRotation().log().norm();
+    real_t pos_error = T_err.getPosition().norm();
+    real_t ang_error = T_err.getRotation().log().norm();
     CHECK_LT(pos_error, 0.005);
     CHECK_LT(ang_error, 0.005);
     VLOG(1) << "ang error = " << ang_error;

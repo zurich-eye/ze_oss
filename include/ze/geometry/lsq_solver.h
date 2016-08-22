@@ -23,10 +23,10 @@ struct LeastSquaresSolverOptions
   //! the steepest direction. This is good if the current iterate is far from the
   //! solution. If mu is small, LM approximates gauss newton iteration and we
   //! have (almost) quadratic convergence in the final stages.
-  FloatType mu_init{0.01};
+  real_t mu_init{0.01};
 
   //! Increase factor of mu after fail
-  FloatType nu_init{2.0};
+  real_t nu_init{2.0};
 
   //! Max number of iterations
   uint32_t max_iter{15u};
@@ -41,7 +41,7 @@ struct LeastSquaresSolverOptions
   bool verbose{false};
 
   //! Stop if update norm is smaller than eps
-  FloatType eps{1.0e-10};
+  real_t eps{1.0e-10};
 };
 
 //! Abstract Class for solving nonlinear least-squares (NLLS) problems.
@@ -53,9 +53,9 @@ class LeastSquaresSolver
 public:
   using State = T;
   enum Dimension : int { dimension = traits<State>::dimension };
-  using HessianMatrix = Eigen::Matrix<FloatType, dimension, dimension>;
-  using GradientVector = Eigen::Matrix<FloatType, dimension, 1>;
-  using UpdateVector = Eigen::Matrix<FloatType, dimension, 1>;
+  using HessianMatrix = Eigen::Matrix<real_t, dimension, dimension>;
+  using GradientVector = Eigen::Matrix<real_t, dimension, 1>;
+  using UpdateVector = Eigen::Matrix<real_t, dimension, 1>;
 
   LeastSquaresSolverOptions solver_options_;
 
@@ -80,13 +80,13 @@ public:
   void reset();
 
   //! Get the squared error.
-  inline FloatType error() const
+  inline real_t error() const
   {
     return chi2_;
   }
 
   //! Get error at every iteration.
-  inline const std::vector<FloatType>& errors() const
+  inline const std::vector<real_t>& errors() const
   {
     return chi2_per_iter_;
   }
@@ -108,7 +108,7 @@ protected:
   //! the Hessian matrix and the gradient vector (Jacobian * residual).
   //! If these parameters are requested, the system is linearized at the current
   //! state.
-  FloatType evaluateError(
+  real_t evaluateError(
       const State& state,
       HessianMatrix* H,
       GradientVector* g)
@@ -203,16 +203,16 @@ protected:
   UpdateVector dx_;
 
   //! Whitened error / log-likelihood: 1/(2*sigma^2)*(z-h(x))^2.
-  FloatType chi2_{std::numeric_limits<FloatType>::max()};
+  real_t chi2_{std::numeric_limits<real_t>::max()};
 
   //! Error reduction: chi2 - new_chi2.
-  FloatType rho_{0.0};
+  real_t rho_{0.0};
 
   //! Damping parameter.
-  FloatType mu_{0.01};
+  real_t mu_{0.01};
 
   //! Factor that specifies how much we increase mu at every trial.
-  FloatType nu_{2.0};
+  real_t nu_{2.0};
 
   //! Stop flag.
   bool stop_{false};
@@ -224,7 +224,7 @@ protected:
   size_t trials_{0u};
 
   // Statistics:
-  std::vector<FloatType> chi2_per_iter_;
+  std::vector<real_t> chi2_per_iter_;
 };
 
 } // namespace ze
