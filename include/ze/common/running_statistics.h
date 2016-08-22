@@ -59,7 +59,7 @@ public:
 
 private:
   uint32_t n_ = 0u;
-  real_t min_ = std::numeric_limits<FloatType>::max();
+  real_t min_ = std::numeric_limits<real_t>::max();
   real_t max_ = 0.0;
   real_t sum_ = 0.0;
   real_t M_ = 0.0;
