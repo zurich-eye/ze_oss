@@ -11,11 +11,11 @@ struct Color
   real_t b = 0.0f;
   real_t a = 1.0f;
 
-  constexpr Color(real_t r, FloatType g, FloatType b)
+  constexpr Color(real_t r, real_t g, real_t b)
     : r(r), g(g), b(b)
   {}
 
-  constexpr Color(real_t r, FloatType g, FloatType b, FloatType a)
+  constexpr Color(real_t r, real_t g, real_t b, real_t a)
     : r(r), g(g), b(b), a(a)
   {}
 };
