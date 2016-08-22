@@ -3,9 +3,6 @@
 #include <cstring>
 #include <algorithm>
 
-#include <imp/core/exception.hpp>
-
-
 namespace ze {
 
 //-----------------------------------------------------------------------------

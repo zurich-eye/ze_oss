@@ -6,7 +6,6 @@
 #include <ze/common/macros.h>
 #include <ze/common/logging.hpp>
 #include <imp/core/image_base.hpp>
-#include <imp/core/exception.hpp>
 #include <imp/core/pixel.hpp>
 
 namespace ze {

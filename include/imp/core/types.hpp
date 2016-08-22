@@ -25,6 +25,5 @@ enum class MemoryType
   ManagedAligned
 };
 
-
-}
+} // namespace ze
 

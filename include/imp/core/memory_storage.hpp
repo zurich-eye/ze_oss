@@ -8,7 +8,6 @@
 
 #include <ze/common/logging.hpp>
 #include <ze/common/types.h>
-#include <imp/core/exception.hpp>
 #include <imp/core/size.hpp>
 #include <imp/core/types.hpp>
 

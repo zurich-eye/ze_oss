@@ -13,8 +13,6 @@ include(ze_setup)
 set(HEADERS
   include/imp/core/macros.hpp
   include/imp/core/types.hpp
-  include/imp/core/exception.hpp
-  include/imp/core/timer.hpp
 
   include/imp/core/size.hpp
   include/imp/core/roi.hpp
@@ -48,7 +46,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/roi_test.cpp
   test/vec_test.cpp
   test/linearmemory_test.cpp
-  test/single_shot_timer_test.cpp
   test/test_copy.cpp
 )
 target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} pthread)
