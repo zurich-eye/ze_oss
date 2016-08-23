@@ -16,7 +16,7 @@ Provided as CSV-file with the structure:
 
 2. `swe`
   ```
-  # timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz
+  timestamp, x, y, z, qx, qy, qz, qw, vx, vy, vz, bgx, bgy, bgz, bax, bay, baz
   ```
   The first 7 components are equivalent to the pose series representation. `vx`, `vy`, `vz` are the componenents of the velocity. `bgx`, `bgy`, `bgz` the bias of the gyroscope and `bax`, `bay` and `baz` the bias of the accelerometer.
 
