@@ -11,10 +11,10 @@
   TypeName(const TypeName&) = delete;               \
   void operator=(const TypeName&) = delete
 
-// Give the compiler a hint that an if statement is false.
-#define ZE_UNLIKELY(x)                              \
+// Give the compiler a hint that an if statement is likely true or false.
+// You should use it only in cases when the likeliest branch is very very very
+// likely, or when the unlikeliest branch is very very very unlikely.
+#define UNLIKELY(x)                                 \
   __builtin_expect((bool)(x), 0)
-
-// Give the compiler a hint that an if statement is true.
-#define ZE_LIKELY(x)                                \
+#define LIKELY(x)                                   \
   __builtin_expect((bool)(x), 1)
