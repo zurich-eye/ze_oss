@@ -4,6 +4,7 @@
 // Adopted from https://github.com/ethz-asl/Schweizer-Messer/ (2016)
 // BSD Licensed
 
+
 #pragma once
 
 #include <vector>

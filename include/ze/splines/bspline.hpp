@@ -1,6 +1,7 @@
 // Copyright (c) 2014, Paul Furgale, Jérôme Maye and Jörn Rehder, Autonomous Systems Lab, ETH Zurich, Switzerland
 // Copyright (c) 2014, Thomas Schneider, Skybotix AG, Switzerland
 // Copyright (c) 2016, Luc Oth
+// Copyright (C) 2016 ETH Zurich, Wyss Zurich, Zurich Eye
 // All rights reserved.
 //
 // Adopted from https://github.com/ethz-asl/kalibr/ (2016)
@@ -17,6 +18,7 @@
 //       capabilities. One major part is the efficiency which isn't perfect at
 //       all (pure Eigen::Dynamic implementations, a bunch of duplicate
 //       evaluations for readability and some debuggng stuff)
+
 
 #pragma once
 
