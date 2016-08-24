@@ -1,3 +1,7 @@
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+
 #include <ze/vi_simulation/imu_simulator.hpp>
 #include <ze/common/test_entrypoint.h>
 #include <ze/splines/bspline_pose_minimal.hpp>
