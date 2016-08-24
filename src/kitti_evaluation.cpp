@@ -1,3 +1,7 @@
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+
 #include <ze/trajectory_analysis/kitti_evaluation.h>
 
 #include <ze/geometry/align_poses.h>
