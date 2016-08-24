@@ -1,3 +1,7 @@
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+
 #include <ros/ros.h>
 #include <ze/common/logging.hpp>
 #include <gflags/gflags.h>
