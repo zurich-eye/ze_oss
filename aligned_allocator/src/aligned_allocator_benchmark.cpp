@@ -9,35 +9,39 @@
 int main(int argc, char* argv[])
 {
   google::InitGoogleLogging(argv[0]);
-  VLOG(2) << "Starting aligned allocator benchmarking";
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InstallFailureSignalHandler();
+  FLAGS_alsologtostderr = true;
+  FLAGS_colorlogtostderr = true;
+  VLOG(1) << "Starting aligned allocator benchmarking";
 
 
   const size_t memory_size = 1e6;
   int memaddr_align = 32;
-  std::uint64_t num_rounds = 1e8;
+  std::uint64_t num_rounds = 1e6;
 
   {
     ze::TimerStatistics timer;
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
-      timer.timeScope();
+      __attribute__((unused)) auto t = timer.timeScope();
       std::uint8_t* p_data_aligned;
       int ret = posix_memalign((void**)&p_data_aligned, memaddr_align, memory_size);
       free(p_data_aligned);
       (void)ret;
     }
-    LOG(INFO) << "posix_memalign: " << timer.mean() << "ms";
+    VLOG(1) << "posix_memalign: " << timer.mean() << "ms";
   }
 
   {
     ze::TimerStatistics timer;
     for (std::uint64_t i=0; i<num_rounds; ++i)
     {
-      timer.timeScope();
+      __attribute__((unused)) auto t = timer.timeScope();
       std::uint8_t* p_data_aligned = (std::uint8_t*)aligned_alloc(memaddr_align, memory_size);
       free(p_data_aligned);
     }
-    LOG(INFO) << "posix_memalign: " << timer.mean() << "ms";
+    VLOG(1) << "posix_memalign: " << timer.mean() << "ms";
   }
 
 }
