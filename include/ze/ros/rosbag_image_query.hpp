@@ -1,5 +1,7 @@
-// Heavily modified by ze.
 // RPG-BSD License, Titus Cieslewski
+// Heavily modified by ZE
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+
 #pragma once
 
 #include <string>

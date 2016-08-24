@@ -1,5 +1,7 @@
-// Heavily modified by ze.
 // RPG-BSD License, Titus Cieslewski
+// Heavily modified by ZE
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+
 #include <ze/ros/rosbag_image_query.hpp>
 
 #include <glog/logging.h>
