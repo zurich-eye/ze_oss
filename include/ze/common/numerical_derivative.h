@@ -24,13 +24,11 @@ numericalDerivative(std::function<Y(const X&)> h, const X& x, real_t delta = 1e-
   const int N_Y = traits<Y>::getDimension(hx);
 
   // Prepare a tangent vector to perturb x.
-  TangentX dx;
-  dx.resize(N_X, 1);
+  TangentX dx(N_X, 1);
   dx.setZero();
 
   // Compute numerical Jacobian column by column.
-  Jacobian H;
-  H.resize(N_Y, N_X);
+  Jacobian H(N_Y, N_X);
   H.setZero();
 
   real_t factor = 1.0 / (2.0 * delta);

@@ -5,12 +5,13 @@
 #include <functional>
 #include <Eigen/Dense>
 #include <ze/common/types.h>
+#include <ze/common/transformation.h>
 
 namespace ze {
 
-// For now, the manifold traits are primarily used for simplified computation of
-// numerical derivatives (see numerical_derivative.h). We use the numerical
-// derivatives mainly to test the correctness of the analytical derivatives.
+// Manifold traits are used for simplified computation of numerical derivatives
+// to verify the analytical ones. The retract method is further used in the
+// optimizer.
 template<typename T> struct traits;
 
 // -----------------------------------------------------------------------------
@@ -209,7 +210,164 @@ struct traits<Eigen::Matrix<real_t, 1, Eigen::Dynamic, Options, MaxRows, MaxCols
     public internal::DynamicMatrixTraits<1, Eigen::Dynamic, Options, MaxRows, MaxCols> {
 };
 
+// -----------------------------------------------------------------------------
+// Manifold traits for SO(3)
+template<> struct traits<Quaternion>
+{
+  enum { dimension = 3 }; // The dimension of the manifold.
+
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
+
+  static int getDimension(const Quaternion& /*v*/)
+  {
+    return 3;
+  }
+
+  static bool equals(
+      const Quaternion& q1, const Quaternion& q2, real_t tol = 1e-8)
+  {
+    return (q1.getUnique().vector()
+            - q2.getUnique().vector()).array().abs().maxCoeff() < tol;
+  }
+
+  static TangentVector local(
+      const Quaternion& origin, const Quaternion& other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    const Quaternion h = origin.inverse() * other;
+    const TangentVector v = h.log();
+    if(H1 || H2)
+    {
+      Jacobian D_v_h = logmapDerivativeSO3(v);
+      if(H1)
+      {
+        // dlocal(origin, other) / dorigin, using that Adjoint(h.inverse()) = h.inverse()
+        *H1 = - D_v_h * h.inverse().getRotationMatrix();
+      }
+      if(H2)
+      {
+        // dlocal(origin, other) / dother
+        *H2 = D_v_h;
+      }
+    }
+    return v;
+  }
+
+  static Quaternion retract(
+      const Quaternion& origin, const Vector3& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    const Quaternion g = Quaternion::exp(v);
+    const Quaternion h = origin * g;
+    if (H1)
+    {
+      // dretract(origin, v) / dorigin
+      *H1 = g.inverse().getRotationMatrix(); // Adjoint(g.inverse()) = g.inverse()
+    }
+    if (H2)
+    {
+      // dretract(origin, v) / dv
+      *H2 = expmapDerivativeSO3(v);
+    }
+    return h;
+  }
+};
+
+// -----------------------------------------------------------------------------
+// Manifold traits for SE(3)
+template<> struct traits<Transformation>
+{
+  enum { dimension = 6 }; // The dimension of the manifold.
+
+  typedef Eigen::Matrix<real_t, dimension, 1> TangentVector;
+  typedef Eigen::Matrix<real_t, dimension, dimension> Jacobian;
+
+  static int getDimension(const Transformation& /*v*/)
+  {
+    return 6;
+  }
+
+  static bool equals(
+      const Transformation& T1, const Transformation& T2, real_t tol = 1e-8)
+  {
+    return (T1.getRotation().getUnique().vector()
+            - T2.getRotation().getUnique().vector()).array().abs().maxCoeff() < tol
+        && (T1.getPosition() - T2.getPosition()).array().abs().maxCoeff() < tol;
+  }
+
+  static TangentVector local(
+      const Transformation& origin, const Transformation& other,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    const Transformation h = origin.inverse() * other;
+    const TangentVector v = (Vector6() << h.getPosition(), h.getRotation().log()).finished();
+    if (H1 || H2)
+    {
+      Matrix3 J_r_inv = logmapDerivativeSO3(v.tail<3>());
+      if (H1)
+      {
+        // dlocal(origin, other) / dorigin
+        H1->block<3,3>(0,0) = -I_3x3;
+        H1->block<3,3>(0,3) = skewSymmetric(v.head<3>());
+        H1->block<3,3>(3,0) = Z_3x3;
+        H1->block<3,3>(3,3) = - J_r_inv * h.getRotation().inverse().getRotationMatrix();
+      }
+      if(H2)
+      {
+        // dlocal(origin, other) / dother
+        H2->block<3,3>(0,0) = h.getRotationMatrix();
+        H2->block<3,3>(0,3) = Z_3x3;
+        H2->block<3,3>(3,0) = Z_3x3;
+        H2->block<3,3>(3,3) = J_r_inv;
+      }
+    }
+    return v;
+  }
+
+  static Transformation retract(
+      const Transformation& origin, const Vector6& v,
+      Jacobian* H1 = nullptr, Jacobian* H2 = nullptr)
+  {
+    Transformation g(Quaternion::exp(v.tail<3>()), v.head<3>());
+    Transformation h  = origin * g;
+
+    if (H1 || H2)
+    {
+      const Matrix3 R_CB = Quaternion::exp(v.tail<3>()).inverse().getRotationMatrix();
+      if (H1)
+      {
+        // dretract(origin, other) / dorigin
+
+        // Remember: Computation of the translation components must be in the
+        // body frame of the result.
+        // Retraction: T_AC = T_AB * exp(xi_BC) = T_AB * T_BC
+        // Let's look at the translation component:
+        //    A_t_AC = A_t_AB + R_AB * B_t_BC
+        // Perturb it the translation (in the body frame B):
+        //    A_t_AC = A_t_AB + (R_AB * B_dt) + R_AB * B_t_BC
+        //           = A_t_AC + (R_AB * B_dt)
+        // !!! What we want is the perturbation in the body frame of the result
+        // i.e. in the frame C:
+        //    A_t_AC = A_t_AC + (R_AB * B_dt)
+        //    A_t_AC = A_t_AC + (R_AC * R_AC^-1) * (R_AB * B_dt) <- trick
+        //           = A_t_AC + R_AC * (R_CB * B_dt)
+        //           -> Jacobian = R_CB
+        H1->block<3,3>(0,0) = R_CB;
+        H1->block<3,3>(0,3) = - R_CB * skewSymmetric(v.head<3>());
+        H1->block<3,3>(3,0) = Z_3x3;
+        H1->block<3,3>(3,3) = g.getRotation().inverse().getRotationMatrix();
+      }
+      if(H2)
+      {
+        H2->block<3,3>(0,0) = R_CB;
+        H2->block<3,3>(0,3) = Z_3x3;
+        H2->block<3,3>(3,0) = Z_3x3;
+        H2->block<3,3>(3,3) = expmapDerivativeSO3(v.tail<3>());
+      }
+    }
+    return h;
+  }
+};
+
 } // namespace ze
-
-
-
