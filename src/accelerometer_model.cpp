@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include "ze/imu/accelerometer_model.h"
+#include <ze/imu/accelerometer_model.hpp>
 
 namespace ze {
 

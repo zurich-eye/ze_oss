@@ -6,11 +6,11 @@
 
 #include <string>
 
-#include <ze/imu/accelerometer_model.h>
-#include <ze/imu/gyroscope_model.h>
-#include <ze/imu/imu_yaml_serialization.h>
-#include <ze/common/macros.h>
-#include <ze/common/types.h>
+#include <ze/imu/accelerometer_model.hpp>
+#include <ze/imu/gyroscope_model.hpp>
+#include <ze/imu/imu_yaml_serialization.hpp>
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

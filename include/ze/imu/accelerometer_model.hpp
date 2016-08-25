@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <ze/imu/imu_intrinsic_model.h>
-#include <ze/imu/imu_noise_model.h>
-#include <ze/common/macros.h>
-#include <ze/common/types.h>
+#include <ze/imu/imu_intrinsic_model.hpp>
+#include <ze/imu/imu_noise_model.hpp>
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

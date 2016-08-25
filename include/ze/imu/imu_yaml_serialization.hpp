@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include <ze/imu/accelerometer_model.h>
-#include <ze/imu/gyroscope_model.h>
+#include <ze/imu/accelerometer_model.hpp>
+#include <ze/imu/gyroscope_model.hpp>
 #include <ze/common/logging.hpp>
-#include <ze/common/transformation.h>
+#include <ze/common/transformation.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace ze {

@@ -2,8 +2,8 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/imu/imu_rig.h>
-#include <ze/imu/imu_yaml_serialization.h>
+#include <ze/imu/imu_rig.hpp>
+#include <ze/imu/imu_yaml_serialization.hpp>
 
 namespace ze {
 

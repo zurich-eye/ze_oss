@@ -4,13 +4,13 @@
 
 #include <string>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/path_utils.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/path_utils.hpp>
 
-#include <ze/imu/imu_model.h>
-#include <ze/imu/imu_rig.h>
-#include <ze/imu/imu_yaml_serialization.h>
+#include <ze/imu/imu_model.hpp>
+#include <ze/imu/imu_rig.hpp>
+#include <ze/imu/imu_yaml_serialization.hpp>
 
 TEST(ImuYamlSerialization, testYamlLoading)
 {

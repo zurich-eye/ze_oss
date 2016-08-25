@@ -2,11 +2,11 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 
-#include <ze/imu/accelerometer_model.h>
-#include <ze/imu/imu_intrinsic_model.h>
-#include <ze/imu/imu_noise_model.h>
+#include <ze/imu/accelerometer_model.hpp>
+#include <ze/imu/imu_intrinsic_model.hpp>
+#include <ze/imu/imu_noise_model.hpp>
 
 TEST(AccelerometerModelTest, testAccelerometer)
 {

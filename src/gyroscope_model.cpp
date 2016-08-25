@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include "ze/imu/gyroscope_model.h"
+#include <ze/imu/gyroscope_model.hpp>
 
 namespace ze {
 

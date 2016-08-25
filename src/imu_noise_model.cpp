@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include "ze/imu/imu_noise_model.h"
+#include <ze/imu/imu_noise_model.hpp>
 
 namespace ze {
 

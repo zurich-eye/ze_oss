@@ -7,8 +7,8 @@
 #include <string>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/macros.h>
-#include <ze/common/types.h>
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

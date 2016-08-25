@@ -7,9 +7,9 @@
 #include <Eigen/LU>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/macros.h>
-#include <ze/common/matrix.h>
-#include <ze/common/types.h>
+#include <ze/common/macros.hpp>
+#include <ze/common/matrix.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

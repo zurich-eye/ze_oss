@@ -2,15 +2,15 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/imu/accelerometer_model.h>
-#include <ze/imu/gyroscope_model.h>
-#include <ze/imu/imu_intrinsic_model.h>
-#include <ze/imu/imu_model.h>
-#include <ze/imu/imu_noise_model.h>
-#include <ze/imu/imu_rig.h>
-#include <ze/imu/imu_yaml_serialization.h>
-#include <ze/common/types.h>
-#include <ze/common/yaml_serialization.h>
+#include <ze/imu/accelerometer_model.hpp>
+#include <ze/imu/gyroscope_model.hpp>
+#include <ze/imu/imu_intrinsic_model.hpp>
+#include <ze/imu/imu_model.hpp>
+#include <ze/imu/imu_noise_model.hpp>
+#include <ze/imu/imu_rig.hpp>
+#include <ze/imu/imu_yaml_serialization.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/yaml_serialization.hpp>
 
 using ze::Matrix3;
 using ze::Vector3;

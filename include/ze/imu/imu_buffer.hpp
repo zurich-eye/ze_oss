@@ -6,8 +6,8 @@
 
 #include <mutex>
 
-#include <ze/imu/imu_model.h>
-#include <ze/common/ringbuffer.h>
+#include <ze/imu/imu_model.hpp>
+#include <ze/common/ringbuffer.hpp>
 
 namespace ze {
 
