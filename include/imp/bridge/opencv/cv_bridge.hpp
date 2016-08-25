@@ -6,7 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
-#include <ze/common/file_utils.h>
+#include <ze/common/file_utils.hpp>
 
 namespace ze {
 
