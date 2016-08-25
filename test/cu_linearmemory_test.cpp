@@ -11,7 +11,7 @@
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_linearmemory.cuh>
 #include <ze/common/random.hpp>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_utils.hpp>
 
 template <typename Pixel>
 class CuLinearMemoryTest : public ::testing::Test

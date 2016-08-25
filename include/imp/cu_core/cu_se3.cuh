@@ -4,7 +4,7 @@
 #include <ostream>
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_matrix.cuh>
-#include <ze/common/transformation.h>
+#include <ze/common/transformation.hpp>
 
 namespace ze
 {

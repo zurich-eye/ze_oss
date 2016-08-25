@@ -12,7 +12,7 @@
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_utils.hpp>
 #include <ze/common/random.hpp>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_utils.hpp>
 
 
 TEST(IMPCuCoreTestSuite,minMaxTest_8uC1)

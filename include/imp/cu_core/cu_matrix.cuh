@@ -9,7 +9,7 @@
 #include <ostream>
 
 #include <imp/core/pixel.hpp>
-#include <ze/common/matrix.h>
+#include <ze/common/matrix.hpp>
 
 namespace ze {
 namespace cu {
