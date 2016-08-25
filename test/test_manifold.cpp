@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include <ze/common/manifold.h>
 #include <ze/common/numerical_derivative.h>
 #include <ze/common/test_entrypoint.h>
@@ -138,7 +136,6 @@ TEST(ManifoldTests, testManifoldSE3RetractJacobians)
   Vector6 v = Transformation::log(origin.inverse() * other);
   EXPECT_TRUE(traits<Vector6>::equals(v, traits<Transformation>::local(origin, other)));
 }
-
 #endif
 
 ZE_UNITTEST_ENTRYPOINT

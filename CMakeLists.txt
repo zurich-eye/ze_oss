@@ -54,7 +54,6 @@ set(HEADERS
   include/ze/common/stl_utils.h
   include/ze/common/string_utils.h
   include/ze/common/test_entrypoint.h
-  include/ze/common/test_manifold.h
   include/ze/common/test_utils.h
   include/ze/common/test_thread_blocking.hpp
   include/ze/common/thread_pool.hpp
