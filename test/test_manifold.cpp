@@ -4,8 +4,8 @@
 
 #include <cmath>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_manifold.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_manifold.hpp>
 
 TEST(ManifoldTests, testScalarTraits)
 {

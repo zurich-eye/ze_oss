@@ -5,8 +5,8 @@
 #pragma once
 
 #include <ze/common/random.hpp>
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
 
 namespace ze {
 

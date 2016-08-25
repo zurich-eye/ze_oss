@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/matrix.h>
+#include <ze/common/matrix.hpp>
 
 #include <Eigen/SVD>
 #include <Eigen/LU>

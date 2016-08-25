@@ -6,11 +6,11 @@
 #include <vector>
 #include <iostream>
 
-#include <ze/common/benchmark.h>
-#include <ze/common/types.h>
-#include <ze/common/ringbuffer.h>
-#include <ze/common/buffer.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/ringbuffer.hpp>
+#include <ze/common/buffer.hpp>
+#include <ze/common/test_entrypoint.hpp>
 
 DEFINE_bool(run_benchmark, false, "Benchmark the buffer vs. ringbuffer");
 

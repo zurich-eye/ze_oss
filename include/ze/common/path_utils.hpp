@@ -8,7 +8,7 @@
 #include <string>
 #include <fstream>
 
-#include <ze/common/string_utils.h>
+#include <ze/common/string_utils.hpp>
 
 namespace ze {
 

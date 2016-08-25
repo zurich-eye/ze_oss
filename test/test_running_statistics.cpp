@@ -2,9 +2,9 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/running_statistics.h>
-#include <ze/common/running_statistics_collection.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/running_statistics.hpp>
+#include <ze/common/running_statistics_collection.hpp>
 
 TEST(RunningStatisticsTest, testRunningStatistics)
 {

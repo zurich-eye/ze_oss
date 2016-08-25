@@ -6,8 +6,8 @@
 
 #include <iostream>
 #include <functional>
-#include <ze/common/types.h>
-#include <ze/common/manifold.h>
+#include <ze/common/types.hpp>
+#include <ze/common/manifold.hpp>
 
 namespace ze {
 

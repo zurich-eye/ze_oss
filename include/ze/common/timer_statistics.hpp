@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <ze/common/running_statistics.h>
-#include <ze/common/timer.h>
-#include <ze/common/types.h>
+#include <ze/common/running_statistics.hpp>
+#include <ze/common/timer.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

@@ -10,7 +10,7 @@
 #include <Eigen/Dense>
 #include <ze/common/logging.hpp>
 
-#include <ze/common/stl_utils.h>
+#include <ze/common/stl_utils.hpp>
 
 namespace ze {
 

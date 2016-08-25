@@ -8,7 +8,7 @@
 
 #include <functional>
 #include <Eigen/Dense>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

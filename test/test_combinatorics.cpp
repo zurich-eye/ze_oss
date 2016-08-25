@@ -3,9 +3,9 @@
 // Proprietary and confidential
 
 #include <iostream>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/types.h>
-#include <ze/common/combinatorics.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/combinatorics.hpp>
 
 TEST(CombinatoricsTests, testGetMatchingIndices)
 {

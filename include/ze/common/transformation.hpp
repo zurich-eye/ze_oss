@@ -11,8 +11,8 @@
 // Fix is in 3.3 devel (http://eigen.tuxfamily.org/bz/show_bug.cgi?id=872).
 #include <kindr/minimal/quat-transformation.h>
 #pragma diagnostic pop
-#include <ze/common/types.h>
-#include <ze/common/matrix.h>
+#include <ze/common/types.hpp>
+#include <ze/common/matrix.hpp>
 
 namespace ze {
 

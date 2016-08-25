@@ -8,11 +8,11 @@
 #include <string>
 #include <sstream>
 
-#include <ze/common/file_utils.h>
+#include <ze/common/file_utils.hpp>
 #include <ze/common/logging.hpp>
-#include <ze/common/string_utils.h>
-#include <ze/common/types.h>
-#include <ze/common/running_statistics.h>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/running_statistics.hpp>
 
 namespace ze {
 

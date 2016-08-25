@@ -4,9 +4,9 @@
 
 #include <cmath>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_manifold.h>
-#include <ze/common/transformation.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_manifold.hpp>
+#include <ze/common/transformation.hpp>
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
 constexpr ze::real_t tol = 1e-9;

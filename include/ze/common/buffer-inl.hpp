@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ze/common/buffer.h>
+#include <ze/common/buffer.hpp>
 
 namespace ze {
 

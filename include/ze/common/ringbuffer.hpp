@@ -11,10 +11,10 @@
 #include <mutex>
 #include <Eigen/Dense>
 #include <ze/common/logging.hpp>
-#include <ze/common/ring_view.h>
+#include <ze/common/ring_view.hpp>
 
-#include <ze/common/types.h>
-#include <ze/common/time_conversions.h>
+#include <ze/common/types.hpp>
+#include <ze/common/time_conversions.hpp>
 
 namespace ze {
 
@@ -286,4 +286,4 @@ protected:
 
 } // namespace ze
 
-#include <ze/common/ringbuffer-inl.h>
+#include <ze/common/ringbuffer-inl.hpp>

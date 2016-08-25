@@ -2,14 +2,14 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/test_utils.h>
+#include <ze/common/test_utils.hpp>
 
 #include <cstdlib>
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
-#include <ze/common/path_utils.h>
-#include <ze/common/string_utils.h>
-#include <ze/common/file_utils.h>
+#include <ze/common/types.hpp>
+#include <ze/common/path_utils.hpp>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/file_utils.hpp>
 
 namespace ze {
 

@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <ze/common/buffer.h>
-#include <ze/common/file_utils.h>
-#include <ze/common/macros.h>
-#include <ze/common/types.h>
-#include <ze/common/transformation.h>
+#include <ze/common/buffer.hpp>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
 
 namespace ze {
 
