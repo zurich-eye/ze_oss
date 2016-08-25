@@ -7,17 +7,17 @@
 #include <iostream>
 #include <functional>
 
-#include <ze/common/benchmark.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/path_utils.h>
-#include <ze/common/matrix.h>
-#include <ze/common/manifold.h>
-#include <ze/common/numerical_derivative.h>
-#include <ze/cameras/camera_rig.h>
-#include <ze/cameras/camera.h>
-#include <ze/cameras/camera_impl.h>
-#include <ze/cameras/camera_utils.h>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/path_utils.hpp>
+#include <ze/common/matrix.hpp>
+#include <ze/common/manifold.hpp>
+#include <ze/common/numerical_derivative.hpp>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/cameras/camera.hpp>
+#include <ze/cameras/camera_impl.hpp>
+#include <ze/cameras/camera_utils.hpp>
 
 DEFINE_bool(run_benchmark, false, "Benchmark the camera models?");
 

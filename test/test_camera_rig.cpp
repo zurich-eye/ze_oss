@@ -3,11 +3,11 @@
 // Proprietary and confidential
 
 #include <iostream>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/path_utils.h>
-#include <ze/cameras/camera.h>
-#include <ze/cameras/camera_rig.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/path_utils.hpp>
+#include <ze/cameras/camera.hpp>
+#include <ze/cameras/camera_rig.hpp>
 
 TEST(CameraRigTests, testYamlLoading)
 {

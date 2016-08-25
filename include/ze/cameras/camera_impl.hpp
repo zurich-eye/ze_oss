@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <ze/cameras/camera.h>
-#include <ze/cameras/camera_models.h>
-#include <ze/cameras/camera_utils.h>
+#include <ze/cameras/camera.hpp>
+#include <ze/cameras/camera_models.hpp>
+#include <ze/cameras/camera_utils.hpp>
 
 namespace ze {
 

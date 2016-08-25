@@ -2,11 +2,11 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/cameras/camera_yaml_serialization.h>
-#include <ze/cameras/camera_impl.h>
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/yaml_serialization.h>
-#include <ze/common/types.h>
+#include <ze/cameras/camera_yaml_serialization.hpp>
+#include <ze/cameras/camera_impl.hpp>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/yaml_serialization.hpp>
+#include <ze/common/types.hpp>
 
 namespace YAML {
 

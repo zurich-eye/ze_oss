@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/cameras/camera_impl.h>
+#include <ze/cameras/camera_impl.hpp>
 
 namespace ze {
 

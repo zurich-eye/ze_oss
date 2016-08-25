@@ -6,7 +6,7 @@
 
 #include <tuple>
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <imp/core/size.hpp>
 
 namespace ze {

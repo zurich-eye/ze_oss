@@ -2,14 +2,14 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/cameras/camera_utils.h>
+#include <ze/cameras/camera_utils.hpp>
 
 #include <random>
 #include <ze/common/config.hpp>
 #include <ze/common/logging.hpp>
 #include <ze/common/random_matrix.hpp>
 
-#include <ze/cameras/camera_rig.h>
+#include <ze/cameras/camera_rig.hpp>
 
 namespace ze {
 

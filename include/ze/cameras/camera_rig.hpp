@@ -8,10 +8,10 @@
 #include <vector>
 #include <gflags/gflags.h>
 
-#include <ze/cameras/camera.h>
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
-#include <ze/common/transformation.h>
+#include <ze/cameras/camera.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
+#include <ze/common/transformation.hpp>
 
 DECLARE_string(calib_filename);
 DECLARE_string(mask_cam0);

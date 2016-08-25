@@ -11,12 +11,12 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/cameras/camera.h
-  include/ze/cameras/camera_impl.h
-  include/ze/cameras/camera_models.h
-  include/ze/cameras/camera_rig.h
-  include/ze/cameras/camera_utils.h
-  include/ze/cameras/camera_yaml_serialization.h
+  include/ze/cameras/camera.hpp
+  include/ze/cameras/camera_impl.hpp
+  include/ze/cameras/camera_models.hpp
+  include/ze/cameras/camera_rig.hpp
+  include/ze/cameras/camera_utils.hpp
+  include/ze/cameras/camera_yaml_serialization.hpp
   )
 
 set(SOURCES

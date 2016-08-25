@@ -2,13 +2,13 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/cameras/camera_rig.h>
+#include <ze/cameras/camera_rig.hpp>
 
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/core/image_raw.hpp>
-#include <ze/cameras/camera_utils.h>
-#include <ze/cameras/camera_yaml_serialization.h>
-#include <ze/common/path_utils.h>
+#include <ze/cameras/camera_utils.hpp>
+#include <ze/cameras/camera_yaml_serialization.hpp>
+#include <ze/common/path_utils.hpp>
 
 DEFINE_string(calib_filename, "", "Camera calibration file.");
 DEFINE_string(mask_cam0, "", "Mask for camera 0");
