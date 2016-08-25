@@ -9,9 +9,9 @@
 #include <type_traits>
 
 #include <ze/common/random.hpp>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/types.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/types.hpp>
 
 #include <imp/core/memory_storage.hpp>
 #include <imp/core/image_raw.hpp>

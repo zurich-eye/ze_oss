@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cmath>
 #include <imp/core/pixel_enums.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 #ifdef WITH_CUDA
 #  include<cuda_runtime_api.h>

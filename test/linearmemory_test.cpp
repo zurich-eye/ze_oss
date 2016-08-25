@@ -10,7 +10,7 @@
 
 #include <imp/core/linearmemory.hpp>
 #include <ze/common/random.hpp>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_utils.hpp>
 
 
 template <typename Pixel>

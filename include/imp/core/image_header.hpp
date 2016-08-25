@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <imp/core/pixel_enums.hpp>
 #include <imp/core/roi.hpp>
 #include <imp/core/size.hpp>

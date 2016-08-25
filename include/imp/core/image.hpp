@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
 #include <ze/common/logging.hpp>
 #include <imp/core/image_base.hpp>
 #include <imp/core/pixel.hpp>

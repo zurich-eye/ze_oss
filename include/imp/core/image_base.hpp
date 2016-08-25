@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
 #include <imp/core/image_header.hpp>
 #include <imp/core/pixel_enums.hpp>
 #include <imp/core/roi.hpp>

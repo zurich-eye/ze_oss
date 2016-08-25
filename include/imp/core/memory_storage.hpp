@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <imp/core/size.hpp>
 #include <imp/core/types.hpp>
 

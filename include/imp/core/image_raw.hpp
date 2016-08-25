@@ -3,8 +3,8 @@
 #include <memory>
 #include <algorithm>
 
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
 #include <imp/core/image.hpp>
 #include <imp/core/memory_storage.hpp>
 
