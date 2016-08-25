@@ -1,5 +1,5 @@
-// Modified by ZE.
 // Copyright (c) 2015, Autonomous Systems Lab, ETH Zurich
+// Copyright (C) 2016, ETH Zurich, Wyss Zurich, Zurich Eye
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
