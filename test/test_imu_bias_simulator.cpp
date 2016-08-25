@@ -3,7 +3,7 @@
 // Proprietary and confidential
 
 #include <ze/vi_simulation/imu_bias_simulator.hpp>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 
 TEST(ImuBiasTest, testConstantImuBias)
 {

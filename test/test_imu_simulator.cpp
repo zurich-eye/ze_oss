@@ -5,9 +5,9 @@
 #include <ze/vi_simulation/imu_bias_simulator.hpp>
 #include <ze/vi_simulation/imu_simulator.hpp>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/common/random_matrix.hpp>
 
 TEST(TrajectorySimulator, testSplineScenario)

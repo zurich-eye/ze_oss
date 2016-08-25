@@ -6,10 +6,10 @@
 
 #include <memory>
 #include <unordered_map>
-#include <ze/common/macros.h>
-#include <ze/common/timer_collection.h>
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
+#include <ze/common/macros.hpp>
+#include <ze/common/timer_collection.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
 #include <ze/vi_simulation/camera_simulator_types.hpp>
 
 namespace ze {

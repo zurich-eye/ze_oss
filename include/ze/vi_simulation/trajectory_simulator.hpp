@@ -7,9 +7,9 @@
 // The below code and structure is heavily inspired by gtsam's
 // navigation/Scenario.h and ScenarioRunner.h
 
-#include <ze/common/macros.h>
+#include <ze/common/macros.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/common/transformation.h>
+#include <ze/common/transformation.hpp>
 
 namespace ze {
 

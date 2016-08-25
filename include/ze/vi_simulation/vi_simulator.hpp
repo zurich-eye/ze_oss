@@ -5,8 +5,8 @@
 #pragma once
 
 #include <memory>
-#include <ze/common/macros.h>
-#include <ze/common/transformation.h>
+#include <ze/common/macros.hpp>
+#include <ze/common/transformation.hpp>
 #include <ze/vi_simulation/camera_simulator_types.hpp>
 
 namespace ze {

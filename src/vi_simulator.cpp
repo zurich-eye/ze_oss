@@ -4,14 +4,14 @@
 
 #include <ze/vi_simulation/vi_simulator.hpp>
 
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/csv_trajectory.h>
-#include <ze/common/path_utils.h>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/csv_trajectory.hpp>
+#include <ze/common/path_utils.hpp>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
 #include <ze/vi_simulation/camera_simulator.hpp>
 #include <ze/vi_simulation/imu_simulator.hpp>
-#include <ze/visualization/viz_interface.h>
+#include <ze/visualization/viz_interface.hpp>
 
 namespace ze {
 

@@ -4,15 +4,15 @@
 
 #include <ze/vi_simulation/camera_simulator.hpp>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/csv_trajectory.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/types.h>
-#include <ze/common/path_utils.h>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/csv_trajectory.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/path_utils.hpp>
 #include <ze/common/random_matrix.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 #ifdef ZE_USE_OPENCV
 #include <opencv2/highgui/highgui.hpp>
 #endif

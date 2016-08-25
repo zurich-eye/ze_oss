@@ -2,11 +2,11 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/timer_statistics.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/timer_statistics.hpp>
 #include <ze/vi_simulation/camera_simulator.hpp>
 #include <ze/vi_simulation/vi_simulator.hpp>
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 
 TEST(CameraSimulator, testSplineScenario)
 {

@@ -4,11 +4,11 @@
 
 #include <ze/vi_simulation/camera_simulator.hpp>
 
-#include <ze/cameras/camera_rig.h>
-#include <ze/cameras/camera_utils.h>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/cameras/camera_utils.hpp>
 #include <ze/common/random_matrix.hpp>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
-#include <ze/visualization/viz_interface.h>
+#include <ze/visualization/viz_interface.hpp>
 
 namespace ze {
 

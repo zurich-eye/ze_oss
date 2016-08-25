@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/common/random_matrix.hpp>
 #include <ze/splines/bspline.hpp>
 
