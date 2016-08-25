@@ -2,8 +2,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <ze/common/logging.hpp>
-#include <ze/common/timer.h>
-#include <ze/common/timer_statistics.h>
+#include <ze/common/timer.hpp>
+#include <ze/common/timer_statistics.hpp>
 #include <imp/core/image_raw.hpp>
 
 int main(int argc, char* argv[])
