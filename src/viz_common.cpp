@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/visualization/viz_common.h>
+#include <ze/visualization/viz_common.hpp>
 
 namespace ze {
 

@@ -11,10 +11,10 @@ include(ze_gtsam)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/visualization/viz_common.h
-  include/ze/visualization/viz_interface.h
-  include/ze/visualization/viz_ros.h
-  include/ze/visualization/viz_ros_utils.h
+  include/ze/visualization/viz_common.hpp
+  include/ze/visualization/viz_interface.hpp
+  include/ze/visualization/viz_ros.hpp
+  include/ze/visualization/viz_ros_utils.hpp
   )
 
 set(SOURCES
@@ -23,7 +23,7 @@ set(SOURCES
   )
 
 if(ZE_USE_GTSAM)
-  list(APPEND HEADERS include/ze/visualization/viz_gtsam.h)
+  list(APPEND HEADERS include/ze/visualization/viz_gtsam.hpp)
   list(APPEND SOURCES src/viz_gtsam.cpp)
 endif()
 

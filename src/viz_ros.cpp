@@ -2,15 +2,15 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-#include <ze/ros/tf_bridge.h>
-#include <ze/visualization/viz_ros_utils.h>
+#include <ze/ros/tf_bridge.hpp>
+#include <ze/visualization/viz_ros_utils.hpp>
 
 namespace ze {
 

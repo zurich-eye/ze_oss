@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <ze/common/types.h>
-#include <ze/visualization/viz_common.h>
+#include <ze/common/types.hpp>
+#include <ze/visualization/viz_common.hpp>
 
 // fwd
 namespace gtsam {

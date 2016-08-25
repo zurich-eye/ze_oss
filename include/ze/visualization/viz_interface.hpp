@@ -4,96 +4,85 @@
 
 #pragma once
 
-#include <memory>
-#include <ze/visualization/viz_interface.h>
+#include <string>
+#include <tuple>
 
-// fwd
-namespace ros {
-class Publisher;
-class NodeHandle;
-}
-
-namespace tf {
-class TransformBroadcaster;
-}
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/visualization/viz_common.hpp>
 
 namespace ze {
 
-//! @todo(cfo): Deal with multi-threaded publishing.
-class VisualizerRos : public Visualizer
+using LineMarkers = std::vector<std::pair<Position, Position>, Eigen::aligned_allocator<std::pair<Position, Position>>>;
+
+//! Interface class for all visualizations.
+class Visualizer
 {
 public:
+  ZE_POINTER_TYPEDEFS(Visualizer);
 
-  VisualizerRos();
-  VisualizerRos(const std::string& frame);
-
-  virtual ~VisualizerRos() = default;
+  Visualizer() = default;
+  virtual ~Visualizer() = default;
 
   // ---------------------------------------------------------------------------
   // Draw single elements
 
   virtual void drawPoint(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const Position& point,
       const Color& color,
-      const real_t size = 0.02) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawLine(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const Position& line_from,
       const Position& line_to,
       const Color& color,
-      const real_t size = 0.02) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawCoordinateFrame(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const Transformation& pose, // T_W_B
-      const real_t size = 0.2) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawRobot(
       const std::string& name,
-      const Transformation& T_W_B) override;
+      const Transformation& T_W_B) = 0;
 
   // ---------------------------------------------------------------------------
   // Draw multiple elements
 
   virtual void drawPoints(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const Positions& points,
       const Color& color,
-      const real_t size = 0.02) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawLines(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const LineMarkers& lines,
       const Color& color,
-      const real_t size = 0.02) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawCoordinateFrames(
-      const std::string& ns,
+      const std::string& topic,
       const size_t id,
       const TransformationVector& poses,
-      const real_t size = 0.2) override;
+      const real_t size = 0.02) = 0;
 
   virtual void drawTrajectory(
       const std::string& topic,
       const size_t id,
       const std::vector<Position>& points,
       const Color& color,
-      const real_t size = 0.02) override;
+      const real_t size = 0.02) = 0;
 
-private:
-  std::shared_ptr<ros::NodeHandle> nh_;
-  std::shared_ptr<ros::Publisher> pub_marker_;
-  std::shared_ptr<tf::TransformBroadcaster> tf_broadcaster_;
-  std::string world_frame = "map";    //!< World-frame
-  double viz_scale_ = 1.0;            //!< Scale marker size
 };
-
 
 } // namespace ze

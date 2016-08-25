@@ -6,7 +6,7 @@
 #include <ze/common/logging.hpp>
 #include <gflags/gflags.h>
 
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 
 int main(int argc, char** argv)
 {

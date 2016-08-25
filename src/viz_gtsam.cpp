@@ -2,14 +2,14 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/visualization/viz_gtsam.h>
+#include <ze/visualization/viz_gtsam.hpp>
 
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/geometry/Point3.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/inference/Symbol.h>
 
-#include <ze/visualization/viz_interface.h>
+#include <ze/visualization/viz_interface.hpp>
 
 namespace ze {
 
