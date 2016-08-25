@@ -11,8 +11,8 @@
 #include <mutex>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
-#include <ze/common/time_conversions.h>
+#include <ze/common/types.hpp>
+#include <ze/common/time_conversions.hpp>
 
 namespace ze {
 
@@ -142,4 +142,4 @@ protected:
 
 } // namespace ze
 
-#include <ze/common/buffer-inl.h>
+#include <ze/common/buffer-inl.hpp>

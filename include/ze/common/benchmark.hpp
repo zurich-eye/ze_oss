@@ -8,9 +8,9 @@
 #include <limits>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
-#include <ze/common/time_conversions.h>
-#include <ze/common/timer.h>
+#include <ze/common/types.hpp>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/timer.hpp>
 
 namespace ze {
 

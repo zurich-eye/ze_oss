@@ -4,9 +4,9 @@
 
 #include <cmath>
 #include <utility>
-#include <ze/common/types.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/statistics.h>
+#include <ze/common/types.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/statistics.hpp>
 #include <ze/common/random_matrix.hpp>
 
 TEST(StatisticsTest, testMedian)

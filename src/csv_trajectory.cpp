@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/csv_trajectory.h>
+#include <ze/common/csv_trajectory.hpp>
 
 namespace ze {
 

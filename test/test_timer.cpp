@@ -6,11 +6,11 @@
 #include <thread>
 #include <iostream>
 
-#include <ze/common/string_utils.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/timer.h>
-#include <ze/common/timer_collection.h>
-#include <ze/common/timer_statistics.h>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/timer.hpp>
+#include <ze/common/timer_collection.hpp>
+#include <ze/common/timer_statistics.hpp>
 
 TEST(TimerTests, testTimerStatistics)
 {

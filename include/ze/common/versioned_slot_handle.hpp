@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

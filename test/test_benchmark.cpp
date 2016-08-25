@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/benchmark.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/benchmark.hpp>
 
 int foo(int x, int y)
 {

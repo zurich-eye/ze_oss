@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <ze/common/string_utils.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/test_entrypoint.hpp>
 
 
 TEST(StringUtilsTest, testTrim)

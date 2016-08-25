@@ -6,8 +6,8 @@
 
 #include <chrono>
 
-#include <ze/common/time_conversions.h>
-#include <ze/common/types.h>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

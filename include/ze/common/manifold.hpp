@@ -8,8 +8,8 @@
 
 #include <functional>
 #include <Eigen/Dense>
-#include <ze/common/types.h>
-#include <ze/common/transformation.h>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
 
 namespace ze {
 

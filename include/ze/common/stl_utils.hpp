@@ -6,7 +6,7 @@
 
 #include <numeric>
 #include <vector>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/common/logging.hpp>
 
 namespace ze {

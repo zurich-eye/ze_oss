@@ -7,7 +7,7 @@
 #include <chrono>
 
 #include <ze/common/logging.hpp>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/common/thread_pool.hpp>
 
 TEST(ThreadPoolTests, testThreadPool)

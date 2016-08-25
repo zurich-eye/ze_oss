@@ -7,7 +7,7 @@
 #include <thread>
 #include <string>
 
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/common/test_thread_blocking.hpp>
 #include <ze/common/thread_safe_fifo.hpp>
 

@@ -6,8 +6,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <ze/common/path_utils.h>
-#include <ze/common/string_utils.h>
+#include <ze/common/path_utils.hpp>
+#include <ze/common/string_utils.hpp>
 
 namespace ze {
 

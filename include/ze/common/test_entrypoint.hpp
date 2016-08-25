@@ -30,7 +30,7 @@
 #include <gflags/gflags.h>
 #include <ze/common/logging.hpp>
 #include <eigen-checks/gtest.h>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 // Floating-point precision checks.
 #ifdef ZE_SINGLE_PRECISION_FLOAT

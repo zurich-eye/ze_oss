@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <ze/common/stl_utils.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/stl_utils.hpp>
+#include <ze/common/test_entrypoint.hpp>
 
 TEST(StlUtilsTests, testRange)
 {

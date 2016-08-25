@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

@@ -2,10 +2,10 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/benchmark.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/common/random_matrix.hpp>
-#include <ze/common/running_statistics.h>
+#include <ze/common/running_statistics.hpp>
 
 TEST(RandomMatrixTests, testRandomVectorSampler)
 {

@@ -4,10 +4,10 @@
 
 #include <cmath>
 
-#include <ze/common/types.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/benchmark.h>
-#include <ze/common/ring_view.h>
+#include <ze/common/types.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/ring_view.hpp>
 
 DEFINE_bool(run_benchmark, false, "Benchmark the buffer vs. ringbuffer");
 

@@ -26,47 +26,47 @@ configure_file(include/ze/common/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/inclu
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/common/benchmark.h
-  include/ze/common/buffer.h
-  include/ze/common/buffer-inl.h
+  include/ze/common/benchmark.hpp
+  include/ze/common/buffer.hpp
+  include/ze/common/buffer-inl.hpp
   include/ze/common/config.hpp
-  include/ze/common/combinatorics.h
-  include/ze/common/csv_trajectory.h
-  include/ze/common/file_utils.h
+  include/ze/common/combinatorics.hpp
+  include/ze/common/csv_trajectory.hpp
+  include/ze/common/file_utils.hpp
   include/ze/common/logging.hpp
-  include/ze/common/macros.h
-  include/ze/common/manifold.h
+  include/ze/common/macros.hpp
+  include/ze/common/manifold.hpp
   include/ze/common/math.hpp
-  include/ze/common/matrix.h
+  include/ze/common/matrix.hpp
   include/ze/common/nonassignable.hpp
   include/ze/common/noncopyable.hpp
-  include/ze/common/numerical_derivative.h
-  include/ze/common/path_utils.h
+  include/ze/common/numerical_derivative.hpp
+  include/ze/common/path_utils.hpp
   include/ze/common/random.hpp
   include/ze/common/random_matrix.hpp
-  include/ze/common/ringbuffer.h
-  include/ze/common/ringbuffer-inl.h
-  include/ze/common/ring_view.h
-  include/ze/common/running_statistics.h
-  include/ze/common/running_statistics_collection.h
+  include/ze/common/ringbuffer.hpp
+  include/ze/common/ringbuffer-inl.hpp
+  include/ze/common/ring_view.hpp
+  include/ze/common/running_statistics.hpp
+  include/ze/common/running_statistics_collection.hpp
   include/ze/common/signal_handler.hpp
-  include/ze/common/statistics.h
-  include/ze/common/stl_utils.h
-  include/ze/common/string_utils.h
-  include/ze/common/test_entrypoint.h
-  include/ze/common/test_utils.h
+  include/ze/common/statistics.hpp
+  include/ze/common/stl_utils.hpp
+  include/ze/common/string_utils.hpp
+  include/ze/common/test_entrypoint.hpp
+  include/ze/common/test_utils.hpp
   include/ze/common/test_thread_blocking.hpp
   include/ze/common/thread_pool.hpp
   include/ze/common/thread_safe_fifo.hpp
-  include/ze/common/time_conversions.h
-  include/ze/common/timer.h
-  include/ze/common/timer_collection.h
-  include/ze/common/timer_statistics.h
-  include/ze/common/transformation.h
-  include/ze/common/ts_match.h
-  include/ze/common/types.h
-  include/ze/common/versioned_slot_handle.h
-  include/ze/common/yaml_serialization.h
+  include/ze/common/time_conversions.hpp
+  include/ze/common/timer.hpp
+  include/ze/common/timer_collection.hpp
+  include/ze/common/timer_statistics.hpp
+  include/ze/common/transformation.hpp
+  include/ze/common/ts_match.hpp
+  include/ze/common/types.hpp
+  include/ze/common/versioned_slot_handle.hpp
+  include/ze/common/yaml_serialization.hpp
   )
 
 set(SOURCES
