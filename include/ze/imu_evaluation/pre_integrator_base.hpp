@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <ze/common/types.h>
-#include <ze/common/timer_collection.h>
+#include <ze/common/types.hpp>
+#include <ze/common/timer_collection.hpp>
 #include <ze/vi_simulation/imu_simulator.hpp>
 
 namespace ze {

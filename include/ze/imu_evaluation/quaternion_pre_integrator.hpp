@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/imu_evaluation/pre_integrator_base.hpp>
-#include <ze/common/transformation.h>
+#include <ze/common/transformation.hpp>
 #include <ze/vi_simulation/imu_simulator.hpp>
 
 namespace ze {

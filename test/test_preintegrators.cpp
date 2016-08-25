@@ -2,8 +2,8 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/types.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/types.hpp>
 #include <ze/imu_evaluation/manifold_pre_integrator.hpp>
 #include <ze/imu_evaluation/quaternion_pre_integrator.hpp>
 

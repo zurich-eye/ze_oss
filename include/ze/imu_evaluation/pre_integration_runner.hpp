@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/data_provider/data_provider_base.hpp>
 #include <ze/imu_evaluation/pre_integrator_base.hpp>
 #include <ze/vi_simulation/imu_simulator.hpp>

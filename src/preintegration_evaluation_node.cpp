@@ -10,10 +10,10 @@
 #include <ze/common/logging.hpp>
 
 #include <imp/core/image.hpp>
-#include <ze/common/file_utils.h>
-#include <ze/common/timer.h>
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/timer.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
 #include <ze/data_provider/data_provider_factory.hpp>
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
@@ -23,9 +23,9 @@
 #include <ze/vi_simulation/imu_simulator.hpp>
 #include <ze/vi_simulation/trajectory_simulator.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/common/csv_trajectory.h>
+#include <ze/common/csv_trajectory.hpp>
 #include <ze/splines/viz_splines.hpp>
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 #include <ze/matplotlib/matplotlibcpp.hpp>
 #include <ze/splines/rotation_vector.hpp>
 #include <ze/imu_evaluation/manifold_pre_integrator.hpp>

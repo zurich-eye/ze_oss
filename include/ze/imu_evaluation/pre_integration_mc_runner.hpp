@@ -5,7 +5,7 @@
 #pragma once
 
 #include <ze/imu_evaluation/pre_integration_runner.hpp>
-#include <ze/common/statistics.h>
+#include <ze/common/statistics.hpp>
 #include <ze/common/thread_pool.hpp>
 
 namespace ze {
