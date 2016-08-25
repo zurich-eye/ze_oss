@@ -4,7 +4,7 @@
 
 #include <imp/core/image_raw.hpp>
 #include <ze/common/logging.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 
 namespace ze {
