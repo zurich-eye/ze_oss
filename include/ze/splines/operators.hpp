@@ -9,8 +9,8 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include <ze/common/types.h>
-#include <ze/common/matrix.h>
+#include <ze/common/types.hpp>
+#include <ze/common/matrix.hpp>
 
 namespace ze {
 // imported from Schweizer-Messer Kinematics. Not intended to be used outside

@@ -5,7 +5,7 @@
 #include <ze/splines/viz_splines.hpp>
 
 #include <ze/matplotlib/matplotlibcpp.hpp>
-#include <ze/visualization/viz_interface.h>
+#include <ze/visualization/viz_interface.hpp>
 
 namespace ze {
 

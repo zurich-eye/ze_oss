@@ -6,11 +6,11 @@
 #include <ze/common/logging.hpp>
 #include <gflags/gflags.h>
 
-#include <ze/visualization/viz_ros.h>
+#include <ze/visualization/viz_ros.hpp>
 #include <ze/splines/viz_splines.hpp>
 #include <ze/splines/bspline.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 int main(int argc, char** argv)
 {

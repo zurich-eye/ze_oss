@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/splines/bspline.hpp>
 #include <ze/splines/bspline_pose_minimal.hpp>
-#include <ze/visualization/viz_common.h>
+#include <ze/visualization/viz_common.hpp>
 
 namespace ze {
 

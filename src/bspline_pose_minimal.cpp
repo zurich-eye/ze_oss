@@ -4,7 +4,7 @@
 
 #include <ze/splines/bspline_pose_minimal.hpp>
 
-#include <ze/common/time_conversions.h>
+#include <ze/common/time_conversions.hpp>
 
 namespace ze {
 

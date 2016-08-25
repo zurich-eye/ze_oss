@@ -5,9 +5,9 @@
 #include <ze/splines/bspline_pose_minimal.hpp>
 
 // Bring in gtest
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/numerical_derivative.h>
-#include <ze/common/transformation.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/numerical_derivative.hpp>
+#include <ze/common/transformation.hpp>
 #include <ze/splines/operators.hpp>
 
 namespace ze {

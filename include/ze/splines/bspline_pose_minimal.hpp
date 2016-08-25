@@ -18,10 +18,10 @@
 #pragma once
 
 #include <ze/splines/bspline.hpp>
-#include <ze/common/transformation.h>
+#include <ze/common/transformation.hpp>
 #include <ze/splines/rotation_vector.hpp>
 #include <ze/splines/operators.hpp>
-#include <ze/common/macros.h>
+#include <ze/common/macros.hpp>
 
 namespace ze {
 
