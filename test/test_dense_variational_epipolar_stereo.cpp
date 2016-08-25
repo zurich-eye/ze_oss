@@ -19,10 +19,10 @@
 #include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_se3.cuh>
 #include <imp/cu_correspondence/variational_epipolar_stereo.hpp>
-#include <ze/cameras/camera.h>
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
+#include <ze/cameras/camera.hpp>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
 #include <ze/common/logging.hpp>
 #include <ze/geometry/epipolar_geometry.hpp>
 

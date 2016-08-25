@@ -4,15 +4,15 @@
 #include <memory>
 #include <tuple>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
 
 #include <imp/core/roi.hpp>
 #include <imp/core/image_raw.hpp>

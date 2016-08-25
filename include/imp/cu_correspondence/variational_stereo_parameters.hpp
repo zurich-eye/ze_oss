@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ze/common/types.h>
-#include <ze/common/macros.h>
+#include <ze/common/types.hpp>
+#include <ze/common/macros.hpp>
 #include <imp/core/types.hpp>
 #include <imp/cu_correspondence/stereo_solver_enum.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>

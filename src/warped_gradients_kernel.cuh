@@ -3,7 +3,7 @@
 
 #include <cuda_runtime_api.h>
 #include <imp/core/types.hpp>
-#include <imp/cuda_toolkit/helper_math.h>
+#include <imp/cuda_toolkit/helper_math.hpp>
 #include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_matrix.cuh>
 #include <imp/cu_core/cu_se3.cuh>

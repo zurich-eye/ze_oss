@@ -4,7 +4,7 @@
 #include <imp/core/types.hpp>
 #include <imp/cu_core/cu_utils.hpp>
 #include <imp/cu_core/cu_k_derivative.cuh>
-#include <imp/cuda_toolkit/helper_math.h>
+#include <imp/cuda_toolkit/helper_math.hpp>
 
 
 namespace ze {
