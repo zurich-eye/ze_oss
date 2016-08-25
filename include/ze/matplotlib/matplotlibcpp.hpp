@@ -13,7 +13,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <iostream>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <initializer_list>
 
 
