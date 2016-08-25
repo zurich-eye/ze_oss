@@ -7,8 +7,8 @@
 #include <type_traits>
 #include <vector>
 
-#include <ze/common/types.h>
-#include <ze/common/manifold.h>
+#include <ze/common/types.hpp>
+#include <ze/common/manifold.hpp>
 
 namespace ze {
 
@@ -233,4 +233,4 @@ protected:
 
 } // namespace ze
 
-#include <ze/geometry/lsq_solver-inl.h>
+#include <ze/geometry/lsq_solver-inl.hpp>

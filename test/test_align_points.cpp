@@ -6,12 +6,12 @@
 #include <functional>
 #include <utility>
 
-#include <ze/common/numerical_derivative.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
+#include <ze/common/numerical_derivative.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
 #include <ze/common/random.hpp>
-#include <ze/geometry/align_points.h>
+#include <ze/geometry/align_points.hpp>
 
 #ifndef ZE_SINGLE_PRECISION_FLOAT
 ze::real_t tol = 1e-10;

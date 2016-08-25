@@ -3,12 +3,12 @@
 // Proprietary and confidential
 
 #include <random>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/matrix.h>
-#include <ze/common/manifold.h>
-#include <ze/common/types.h>
-#include <ze/common/transformation.h>
-#include <ze/geometry/lsq_state.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/matrix.hpp>
+#include <ze/common/manifold.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/geometry/lsq_state.hpp>
 
 TEST(StateTests, testTupleFixedSize)
 {

@@ -19,20 +19,20 @@ endif()
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/geometry/align_points.h
-  include/ze/geometry/align_poses.h
-  include/ze/geometry/clam.h
+  include/ze/geometry/align_points.hpp
+  include/ze/geometry/align_poses.hpp
+  include/ze/geometry/clam.hpp
   include/ze/geometry/epipolar_geometry.hpp
   include/ze/geometry/line.hpp
-  include/ze/geometry/lsq_solver.h
-  include/ze/geometry/lsq_solver-inl.h
-  include/ze/geometry/lsq_state.h
-  include/ze/geometry/pose_optimizer.h
-  include/ze/geometry/pose_prior.h
-  include/ze/geometry/ransac_relative_pose.h
-  include/ze/geometry/robust_cost.h
-  include/ze/geometry/triangulation.h
-  include/ze/geometry/vogiatzis_filter.h
+  include/ze/geometry/lsq_solver.hpp
+  include/ze/geometry/lsq_solver-inl.hpp
+  include/ze/geometry/lsq_state.hpp
+  include/ze/geometry/pose_optimizer.hpp
+  include/ze/geometry/pose_prior.hpp
+  include/ze/geometry/ransac_relative_pose.hpp
+  include/ze/geometry/robust_cost.hpp
+  include/ze/geometry/triangulation.hpp
+  include/ze/geometry/vogiatzis_filter.hpp
   )
 
 set(SOURCES

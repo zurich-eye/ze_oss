@@ -2,12 +2,12 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/triangulation.h>
+#include <ze/geometry/triangulation.hpp>
 
 #include <algorithm>
 #include <ze/common/logging.hpp>
-#include <ze/common/matrix.h>
-#include <ze/geometry/pose_optimizer.h>
+#include <ze/common/matrix.hpp>
+#include <ze/geometry/pose_optimizer.hpp>
 
 namespace ze {
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
 
 namespace ze {
 

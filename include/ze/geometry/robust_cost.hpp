@@ -9,8 +9,8 @@
 #include <ze/common/logging.hpp>
 #include <Eigen/Core>
 
-#include <ze/common/types.h>
-#include <ze/common/statistics.h>
+#include <ze/common/types.hpp>
+#include <ze/common/statistics.hpp>
 
 namespace ze {
 

@@ -2,17 +2,17 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/pose_optimizer.h>
+#include <ze/geometry/pose_optimizer.hpp>
 
 #include <cmath>
 #include <numeric>
 #include <algorithm>
 
-#include <ze/cameras/camera.h>
+#include <ze/cameras/camera.hpp>
 #include <ze/common/logging.hpp>
-#include <ze/common/matrix.h>
-#include <ze/common/stl_utils.h>
-#include <ze/geometry/pose_prior.h>
+#include <ze/common/matrix.hpp>
+#include <ze/common/stl_utils.hpp>
+#include <ze/geometry/pose_prior.hpp>
 
 namespace ze {
 

@@ -2,11 +2,11 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/lsq_solver.h>
+#include <ze/geometry/lsq_solver.hpp>
 
 #include <stdexcept>
 #include <ze/common/logging.hpp>
-#include <ze/common/matrix.h>
+#include <ze/common/matrix.hpp>
 
 namespace ze {
 

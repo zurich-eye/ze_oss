@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <ze/common/statistics.h>
-#include <ze/common/types.h>
-#include <ze/common/transformation.h>
+#include <ze/common/statistics.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
 
 #include <glog/logging.h>
 

@@ -2,15 +2,15 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/align_poses.h>
+#include <ze/geometry/align_poses.hpp>
 
 #include <cmath>
 #include <numeric>
 #include <algorithm>
 #include <ze/common/logging.hpp>
 
-#include <ze/common/matrix.h>
-#include <ze/common/stl_utils.h>
+#include <ze/common/matrix.hpp>
+#include <ze/common/stl_utils.hpp>
 
 namespace ze {
 

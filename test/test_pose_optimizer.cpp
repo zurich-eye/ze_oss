@@ -3,17 +3,17 @@
 // Proprietary and confidential
 
 #include <random>
-#include <ze/common/benchmark.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/matrix.h>
-#include <ze/common/timer.h>
-#include <ze/common/types.h>
-#include <ze/common/transformation.h>
-#include <ze/cameras/camera_utils.h>
-#include <ze/cameras/camera_impl.h>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/matrix.hpp>
+#include <ze/common/timer.hpp>
+#include <ze/common/types.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/cameras/camera_utils.hpp>
+#include <ze/cameras/camera_impl.hpp>
 #include <ze/geometry/line.hpp>
-#include <ze/geometry/pose_optimizer.h>
-#include <ze/geometry/robust_cost.h>
+#include <ze/geometry/pose_optimizer.hpp>
+#include <ze/geometry/robust_cost.hpp>
 
 namespace ze {
 

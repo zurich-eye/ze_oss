@@ -7,11 +7,11 @@
 #include <random>
 #include <utility>
 
-#include <ze/common/numerical_derivative.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
-#include <ze/geometry/align_poses.h>
+#include <ze/common/numerical_derivative.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
+#include <ze/geometry/align_poses.hpp>
 
 TEST(AlignPosesTest, testJacobian)
 {

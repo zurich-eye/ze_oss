@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <ze/common/transformation.h>
-#include <ze/common/types.h>
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/matrix.h>
+#include <ze/common/transformation.hpp>
+#include <ze/common/types.hpp>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/matrix.hpp>
 
 namespace ze {
 

@@ -4,7 +4,7 @@
 
 #include <ze/geometry/line.hpp>
 
-#include <ze/cameras/camera_utils.h>
+#include <ze/cameras/camera_utils.hpp>
 
 namespace ze {
 

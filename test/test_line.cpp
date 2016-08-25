@@ -4,9 +4,9 @@
 
 #include <functional>
 
-#include <ze/cameras/camera_impl.h>
-#include <ze/common/numerical_derivative.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/cameras/camera_impl.hpp>
+#include <ze/common/numerical_derivative.hpp>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/geometry/line.hpp>
 
 TEST(LineTests, testLineGeneration)

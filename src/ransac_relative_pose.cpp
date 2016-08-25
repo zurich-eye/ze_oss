@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/ransac_relative_pose.h>
+#include <ze/geometry/ransac_relative_pose.hpp>
 
 #include <glog/logging.h>
 
@@ -14,8 +14,8 @@
 #include <opengv/relative_pose/CentralRelativeAdapter.hpp>
 #include <opengv/triangulation/methods.hpp>
 
-#include <ze/cameras/camera.h>
-#include <ze/common/combinatorics.h>
+#include <ze/cameras/camera.hpp>
+#include <ze/common/combinatorics.hpp>
 
 namespace ze {
 

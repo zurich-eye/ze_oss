@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <ze/common/transformation.h>
-#include <ze/cameras/camera_utils.h>
-#include <ze/cameras/camera_impl.h>
+#include <ze/common/transformation.hpp>
+#include <ze/cameras/camera_utils.hpp>
+#include <ze/cameras/camera_impl.hpp>
 #include <ze/geometry/line.hpp>
-#include <ze/geometry/robust_cost.h>
-#include <ze/geometry/lsq_solver.h>
+#include <ze/geometry/robust_cost.hpp>
+#include <ze/geometry/lsq_solver.hpp>
 
 namespace ze {
 

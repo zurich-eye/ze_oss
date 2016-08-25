@@ -2,9 +2,9 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/geometry/clam.h>
-#include <ze/geometry/pose_optimizer.h>
-#include <ze/geometry/pose_prior.h>
+#include <ze/geometry/clam.hpp>
+#include <ze/geometry/pose_optimizer.hpp>
+#include <ze/geometry/pose_prior.hpp>
 
 namespace ze {
 
