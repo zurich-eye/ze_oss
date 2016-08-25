@@ -6,10 +6,10 @@
 
 #include <memory>
 #include <imp/core/image_base.hpp>
-#include <ze/common/time_conversions.h>
-#include <ze/common/types.h>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/types.hpp>
 #include <ze/data_provider/camera_imu_synchronizer_base.hpp>
-#include <ze/imu/imu_buffer.h>
+#include <ze/imu/imu_buffer.hpp>
 
 namespace ze {
 

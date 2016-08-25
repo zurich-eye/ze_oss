@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include <ze/common/macros.h>
-#include <ze/common/types.h>
+#include <ze/common/macros.hpp>
+#include <ze/common/types.hpp>
 #include <ze/data_provider/data_provider_base.hpp>
 
 

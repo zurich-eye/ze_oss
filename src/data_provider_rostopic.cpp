@@ -6,9 +6,9 @@
 
 #include <imp/bridge/ros/ros_bridge.hpp>
 #include <ze/common/logging.hpp>
-#include <ze/common/time_conversions.h>
-#include <ze/common/string_utils.h>
-#include <ze/common/path_utils.h>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/path_utils.hpp>
 
 namespace ze {
 

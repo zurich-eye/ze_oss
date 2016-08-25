@@ -8,10 +8,10 @@
 #include <functional>
 #include <memory>
 
-#include <ze/common/macros.h>
+#include <ze/common/macros.hpp>
 #include <ze/common/noncopyable.hpp>
 #include <ze/common/signal_handler.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 
 // fwd
 namespace cv {

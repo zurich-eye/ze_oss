@@ -8,12 +8,12 @@
 #include <imp/core/image_base.hpp>
 #include <imp/core/image_raw.hpp>
 #include <imp/bridge/opencv/image_cv.hpp>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
 #include <ze/data_provider/data_provider_csv.hpp>
 #include <ze/data_provider/data_provider_rosbag.hpp>
 #include <ze/data_provider/camera_imu_synchronizer_unsync.hpp>
-#include <ze/imu/imu_model.h>
+#include <ze/imu/imu_model.hpp>
 
 namespace ze {
 // a dummy data provider

@@ -10,9 +10,9 @@
 
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/core/image_base.hpp>
-#include <ze/common/time_conversions.h>
-#include <ze/common/string_utils.h>
-#include <ze/common/file_utils.h>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/string_utils.hpp>
+#include <ze/common/file_utils.hpp>
 
 namespace ze {
 namespace internal {

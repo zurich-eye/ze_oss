@@ -5,9 +5,9 @@
 #include <string>
 #include <iostream>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/path_utils.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/path_utils.hpp>
 #include <ze/data_provider/data_provider_csv.hpp>
 #include <ze/data_provider/data_provider_rosbag.hpp>
 #include <imp/core/image_base.hpp>

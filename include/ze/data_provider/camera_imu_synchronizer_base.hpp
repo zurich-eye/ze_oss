@@ -6,9 +6,9 @@
 
 #include <memory>
 #include <imp/core/image_base.hpp>
-#include <ze/common/types.h>
-#include <ze/common/time_conversions.h>
-#include <ze/imu/imu_buffer.h>
+#include <ze/common/types.hpp>
+#include <ze/common/time_conversions.hpp>
+#include <ze/imu/imu_buffer.hpp>
 
 namespace ze {
 
