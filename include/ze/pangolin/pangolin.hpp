@@ -8,7 +8,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/common/logging.hpp>
 #include <pangolin/pangolin.h>
 #include <ze/common/noncopyable.hpp>

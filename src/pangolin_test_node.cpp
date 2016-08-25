@@ -3,7 +3,7 @@
 // Proprietary and confidential
 
 #include <ze/pangolin/pangolin.hpp>
-#include <ze/common/types.h>
+#include <ze/common/types.hpp>
 #include <ze/pangolin/type_watches.hpp>
 #include <ze/pangolin/pangolin_insight.hpp>
 

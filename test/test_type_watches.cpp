@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/test_entrypoint.hpp>
 #include <ze/pangolin/type_watches.hpp>
 
 #define ASSERT_OPERATOR(TYPE, LHS, RHS, OP)       \
