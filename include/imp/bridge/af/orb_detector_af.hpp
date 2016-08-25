@@ -1,6 +1,6 @@
 #pragma once
 
-#include <imp/features/feature_detector.h>
+#include <imp/features/feature_detector.hpp>
 #include <imp/bridge/af/image_af.hpp>
 
 namespace ze {
