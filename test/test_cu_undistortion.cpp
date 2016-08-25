@@ -1,11 +1,11 @@
 #include <imp/bridge/opencv/cv_bridge.hpp>
 #include <imp/cu_imgproc/cu_undistortion.cuh>
 
-#include <ze/cameras/camera_rig.h>
-#include <ze/common/benchmark.h>
-#include <ze/common/file_utils.h>
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
+#include <ze/cameras/camera_rig.hpp>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
 
 using namespace ze;
 

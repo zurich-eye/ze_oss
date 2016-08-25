@@ -4,7 +4,7 @@
 
 #include <cuda_runtime.h>
 
-#include <imp/cuda_toolkit/helper_math.h>
+#include <imp/cuda_toolkit/helper_math.hpp>
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_texture.cuh>
 #include <imp/cu_core/cu_k_derivative.cuh>

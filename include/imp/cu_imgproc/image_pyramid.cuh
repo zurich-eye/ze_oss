@@ -1,6 +1,6 @@
 #pragma once
 
-#include <imp/imgproc/image_pyramid.h>
+#include <imp/imgproc/image_pyramid.hpp>
 
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_imgproc/cu_reduce.cuh>

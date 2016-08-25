@@ -6,7 +6,7 @@
 #include <imp/core/pixel.hpp>
 #include <imp/cu_core/cu_math.cuh>
 #include <imp/cu_core/cu_texture.cuh>
-#include <imp/cuda_toolkit/helper_math.h>
+#include <imp/cuda_toolkit/helper_math.hpp>
 // kernels
 #include <imp/cu_core/cu_k_derivative.cuh>
 

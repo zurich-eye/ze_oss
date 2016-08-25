@@ -1,10 +1,10 @@
 #include <sstream>
 #include <string>
 
-#include <ze/common/test_entrypoint.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/benchmark.h>
-#include <ze/common/types.h>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/benchmark.hpp>
+#include <ze/common/types.hpp>
 
 #include <imp/core/image.hpp>
 #include <imp/core/image_raw.hpp>

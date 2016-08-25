@@ -5,7 +5,7 @@
 #include <imp/core/image_base.hpp>
 #include <imp/cu_core/cu_image_gpu.cuh>
 #include <imp/cu_core/cu_utils.hpp>
-#include <ze/common/macros.h>
+#include <ze/common/macros.hpp>
 
 namespace ze {
 namespace cu {
