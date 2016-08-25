@@ -6,8 +6,8 @@
 
 #include <glog/logging.h>
 #include <rosbag/view.h>
-#include <ze/common/file_utils.h>
-#include <ze/common/time_conversions.h>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/time_conversions.hpp>
 
 namespace ze {
 

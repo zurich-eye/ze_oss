@@ -10,7 +10,7 @@
 
 #include <imp/bridge/ros/ros_bridge.hpp>
 #include <imp/core/image.hpp>
-#include <ze/common/macros.h>
+#include <ze/common/macros.hpp>
 
 namespace ze {
 

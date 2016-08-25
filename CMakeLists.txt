@@ -11,8 +11,8 @@ include(ze_setup)
 #############
 set(HEADERS
   include/ze/ros/rosbag_image_query.hpp
-  include/ze/ros/pose_msg_bridge.h
-  include/ze/ros/tf_bridge.h
+  include/ze/ros/pose_msg_bridge.hpp
+  include/ze/ros/tf_bridge.hpp
   )
 
 set(SOURCES

@@ -2,7 +2,7 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/ros/tf_bridge.h>
+#include <ze/ros/tf_bridge.hpp>
 
 namespace ze {
 
