@@ -27,6 +27,7 @@ TEST(impCuUndistortionTexture, radTan32fC1_zeroDistortion)
   VectorX cam_params(4);
   cam_params << 471.690643292, 471.765601046, 371.087464172, 228.63874151;
   VectorX dist_coeffs(4);
+  dist_coeffs << 0.0, 0.0, 0.0, 0.0;
 
   cu::ImageGpu32fC1 gpu_src(*cv_img);
   cu::ImageGpu32fC1 gpu_dst(cv_img->size());
