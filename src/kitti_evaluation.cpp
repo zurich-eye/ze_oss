@@ -2,10 +2,10 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-#include <ze/trajectory_analysis/kitti_evaluation.h>
+#include <ze/trajectory_analysis/kitti_evaluation.hpp>
 
-#include <ze/geometry/align_poses.h>
-#include <ze/geometry/align_points.h>
+#include <ze/geometry/align_poses.hpp>
+#include <ze/geometry/align_points.hpp>
 
 namespace ze {
 

@@ -14,7 +14,7 @@ include(ze_setup)
 # LIBRARIES #
 #############
 set(HEADERS
-  include/ze/trajectory_analysis/kitti_evaluation.h
+  include/ze/trajectory_analysis/kitti_evaluation.hpp
   )
 
 set(SOURCES

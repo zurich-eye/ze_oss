@@ -7,8 +7,8 @@
 #include <cstdint>
 #include <Eigen/Core>
 
-#include <ze/common/time_conversions.h>
-#include <ze/common/buffer.h>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/buffer.hpp>
 
 namespace ze {
 

@@ -7,9 +7,9 @@
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 
-#include <ze/common/file_utils.h>
-#include <ze/common/csv_trajectory.h>
-#include <ze/trajectory_analysis/kitti_evaluation.h>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/csv_trajectory.hpp>
+#include <ze/trajectory_analysis/kitti_evaluation.hpp>
 
 DEFINE_string(data_dir, ".", "Path to data");
 DEFINE_string(filename_es, "traj_es.csv", "Filename of estimated trajectory.");

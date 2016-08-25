@@ -5,15 +5,15 @@
 #include <iostream>
 #include <gtest/gtest.h>
 
-#include <ze/common/types.h>
-#include <ze/common/buffer.h>
-#include <ze/common/file_utils.h>
-#include <ze/common/path_utils.h>
-#include <ze/common/time_conversions.h>
-#include <ze/common/test_utils.h>
-#include <ze/common/ts_match.h>
-#include <ze/common/csv_trajectory.h>
-#include <ze/common/test_entrypoint.h>
+#include <ze/common/types.hpp>
+#include <ze/common/buffer.hpp>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/path_utils.hpp>
+#include <ze/common/time_conversions.hpp>
+#include <ze/common/test_utils.hpp>
+#include <ze/common/ts_match.hpp>
+#include <ze/common/csv_trajectory.hpp>
+#include <ze/common/test_entrypoint.hpp>
 
 // Matching parameters
 constexpr double offset_sec = 0.0;

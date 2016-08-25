@@ -5,11 +5,11 @@
 #include <iostream>
 #include <glog/logging.h>
 #include <gflags/gflags.h>
-#include <ze/common/types.h>
-#include <ze/common/buffer.h>
-#include <ze/common/file_utils.h>
-#include <ze/common/transformation.h>
-#include <ze/common/time_conversions.h>
+#include <ze/common/types.hpp>
+#include <ze/common/buffer.hpp>
+#include <ze/common/file_utils.hpp>
+#include <ze/common/transformation.hpp>
+#include <ze/common/time_conversions.hpp>
 
 DEFINE_string(data_dir, ".", "Path to data");
 DEFINE_string(filename_es, "traj_es.csv", "Filename of estimated trajectory.");
