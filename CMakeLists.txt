@@ -63,7 +63,6 @@ set(HEADERS
   include/ze/common/timer_collection.hpp
   include/ze/common/timer_statistics.hpp
   include/ze/common/transformation.hpp
-  include/ze/common/ts_match.hpp
   include/ze/common/types.hpp
   include/ze/common/versioned_slot_handle.hpp
   include/ze/common/yaml_serialization.hpp
@@ -90,6 +89,9 @@ target_link_libraries(test_benchmark ${PROJECT_NAME})
 
 catkin_add_gtest(test_buffer test/test_buffer.cpp)
 target_link_libraries(test_buffer ${PROJECT_NAME})
+
+catkin_add_gtest(test_csv_trajectory test/test_csv_trajectory.cpp)
+target_link_libraries(test_csv_trajectory ${PROJECT_NAME})
 
 catkin_add_gtest(test_manifold test/test_manifold.cpp)
 target_link_libraries(test_manifold ${PROJECT_NAME})
