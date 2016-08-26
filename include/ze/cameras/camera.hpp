@@ -45,6 +45,7 @@ inline bool isPinholeType(CameraType type)
   return false;
 }
 
+//! Wrapper class of various camera projection and distortion models.
 class Camera
 {
 public:
