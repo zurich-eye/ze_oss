@@ -33,12 +33,6 @@ cs_add_executable(kitti_evaluation src/kitti_evaluation_node.cpp)
 target_link_libraries(kitti_evaluation ${PROJECT_NAME})
 
 ##########
-# GTESTS #
-##########
-catkin_add_gtest(test_ts_match test/test_ts_match.cpp)
-target_link_libraries(test_ts_match ${catkin_LIBRARIES})
-
-##########
 # EXPORT #
 ##########
 cs_install()
