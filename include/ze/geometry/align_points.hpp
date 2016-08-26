@@ -11,7 +11,8 @@
 
 namespace ze {
 
-//! Estimates relative transformation between two sets of associated pints
+//! Estimates relative transformation between two sets of associated points.
+//! Iterative least squares solution.
 class PointAligner : public LeastSquaresSolver<Transformation, PointAligner>
 {
 public:
@@ -28,24 +29,6 @@ public:
       const Transformation& T_A_B,
       HessianMatrix* H,
       GradientVector* g);
-
-  //! Compute LSQ alignment in SE3 (closed form solution by K. S. Arun et al.:
-  // Least-Squares Fitting of Two 3-D Point Sets, IEEE Trans. Pattern Anal.
-  // Mach. Intell., 9, NO. 5, SEPTEMBER 1987)
-  //! @param pts_A A vector of N points in the 'A' reference system (3xN)
-  //! @param pts_B A vector of N points in the 'B' reference system (3xN)
-  //! @return T_B_A such that ||T_B_A * pts_A - pts_B|| is minimized
-  static Transformation alignSE3(
-      const Positions& pts_A, const Positions& pts_B);
-
-  //! Compute LSQ alignment in Sim3 (close form solution by S. Umeyama:
-  //! Least-Squares Estimation of Transformation Parameters Between Two Point
-  //! Patterns, IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.)
-  //! @param pts_A A vector of N points in the 'A' reference system (3xN)
-  //! @param pts_B A vector of N points in the 'B' reference system (3xN)
-  //! @return <s, T_B_A> such that ||s*T_B_A * pts_A - pts_B|| is minimized
-  static std::pair<real_t, Transformation> alignSim3(
-      const Positions& pts_A, const Positions& pts_B);
 
 private:
   real_t measurement_sigma_;
@@ -64,5 +47,23 @@ inline Matrix36 dPointdistance_dRelpose(
   J.block<3,3>(0,3) = R * skewSymmetric(p_B); // orientation
   return J;
 }
+
+//! Compute LSQ alignment in SE3 (closed form solution by K. S. Arun et al.:
+//! Least-Squares Fitting of Two 3-D Point Sets, IEEE Trans. Pattern Anal.
+//! Mach. Intell., 9, NO. 5, SEPTEMBER 1987)
+//! @param pts_A A vector of N points in the 'A' reference system (3xN)
+//! @param pts_B A vector of N points in the 'B' reference system (3xN)
+//! @return T_B_A such that ||T_B_A * pts_A - pts_B|| is minimized
+Transformation alignSE3(
+    const Positions& pts_A, const Positions& pts_B);
+
+//! Compute LSQ alignment in Sim3 (close form solution by S. Umeyama:
+//! Least-Squares Estimation of Transformation Parameters Between Two Point
+//! Patterns, IEEE Trans. Pattern Anal. Mach. Intell., vol. 13, no. 4, 1991.)
+//! @param pts_A A vector of N points in the 'A' reference system (3xN)
+//! @param pts_B A vector of N points in the 'B' reference system (3xN)
+//! @return <s, T_B_A> such that ||s*T_B_A * pts_A - pts_B|| is minimized.
+std::pair<real_t, Transformation> alignSim3(
+    const Positions& pts_A, const Positions& pts_B);
 
 } // namespace ze

@@ -12,7 +12,8 @@ namespace ze {
 // fwd
 class Camera;
 
-using BearingsVector = std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>;
+using BearingsVector =
+  std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>;
 
 // utility
 inline BearingsVector bearingsVectorFromBearings(const Bearings& f)

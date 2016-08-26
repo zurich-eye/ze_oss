@@ -23,6 +23,7 @@ PointAligner::PointAligner(
   CHECK_EQ(p_A_.cols(), p_B_.cols());
 }
 
+// -----------------------------------------------------------------------------
 double PointAligner::evaluateError(
     const Transformation& T_A_B,
     HessianMatrix* H,
@@ -70,8 +71,8 @@ double PointAligner::evaluateError(
   return chi2;
 }
 
-Transformation PointAligner::alignSE3(
-    const Positions& pts_A, const Positions& pts_B)
+// -----------------------------------------------------------------------------
+Transformation alignSE3(const Positions& pts_A, const Positions& pts_B)
 {
   CHECK_GE(pts_A.cols(), 0u);
   CHECK_EQ(pts_A.cols(), pts_B.cols());
@@ -106,7 +107,8 @@ Transformation PointAligner::alignSE3(
   return Transformation(t_B_A, Quaternion(R_B_A));
 }
 
-std::pair<real_t, Transformation> PointAligner::alignSim3(
+// -----------------------------------------------------------------------------
+std::pair<real_t, Transformation> alignSim3(
     const Positions& pts_A, const Positions& pts_B)
 {
   CHECK_NE(pts_A.cols(), 0u);

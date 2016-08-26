@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <ze/common/logging.hpp>
 #include <ze/common/matrix.hpp>
+#include <ze/common/manifold.hpp>
 #include <ze/geometry/pose_optimizer.hpp>
 
 namespace ze {
@@ -121,7 +122,7 @@ void triangulateGaussNewton(
     real_t new_chi2{0.0};
 
     // compute residuals
-    for(size_t i = 0; i < T_C_W.size(); ++i)
+    for (size_t i = 0; i < T_C_W.size(); ++i)
     {
       const Position p_C_estimated = T_C_W[i] * p_W;
       Matrix23 J = dUv_dLandmark(p_C_estimated) * T_C_W[i].getRotationMatrix();
@@ -135,7 +136,7 @@ void triangulateGaussNewton(
     const Vector3 dp(A.ldlt().solve(b));
 
     // check if error increased
-    if((iter > 0 && new_chi2 > chi2) || std::isnan(dp[0]))
+    if ((iter > 0 && new_chi2 > chi2) || std::isnan(dp[0]))
     {
       VLOG(100) << "it " << iter
                 << "\t FAILURE \t new_chi2 = " << new_chi2;
@@ -154,7 +155,7 @@ void triangulateGaussNewton(
               << "\t Success \t new_chi2 = " << new_chi2;
 
     // stop when converged
-    if(ze::normMax(dp) <= eps)
+    if (ze::normMax(dp) <= eps)
     {
       break;
     }

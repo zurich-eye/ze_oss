@@ -5,6 +5,7 @@
 #pragma once
 
 #include <ze/common/transformation.hpp>
+#include <ze/common/manifold.hpp>
 #include <ze/cameras/camera_utils.hpp>
 #include <ze/cameras/camera_impl.hpp>
 #include <ze/geometry/line.hpp>

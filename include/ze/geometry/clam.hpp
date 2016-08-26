@@ -49,7 +49,9 @@ struct ClamFrameData
   Transformation T_C_B;
 };
 
-//! Coupled localization and mapping (Clam).
+//! Coupled localization and mapping (Clam) as descripted in:
+//! Jonathan Balzer, Stefano Soatto, "CLAM: Coupled Localization and Mapping
+//! with Efficient Outlier Handling".
 class Clam : public LeastSquaresSolver<ClamState, Clam>
 {
 public:

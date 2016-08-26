@@ -95,8 +95,7 @@ TEST(AlignPosesTest, testAlignSE3)
   Positions p_A = T_A_B.transformVectorized(p_B);
 
   // Align trajectories
-  Transformation T_A_B_estimate =
-      PointAligner::alignSE3(p_B, p_A);
+  Transformation T_A_B_estimate = alignSE3(p_B, p_A);
 
   // Compute error.
   Transformation T_err = T_A_B.inverse() * T_A_B_estimate;
@@ -128,8 +127,7 @@ TEST(AlignPosesTest, testAlignSim3)
       + T_A_B.getPosition();
 
   // Align trajectories
-  std::pair<real_t, Transformation> sim3_estimate =
-      PointAligner::alignSim3(p_B, p_A);
+  std::pair<real_t, Transformation> sim3_estimate = alignSim3(p_B, p_A);
   Transformation T_A_B_estimate = sim3_estimate.second;
   real_t scale_estimate = sim3_estimate.first;
 

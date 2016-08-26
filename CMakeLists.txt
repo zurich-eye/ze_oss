@@ -32,7 +32,6 @@ set(HEADERS
   include/ze/geometry/ransac_relative_pose.hpp
   include/ze/geometry/robust_cost.hpp
   include/ze/geometry/triangulation.hpp
-  include/ze/geometry/vogiatzis_filter.hpp
   )
 
 set(SOURCES
