@@ -8,9 +8,9 @@
 
 namespace ze {
 
-//! This data handle is composed of the slot index (in an array) plus a
-//! version number. The indexed array stores the version number of each object
-//! and can therefore tell if the object at the slot is at the same version we
+//! A template for a data handle that is composed of the slot index (in an array)
+//! plus a version number. The indexed array stores the version number of each
+//! object and can therefore tell if the object at the slot is at the same version we
 //! request.
 //! http://seanmiddleditch.com/data-structures-for-game-developers-the-slot-map/
 //! http://blog.molecular-matters.com/2013/05/17/adventures-in-data-oriented-design-part-3b-internal-references/

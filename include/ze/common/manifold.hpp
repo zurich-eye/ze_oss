@@ -2,8 +2,6 @@
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 
-// INSPIRED BY GTSAM
-
 #pragma once
 
 #include <functional>
@@ -13,9 +11,12 @@
 
 namespace ze {
 
-// Manifold traits are used for simplified computation of numerical derivatives
-// to verify the analytical ones. The retract method is further used in the
-// optimizer.
+//! Manifold traits define a retract (boxPlus), and local (boxMinus) operation
+//! for scalars, vectors, rotations and transformations. The traits are used for
+//! simplified computation of numerical derivatives to verify the analytical ones
+//! and in the optimizer. These traits are inspired by GTSAM and for rotations
+//! and transformation we use the same convention (updates are applied on the
+//! right hand side / in the body frame).
 template<typename T> struct traits;
 
 // -----------------------------------------------------------------------------

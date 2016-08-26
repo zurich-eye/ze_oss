@@ -104,7 +104,7 @@ struct InterpolatorLinear
 using DefaultInterpolator = InterpolatorLinear;
 
 
-//! a fixed size timed buffer templated on the number of entries
+//! A fixed size timed buffer templated on the number of entries.
 //! Opposed to the `Buffer`, values are expected to be received ORDERED in
 //! TIME!
 // Oldest entry: buffer.begin(), newest entry: buffer.rbegin()

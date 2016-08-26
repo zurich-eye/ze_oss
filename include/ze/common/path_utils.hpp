@@ -10,6 +10,9 @@
 
 #include <ze/common/string_utils.hpp>
 
+//! @file path_utils.hpp
+//! Utilities to check whether a path or file exists or to join paths.
+//! @todo: replace with std/boost::filesystem.
 namespace ze {
 
 inline bool fileExists(const std::string& filename)

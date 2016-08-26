@@ -8,6 +8,9 @@
 #include <ze/common/logging.hpp>
 #include <ze/common/types.hpp>
 
+//! @file random.hpp
+//! Sample integer and real-valued scalars from uniform or normal distributions.
+
 namespace ze {
 
 //------------------------------------------------------------------------------
@@ -132,6 +135,20 @@ normalDistribution(
   auto fun = deterministic ?
                std::bind(distribution, gen_deterministic) :
                std::bind(distribution, gen_nondeterministic);
+  return fun;
+}
+
+// ----------------------------------------------------------------------------
+//! Bernoulli distribution, returns true with probability `true_probability` and
+//! false with probability `1-true_probability`
+inline std::function<bool()> getRandomGeneratorBinary(
+    real_t true_probability)
+{
+  CHECK_GE(true_probability, real_t{0.0});
+  CHECK_LE(true_probability, real_t{1.0});
+  std::mt19937 generator(std::random_device{}());
+  std::bernoulli_distribution distribution(true_probability);
+  std::function<bool()> fun = std::bind(distribution, generator);
   return fun;
 }
 

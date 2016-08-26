@@ -11,6 +11,9 @@
 
 #include <ze/common/logging.hpp>
 
+//! @file string_utilties.hpp
+//! Various utilities to work with std::string.
+
 namespace ze {
 
 inline std::string& leftTrimString(std::string& s)

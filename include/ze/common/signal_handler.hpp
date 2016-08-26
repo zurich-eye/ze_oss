@@ -8,10 +8,8 @@
 
 namespace ze {
 
-/**
- * RAII-style signal handler that simply clears a flag when receiving SIGHUP,
- * SIGINT or SIGTERM
- **/
+//! RAII-style signal handler that simply clears a flag when receiving SIGHUP,
+//! SIGINT or SIGTERM.
 class SimpleSigtermHandler : Noncopyable
 {
 public:

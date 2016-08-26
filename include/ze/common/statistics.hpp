@@ -12,6 +12,9 @@
 
 #include <ze/common/stl_utils.hpp>
 
+//! @file statistics.hpp
+//! Various utilities, e.g. to compute statistical properties of vectors.
+
 namespace ze {
 
 //! Does not take const-ref because vector will be sorted.

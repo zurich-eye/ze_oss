@@ -6,6 +6,9 @@
 
 #include <ze/common/types.hpp>
 
+//! @file math.hpp
+//! Common math utilities.
+
 namespace ze {
 
 template<typename Scalar>

@@ -9,6 +9,9 @@
 #include <ze/common/types.hpp>
 #include <ze/common/logging.hpp>
 
+//! @file stl_utils.hpp
+//! Various utilities to work with the standard template library.
+
 namespace ze {
 
 // -----------------------------------------------------------------------------

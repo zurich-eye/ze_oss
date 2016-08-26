@@ -10,17 +10,13 @@
 
 #include <ze/common/types.hpp>
 
+//! @file matrix.hpp
+//! Common matrix utilities.
+
 namespace ze {
 
 // ----------------------------------------------------------------------------
 //! Skew symmetric matrix.
-inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
-{
-  return (Matrix3() <<
-           0.0f, -w(2),  w(1),
-           w(2),  0.0f, -w(0),
-          -w(1),  w(0),  0.0f).finished();
-}
 inline Matrix3 skewSymmetric(const real_t w1,
                              const real_t w2,
                              const real_t w3)
@@ -29,6 +25,11 @@ inline Matrix3 skewSymmetric(const real_t w1,
            0.0f, -w3,  w2,
            w3,  0.0f, -w1,
           -w2,  w1,  0.0f).finished();
+}
+
+inline Matrix3 skewSymmetric(const Eigen::Ref<const Vector3>& w)
+{
+  return skewSymmetric(w(0), w(1), w(2));
 }
 
 // ----------------------------------------------------------------------------

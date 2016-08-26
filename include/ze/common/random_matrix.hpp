@@ -8,6 +8,9 @@
 #include <ze/common/types.hpp>
 #include <ze/common/macros.hpp>
 
+//! @file random_matrix.hpp
+//! Sample matrices and vectors from uniform or normal distributions.
+
 namespace ze {
 
 //------------------------------------------------------------------------------

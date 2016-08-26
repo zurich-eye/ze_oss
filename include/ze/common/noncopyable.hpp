@@ -6,10 +6,8 @@
 
 namespace ze {
 
-/**
- * Denotes a class that cannot be copied.
- * Depending on the class semantics it may be possible to move the object.
- **/
+//! Denotes a class that cannot be copied.
+//! Depending on the class semantics it may be possible to move the object.
 class Noncopyable
 {
 public:

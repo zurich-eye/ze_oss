@@ -6,10 +6,8 @@
 
 namespace ze {
 
-/**
- * Denotes a class that can be copied but may not be assigned to
- * (e.g. because of reference member variables)
- **/
+//! Denotes a class that can be copied but may not be assigned to
+//! (e.g. because of reference member variables)
 class Nonassignable
 {
 public:

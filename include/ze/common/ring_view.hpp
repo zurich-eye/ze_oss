@@ -4,17 +4,15 @@
 
 #pragma once
 
-// On the subject of "API conventions for pushing into a fixed-size container",
-// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4416.pdf
-//
-
-// Goal: A non-owning ring-buffer class.
-// Since it's non-owning, it's not allowed to construct or destroy elements
-// of the underlying container. Push and pop are implemented as assignment and
-// bookkeeping, respectively.
-//
-// Original: https://github.com/Quuxplusone/ring_view
-// License: MIT
+//! A non-owning ring-buffer class.
+//! Since it's non-owning, it's not allowed to construct or destroy elements
+//! of the underlying container. Push and pop are implemented as assignment and
+//! bookkeeping, respectively.
+//!
+//! Original: https://github.com/Quuxplusone/ring_view
+//! License: MIT
+//! On the subject of "API conventions for pushing into a fixed-size container",
+//! see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4416.pdf
 
 #include <cassert>
 #include <cstddef>

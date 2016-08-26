@@ -11,7 +11,8 @@
 
 namespace ze {
 
-// The traits used for this functions are defined in common/manifold.h
+//! Template function to compute numerical derivatives. See unit tests for examples.
+//! The traits used for this functions are defined in common/manifold.h
 template<class Y, class X>
 typename Eigen::Matrix<real_t, traits<Y>::dimension, traits<X>::dimension>
 numericalDerivative(std::function<Y(const X&)> h, const X& x, real_t delta = 1e-5)

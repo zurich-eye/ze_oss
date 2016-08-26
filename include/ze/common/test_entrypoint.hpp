@@ -32,6 +32,9 @@
 #include <eigen-checks/gtest.h>
 #include <ze/common/types.hpp>
 
+//! @file test_entrypoint.hpp
+//! Macros for unit tests.
+
 // Floating-point precision checks.
 #ifdef ZE_SINGLE_PRECISION_FLOAT
 # define EXPECT_FLOATTYPE_EQ(a, b) EXPECT_FLOAT_EQ(a, b)
