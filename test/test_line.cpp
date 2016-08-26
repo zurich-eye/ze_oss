@@ -28,11 +28,11 @@ TEST(LineTests, testLineGeneration)
     // Check whether anchor point is really the closest point available.
     EXPECT_NEAR(direction.dot(anchor_point), 0.0, 1e-10);
     // Direction should be a normalized vector.
-    EXPECT_NEAR(direction.norm(), 1.0, 1e-15);
+    EXPECT_NEAR(direction.norm(), 1.0, 1e-12);
     // Anchor, start and end point should be on the line.
-    EXPECT_NEAR(lines[i].distanceToLine(anchor_point), 0.0, 1e-14);
-    EXPECT_NEAR(lines[i].distanceToLine(start.col(i)), 0.0, 1e-13);
-    EXPECT_NEAR(lines[i].distanceToLine(end.col(i)), 0.0, 1e-14);
+    EXPECT_NEAR(lines[i].distanceToLine(anchor_point), 0.0, 1e-12);
+    EXPECT_NEAR(lines[i].distanceToLine(start.col(i)), 0.0, 1e-12);
+    EXPECT_NEAR(lines[i].distanceToLine(end.col(i)), 0.0, 1e-12);
   }
 }
 

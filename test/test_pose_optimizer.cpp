@@ -25,6 +25,7 @@ void testPoseOptimizer(
     const PoseOptimizerFrameData& data,
     const std::string& description)
 {
+  SCOPED_TRACE(description);
   PoseOptimizerFrameDataVec data_vec = { data };
   Transformation T_B_W_estimate;
   auto fun = [&]()
@@ -41,7 +42,7 @@ void testPoseOptimizer(
   Transformation T_err = T_B_W * T_B_W_estimate.inverse();
   real_t pos_error = T_err.getPosition().norm();
   real_t ang_error = T_err.getRotation().log().norm();
-  EXPECT_LT(pos_error, 0.005);
+  EXPECT_LT(pos_error, 0.0075);
   EXPECT_LT(ang_error, 0.005);
   VLOG(1) << "ang error = " << ang_error;
   VLOG(1) << "pos error = " << pos_error;
