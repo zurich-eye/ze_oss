@@ -27,6 +27,8 @@ using CameraVector     = std::vector<Camera::Ptr>;
 using StereoIndexPair  = std::pair<uint8_t, uint8_t>;
 using StereoIndexPairs = std::vector<StereoIndexPair>;
 
+//! A camera rig is a set of rigidly attached cameras. The cameras are
+//! assumed intrinsically and extrinsically calibrated.
 class CameraRig
 {
 public:
@@ -42,7 +44,7 @@ public:
       const real_t stereo_min_fov_overlap = 0.7,
       const real_t stereo_min_baseline = 0.04);
 
-  //! @name Camera extrinsic calibration.
+  //! @name Camera extrinsic calibration: Pose of (B)ody/Imu in (C)amera frame.
   //! @{
   inline const Transformation& T_C_B(size_t camera_index) const
   {
