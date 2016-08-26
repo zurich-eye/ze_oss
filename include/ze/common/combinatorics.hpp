@@ -11,6 +11,10 @@
 
 #include <ze/common/types.hpp>
 
+//! @file combinatorics.hpp
+//! Some useful combinatorial functions. E.g. find matching index-entries in
+//! two vectors.
+
 namespace ze {
 
 // -----------------------------------------------------------------------------

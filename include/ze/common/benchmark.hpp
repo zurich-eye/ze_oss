@@ -14,6 +14,8 @@
 
 namespace ze {
 
+//! Benchmark utilty for unit tests. Runs a function many times and reports the
+//! minimum time. See test_benchmark.cpp for usage examples.
 template <typename Lambda>
 uint64_t runTimingBenchmark(
     const Lambda& benchmark_fun, uint32_t num_iter_per_epoch, uint32_t num_epochs,

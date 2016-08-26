@@ -12,6 +12,9 @@
 
 namespace ze {
 
+//! Reading of various csv trajectory file formats (e.g. swe, euroc, pose).
+//! Reads the result in a buffer that allows accessing the pose via the
+//! timestamps.
 class CSVTrajectory
 {
 public:

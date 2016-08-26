@@ -1,5 +1,8 @@
 #pragma once
 
+//! @file config.hpp.in
+//! Compile-time configuration via ze_cmake/ze_options module.
+
 #cmakedefine ZE_SINGLE_PRECISION_FLOAT
 #cmakedefine ZE_USE_BRISK
 #cmakedefine ZE_USE_GTSAM

@@ -6,6 +6,9 @@
 
 #include <memory>
 
+//! @file macros.hpp
+//! Common macros such as ZE_POINTER_TYPEDEFS, ZE_DELETE_COPY_ASSIGN, UNLIKELY.
+
 #define ZE_POINTER_TYPEDEFS(TypeName)               \
   typedef std::unique_ptr<TypeName> UniquePtr;      \
   typedef std::shared_ptr<TypeName> Ptr;            \

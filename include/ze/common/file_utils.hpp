@@ -9,6 +9,9 @@
 #include <ze/common/path_utils.hpp>
 #include <ze/common/string_utils.hpp>
 
+//! @file file_utils.hpp
+//! Utility to open read or write filestreams and do the appropriate checks.
+
 namespace ze {
 
 inline void openFileStream(

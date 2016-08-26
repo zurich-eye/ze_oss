@@ -11,6 +11,10 @@
 #include <glog/logging.h>
 #pragma diagnostic pop
 
+//! @file logging.hpp
+//! Includes Glog framework and defines macros for DEBUG_CHECK_* which
+//! can be compiled away.
+
 #define DEBUG_CHECK(val) CHECK(val)
 #define DEBUG_CHECK_NOTNULL(val) CHECK_NOTNULL(val)
 #define DEBUG_CHECK_EQ(val1, val2) CHECK_EQ(val1, val2)
