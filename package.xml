@@ -23,7 +23,5 @@
   <depend>visualization_msgs</depend>
   <depend>image_transport</depend>
   
-  <depend>gtsam_catkin</depend>
-  
   <test_depend>gtest</test_depend>
 </package>

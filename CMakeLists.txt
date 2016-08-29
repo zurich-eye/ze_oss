@@ -5,7 +5,6 @@ find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ze_setup)
-include(ze_gtsam)
 
 #############
 # LIBRARIES #
@@ -21,13 +20,6 @@ set(SOURCES
   src/viz_common.cpp 
   src/viz_ros.cpp
   )
-
-if(ZE_USE_GTSAM)
-  list(APPEND HEADERS include/ze/visualization/viz_gtsam.hpp)
-  list(APPEND SOURCES src/viz_gtsam.cpp)
-endif()
-
-message(STATUS "catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
 
 cs_add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
