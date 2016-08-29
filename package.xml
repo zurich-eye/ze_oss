@@ -15,7 +15,6 @@
   <depend>ze_cmake</depend>
   <depend>ze_common</depend>
   <depend>ze_splines</depend>
-  <depend>ze_data_provider</depend>
   <depend>ze_visualization</depend>
   <depend>minkindr</depend>
 
