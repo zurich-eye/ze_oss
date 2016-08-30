@@ -15,7 +15,6 @@ find_cuda()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs" )
 
 cs_add_executable(pangolin_load_test src/pangolin_load_test.cpp)
-target_link_libraries(pangolin_load_test)
 
 cs_install()
 cs_export()
