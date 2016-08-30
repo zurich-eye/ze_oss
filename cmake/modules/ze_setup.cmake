@@ -7,7 +7,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif()
 
-# threading
+
 find_package(Threads)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
@@ -36,6 +36,10 @@ if (CMAKE_VERSION VERSION_LESS "3.1" OR Boost_VERSION VERSION_LESS "1.56")
 else ()
   set (CMAKE_CXX_STANDARD 11)
 endif ()
+
+# RT library
+find_library(RT_LIBRARY NAMES rt librt)
+list(APPEND ZE_LIBRARIES ${RT_LIBRARY})
 
 # forward pure cmake dependencies if not added by <depend> in the package xml
 # but should be forwarded from/to the packages
