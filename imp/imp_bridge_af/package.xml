@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_bridge_af</name>
+  <description>
+    IMP bridge to ArrayFire
+  </description>
+  <version>0.1.0</version>
+  <license>ZE</license>
+
+  <maintainer email="matia.pizzoli@wysszurich.ch">Matia Pizzoli</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>ze_cmake</depend>
+  <depend>imp_core</depend>
+  <depend>imp_cu_core</depend>
+  <depend>imp_bridge_opencv</depend>
+  <depend>imp_3rdparty_cuda_toolkit</depend>
+  <depend>imp_features</depend>
+  <depend>arrayfire_catkin</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
