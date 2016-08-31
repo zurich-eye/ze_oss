@@ -1,0 +1,42 @@
+// Copyright (C) ETH Zurich, Wyss Zurich, Zurich Eye - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+
+#include <cmath>
+#include <utility>
+#include <ze/common/types.hpp>
+#include <ze/common/test_entrypoint.hpp>
+#include <ze/common/statistics.hpp>
+#include <ze/common/random_matrix.hpp>
+
+TEST(StatisticsTest, testMedian)
+{
+  Eigen::VectorXd x(5);
+  x << 1, 2, 3, 4, 5;
+  auto m = ze::median(x);
+  EXPECT_DOUBLE_EQ(m.first, 3);
+}
+
+TEST(StatisticsTest, testMeasurementCovariance)
+{
+  using namespace ze;
+
+  // Generate a random distribution matrix of known covariance.
+  Vector3 variances;
+  variances << 2.0, 3.0, 4.0;
+  RandomVectorSampler<3>::Ptr sampler(
+        RandomVectorSampler<3>::variances(variances));
+
+  MatrixX measurements(3, 100000);
+  for (int i = 0; i < 100000; ++i)
+  {
+    measurements.col(i) = sampler->sample();
+  }
+
+  Matrix3 cov = measurementCovariance(measurements);
+  Matrix3 ref = Vector3(2.0, 3.0, 4.0).asDiagonal();
+
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(cov, ref, 1e-1));
+}
+
+ZE_UNITTEST_ENTRYPOINT

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_common</name>
+  <version>0.1.4</version>
+  <description>
+    Common utilities for all ZE projects.
+  </description>
+  <maintainer email="christian.forster@WyssZurich.ch">Christian Forster</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>glog_catkin</depend>
+  <depend>gflags_catkin</depend>
+  <depend>eigen_catkin</depend>
+  <depend>eigen_checks</depend>
+  <depend>minkindr</depend>
+  <depend>ze_cmake</depend>
+  <depend>yaml_cpp_catkin</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
