@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_splines</name>
+  <version>0.1.4</version>
+  <description>
+    Basic spline package with Pose and N-Dimensional Spline
+  </description>
+  <maintainer email="luc.oth@wysszurich.ch">Luc Oth</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>glog_catkin</depend>
+  <depend>gflags_catkin</depend>
+  <depend>eigen_catkin</depend>
+  <depend>eigen_checks</depend>
+  <depend>minkindr</depend>
+  <depend>ze_cmake</depend>
+  <depend>ze_common</depend>
+  <depend>ze_visualization</depend>
+  <depend>PythonLibs</depend>
+  <depend>ze_matplotlib</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
