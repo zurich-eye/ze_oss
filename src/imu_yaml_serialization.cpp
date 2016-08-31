@@ -45,17 +45,10 @@ bool convert<std::shared_ptr<ze::ImuModel>>::decode(
     const YAML::Node a_noise_node = accelerometers["noise_model"];
     const YAML::Node a_intrinsic_node = accelerometers["intrinsic_model"];
 
-    std::string g_noise_type;
-    std::string g_intrinsic_type;
-    std::string a_noise_type;
-    std::string a_intrinsic_type;
-    if (!YAML::safeGet(g_noise_node, "type", &g_noise_type) ||
-        !YAML::safeGet(g_intrinsic_node, "type", &g_intrinsic_type) ||
-        !YAML::safeGet(a_noise_node, "type", &a_noise_type) ||
-        !YAML::safeGet(a_intrinsic_node, "type", &a_intrinsic_type))
-    {
-      throw std::runtime_error("Missing Gyroscope or Accelerometer types.");
-    }
+    std::string g_noise_type = extractChild<std::string>(g_noise_node, "type");
+    std::string g_intrinsic_type = extractChild<std::string>(g_intrinsic_node, "type");
+    std::string a_noise_type = extractChild<std::string>(a_noise_node, "type");
+    std::string a_intrinsic_type = extractChild<std::string>(a_intrinsic_node, "type");
 
     if (!internal::validateNoise(g_noise_type) ||
         !internal::validateNoise(a_noise_type) ||
@@ -135,22 +128,12 @@ std::shared_ptr<ze::ImuNoiseModel> internal::decodeNoise(const Node& node)
   }
 
   // gyroscopes:
-  std::string noise_type;
-  if (!YAML::safeGet(node, "type", &noise_type))
-  {
-    throw std::runtime_error("Missing Noise Model Type");
-  }
+  std::string noise_type = extractChild<std::string>(node, "type");
   if (noise_type == "white-brownian")
   {
-    real_t noise_density;
-    real_t bandwidth;
-    real_t bias_noise_density;
-    if (!YAML::safeGet(node, "noise_density", &noise_density)
-        || !YAML::safeGet(node, "bandwidth", &bandwidth)
-        || !YAML::safeGet(node, "bias_noise_density", &bias_noise_density))
-    {
-      throw std::runtime_error("Missing Gyroscope Noise Parameters");
-    }
+    real_t noise_density = extractChild<real_t>(node, "noise_density");
+    real_t bandwidth = extractChild<real_t>(node, "bandwidth");
+    real_t bias_noise_density = extractChild<real_t>(node, "bias_noise_density");
     return std::make_shared<ze::ImuNoiseWhiteBrownian>(
           noise_density, bandwidth, bias_noise_density);
   }
@@ -172,11 +155,7 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
   }
 
   // gyroscopes:
-  std::string type;
-  if (!YAML::safeGet(node, "type", &type))
-  {
-    throw std::runtime_error("Missing Intrinsic Model Type");
-  }
+  std::string type = extractChild<std::string>(node, "type");
 
   if (type == "calibrated")
   {
@@ -186,18 +165,10 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
            type == "scale-misalignment-gsensitivity" ||
            type == "scale-misalignment-size-effect")
   {
-    real_t delay;
-    real_t range;
-    Vector3 b;
-    Matrix3 M;
-
-    if (!YAML::safeGet(node, "delay", &delay)
-        || !YAML::safeGet(node, "range", &range)
-        || !YAML::safeGet(node, "b", &b)
-        || !YAML::safeGet(node, "M", &M))
-    {
-      throw std::runtime_error("Incomplete Intrinsic Parameters");
-    }
+    real_t delay = extractChild<real_t>(node, "delay");
+    real_t range = extractChild<real_t>(node, "range");
+    Vector3 b = extractChild<Vector3>(node, "b");
+    Matrix3 M = extractChild<Matrix3>(node, "M");
 
     if ("scale-misalignment" == type)
     {
@@ -206,22 +177,14 @@ typename std::shared_ptr<ze::ImuIntrinsicModel> internal::decodeIntrinsics(
     }
     else if ("scale-misalignment-gsensitivity" == type)
     {
-      Matrix3 Ma;
-      if (!YAML::safeGet(node, "Ma", &Ma))
-      {
-        throw std::runtime_error("Incomplete Intrinsic Parameters");
-      }
+      Matrix3 Ma = extractChild<Matrix3>(node, "Ma");
       return std::make_shared<
                        ze::ImuIntrinsicModelScaleMisalignmentGSensitivity>(
                          delay, range, b, M, Ma);
     }
     else if ("scale-misalignment-size-effect" == type)
     {
-      Matrix3 R;
-      if (!YAML::safeGet(node, "R", &R))
-      {
-        throw std::runtime_error("Incomplete Intrinsic Parameters");
-      }
+      Matrix3 R = extractChild<Matrix3>(node, "R");
       return std::make_shared<
                        ze::ImuIntrinsicModelScaleMisalignmentSizeEffect>(
                          delay, range, b, M, R);
@@ -248,12 +211,7 @@ bool convert<std::shared_ptr<ze::ImuRig>>::decode(
       return false;
     }
 
-    std::string label = "";
-    if (!YAML::safeGet<std::string>(node, "label", &label))
-    {
-      LOG(ERROR) << "Parsing ImuRig label failed.";
-      return false;
-    }
+    std::string label = extractChild<std::string>(node, "label");
 
     const Node& imus_node = node["imus"];
     if (!imus_node.IsSequence())
@@ -285,19 +243,9 @@ bool convert<std::shared_ptr<ze::ImuRig>>::decode(
         return false;
       }
 
-      ze::ImuModel::Ptr imu;
-      if (!YAML::safeGet(imu_node, "imu", &imu))
-      {
-        LOG(ERROR) << "Unable to retrieve imu " << i;
-        return false;
-      }
+      ze::ImuModel::Ptr imu = extractChild<ze::ImuModel::Ptr>(imu_node, "imu");
 
-      ze::Matrix4 T_B_S;
-      if (!YAML::safeGet(imu_node, "T_B_S", &T_B_S))
-      {
-        LOG(ERROR) << "Unable to get extrinsic transformation T_B_S for imu " << i;
-        return false;
-      }
+      ze::Matrix4 T_B_S = extractChild<ze::Matrix4>(imu_node, "T_B_S");
 
       imus.push_back(imu);
       T_B_Si.push_back(ze::Transformation(T_B_S).inverse());
