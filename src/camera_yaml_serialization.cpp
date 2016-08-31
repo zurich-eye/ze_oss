@@ -16,64 +16,54 @@ bool convert<std::shared_ptr<ze::Camera>>::decode(
     const Node& node, ze::Camera::Ptr& camera)
 {
   camera.reset();
-  try {
-    if(!node.IsMap())
-    {
-      LOG(ERROR) << "Unable to get parse the camera because the node is not a map.";
-      return false;
-    }
-
-    std::string camera_type;
-    int width, height;
-    ze::VectorX intrinsics;
+  if (!node.IsMap())
+  {
+    LOG(ERROR) << "Parsing Camera failed because node is not a map.";
+    return false;
+  }
+  try 
+  {
+    std::string camera_type = extractChild<std::string>(node, "type");
+    int width = extractChild<int>(node, "image_width");
+    int height = extractChild<int>(node, "image_height");
+    ze::VectorX intrinsics = extractChild<ze::VectorX>(node, "intrinsics");
     const YAML::Node distortion_config = node["distortion"];
-    std::string distortion_type;
-    ze::VectorX distortion_parameters;
+    std::string distortion_type = extractChild<std::string>(distortion_config, "type");
+    ze::VectorX distortion_parameters = extractChild<ze::VectorX>(distortion_config, "parameters");
 
-    if(!distortion_config)
+    if(camera_type == "pinhole" && distortion_type == "none")
     {
-      distortion_type = "none";
+      camera = std::make_shared<ze::PinholeCamera>(
+            width, height, ze::CameraType::Pinhole, intrinsics,
+            distortion_parameters);
     }
-
-    if(YAML::safeGet(distortion_config, "type", &distortion_type) &&
-       YAML::safeGet(distortion_config, "parameters", &distortion_parameters) &&
-       YAML::safeGet(node, "type", &camera_type) &&
-       YAML::safeGet(node, "image_width", &width) &&
-       YAML::safeGet(node, "image_height", &height) &&
-       YAML::safeGet(node, "intrinsics", &intrinsics))
+    else if(camera_type == "pinhole" && distortion_type == "radial-tangential")
     {
-      if(camera_type == "pinhole" && distortion_type == "none")
-      {
-        camera = std::make_shared<ze::PinholeCamera>(
-              width, height, ze::CameraType::Pinhole, intrinsics,
-              distortion_parameters);
-      }
-      else if(camera_type == "pinhole" && distortion_type == "radial-tangential")
-      {
-        camera = std::make_shared<ze::RadTanCamera>(
-              width, height, ze::CameraType::PinholeRadialTangential, intrinsics,
-              distortion_parameters);
-      }
-      else if(camera_type == "pinhole" && distortion_type == "equidistant")
-      {
-        camera = std::make_shared<ze::EquidistantCamera>(
-              width, height, ze::CameraType::PinholeEquidistant, intrinsics,
-              distortion_parameters);
-      }
-      else if(camera_type == "pinhole" && distortion_type == "fisheye")
-      {
-        camera = std::make_shared<ze::FovCamera>(
-              width, height, ze::CameraType::PinholeFov, intrinsics,
-              distortion_parameters);
-      }
-      else
-      {
-        LOG(FATAL) << "Camera model not yet supported.";
-      }
+      camera = std::make_shared<ze::RadTanCamera>(
+            width, height, ze::CameraType::PinholeRadialTangential, intrinsics,
+            distortion_parameters);
+    }
+    else if(camera_type == "pinhole" && distortion_type == "equidistant")
+    {
+      camera = std::make_shared<ze::EquidistantCamera>(
+            width, height, ze::CameraType::PinholeEquidistant, intrinsics,
+            distortion_parameters);
+    }
+    else if(camera_type == "pinhole" && distortion_type == "fisheye")
+    {
+      camera = std::make_shared<ze::FovCamera>(
+            width, height, ze::CameraType::PinholeFov, intrinsics,
+            distortion_parameters);
+    }
+    else
+    {
+      LOG(FATAL) << "Camera model not yet supported.";
     }
 
     if(node["label"])
+    {
       camera->setLabel(node["label"].as<std::string>());
+    }
   }
   catch(const std::exception& e)
   {
@@ -106,14 +96,9 @@ bool convert<std::shared_ptr<ze::CameraRig>>::decode(
       return false;
     }
 
-    std::string label = "";
-    if (!YAML::safeGet<std::string>(node, "label", &label))
-    {
-      LOG(ERROR) << "Parsing CameraRig label failed.";
-      return false;
-    }
+    std::string label = extractChild<std::string>(node, "label");
 
-    const Node& cameras_node = node["cameras"];
+    const Node cameras_node = node["cameras"];
     if (!cameras_node.IsSequence())
     {
       LOG(ERROR) << "Parsing CameraRig failed because 'cameras' is not a sequence.";
@@ -143,23 +128,19 @@ bool convert<std::shared_ptr<ze::CameraRig>>::decode(
         return false;
       }
 
-      ze::Camera::Ptr camera;
-      if (!YAML::safeGet(camera_node, "camera", &camera))
-      {
-        LOG(ERROR) << "Unable to retrieve camera " << i;
-        return false;
-      }
+      ze::Camera::Ptr camera = extractChild<ze::Camera::Ptr>(camera_node, "camera");
       cameras.push_back(camera);
 
-      ze::Matrix4 T_B_C, T_C_B;
-      if (YAML::safeGet(camera_node, "T_B_C", &T_B_C))
+      if (camera_node["T_B_C"])
       {
+        ze::Matrix4 T_B_C = extractChild<ze::Matrix4>(camera_node, "T_B_C");
         T_Ci_B.push_back(ze::Transformation(
                            ze::Quaternion::fromApproximateRotationMatrix(T_B_C.block<3,3>(0,0)),
                            T_B_C.block<3,1>(0,3)).inverse());
       }
-      else if (YAML::safeGet(camera_node, "T_C_B", &T_C_B))
+      else if (camera_node["T_C_B"])
       {
+        ze::Matrix4 T_C_B = extractChild<ze::Matrix4>(camera_node, "T_C_B");
         T_Ci_B.push_back(ze::Transformation(
                            ze::Quaternion::fromApproximateRotationMatrix(T_C_B.block<3,3>(0,0)),
                            T_C_B.block<3,1>(0,3)));
