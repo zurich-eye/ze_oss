@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_3rdparty_cuda_toolkit</name>
+  <version>0.1.4</version>
+  <description>catkin package for cuda helper stuff shiped with cuda samples</description>
+  <license>See cuda distribution</license>
+
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>ze_cmake</depend>
+</package>
+  
