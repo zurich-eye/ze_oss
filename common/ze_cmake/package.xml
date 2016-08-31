@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ze_cmake</name>
+  <version>0.1.4</version>
+  <description>
+    CMake configuration, scripts and macros common for common ZE usage.
+  </description>
+  <maintainer email="christian.forster@WyssZurich.ch">Christian Forster</maintainer>
+  <maintainer email="manuel.werlberger@WyssZurich.ch">Manuel Werlberger</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+</package>
