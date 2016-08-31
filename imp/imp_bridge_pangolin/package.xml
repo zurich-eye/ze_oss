@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_bridge_pangolin</name>
+  <version>0.1.4</version>
+  <description>The imp_bridge_pangolin package</description>
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+  <license>TODO</license>
+  <url type="repository">https://github.com/mwerlberger/imp/</url>
+
+
+  <author email="code@werlberger.org">Manuel Werlberger</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>ze_cmake</depend>
+  <depend>imp_core</depend>
+  <depend>pangolin_catkin</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
