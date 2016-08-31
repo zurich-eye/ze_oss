@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>imp_app_pangolin_example</name>
+  <description>
+    Examples on how to use pangolin
+  </description>
+  <version>0.1.4</version>
+  <license>ZE</license>
+
+  <maintainer email="code@werlberger.org">Manuel Werlberger</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>glog_catkin</depend>
+  <depend>ze_cmake</depend>
+  <depend>imp_core</depend>
+  <depend>imp_bridge_pangolin</depend>
+
+  <test_depend>gtest</test_depend>
+</package>
