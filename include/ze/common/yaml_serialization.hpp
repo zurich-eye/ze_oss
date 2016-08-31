@@ -43,6 +43,8 @@ T extractChild(const YAML::Node& node, const std::string& key)
  * http://eigen.tuxfamily.org/dox-devel/TutorialMatrixClass.html
  * 
  * see yaml-cpp for how the extraction of complex types works
+ *
+ * Inspired by ETHZ-ASL ASLAM_CV_COMMON
  */
 template <class Scalar, int A, int B, int C, int D, int E>
 struct convert<Eigen::Matrix<Scalar, A, B, C, D, E> >
