@@ -19,7 +19,7 @@ set(SOURCES
   )
 
 set(CU_HDRS
-  include/imp/cu_imgproc/image_pyramid.cuh
+  include/imp/cu_imgproc/image_pyramid.hpp
   include/imp/cu_imgproc/cu_reduce.cuh
   include/imp/cu_imgproc/cu_resample.cuh
   include/imp/cu_imgproc/cu_image_filter.cuh
@@ -35,6 +35,7 @@ set(CU_HDRS
   )
 
 set(CU_SRCS
+  src/image_pyramid.cpp
   src/cu_reduce.cu
   src/cu_resample.cu
   src/cu_median3x3_filter.cu

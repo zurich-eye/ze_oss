@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <imp/cu_core/cu_image_gpu.cuh>
-#include <imp/cu_imgproc/image_pyramid.cuh>
+#include <imp/cu_imgproc/image_pyramid.hpp>
 #include <imp/cu_core/cu_pinhole_camera.cuh>
 #include <imp/cu_core/cu_se3.cuh>
 #include <imp/cu_core/cu_matrix.cuh>

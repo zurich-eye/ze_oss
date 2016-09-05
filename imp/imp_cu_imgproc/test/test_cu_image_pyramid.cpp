@@ -9,7 +9,7 @@
 #include <imp/core/image.hpp>
 #include <imp/core/image_raw.hpp>
 #include <imp/bridge/opencv/cu_cv_bridge.hpp>
-#include <imp/cu_imgproc/image_pyramid.cuh>
+#include <imp/cu_imgproc/image_pyramid.hpp>
 
 DEFINE_bool(visualize, false, "Show input images and results");
 
